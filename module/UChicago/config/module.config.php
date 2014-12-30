@@ -23,6 +23,7 @@ $config = array(
                     $sm->get('VuFind\HMAC'), $sm->get('VuFind\Config')->get('config')
                 );
             },
+            'VuFind\Mailer' => 'UChicago\Mailer\Factory',
         ),
     ),//service_manager
     'vufind' => array(
