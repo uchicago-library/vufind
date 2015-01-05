@@ -3,6 +3,9 @@
 
 .container {
     background: rgb(255, 255, 255);
+    @media (max-width: @screen-sm) {
+        background:@body-bg;
+    }
 }
 
 .bulkActionButtons {
@@ -11,6 +14,27 @@
 }
 
 /*General header*/
+.navbar-brand {
+    font-family: @headings-font-family;
+    font-weight: normal;
+    @media (min-width: @screen-sm) {
+        background: transparent url(../../images/ucl_catalog_logo.png) 0 0 no-repeat;
+        margin: 0;
+        height: 86px;
+        overflow: hidden;
+        text-indent: -9999px;
+        width: 433px;
+    }
+}
+
+.tagline {
+    font-family: @tagline;
+}
+
+.navbar-header {
+    float:none;
+}
+
 .navbar {
     background-color:@maroon;
     border-top:7px solid @dark-maroon;
@@ -30,10 +54,14 @@
 .navbar > ul {
     display:inline;
     float:right;
+    background:@dark-maroon;
+    padding:0 8px 5px 8px;
+    @media (max-width: @screen-sm) {
+        display:none;
+    }
 }
 
 .navbar > ul > li {
-    background:@dark-maroon;
     padding:5px 0;
     font-size:@tiny;
 }
@@ -47,53 +75,96 @@
 }
 
 .navbar > ul > li:after {
-    content:" | ";
+    content:"\00a0\00a0|\00a0\00a0";
 }
 
 .navbar > ul > li:last-child:after {
-    content:"";
+    content:" ";//necessary
+}
+
+.container { /*box-shadow, seeps through, can't be used :-(*/
+    /*@media (min-width: @screen-sm) { 
+        box-shadow:0 4px 8px #111;
+        box-shadow:0px 2px 16px rgba(0,0,0,.15);
+    }*/
 }
 
 body > .main > .container {
-    padding-top:20px;
+    @media (min-width: @container-desktop) { 
+       padding-top: 10px; 
+    }   
+    @media (min-width: @screen-lg) { 
+       padding-top: 75px; 
+    }
+}
+
+.breadcrumb {
+    display:none;
 }
 
 /*Dark maroon top nav*/
 #header-collapse {
     background:@dark-maroon;
-    margin: 60px -15px 0 -15px;
+    @media (min-width: @screen-sm) {
+        margin: 0 -15px 0 -15px;
+    }
 }
 .navbar-nav > li > a { 
-    padding: 5px 5px 10px 5px;
+    padding: 5px 15px 10px 15px;
 }
 
 /*Grey search bar*/
-.visible-lg {
-    #gradient.vertical(#7b7b7b, #666, 0, 100%);
-    padding: 6px 0;
-    border-radius: 0;
-    border:none;
-    margin: 90px 0 0 -16px;
+body > header > .container > section.visible-lg,
+.nav.searchbox.hidden-lg {
+    @media (min-width: @screen-sm) {
+        #gradient.vertical(#7b7b7b, #666, 0, 100%);
+        border-radius: 0;
+        border:none;
+    }
+}
+body > header > .container > section.visible-lg { //Fullscreen
     position:absolute;
+    margin: 31px 0 0 -16px;
+    padding: 6px 0;
     width:1170px;
+}
+
+.nav.searchbox.hidden-lg {
+    position:relative;
+    top:-3px;
+    @media (min-width: @screen-sm) {
+        margin:0 -15px;
+        padding: 4px 0;
+    }
 }
 .visible-lg > .navbar-left {
     float:none !important;
 }
 
-.visible-lg a.btn {
+/*Forms*/
+#searchForm .form_control {
+    width:200px;
+}
+
+#searchForm a.btn {
     color:@light-link;
     font-size:@tiny;
     text-shadow:1px 1px 2px rgba(0, 0, 0, 0.6);
+    @media (max-width: @screen-sm) {
+        display:none;
+    }
 }
 #searchForm .twitter-typeahead,
 #searchForm_type.form-control {
     margin-right:15px;
+    @media (max-width: @screen-sm) {
+        margin:0 0 10px 0; 
+    }
 }
-
-/*Forms*/
-#searchForm .form_control {
-    width:200px;
+#searchForm_lookfor.form-control {
+    @media (min-width: @container-desktop) {
+        width:250px;
+    }
 }
 
 /*Footer*/
@@ -114,7 +185,44 @@ footer li {
 }
 
 // Buttons
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary.active,
+.btn-primary.disabled,
+.btn-primary[disabled] {
+    color: @light-link;
+    background-color: @dark-maroon;
+    *background-color: #4a0000;
+    border-color:@dark-maroon;
+    background-image:none;
+}
+
+.btn-primary:active,
+.btn-primary.active {
+    background-color: #300000 \9;
+    background-image:none;
+}
+
 .btn-primary {
     #gradient.vertical(@maroon, @dark-maroon);
-    border-color: #630000 #630000 #170000;
+    @media (max-width: @screen-sm) {
+        #gradient.vertical(lighten(@gray-lighter, 5%), lighten(@gray-light, 10%));
+        border:1px solid lighten(@gray-light, 5%);
+        color:@gray-dark;
+    }
 }
+.btn-primary:hover, 
+.btn-primary:active {    
+    @media (max-width: @screen-sm) {
+        #gradient.vertical(lighten(@gray-lighter, 0%), lighten(@gray-light, 5%));
+        border:1px solid lighten(@gray-light, 10%);
+        color:@gray-dark;
+    }
+}
+#searchForm > .btn {
+    @media (max-width: @screen-sm) {
+        width:100%;
+    }
+}
+
+
