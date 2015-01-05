@@ -44,7 +44,38 @@ $config = array(
                         return $driver;
                     },
                 ),
-            ),
+            ),//recorddriver
+            'recordtab' => array(
+                'factories' => array(
+                    'holdingsils' => function ($sm) {
+                        // If VuFind is configured to suppress the
+                        // holdings tab when the
+                        // ILS driver specifies no holdings, we need to
+                        // pass in a connection
+                        // object:
+                        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+                        if (isset($config->Site->hideHoldingsTabWhenEmpty)
+                            && $config->Site->hideHoldingsTabWhenEmpty
+                        ) { 
+                            $catalog = $sm->getServiceLocator()->get('VuFind\ILSConnection');
+                        } else {
+                            $catalog = false;
+                        }   
+                        return new \UChicago\RecordTab\HoldingsILS($catalog);
+                    },  
+                ),  
+            ),//recordtab
+            'resolver_driver' => array(
+                'factories' => array(
+                    'sfx' => function ($sm) {
+                        return new \UChicago\Resolver\Driver\Sfx(
+                            $sm->getServiceLocator()->get('VuFind\Config')->get('config')->OpenURL->url,
+                            $sm->getServiceLocator()->get('VuFind\Http')
+                                ->createClient()
+                        );
+                    },
+                ),
+            ),//resolver_driver
         ),
     ),
 );
