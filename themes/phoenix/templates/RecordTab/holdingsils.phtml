@@ -1,0 +1,339 @@
+<?
+    // Set up convenience variables:
+    $account = $this->auth()->getManager();
+    $user = $account->isLoggedIn();
+    $holdings = $this->driver->getRealTimeHoldings();
+    $openUrl = $this->driver->openURLActive('holdings') ? $this->driver->getOpenURL() : false;
+    $offlineMode = $this->ils()->getOfflineMode();
+    $summaryHoldings = false; 
+
+    // Account for replace_other_urls setting
+    $urls = ($openUrl && $this->driver->replaceURLsWithOpenURL()) ? array() : $this->record($this->driver)->getLinkDetails();
+    $hathiLink = $this->HathiLink()->getHathiLink();
+    $hasFullTextOnline = $this->HathiLink()->hasFullTextOnline($holdings);
+    $hasRelatedTextOnline = $this->HathiLink()->hasFullTextOnline($holdings, $related=true);
+    $previews = $this->record($this->driver)->getPreviews();
+
+    // Whitelist for things without a barcode that need to display when a barcode isn't present.
+    $itemStatusWhitelist = array('INPROCESS', 'ONORDER');
+    
+
+    // Set page title.
+    $this->headTitle($this->translate('Holdings') . ': ' . $this->driver->getBreadcrumb()); 
+?>
+<? if ($offlineMode == "ils-offline"): ?>
+  <div class="sysInfo">
+    <h2>Item Information Temporarily Cannot be Displayed</h2>
+    <p>This includes location, call number, availability, and serial holdings.</p>
+    <p>These outages are typically brief. Please try reloading this page
+in a few minutes. The Library apologizes and appreciates your patience
+during our transition to our new catalog system.</p>
+  </div>
+<? endif; ?>
+<? if (($this->ils()->getHoldsMode() == 'driver' && !empty($holdings)) || $this->ils()->getTitleHoldsMode() == 'driver'): ?>
+  <? if ($account->loginEnabled() && $offlineMode != 'ils-offline'): ?>
+    <? if (!$user): ?>
+      <div class="info">
+        <a href="<?=$this->currentPath()?>?login=true&amp;catalogLogin=true"><?=$this->transEsc("Login")?></a> <?=$this->transEsc("hold_login")?>
+      </div>
+    <? elseif (!$user->cat_username): ?>
+      <div class="info">
+        <?=$this->transEsc("hold_profile_html", array('%%url%%' => $this->currentPath() . '?catalogLogin=true'))?>
+      </div>
+    <? endif; ?>
+  <? endif; ?>
+<? endif; ?>
+<? $holdingTitleHold = $this->driver->tryMethod('getRealTimeTitleHold'); if (!empty($holdingTitleHold)): ?>
+    <a class="service holdPlace" href="<?=$this->recordLink()->getHoldUrl($holdingTitleHold)?>"><?=$this->transEsc('title_hold_place')?></a>
+<? endif; ?>
+
+<? //if (!empty($urls) || $openUrl): ?>
+  <!--<h3><//?=$this->transEsc("Internet")?></h3>-->
+  <? //if (!empty($urls)): ?>
+    <? //foreach ($urls as $current): ?>
+      <!--<a href="<?//=$this->escapeHtml($this->proxyUrl($current['url']))?>"><?//=$this->escapeHtml($current['desc'])?></a><br/>-->
+    <? //endforeach; ?>
+  <? //endif; ?>
+  <? //if ($openUrl): ?><?//=$this->openUrl($openUrl);?><? //endif; ?>
+<? //endif; ?>
+
+<? // No Fulltext e-holdings
+   if (!$hasFullTextOnline): ?> 
+  <? if ($openUrl || $hathiLink) : ?>
+    <div class="holdings-unit" id="eholdings">
+        <h3><?=$this->transEsc('Online')?></h3>
+        <br /><strong><?=$this->transEsc("Available via:")?></strong> 
+        <?= '<br/>' . $hathiLink?>
+        <? if ($openUrl): ?><?=$this->openUrl($openUrl);?><? endif; ?>
+    </div>
+  <? endif; ?>
+<? endif; ?>
+
+<? foreach ($holdings as $location => $holding): ?>
+  <div class="holdings-unit" <?=($location == 'FullText' || $location == 'Related' ? 'id="eholdings"' : null) ?>>
+  <? // Create headers for e-holdings and/or locatgions
+    if ($location == 'FullText' or $location == 'Related'):?>
+      <h3><?=$this->transEsc('Online')?></h3>
+  <? else: ?>
+      <h3><?=$this->transEsc($location)?></h3>
+  <? endif; ?>
+  <? 
+    /**
+     * Get the first barcode to pass to the map links. 
+     */
+    $first_barcode = ''; 
+    foreach($holding['items'] as $item) {
+        if (!empty($item['barcode'])){
+            $first_barcode = $item['barcode'];
+            break;
+        }
+    }
+  ?>
+<span class="maplink"><?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $first_barcode)?></span>
+<? if ($location == 'FullText'): ?>
+  <?//fulltext eholding in array or openUrl?>
+  <? if ($hasFullTextOnline || $openUrl): ?>
+    <br /><strong><?=$this->transEsc("Available via:")?></strong>
+      <? foreach($holding['items'] as $link): ?>
+            <a href="<?=$this->proxyUrl($link['eHolding']['uri'])?>" class="fulltext e-holding"><?=$this->transEsc("Full text online")?> <i class="icon-laptop"></i></a> <?//=$link['eHolding']['uri'])?>
+      <? endforeach;?>
+  <? endif;?>
+  <? if ($hathiLink) : ?>
+    <?=$hathiLink?>
+    <?$hathiLinkFlag = true;?>
+  <? endif; ?>
+  <? if ($openUrl): ?><?=$this->openUrl($openUrl);?><? endif; ?>
+<? endif; ?>
+<? if ($location == 'Related'): ?>
+  <?//related non-fulltext eholding in array or openUrl?>
+  <? if ($hasRelatedTextOnline || $openUrl): ?>
+    <br /><strong><?=$this->transEsc("Related Links:")?></strong>
+      <? foreach($holding['items'] as $link): ?>
+            <a href="<?=$this->proxyUrl($link['eHolding']['uri'])?>" class="fulltext e-holding"><?=(preg_match("/\/scrc\/ead/i", $link['eHolding']['uri']) ? $this->transEsc("Finding Aid") : $this->transEsc("Limited Preview"))?> <i class="icon-laptop"></i></a> <?//=$link['eHolding']['uri'])?>
+      <? endforeach;?>
+  <? endif;?>
+<? endif; ?>
+<table cellpadding="2" cellspacing="0" border="0" class="citation" summary="<?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($location)?>">
+  <? $callNos = $this->tab->getUniqueCallNumbers($holding['items'], $display=true); if (!empty($callNos)): ?>
+  <? //$callNosDisplay = $this->tab->getUniqueCallNumbers($holding['items'], $display=true); 
+//print_r($callNos);
+?>
+  <tr>
+    <th><?=$this->transEsc("Call Number")?>: </th>
+    <td>
+      <? 
+foreach ($callNos['display'] as $numKey => $callNo): ?>
+        <?=$this->escapeHtml($callNo)?>
+        <a href="<?= $this->url('home')?>alphabrowse/results?source=lcc&from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
+           class="ablink">(Browse the Shelves)</a><br/>
+      <? endforeach; ?>
+    </td>
+  </tr>
+  <? endif; ?>
+  <? if (!empty($holding['holdingsNotes'])): ?>
+  <? $summaryHoldings = true; ?>
+  <tr>
+    <th><?=$this->transEsc("Holdings Note")?>: </th>
+    <td>
+      <? foreach ($holding['holdingsNotes'] as $key => $data): ?>
+        <?=$this->escapeHtml($data)?><br/> 
+      <? endforeach; ?>
+    </td>
+  </tr>
+  <? endif; ?>
+  <? if (!empty($holding['libraryHas'])): ?>
+  <? $summaryHoldings = true; ?>
+  <tr>
+    <th><?=$this->transEsc("Library has")?>: </th>
+    <td>
+      <? foreach ($holding['libraryHas'] as $key => $data): ?>
+        <?=$this->escapeHtml($data)?><br/> 
+      <? endforeach; ?>
+    </td>
+  </tr>
+  <? endif; ?>
+  <? if (!empty($holding['supplements'])): ?>
+  <? $summaryHoldings = true; ?>
+  <tr>
+    <th><?=$this->transEsc("Supplements")?>: </th>
+    <td>
+      <? $counter = 0?>
+      <? foreach ($holding['supplements'] as $key => $data): ?>
+        <?if(!empty($data)):?>
+            <?=$this->escapeHtml($data)?>
+            <? if ($counter > 0): ?><br/><?endif;?>
+            <?=($counter % 2 == 0 ? '&nbsp;&nbsp;&nbsp;&nbsp;' : '')?>
+            <?$counter++?> 
+        <? endif; ?>
+      <? endforeach; ?>
+    </td>
+  </tr>
+  <? endif; ?>
+  <? if (!empty($holding['indexes'])): ?>
+  <? $summaryHoldings = true; ?>
+  <tr>
+    <th><?=$this->transEsc("Indexes")?>: </th>
+    <td>
+      <? $counter = 0?>
+      <? foreach ($holding['indexes'] as $key => $data): ?>
+        <?if(!empty($data)):?>
+            <?=$this->escapeHtml($data)?>
+            <?=$count < count($holding['indexes']) - 1 ? '<br/>' : ''?>
+            <?=($counter % 2 == 0 ? '&nbsp;&nbsp;&nbsp;&nbsp;' : '')?>
+            <?$counter++?> 
+        <? endif; ?>
+      <? endforeach; ?>
+    </td>
+  </tr>
+  <? endif; ?>
+  <? if (!empty($holding['unbound'])): ?>
+  <tr>
+    <th><?=$this->transEsc("Recent issues")?>: </th>
+    <td>
+      <? foreach ($holding['unbound'] as $key => $data): ?>
+        <?=$this->escapeHtml($data)?><br/>
+      <? endforeach; ?>
+    </td>
+  </tr>
+  <? endif; ?> 
+  <? if (!empty($holding['notes'])): ?>
+  <? $summaryHoldings = true; ?>
+  <tr>
+    <th><?=$this->transEsc("Notes")?>: </th>
+    <td>
+      <? foreach ($holding['notes'] as $key => $data): ?>
+        <?=$this->escapeHtml($data)?><br/> 
+      <? endforeach; ?>
+    </td>
+  </tr>
+  <? endif; ?>
+  <? if (!empty($holding['summary'])): ?>
+  <? $summaryHoldings = true; ?>
+  <tr>
+    <th><?=$this->transEsc("Volume Holdings")?>: </th>
+    <td>
+      <? $counter = 0?>
+      <? foreach ($holding['summary'] as $current): ?>
+        <? if (!empty($current)): ?>
+          <?=$this->escapeHtml($current)?><br/>
+          <?=($counter % 2 == 0 ? '&nbsp;&nbsp;&nbsp;&nbsp;' : '')?>
+          <?$counter++?>
+        <?endif;?>
+      <? endforeach; ?>
+    </td>
+  </tr>
+  <? endif; ?> 
+  <tr class=""><td <?=($summaryHoldings == true ? 'class="ajaxitems hide"' : '');?> colspan="2">
+  <table class="citation items">
+  <tbody>
+  <? foreach ($holding['items'] as $row): ?>
+    <? $check = (isset($row['check']) && $row['check']); ?>
+    <? if ((isset($row['barcode']) && $row['barcode'] != "") || (in_array($row['status'], $itemStatusWhitelist)) ): ?>
+      <tr vocab="http://schema.org/" typeof="Offer">
+        <th><?=$this->transEsc("Copy")?> <?=$this->escapeHtml($row['number'])?></th>
+        <td>
+          <? if ($row['reserve'] == "Y"): ?>
+            <link property="availability" href="http://schema.org/InStoreOnly" />
+            <?=$this->transEsc("On Reserve - Ask at Circulation Desk")?><br />
+          <? endif; ?>
+          <? if (isset($row['use_unknown_message']) && $row['use_unknown_message']): ?>
+            <span class="unknown"><?=$this->transEsc("status_unknown_message")?></span>
+          <? else: ?>
+            <div>
+            <? if ($row['availability']): ?>
+              <? /* Begin Available Items (Holds) */ ?>
+               <link property="availability" href="http://schema.org/InStock" />
+               <? if (isset($row['itemTypeCode']) && $row['itemTypeCode'] != "stks"):?>
+                  <span>Loan period: <?=$row['itemTypeName']?>&nbsp;</span>
+               <?endif;?>
+               <? /*Manual override of the display for items AVAILABLE-AT-MANSUETO*/ ?>
+               <span class="available service"><?=$this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'AVAILABLE' : $row['status'])?></span>                
+               <?=$this->ServiceLinks()->scanAndDeliver($row)?>
+               <?=$this->ServiceLinks()->asr($row)?>
+               <?=$this->ServiceLinks()->dllStorage($row)?>
+               <?=$this->ServiceLinks()->cantFindIt($row)?>
+               <?=$this->ServiceLinks()->debugging($row)?>
+
+            <? else: ?>
+              <? /* Begin Unavailable Items (Recalls) */ ?>
+              <? if ($row['status'] == 'ANAL'): ?>
+                 To check availability
+                 <? $c = array_shift(explode(' ', $this->driver->getCallNumber())); ?>
+                 <a href="/vufind/alphabrowse/results?from=<?=$c;?>&source=lcc">consult the series record</a>.
+              <? else: ?>
+              <span class="checkedout service"><?=$this->transEsc($row['status'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
+              <? if (isset($row['returnDate']) && $row['returnDate']): ?> <span class="statusExtra"><?=$this->escapeHtml($row['returnDate'])?></span><? endif; ?>
+              <? if ($row['status'] == 'LOANED' && isset($row['duedate']) && $row['duedate']): ?>
+              <? 
+                 if ($row['duedate'] == 'Indefinite') {
+                    $due = 'Indefinite';
+                 } else {
+                    if (strpos($row['location'], 'Reserve') !== false || strpos($row['location'], 'TECHB@R') !== false) {
+                       $due = date("F j, g:ia", strtotime($row['duedate']));
+                    } else {
+                       $due = date("F j, Y", strtotime($row['duedate']));
+                    }
+                 } 
+              ?>
+              <span class="statusExtra"><?=$this->transEsc("Due")?>: <?=$this->escapeHtml($due); ?></span>
+              <? endif; ?>
+              <? if (isset($row['requests_placed']) && $row['requests_placed'] > 0): ?>
+                <span><?=$this->transEsc("Requests")?>: <?=$this->escapeHtml($row['requests_placed'])?></span>
+              <? endif; ?>
+              <? endif; ?>
+              <?=$this->ServiceLinks()->asr($row)?>
+              <?=$this->ServiceLinks()->borrowDirect($row)?>
+              <?=$this->ServiceLinks()->uBorrow($row)?>
+              <?=$this->ServiceLinks()->debugging($row)?>
+              <? if (isset($row['link']) && $row['link'] && !$row['claimsReturned']): ?>
+                <!--<a class="service holdPlace<?//=$check ? ' checkRequest' : ''?>" href="<?//=$this->recordLink()->getHoldUrl($row['link'])?>"><span><?//=$this->transEsc($check ? "Check Recall" : "Recall This")?></span></a>-->
+                <?=$this->ServiceLinks()->recall($row)?> 
+              <? endif; ?>
+            <? endif; ?>
+              <? /* Begin Items that are either Available or Unavailable */ ?>
+                <?=$this->ServiceLinks()->aeon($row)?> 
+            </div>
+          <? endif; ?>
+          <? /* Embed item structured data: library, barcode, call number */ ?>
+          <? if ($row['location']): ?>
+            <meta property="seller" content="<?=$this->escapeHtml($row['location'])?>" />
+          <? endif; ?>
+          <? if ($row['barcode']): ?>
+            <meta property="serialNumber" content="<?=$this->escapeHtml($row['barcode'])?>" />
+          <? endif; ?>
+          <? if ($row['callnumber']): ?>
+            <meta property="sku" content="<?=$this->escapeHtml($row['callnumber'])?>" />
+          <? endif; ?>
+          <? /* Declare that the item is to be borrowed, not for sale */ ?>
+            <link property="businessFunction" href="http://purl.org/goodrelations/v1#LeaseOut" />
+            <link property="itemOffered" href="#record" />
+            
+      <?='<span class="item-note">' . $row['itemNotes'] . '</span>'?>
+        </td>
+      </tr>
+    <? endif; ?>   
+  <? endforeach; ?>
+<? if ($summaryHoldings == true): ?>
+</td>
+</tr>
+<?endif;?>
+</tbody>
+</table>
+</table>
+</div><!--/.holdings-unit-->
+<? endforeach; ?>
+<? $history = $this->driver->getRealTimeHistory(); ?>
+<? if (is_array($history) && !empty($history)): ?>
+<h3><?=$this->transEsc("Most Recent Received Issues")?></h3>
+<ul>
+  <? foreach ($history as $row): ?>
+    <li><?=$this->escapeHtml($row['issue'])?></li>
+  <? endforeach; ?>
+</ul>
+<? endif; ?>
+
+<? /* Google, Hathi, and Open Library previews are stashed and hidden
+      here ath the bottom. If they become visible, preview.js moves 
+      them into the proper position. This is done inside the 
+      applyPreviewUrl in preview.js.*/?>
+<?='<div class="previews">' . $previews . '</div>'?>
