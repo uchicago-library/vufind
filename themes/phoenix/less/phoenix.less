@@ -166,6 +166,16 @@ body > header > .container > section.visible-lg { //Fullscreen
         width:250px;
     }
 }
+.form-vertical .form-control {
+    max-width: 100%;
+}
+
+.modal-body.in[style="padding-right: 0px;"] { /*Put "padding" back that twitter bootstrap removes via inline styles (bugfix for modal windows)*/
+    margin-right: @modal-inner-padding;
+}
+.modal-body.in[style="padding-left: 0px;"] { /*Put "padding" back that twitter bootstrap removes via inline styles (bugfix for modal windows)*/
+    margin-left: @modal-inner-padding;
+}
 
 /*Footer*/
 footer .container {

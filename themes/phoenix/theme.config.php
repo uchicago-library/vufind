@@ -12,6 +12,7 @@ return array(
             'FeedbackLink' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\FeedbackLink();
             },
+            'knowledgeTracker' => '\UChicago\View\Helper\Phoenix\Factory::getKnowledgeTracker',
         )    
     ),
 );
