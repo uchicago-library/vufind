@@ -47,12 +47,6 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
      *
      * @return array
      */
-/*
-    JEJ- This is overriding the getUniqueCallNumbers() function from the
-parent class, but I don't understand why. It's erroring out right now
-because it returns an associative array. I'm commenting this out for the 
-time being.
-
     public function getUniqueCallNumbers($items, $display=false)
     {
         $callNos = array();
@@ -66,5 +60,4 @@ time being.
         sort($callNos['sort']);
         return array('display' => array_unique($callNos['display']), 'sort' => $callNos['sort']);
     }
-*/
 }
