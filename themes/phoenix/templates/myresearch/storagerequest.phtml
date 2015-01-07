@@ -1,0 +1,72 @@
+<?
+    // Set up page title:
+    $this->headTitle('Mansueto Requests');
+
+?>
+<div class="<?=$this->layoutClass('mainbody')?>">
+    <h3>Mansueto Requests</h3>
+    <?=$this->flashmessages()?>
+
+    <? if (empty($this->storagerequests)): ?>
+        <p>You do not have any Mansueto requests waiting to be
+submitted. For the status of requested Mansueto items, check <a
+href="/vufind/MyResearch/Holds">Holds and Recalls</a>.</p>
+    <? else: ?>
+	        <form action='/vufind/MyResearch/Storagerequest' method='post'>
+            <p>
+            <span id="asrselectallornone"></span>
+	        <button name='action' type='submit' value='remove'>Remove selected items</button>
+            </p>
+	
+		    <table class="datagrid">
+		        <tr>
+				    <th/>
+			        <th>Title</th>
+				    <th>Call #</th>
+				    <th>Copy</th>
+		        </tr>
+		        <?php foreach ($this->storagerequests as $storagerequest): ?>
+		            <tr>
+                        <td><input name="remove[]" type="checkbox" value="<?=$storagerequest['bib']?>|<?=$storagerequest['barcode']?>"/></td>
+		                <?php 
+		                    $title = $storagerequest['title'];
+		                    if ($storagerequest['volumeNumber']) {
+		                        $title .= ', ' .  $storagerequest['volumeNumber'];
+		                    }
+		                ?>
+		                <td><?=$title?></td>
+		                <td><?=$storagerequest['callNumber']?></td>
+		                <td><?=$storagerequest['copyNumber']?></td>
+		            </tr>
+		        <?php endforeach; ?>
+		    </table>
+	
+		    <?php foreach ($this->storagerequests as $storagerequest): ?>
+	            <input name='barcode[]' type='hidden' value='<?=$storagerequest['barcode']?>'/>
+	            <input name='bib[]' type='hidden' value='<?=$storagerequest['bib']?>'/>
+	        <?php endforeach; ?>
+
+	        <label for='asrpickuplocation'>Select Pickup Location</label>
+            <select id='asrpickuplocation' name='location'>
+	            <option value=''>Select...</option>
+	            <option value='MANSUETO'>Mansueto within 15 min during open hours</option>
+	            <option value='CRERAR'>Crerar Lib, within 1 business day</option>
+	            <option value='LAW'>D'Angelo Law Lib, within 1 business day</option>
+	            <option value='ECKHART'>Eckhart Lib, within 1 business day</option>
+	            <option value='SSAd'>Soc Serv Admin Lib within 1 business day</option>
+	        </select>
+
+            <p style="text-align: right;">	
+	        <button name='action' type='submit' value='request'>Request all items</button>
+            </p>
+	    </form>
+	
+	    <p><a href="http://www.lib.uchicago.edu/e/ask/asrfeedback.html">Provide feedback on this service</a>.</p>
+    <? endif; ?>
+</div>
+
+<div class="<?=$this->layoutClass('sidebar')?>">
+  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", array('active' => 'storagerequests'))?>
+</div>
+
+<div class="clear"></div>

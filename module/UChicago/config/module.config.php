@@ -80,6 +80,27 @@ $config = array(
     ),
 );
 
+// Define static routes -- Controller/Action strings
+$staticRoutes = array(
+    'MyResearch/StorageRequest'
+);
+    
+// Build static routes
+foreach ($staticRoutes as $route) {
+    list($controller, $action) = explode('/', $route);
+    $routeName = str_replace('/', '-', strtolower($route));
+    $config['router']['routes'][$routeName] = array(
+        'type' => 'Zend\Mvc\Router\Http\Literal',
+        'options' => array(
+            'route'    => '/' . $route,
+            'defaults' => array(
+                'controller' => $controller,
+                'action'     => $action,
+            )    
+        )    
+    );   
+}
+
 return $config;
 
 
