@@ -537,9 +537,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $record = $this->getRecord($recordId);
 
         return array(
-                 'amount' => (string)$itemXml->amount,
+                 'amount' => (string)((float)$itemXml->amount * 100),
                  'fine' => (string)$itemXml->reason,
-                 'balance' => (string)$itemXml->balance,
+                 'balance' => (string)((float)$itemXml->balance * 100),
                  'createdate' => (string)$itemXml->dateCharged,
                  'title' => (string)$itemXml->title,
                  'checkout' => '',
