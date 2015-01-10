@@ -9,6 +9,9 @@ return array(
     ),
     'helpers' => array(
         'factories' => array(
+            'BookPlates' => function ($sm) {
+                return new \UChicago\View\Helper\Phoenix\BookPlates();
+            },
             'FeedbackLink' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\FeedbackLink();
             },
