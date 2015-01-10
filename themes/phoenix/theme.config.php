@@ -12,9 +12,15 @@ return array(
             'FeedbackLink' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\FeedbackLink();
             },
-            'knowledgeTracker' => '\UChicago\View\Helper\Phoenix\Factory::getKnowledgeTracker',
             'HathiLink' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\HathiLink();
+            },
+            'knowledgeTracker' => '\UChicago\View\Helper\Phoenix\Factory::getKnowledgeTracker',
+            'MarcFields' => function ($sm) {
+                $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+                $siteUrl = !isset($config->Site->url)
+                    ? false : $config->Site->url;
+                return new \UChicago\View\Helper\Phoenix\MarcFields($siteUrl);
             },
             'ServiceLinks' => function ($sm) {
                 $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');

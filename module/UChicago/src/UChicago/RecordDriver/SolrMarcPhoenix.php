@@ -22,7 +22,6 @@
  * @category VuFind2
  * @package  RecordDrivers
  * @author   Brad Busenius <bbusenius@uchicago.edu>
- * @author   Bryon Czoch <bczoch@uchicago.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
  */
@@ -35,12 +34,19 @@ use VuFind\Exception\ILS as ILSException, VuFind\XSLT\Processor as XSLTProcessor
  * @category VuFind2
  * @package  RecordDrivers
  * @author   Brad Busenius <bbusenius@uchicago.edu>
- * @author   Bryon Czoch <bczoch@uchicago.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
  */
 class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
 {
+
+    /**
+     * For testing if a record can be parsed by this class in the results view.
+     * If a more robust solution is needed in the future we can write a view helper
+     * or controller action that uses get_class($this->driver) to return the driver
+     * name in the templates (not really necessary at the moment).   
+     */
+    public $isMarc = true;
 
     /**
      * Get default OpenURL parameters.
@@ -276,72 +282,6 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             implode(', ', $this->fields['callnumber_browse']) : '';
     } 
 
-    /**
-     * Get Status/Holdings Information from the internally stored MARC Record
-     * (support method used by the NoILS driver).
-     *
-     * @param array $field The MARC Field to retrieve
-     * @param array $data  A keyed array of data to retrieve from subfields
-     *
-     * @return array
-     */
-    public function getFormattedMarcDetails($field, $data)
-    {
-        // Initialize return array
-        $matches = array();
-        $i = 0;
-
-        // Try to look up the specified field, return empty array if it doesn't
-        // exist.
-        $fields = $this->marcRecord->getFields($field);
-        if (!is_array($fields)) {
-            return $matches;
-        }
-
-        // Extract all the requested subfields, if applicable.
-        foreach ($fields as $currentField) {
-            //Chunk the data for processing
-            $currentMarcFields = explode(' ', $currentField);
-            //The current MARC field
-            $currentMarcField = $currentMarcFields[0]; 
-            //Get the first indicator value
-            $ind1 = $currentField->getIndicator('1');
-            //Get the second indicator value
-            $ind2 = $currentField->getIndicator('2');
-
-            foreach ($data as $key => $info) {
-                $split = explode("|", $info);
-                if ($split[0] == "msg") {
-                    if ($split[1] == "true") {
-                        $result = true;
-                    } elseif ($split[1] == "false") {
-                        $result = false;
-                    } else {
-                        $result =$split[1];
-                    }
-                    $matches[$i][$key] = $result;
-                } else {
-                    // Default to subfield a if nothing is specified.
-                    if (count($split) < 2) {
-                        $subfields = array('a');
-                    } else {
-                        $subfields = str_split($split[1]);
-                    }
-                    $result = $this->getSubfieldArray(
-                        $currentField, $subfields, true
-                    );
-                    $matches[$i][$key] = count($result) > 0
-                        ? (string)$result[0] : '';
-                }
-            }
-            $matches[$i]['indicator1'] = $ind1;
-            $matches[$i]['indicator2'] = $ind2;
-            $matches[$i]['current-field'] = $currentMarcField;
-            $matches[$i]['id'] = $this->getUniqueID();
-            $i++;
-        }
-        return $matches;
-    }
 
     public function getBookPlate()
     {
@@ -375,17 +315,14 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
    /** function that drives the full record display. Unrelated methods **/
    /** should be placed above this comment.                            **/
 
-   /**
-     * Method returns a configuration array of marc fields to display at the top of the full record display
-     *
-     * @return array
+    /**
+     * Configuration array for the display of MARC fields and their corresponding functions
      */
-    protected function topFields()
-    {
+    protected $displayConfig = array(
         /*Array of marc fields and sub fields displayed at the top of the full record view.
         Included in the array is a field for labels that will be used in the html
         Note, labels in the array are overriden in the templates in certain special cases*/
-        $marcFieldsArray = array(
+        'top' => array(
             array('label'  => 'Title',
                   'values' => array('245|abcfgknps')),
                   //array('label' => 'OCLC', 'values' => array('035|a', 'atlas_oclc')),
@@ -431,20 +368,10 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                   'values' => array('LDR|07')),
             array('label'  => 'URL for this record',
                   'values' => array('URL|http://pi.lib.uchicago.edu/1001/cat/bib/'))
-        );
-        return $marcFieldsArray;
-    }
-
-    /**
-     * Method returns a configuration array of marc fields to display in the Description tab of the full record display
-     *
-     * @return array
-     */
-    protected function tabFields()
-    {
+        ),
         /*Array of marc fields and sub fields displayed in the description tab of the
         full record view. Included in the array is a field for labels that will be used in the html*/
-        $marcFieldsArray = array(
+        'tab' => array(
             array('label'  => 'Varying Form of Title',
                   'values' => array('246|abfginp')),
             array('label'  => 'Other title',
@@ -529,18 +456,11 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                   'values' => array('074|az')),
             array('label'  => 'Govt.docs classification',
                   'values' => array('086|az')),
-        );
-        return $marcFieldsArray;
-    }
-
-    /**
-     * Method returns a configuration array of marc fields to display for the Atlas plugins.
-     *
-     * @return array
-     */
-    protected function atlasFields()
-    {
-        $marcFieldsArray = array(
+        ),
+        /**
+         * Array of marc fields to display for the Atlas plugins.
+         */
+        'atlas' => array(
             array('label'  => 'atlas_author',
                   'values' => array('100|a', '110|a', '111|a')),
             array('label'  => 'atlas_title',
@@ -563,43 +483,44 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                   'values' => array('300|a')),
             array('label'  => 'atlas_oclc',                   
                   'values' => array('035|a')), 
-        );
-        return $marcFieldsArray;
-    }
-
-    /**
-     * Method returns a configuration array of marc fields to display for 
-     * Hathi links on records with bib numbers having an ocm or ocn prefix.
-     *
-     * @return array
-     */
-    protected function hathiLinkFields()
-    {
-        $marcFieldsArray = array(
+        ),
+        /**
+         * Array of marc fields to display for Hathi links on records 
+         * with bib numbers having an ocm or ocn prefix.
+         */
+        'hathiLink' => array(
             array('label'  => 'oclcNumber',
                   'values' => array('035|a')),
             array('label'  => 'Project identifier',
                   'values' => array('903|a')),
-        );
-        return $marcFieldsArray;
-    }
-
-    /**
-     * Method returns a configuration array of marc fields to display for 
-     * eHoldings on results pages.
-     *
-     * @return array
-     */
-    protected function eHoldingsFields()
-    {
-        $marcFieldsArray = array(
+        ),
+        /**
+         * Array of marc fields to display for 
+         * eHoldings on results pages.
+         */
+        'eHoldings' => array(
             array('label'  => 'urls',
                   'values' => array('098|u')),
             array('label'  => 'displayText',
                   'values' => array('098|cl')),
-        );
-        return $marcFieldsArray;
-    }
+        ),
+        /**
+         * Array of marc fields to display for 
+         * MARC holdings  on results pages.
+         */
+        'results' => array(
+            array('label'  => 'title',
+                  'values' => array('245|abcfgknps')),
+            array('label'  => 'author',
+                  'values' => array('100|abcdequ')),
+            array('label'  => 'corporate-author',
+                  'values' => array('110|abcdegnu')),
+            array('label'  => 'edition',
+                  'values' => array('250|ab','254|a')),
+            array('label'  => 'imprint',
+                  'values' => array('260|abcdefg','264|abc')),
+        ),
+    ); // end $displayConfig
 
     /**
      * Method for returning the proper configuration array depending where we are in the templates
@@ -610,27 +531,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
      */
     protected function getConfigArray($pos)
     {
-        $marcFieldsArray = array();
- 
-        if ($pos == 'top') {
-            $marcFieldsArray = $this->topFields($marcFieldsArray);
-        }
-        elseif ($pos == 'tabs'){
-            $marcFieldsArray = $this->tabFields($marcFieldsArray);
-        }
-        elseif ($pos == 'atlas'){
-            $marcFieldsArray = $this->atlasFields($marcFieldsArray);
-        }
-        elseif ($pos == 'hathiLink'){
-            $marcFieldsArray = $this->hathiLinkFields($marcFieldsArray);
-        }
-        elseif ($pos == 'eHoldings'){
-            $marcFieldsArray = $this->eHoldingsFields($marcFieldsArray);
-        }
-        else {
-            error_log('You incorrectly set the position variable: $pos in your call to marcFields->returnMarcData() or $pos was not passed to the getConfigArray function');
-        }
-        return $marcFieldsArray;
+        return $this->displayConfig[$pos];
     }
 
     /**

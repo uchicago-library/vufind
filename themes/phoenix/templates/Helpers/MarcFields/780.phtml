@@ -1,0 +1,32 @@
+<!--780.phtml-->
+<? if($data['indicator2'] == 0) {
+       $subLabel = '<span class="subLabel">Continues</span>';
+   }
+   elseif($data['indicator2'] == 1) {
+       $subLabel = '<span class="subLabel">Continues in part</span>';
+   }
+   elseif($data['indicator2'] == 2) {
+              $subLabel = '<span class="subLabel">Supersedes</span>';
+   }
+   elseif($data['indicator2'] == 3) {
+              $subLabel = '<span class="subLabel">Supersedes in part</span>';
+   }
+   elseif($data['indicator2'] == 4) {
+              $subLabel = '<span class="subLabel">Formed by the union of</span>';
+   }
+   elseif($data['indicator2'] == 5) {
+              $subLabel = '<span class="subLabel">Absorbed</span>';
+   }
+   elseif($data['indicator2'] == 6) {
+              $subLabel = '<span class="subLabel">Absorbed in part</span>';
+   }
+   elseif($data['indicator2'] == 7) {
+              $subLabel = '<span class="subLabel">Absorbed in part</span>';
+   }  
+
+   echo $subLabel . ' '. implode(' ', $data['subfieldData']).'<br/>';
+
+       if (!empty($data['vernacularData'])) {
+           echo implode(' ', $data['vernacularData']).'<br />';
+       }
+?>

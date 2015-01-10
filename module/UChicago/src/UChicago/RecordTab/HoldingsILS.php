@@ -47,7 +47,7 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
      *
      * @return array
      */
-    public function getUniqueCallNumbers($items, $display=false)
+    public function getUniqueCallNumbersPhoenix($items, $display=false)
     {
         $callNos = array();
         foreach ($items as $item) {

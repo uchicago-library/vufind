@@ -48,12 +48,14 @@
 <? foreach ($holdings as $holding): ?>
 <h3><?=$this->transEsc('location_' . $holding['location'], array(), $holding['location'])?></h3>
 <table class="table table-striped" summary="<?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?>">
-  <? $callNos = $this->tab->getUniqueCallNumbers($holding['items']); if (!empty($callNos)): ?>
+  <? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
   <tr>
     <th><?=$this->transEsc("Call Number")?>: </th>
     <td width="50%">
-      <? foreach ($callNos as $callNo): ?>
-        <?//$this->escapeHtml($callNo)?><br />
+      <?foreach ($callNos['display'] as $numKey => $callNo): ?>
+        <?=$this->escapeHtml($callNo)?>
+        <a href="<?= $this->url('home')?>alphabrowse/results?source=lcc&from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
+           class="ablink">(Browse the Shelves)</a><br/>
       <? endforeach; ?>
     </td>
   </tr>

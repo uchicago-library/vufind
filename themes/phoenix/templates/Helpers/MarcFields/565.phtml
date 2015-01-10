@@ -1,0 +1,16 @@
+<!--565.phtml-->
+<? if(empty($data['indicator1'])) {
+       $subLabel = '<span class="subLabel">File size    </span> ';
+   }
+   elseif($data['indicator1'] == 0) {
+       $subLabel = '<span class="subLabel">Case file characteristics</span> ';
+   }
+   else {
+       $subLabel = null;
+   }
+  
+   echo $subLabel . ' '. implode(' ', $data['subfieldData']) ?><br/>
+
+   <? if (!empty($data['vernacularData'])) :
+          echo implode(' ', $data['vernacularData']);?><br />
+   <? endif; ?>

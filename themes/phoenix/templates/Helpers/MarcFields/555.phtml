@@ -1,0 +1,16 @@
+<!--555.phtml-->
+<? if(empty($data['indicator1'])) {
+       $subLabel = '<span class="subLabel">Indexes</span> ';
+   }
+   elseif($data['indicator1'] == 0) {
+       $subLabel = '<span class="subLabel">Findind aids</span> ';
+   }
+   else {
+       $subLabel = null;
+   }
+  
+   echo $subLabel . ' '. implode(' ', $data['subfieldData']) ?><br/>
+
+   <? if (!empty($data['vernacularData'])) :
+          echo implode(' ', $data['vernacularData']);?><br />
+   <? endif; ?>

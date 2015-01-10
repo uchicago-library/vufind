@@ -18,12 +18,6 @@ $config = array(
     'service_manager' => array(
         'allow_override' => true,
         'factories' => array(
-            'UChicago\ILSHoldLogic' => function ($sm) {
-                return new \UChicago\ILS\Logic\Holds(
-                    $sm->get('VuFind\ILSAuthenticator'), $sm->get('VuFind\ILSConnection'),
-                    $sm->get('VuFind\HMAC'), $sm->get('VuFind\Config')->get('config')
-                );
-            },
             'VuFind\Mailer' => 'UChicago\Mailer\Factory',
         ),
     ),//service_manager
@@ -39,7 +33,7 @@ $config = array(
                         );
                         $driver->attachILS(
                             $sm->getServiceLocator()->get('VuFind\ILSConnection'),
-                            $sm->getServiceLocator()->get('UChicago\ILSHoldLogic'),
+                            $sm->getServiceLocator()->get('VuFind\ILSHoldLogic'),
                             $sm->getServiceLocator()->get('VuFind\ILSTitleHoldLogic')
                         );
                         return $driver;
