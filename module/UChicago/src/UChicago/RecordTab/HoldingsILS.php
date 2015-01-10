@@ -60,4 +60,23 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
         sort($callNos['sort']);
         return array('display' => array_unique($callNos['display']), 'sort' => $callNos['sort']);
     }
+
+    /**
+     * Gets the first barcode of a holding
+     * 
+     * @param array $holding
+     *
+     * @return string, the first barcode in the holding.
+     */
+    public function getFirstBarcode($holding)
+    {
+        $firstBarcode = '';
+        foreach($holding['items'] as $item) {
+            if (!empty($item['barcode'])){
+                $firstBarcode = $item['barcode'];
+                break;
+            }
+        }
+        return $firstBarcode;
+    }
 }

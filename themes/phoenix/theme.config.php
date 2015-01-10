@@ -12,13 +12,10 @@ return array(
             'BookPlates' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\BookPlates();
             },
-            'FeedbackLink' => function ($sm) {
-                return new \UChicago\View\Helper\Phoenix\FeedbackLink();
-            },
             'HathiLink' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\HathiLink();
             },
-            'knowledgeTracker' => '\UChicago\View\Helper\Phoenix\Factory::getKnowledgeTracker',
+            'KnowledgeTracker' => '\UChicago\View\Helper\Phoenix\Factory::getKnowledgeTracker',
             'MarcFields' => function ($sm) {
                 $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
                 $siteUrl = !isset($config->Site->url)
