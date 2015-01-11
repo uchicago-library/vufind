@@ -93,7 +93,11 @@
           <? else: ?>
             <? if ($row['availability']): ?>
               <? /* Begin Available Items (Holds) */ ?>
-               <span class="text-success"><?=$this->transEsc("Available")?><link property="availability" href="http://schema.org/InStock" /></span>
+               <? if (isset($row['itemTypeCode']) && $row['itemTypeCode'] != "stks"):?>
+                  <span>Loan period: <?=$row['itemTypeName']?>&nbsp;</span>
+               <?endif;?>
+
+               <span class="text-success"><?=$this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'AVAILABLE' : $row['status'])?><link property="availability" href="http://schema.org/InStock" /></span>
                <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                <?=$this->ServiceLinks()->asr($row)?>
                <?=$this->ServiceLinks()->dllStorage($row)?>
@@ -113,7 +117,8 @@
               <span class="text-danger"><?=$this->transEsc($row['status'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
               <? if (isset($row['returnDate']) && $row['returnDate']): ?>&ndash; <span class="small"><?=$this->escapeHtml($row['returnDate'])?></span><? endif; ?>
               <? if (isset($row['duedate']) && $row['duedate']): ?>
-                &ndash; <span class="small"><?=$this->transEsc("Due")?>: <?=$this->escapeHtml($row['duedate'])?></span>
+                <? $duedate = $row['status'] == 'LOANED' ? $this->tab->getDuedate($row) : $row['duedate'];?>
+                &ndash; <span class="small"><?=$this->transEsc("Due")?>: <?=$this->escapeHtml($duedate)?></span>
               <? endif; ?>
               <? if (isset($row['requests_placed']) && $row['requests_placed'] > 0): ?>
                 <span><?=$this->transEsc("Requests")?>: <?=$this->escapeHtml($row['requests_placed'])?></span>

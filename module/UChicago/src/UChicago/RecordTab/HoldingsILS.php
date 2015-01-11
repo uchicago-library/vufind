@@ -79,4 +79,25 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
         }
         return $firstBarcode;
     }
+
+    /**
+     * Gets the duedate or time for a checkedout item.
+     *
+     * @param array $row, information about the holding.
+     *
+     * @return string, the duedate or time for a loaned item. 
+     */
+    public function getDueDate($row)
+    {
+        if ($row['duedate'] == 'Indefinite') {
+            $due = 'Indefinite';
+        } else {
+            if (strpos($row['location'], 'Reserve') !== false || strpos($row['location'], 'TECHB@R') !== false) {
+               $due = date("F j, g:ia", strtotime($row['duedate']));
+            } else {
+               $due = date("F j, Y", strtotime($row['duedate']));
+            }
+        }
+        return $due;
+    }
 }
