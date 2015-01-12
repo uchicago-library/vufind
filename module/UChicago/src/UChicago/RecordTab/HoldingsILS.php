@@ -47,7 +47,7 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
      *
      * @return array
      */
-    public function getUniqueCallNumbers($items, $display=false)
+    public function getUniqueCallNumbersPhoenix($items, $display=false)
     {
         $callNos = array();
         foreach ($items as $item) {
@@ -59,5 +59,45 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
 
         sort($callNos['sort']);
         return array('display' => array_unique($callNos['display']), 'sort' => $callNos['sort']);
+    }
+
+    /**
+     * Gets the first barcode of a holding
+     * 
+     * @param array $holding
+     *
+     * @return string, the first barcode in the holding.
+     */
+    public function getFirstBarcode($holding)
+    {
+        $firstBarcode = '';
+        foreach($holding['items'] as $item) {
+            if (!empty($item['barcode'])){
+                $firstBarcode = $item['barcode'];
+                break;
+            }
+        }
+        return $firstBarcode;
+    }
+
+    /**
+     * Gets the duedate or time for a checkedout item.
+     *
+     * @param array $row, information about the holding.
+     *
+     * @return string, the duedate or time for a loaned item. 
+     */
+    public function getDueDate($row)
+    {
+        if ($row['duedate'] == 'Indefinite') {
+            $due = 'Indefinite';
+        } else {
+            if (strpos($row['location'], 'Reserve') !== false || strpos($row['location'], 'TECHB@R') !== false) {
+               $due = date("F j, g:ia", strtotime($row['duedate']));
+            } else {
+               $due = date("F j, Y", strtotime($row['duedate']));
+            }
+        }
+        return $due;
     }
 }

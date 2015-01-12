@@ -46,14 +46,20 @@
   <? if ($openUrl): ?><?=$this->openUrl($openUrl);?><? endif; ?>
 <? endif; ?>
 <? foreach ($holdings as $holding): ?>
+<div class="holdings-unit">
 <h3><?=$this->transEsc('location_' . $holding['location'], array(), $holding['location'])?></h3>
-<table class="table table-striped" summary="<?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?>">
-  <? $callNos = $this->tab->getUniqueCallNumbers($holding['items']); if (!empty($callNos)): ?>
+<?/*Get the first barcode to pass to the map links*/
+  $firstBarcode = $this->tab->getFirstBarcode($holding);?>
+<span class="maplink"><?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $firstBarcode)?></span>
+<table class="" summary="<?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?>">
+  <? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
   <tr>
     <th><?=$this->transEsc("Call Number")?>: </th>
-    <td width="50%">
-      <? foreach ($callNos as $callNo): ?>
-        <?//$this->escapeHtml($callNo)?><br />
+    <td>
+      <?foreach ($callNos['display'] as $numKey => $callNo): ?>
+        <?=$this->escapeHtml($callNo)?>
+        <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
+           class="ablink">(Browse the Shelves)</a><br/>
       <? endforeach; ?>
     </td>
   </tr>
@@ -88,9 +94,18 @@
           <? else: ?>
             <? if ($row['availability']): ?>
               <? /* Begin Available Items (Holds) */ ?>
-               <span class="text-success"><?=$this->transEsc("Available")?><link property="availability" href="http://schema.org/InStock" /></span>
+               <? if (isset($row['itemTypeCode']) && $row['itemTypeCode'] != "stks"):?>
+                  <span>Loan period: <?=$row['itemTypeName']?>&nbsp;</span>
+               <?endif;?>
+
+               <span class="text-success"><?=$this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'AVAILABLE' : $row['status'])?><link property="availability" href="http://schema.org/InStock" /></span>
+               <?=$this->ServiceLinks()->scanAndDeliver($row)?>
+               <?=$this->ServiceLinks()->asr($row)?>
+               <?=$this->ServiceLinks()->dllStorage($row)?>
+               <?=$this->ServiceLinks()->cantFindIt($row)?>
+               <?=$this->ServiceLinks()->debugging($row)?>
               <? if (isset($row['link']) && $row['link']): ?>
-                <a style="display:inline-block" class="<?=$check ? 'checkRequest ' : ''?>inlineblock modal-link placehold" href="<?=$this->recordLink()->getRequestUrl($row['link'])?>" title="<?=$this->transEsc($check ? "Check Hold" : "Place a Hold")?>"><i class="fa fa-flag"></i>&nbsp;<?=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>
+                <!--<a style="display:inline-block" class="<?//=$check ? 'checkRequest ' : ''?>inlineblock modal-link placehold" href="<?//=$this->recordLink()->getRequestUrl($row['link'])?>" title="<?//=$this->transEsc($check ? "Check Hold" : "Place a Hold")?>"><i class="fa fa-flag"></i>&nbsp;<?//=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>-->
               <? endif; ?>
               <? if (isset($row['storageRetrievalRequestLink']) && $row['storageRetrievalRequestLink']): ?>
                 <a class="<?=$checkStorageRetrievalRequest ? 'checkStorageRetrievalRequest ' : ''?>modal-link placeStorageRetrievalRequest" href="<?=$this->recordLink()->getRequestUrl($row['storageRetrievalRequestLink'])?>" title="<?=$this->transEsc($checkStorageRetrievalRequest ? "storage_retrieval_request_check_text" : "storage_retrieval_request_place_text")?>"><i class="fa fa-flag"></i>&nbsp;<?=$this->transEsc($checkStorageRetrievalRequest ? "storage_retrieval_request_check_text" : "storage_retrieval_request_place_text")?></a>
@@ -103,15 +118,23 @@
               <span class="text-danger"><?=$this->transEsc($row['status'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
               <? if (isset($row['returnDate']) && $row['returnDate']): ?>&ndash; <span class="small"><?=$this->escapeHtml($row['returnDate'])?></span><? endif; ?>
               <? if (isset($row['duedate']) && $row['duedate']): ?>
-                &ndash; <span class="small"><?=$this->transEsc("Due")?>: <?=$this->escapeHtml($row['duedate'])?></span>
+                <? $duedate = $row['status'] == 'LOANED' ? $this->tab->getDuedate($row) : $row['duedate'];?>
+                &ndash; <span class="small"><?=$this->transEsc("Due")?>: <?=$this->escapeHtml($duedate)?></span>
               <? endif; ?>
               <? if (isset($row['requests_placed']) && $row['requests_placed'] > 0): ?>
                 <span><?=$this->transEsc("Requests")?>: <?=$this->escapeHtml($row['requests_placed'])?></span>
               <? endif; ?>
-              <? if (isset($row['link']) && $row['link']): ?>
-                <a class="<?=$check ? 'checkRequest' : ''?> modal-link inlineblock placehold" href="<?=$this->recordLink()->getRequestUrl($row['link'])?>"><i class="fa fa-flag"></i>&nbsp;<?=$this->transEsc($check ? "Check Recall" : "Recall This")?></a>
+              <?=$this->ServiceLinks()->asr($row)?>
+              <?=$this->ServiceLinks()->borrowDirect($row)?>
+              <?=$this->ServiceLinks()->uBorrow($row)?>
+              <?=$this->ServiceLinks()->debugging($row)?>
+              <? if (isset($row['link']) && $row['link'] && !$row['claimsReturned']): ?>
+                <!--<a class="<?//=$check ? 'checkRequest' : ''?> modal-link inlineblock placehold" href="<?//=$this->recordLink()->getRequestUrl($row['link'])?>"><i class="fa fa-flag"></i>&nbsp;<?//=$this->transEsc($check ? "Check Recall" : "Recall This")?></a>-->
+                <?=$this->ServiceLinks()->recall($row)?>
               <? endif; ?>
             <? endif; ?>
+              <? /* Begin Items that are either Available or Unavailable */ ?>
+                <?=$this->ServiceLinks()->aeon($row)?> 
           <? endif; ?>
           <? /* Embed item structured data: library, barcode, call number */ ?>
           <? if ($row['location']): ?>
@@ -141,6 +164,7 @@
     </tr>
   <? endif; ?>
 </table>
+</div><!--/.holdings-unit-->
 <? endforeach; ?>
 
 <? $history = $this->driver->getRealTimeHistory(); ?>
