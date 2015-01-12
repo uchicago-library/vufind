@@ -47,6 +47,9 @@ class BookPlates extends AbstractHelper
                 }
             }
         }
+        if (!empty($html)) { 
+            $html = '<div id="bookplates">' . $html . '</div>'; 
+        }
         return $html;
     }
 }

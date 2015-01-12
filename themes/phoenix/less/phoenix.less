@@ -180,18 +180,37 @@ body > header > .container > section.visible-lg { //Fullscreen
 /*Footer*/
 footer .container {
     background:@dark-maroon;
+    padding-top:@grid-gutter-width / 1.5; 
+    padding-bottom:@grid-gutter-width / 1.5;
 }
 
 footer hr {
     display:none;
 }
 
-footer a {
+footer a,
+footer a:hover,
+footer a:focus {
     color:@light-link;
 }
 
-footer li {
-    list-style:none;
+#uc_logo {
+    background:url("../../images/uc_logo.png") no-repeat scroll left center transparent;
+    width:141px;
+    height:30px;
+}
+
+#uc_logo a {
+    display: block;
+    width: 141px;
+    height: 30px;
+    overflow:hidden;
+    text-indent: 100%;
+    white-space: nowrap;
+}
+
+footer .text-right {
+    color:@light-link;
 }
 
 // Buttons
@@ -235,4 +254,171 @@ footer li {
     }
 }
 
+/* Typeogrophy*/
+.text-shadow (@string: 1px 1px 1px rgba(0, 0, 0, 0.1)) {
+    text-shadow: @string;
+}
+h1 {
+    .text-shadow();
+}
+
+/* Tables */
+.table {
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: @line-height-computed;
+  // Cells
+  > thead,
+  > tbody,
+  > tfoot {
+    > tr {
+      > th,
+      > td {
+        padding: @table-cell-padding;
+        line-height: @line-height-base;
+        vertical-align: top;
+        border-top: 1px dashed @table-border-color;
+      }
+    }
+  }
+  // Field labels
+  > tbody {
+    > tr {
+      > th {
+        color: #666;
+      }
+    }
+  }
+  // Bottom align for column headings
+  > thead > tr > th {
+    vertical-align: bottom;
+    border-bottom: 2px solid @table-border-color;
+  }
+  // Remove top border from thead by default
+  > caption + thead,
+  > colgroup + thead,
+  > thead:first-child {
+    > tr:first-child {
+      > th,
+      > td {
+        border-top: 0;
+      }
+    }
+  }
+  // Account for multiple tbody instances
+  > tbody + tbody {
+    border-top: 2px solid @table-border-color;
+  }
+
+  // Nesting
+  .table {
+    background-color: @body-bg;
+  }
+}
+
+// Full Record 
+div[resource="#record"] .table {
+  width: auto;
+  max-width: auto;
+  > tbody {
+    > tr {
+      > th {
+        width:@record-th-width;
+        max-width:@record-th-width;
+      }    
+    }
+    > tr {
+      > td {
+        width: 100% - @record-th-width;
+        max-width: 100% - @record-th-width;
+      }
+    }   
+  }  
+} 
+
+.table > tbody > tr:first-child > td {
+    border-top:none;
+}
+/*Top of full record*/
+div[resource="#record"] .table > tbody > tr:first-child > td {
+    padding-bottom:0;
+    padding-top:0;
+}
+
+/* Sidebar */
+.bookplate {
+    margin-top:25px;
+}
+.bookplate:first-child {
+    margin-top: 0;
+}
+#bookplates {
+    margin-bottom:25px;
+}
+.bookplateTitle {
+    line-height:normal;
+    margin-top:5px;
+}
+.sidebar {
+    margin-top:14px;
+}
+
+/* Full Record */
+.recordcover {
+    margin-top:47px;
+}
+#record-tabs h3 {
+    display: inline;
+}
+.maplink,
+.ablink {
+    font-size: ceil((@font-size-base * 0.88)); // ~10.5px
+}
+#holdings-tab h3 {
+    margin-bottom: 0;
+}
+#holdings-tab table {
+    margin: 0;
+    background: transparent;    
+}
+#holdings-tab table th,
+#holdings-tab table tr,
+#holdings-tab table td {
+    border: none;
+}
+#holdings-tab table th {
+    padding-right: 15px;
+    text-align: right;
+}
+#holdings-tab table tr,
+#holdings-tab table td {
+    padding: 3px 0; 
+}
+#record-tabs > div {
+    margin-top: 10px;
+}
+.holdings-unit {
+    padding: 20px 10px 20px 10px;
+    line-height: 15px;
+    border-bottom:1px dashed @table-border-color;
+}
+.holdings-unit:nth-child(even) {
+    background:@table-bg;
+}
+.service {
+    margin: 0 10px;
+}
+.main .nav {
+    border-top:1px dashed @table-border-color;
+    border-bottom:1px dashed @table-border-color;
+}
+
+/*Results*/
+.result:nth-child(even) {
+    background:@table-bg;
+}
+.result {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
 
