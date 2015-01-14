@@ -126,6 +126,7 @@
               <? endif; ?>
               <?=$this->ServiceLinks()->asr($row)?>
               <?=$this->ServiceLinks()->borrowDirect($row)?>
+              <?=$this->ServiceLinks()->getIt($row)?>
               <?=$this->ServiceLinks()->uBorrow($row)?>
               <?=$this->ServiceLinks()->debugging($row)?>
               <? if (isset($row['link']) && $row['link'] && !$row['claimsReturned']): ?>
