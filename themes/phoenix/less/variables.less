@@ -1,4 +1,7 @@
 //== Colors 
+//
+//## Brand colors for use across Phoenix.
+
 @maroon: #800;
 @blue: #155f83;
 @dark-maroon: #630000;
@@ -8,7 +11,11 @@
 @link-color: @blue;
 
 
-//== Fonts
+
+//== Typography
+//
+//## Font, line-height, and color for body text, headings, and more.
+
 @tiny:10.5px;
 @font-size-base: 12px;
 @logo:"ProximaNova-Regular";
@@ -17,46 +24,6 @@
 @headings-font-weight:    500;
 @headings-line-height:    1.1;
 @headings-color:          inherit;
-
-//== Buttons
-@btn-primary-color:              #fff;
-@btn-primary-bg:                 @brand-primary;
-@btn-primary-border:             darken(@btn-primary-bg, 5%);
-
-//=== Shared nav styles
-@nav-link-hover-bg: rgba(0,0,0,0.15);
-
-//== Scaffolding
-//
-//## Settings for some of the most global styles.
-@body-bg:                          rgb(248, 248, 248);
-
-//== Navbar
-//
-//##
-
-@navbar-margin-bottom:             0px;
-
-//== Tables
-//
-//## Customizes the `.table` component with basic values, each used across all table variations.
-
-//** Padding for `<th>`s and `<td>`s.
-@table-cell-padding:            8px;
-//** Padding for cells in `.table-condensed`.
-@table-condensed-cell-padding:  5px;
-
-//** Default background color used for all tables.
-@table-bg:                      #f9f9f9;
-//** Background color used for `.table-striped`.
-@table-bg-accent:               #fff;
-//** Width of right table column on full record page.
-@record-th-width: 20%;
-
-
-//== Typography
-//
-//## Font, line-height, and color for body text, headings, and more.
 
 @font-family-sans-serif:  "Helvetica Neue", Helvetica, Arial, sans-serif;
 @font-family-serif:       Georgia, "Times New Roman", Times, serif;
@@ -68,6 +35,14 @@
 @font-size-large:         ceil((@font-size-base * 1.25)); // ~18px
 @font-size-small:         ceil((@font-size-base * 0.85)); // ~12px
 
+
+//== General
+//
+//## Generic styles used across Phoenix.
+
+@horizontal-padding-div: 12px;
+@vertical-padding-div: 10px;
+
 //** These are set for the full record page.
 //** If this isn't working out for other pages we 
 //** can scope them more specifically on full record pages
@@ -77,6 +52,52 @@
 @font-size-h4:            ceil((@font-size-base * 1.25)); // ~18px
 @font-size-h5:            @font-size-base;
 @font-size-h6:            ceil((@font-size-base * 0.85)); // ~12px
+
+
+//== Buttons
+//
+//##
+
+@btn-primary-color:              #fff;
+@btn-primary-bg:                 @brand-primary;
+@btn-primary-border:             darken(@btn-primary-bg, 5%);
+
+//=== Shared nav styles
+//
+//##
+
+@nav-link-hover-bg: rgba(0,0,0,0.15);
+
+//== Scaffolding
+//
+//## Settings for some of the most global styles.
+
+@body-bg:                          rgb(248, 248, 248);
+
+
+//== Navbar
+//
+//##
+
+@navbar-margin-bottom:             0px;
+
+
+//== Tables
+//
+//## Customizes the `.table` component with basic values, each used across all table variations.
+
+//** Padding for `<th>`s and `<td>`s.
+//
+@table-cell-padding:            8px;
+//** Padding for cells in `.table-condensed`.
+@table-condensed-cell-padding:  5px;
+
+//** Default background color used for all tables.
+@table-bg:                      #f9f9f9;
+//** Background color used for `.table-striped`.
+@table-bg-accent:               #fff;
+//** Width of right table column on full record page.
+@record-th-width: 20%;
 
 
 //== Form states and alerts

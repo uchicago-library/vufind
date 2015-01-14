@@ -8,11 +8,6 @@
     }
 }
 
-.bulkActionButtons {
-    border-top:    1px dashed #ccc;
-    border-bottom: 1px dashed #ccc;
-}
-
 /*General header*/
 .navbar-brand {
     font-family: @headings-font-family;
@@ -364,7 +359,7 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
 }
 
 /* Full Record */
-.recordcover {
+#record .recordcover {
     margin-top:47px;
 }
 #record-tabs h3 {
@@ -405,21 +400,50 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
 .holdings-unit:nth-child(even) {
     background:@table-bg;
 }
+.holdings-unit:last-child {
+    border-bottom: none;
+}
 .service {
     margin: 0 10px;
 }
-.main .nav {
+.main .nav-pills,
+.bulkActionButtons {
     border-top:1px dashed @table-border-color;
     border-bottom:1px dashed @table-border-color;
 }
 
 /*Results*/
-.result:nth-child(even) {
+.result:nth-child(odd) {
     background:@table-bg;
 }
 .result {
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin-top: @vertical-padding-div;
+    margin-bottom: @vertical-padding-div;
+    padding: @vertical-padding-div @horizontal-padding-div;
+}
+.result a.title {
+    font-size: ceil((@font-size-base * 1.2)); // ~15px 
+    font-weight: normal;
+    line-height: normal;
+    .text-shadow();
+}
+.bulkActionButtons .checkbox {
+    padding:@nav-link-padding;
+}
+.search-controls {
+    margin: @vertical-padding-div 0;
+}
+.search-controls .col-sm-6:first-child {
+    padding-top: ((@input-height-base + @input-border-radius) / 2) - @font-size-base; // Vertically center text in relation to from element to the left
+}
+.template-name-results .row.result {
+    margin-left: 0; //Override: default vufind puts this at -15px/
+}
+.search-controls form {
+    display: inline;
+}
+.search-controls form:not(:first-of-type) {
+    margin-left: 15px;
 }
 
 /*MyResearch*/
