@@ -106,6 +106,16 @@
                 foreach ($item['extras'][$extraName] as $j => $e):
                   $extraDisplayArray = array_unique(array_merge($extraDisplayArray, $e));
                 endforeach;
+                if (count($extraDisplayArray) > 1) {
+                    switch ($extraName) {
+                        case 'publishDate':
+                            $extraDisplayArray = array('Multiple dates');
+                            break;
+                        case 'author':
+                            $extraDisplayArray = array('Multiple authors');
+                            break;
+                    }
+                }
                 echo empty($extraDisplayArray) ? '&nbsp;' : implode('<br />', $extraDisplayArray);
               ?>
             </td>
