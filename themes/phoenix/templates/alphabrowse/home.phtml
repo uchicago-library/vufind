@@ -41,10 +41,10 @@
     <thead>
       <tr>
         <th class="<?=$this->source ?>">
-          <?=$this->transEsc("browse_" . $this->source) ?>
+          <?=$this->transEsc("Browse" . ' ' . $this->source) ?>
         </th>
         <? foreach ($this->extras as $e): ?>
-          <th><?=$this->transEsc("browse_" . $e) ?></th>
+          <th><?=$this->transEsc("Browse" . ' ' . $e) ?></th>
         <? endforeach; ?>
         <th class="titles"><?=$this->transEsc("alphabrowse_matches") ?></th>
       </tr>
