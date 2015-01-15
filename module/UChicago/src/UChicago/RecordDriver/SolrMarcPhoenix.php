@@ -207,7 +207,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
      *
      * @return array of combined subfield data.
      */
-    protected function combineLinkData($marcData) {
+    /*protected function combineLinkData($marcData) {
         $retval = array();
         $i = 0;
         if (isset($marcData['urls'])) {
@@ -230,10 +230,10 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             }
         } 
         return $retval;
-    }
+    }*/
 
     /**
-     * Get all record links related to the current record. Each link is returned as
+     * Get e-holdings from the marc record. Each link is returned as
      * array.
      * Format:
      * <code>
@@ -259,12 +259,16 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
      *
      * @return null|array
      */
-    public function getAllRecordLinks()
+    /*public function getEholdingsFromMarc()
     {
         $rawMarcData = $this->crosswalk('eHoldings');
         $rawMarcData = $this->combineLinkData($rawMarcData);
         return !empty($rawMarcData) ? $rawMarcData : null;
     }
+    !!! - Above function used to be an override of getAllRecordLinks. 
+    It blows up in the VuFind 2.3 so I changed the method name. 
+    I belive this method I'm not sure what to do with this right now. - brad
+    */
 
     /**  
      * Get the call number associated with the record (empty string if
