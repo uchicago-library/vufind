@@ -38,6 +38,22 @@ $config = array(
                         );
                         return $driver;
                     },
+                    'SolrSfx' => function ($sm) {
+                        $driver = new \UChicago\RecordDriver\SolrMarcPhoenix(
+                            $sm->getServiceLocator()->get('VuFind\Config')->get('config'),
+                            null,
+                            $sm->getServiceLocator()->get('VuFind\Config')->get('searches')
+                        );
+                        return $driver;
+                    },
+                    'SolrHathi' => function ($sm) {
+                        $driver = new \UChicago\RecordDriver\SolrMarcPhoenix(
+                            $sm->getServiceLocator()->get('VuFind\Config')->get('config'),
+                            null,
+                            $sm->getServiceLocator()->get('VuFind\Config')->get('searches')
+                        );
+                        return $driver;
+                    },
                 ),
             ),//recorddriver
             'recordtab' => array(
