@@ -1,11 +1,23 @@
 @import "bootstrap";
 @import "variables";
 
+/*Variables and mixins*/
+.tiny-text-shadow {
+    text-shadow:1px 1px 2px rgba(0, 0, 0, 0.6);
+}
+.text-shadow (@string: 1px 1px 1px rgba(0, 0, 0, 0.1)) {
+    text-shadow: @string;
+}
+
+/*General*/
 .container {
     background: rgb(255, 255, 255);
     @media (max-width: @screen-sm) {
         background:@body-bg;
     }
+}
+.main > .container {
+    padding-bottom: @grid-gutter-width / 2;
 }
 
 /*General header*/
@@ -31,10 +43,9 @@
 }
 
 .navbar {
-    background-color:@maroon;
-    border-top:7px solid @dark-maroon;
+    background-color:@brand-primary;
+    border-top:7px solid @brand-primary-dark;
     border-radius: 0;
-    color:#fff;
 }
 
 .navbar a {
@@ -49,7 +60,7 @@
 .navbar > ul {
     display:inline;
     float:right;
-    background:@dark-maroon;
+    background:@brand-primary-dark;
     padding:0 8px 5px 8px;
     @media (max-width: @screen-sm) {
         display:none;
@@ -99,7 +110,7 @@ body > .main > .container {
 
 /*Dark maroon top nav*/
 #header-collapse {
-    background:@dark-maroon;
+    background:@brand-primary-dark;
     @media (min-width: @screen-sm) {
         margin: 0 -15px 0 -15px;
     }
@@ -140,11 +151,18 @@ body > header > .container > section.visible-lg { //Fullscreen
 #searchForm .form_control {
     width:200px;
 }
-
+.navbar .checkbox {
+    color:#111 !important;
+}
+.checkbox input[type="checkbox"] {
+    @media (min-width: @container-desktop) {
+        margin: 0; 
+    }
+}
 #searchForm a.btn {
     color:@light-link;
-    font-size:@tiny;
-    text-shadow:1px 1px 2px rgba(0, 0, 0, 0.6);
+    //font-size:@tiny;
+    .tiny-text-shadow();
     @media (max-width: @screen-sm) {
         display:none;
     }
@@ -174,7 +192,7 @@ body > header > .container > section.visible-lg { //Fullscreen
 
 /*Footer*/
 footer .container {
-    background:@dark-maroon;
+    background:@brand-primary-dark;
     padding-top:@grid-gutter-width / 1.5; 
     padding-bottom:@grid-gutter-width / 1.5;
 }
@@ -215,9 +233,9 @@ footer .text-right {
 .btn-primary.disabled,
 .btn-primary[disabled] {
     color: @light-link;
-    background-color: @dark-maroon;
+    background-color: @brand-primary-dark;
     *background-color: #4a0000;
-    border-color:@dark-maroon;
+    border-color:@brand-primary-dark;
     background-image:none;
 }
 
@@ -228,7 +246,7 @@ footer .text-right {
 }
 
 .btn-primary {
-    #gradient.vertical(@maroon, @dark-maroon);
+    #gradient.vertical(@btn-primary-bg, @brand-primary-dark);
     @media (max-width: @screen-sm) {
         #gradient.vertical(lighten(@gray-lighter, 5%), lighten(@gray-light, 10%));
         border:1px solid lighten(@gray-light, 5%);
@@ -250,9 +268,6 @@ footer .text-right {
 }
 
 /* Typeogrophy*/
-.text-shadow (@string: 1px 1px 1px rgba(0, 0, 0, 0.1)) {
-    text-shadow: @string;
-}
 h1 {
     .text-shadow();
 }
@@ -430,6 +445,9 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
 .bulkActionButtons .checkbox {
     padding:@nav-link-padding;
 }
+.bulkActionButtons #updateCart {
+    margin-left:0;
+} 
 .search-controls {
     margin: @vertical-padding-div 0;
 }
@@ -461,5 +479,45 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
 .template-dir-myresearch.template-name-profile .table tr > th:first-child {
     width:22%;
 }
+.holdings-info:first-child:before {
+    content: "";
+}
+.holdings-info:before {
+    content: " | ";
+    font-weight: normal;
+}
+.callnumAndLocation {
+    margin-top:@vertical-padding-div;
+}
+.iconlabel {
+    display: block;
+    font-weight: bold;
+    color:#555;
+}
+.custom-marc-record {
+    line-height: @line-height-base * 1.05;
+}
+/* Trying to improve the bookcover column on results pages*/
+/*
+.template-name-results .col-sm-9 .row > .col-sm-2,
+.template-name-results .col-sm-9 form .col-xs-11,
+.template-name-results .col-sm-9 form .col-xs-11 .row  {
+    margin-left:0;
+    padding-left:0;
+}
+.template-name-results .col-sm-9 form .col-xs-1 {
+    margin-right:0;
+    padding-right:0; 
+}*/
+.result .left img {
+    max-width: 70px;
+}
 
+.callnumAndLocation {
+    margin-bottom:10px;
+}
 
+/*Sidebar*/
+.list-group-item {
+    padding: 8px 13px;
+}

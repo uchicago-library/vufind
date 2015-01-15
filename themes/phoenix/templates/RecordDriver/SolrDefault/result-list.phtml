@@ -121,10 +121,10 @@
 
       <div class="callnumAndLocation ajax-availability hidden">
         <? if ($this->driver->supportsAjaxStatus()): ?>
-          <span class="location ajax-availability hidden">
+          <span class="location holdings-info ajax-availability hidden">
             <?=$this->transEsc('Loading')?>...
           </span>
-          <strong class="hideIfDetailed">
+          <strong class="hideIfDetailed holdings-info">
             <span class="callnumber ajax-availability hidden">
               <?=$this->transEsc('Loading')?>...
             </span>
@@ -132,9 +132,10 @@
           <!--<div class="locationDetails"></div>-->
         <? else: ?>
           <? $summCallNo = $this->driver->getCallNumber(); if (!empty($summCallNo)): ?>
-            <strong><?=$this->transEsc('Call Number')?>:</strong> <?=$this->escapeHtml($summCallNo)?>
+            <span class="callnumber holdings-info"><strong><?=$this->transEsc('Call Number')?>:</strong> <?=$this->escapeHtml($summCallNo)?></span>
           <? endif; ?>
         <? endif; ?>
+      </div><!--/.callnumAndLocation-->
 
       <? /* We need to find out if we're supposed to display an OpenURL link ($openUrlActive),
             but even if we don't plan to display the link, we still want to get the $openUrl
@@ -145,7 +146,6 @@
         $urls = $this->record($this->driver)->getLinkDetails();
         if ($openUrlActive || !empty($urls)): ?>
         <? if ($openUrlActive): ?>
-          <br/>
           <?=$this->openUrl($openUrl)?>
           <? if ($this->driver->replaceURLsWithOpenURL()) $urls = array(); // clear URL list if replace setting is active ?>
         <? endif; ?>
@@ -158,15 +158,13 @@
       <? endif; ?>
 
       <? if (!$openUrlActive && empty($urls) && $this->driver->supportsAjaxStatus()): ?>
-        <span class="status ajax-availability hidden">
-          <span class="text-success"><?=$this->transEsc('Loading')?>...</span>
+        <span class="status ajax-availability holdings-info hidden">
+          <span class=""><?=$this->transEsc('Loading')?>...</span>
         </span>
       <? endif; ?>
-      </div><!--/.callnumAndLocation-->
       <?=$this->record($this->driver)->getPreviews()?>
-      <?=str_replace('class="', 'class="label label-info ', $this->record($this->driver)->getFormatList())?>
     </div>
-    <div class="col-xs-3 right hidden-print">
+    <div class="col-xs-3 right text-right hidden-print">
       <? /* Display qrcode if appropriate: */ ?>
       <? if ($QRCode = $this->record($this->driver)->getQRCode("results")): ?>
         <?
@@ -205,6 +203,7 @@
       <? endif; ?>
 
       <?=$openUrl?'<span class="Z3988" title="'.$this->escapeHtmlAttr($openUrl).'"></span>':''?>
+      <?=str_replace('class="', 'class="', $this->record($this->driver)->getFormatList())?>
     </div>
   </div>
 </div>

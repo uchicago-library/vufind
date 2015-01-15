@@ -4,7 +4,13 @@
 
 @maroon: #800;
 @blue: #155f83;
-@dark-maroon: #630000;
+@yellow: #FFA319;
+@orange: #C16622;
+@mid-green: #8A9045;
+@mid-violet: #725663;
+@mid-blue:  #5B8FA8;
+@vday-hack: #e75acb;
+@brand-primary-dark:darken(@brand-primary, 6.5%);
 @light-link: #fff;
 @gray-light:#b4b4b4;
 @brand-primary: @maroon;
@@ -61,6 +67,10 @@
 @btn-primary-color:              #fff;
 @btn-primary-bg:                 @brand-primary;
 @btn-primary-border:             darken(@btn-primary-bg, 5%);
+
+@btn-orange-color:              #fff;
+@btn-orange-bg:                 @orange;
+@btn-orange-border:             darken(@btn-primary-bg, 5%);
 
 //=== Shared nav styles
 //
@@ -120,3 +130,10 @@
 @state-danger-bg:                #f2dede;
 @state-danger-border:            darken(spin(@state-danger-bg, -10), 5%); 
 
+
+//== Components
+//
+//## Define common padding and border radius sizes and more. Values based on 14px text and 1.428 line-height (~20px to start).
+
+//** Global background color for active items (e.g., navs or dropdowns).
+@component-active-bg:       @mid-blue;
