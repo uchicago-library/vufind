@@ -135,7 +135,6 @@
             <span class="callnumber holdings-info"><strong><?=$this->transEsc('Call Number')?>:</strong> <?=$this->escapeHtml($summCallNo)?></span>
           <? endif; ?>
         <? endif; ?>
-      </div><!--/.callnumAndLocation-->
 
       <? /* We need to find out if we're supposed to display an OpenURL link ($openUrlActive),
             but even if we don't plan to display the link, we still want to get the $openUrl
@@ -162,6 +161,7 @@
           <span class=""><?=$this->transEsc('Loading')?>...</span>
         </span>
       <? endif; ?>
+      </div><!--/.callnumAndLocation-->
       <?=$this->record($this->driver)->getPreviews()?>
     </div>
     <div class="col-xs-3 right text-right hidden-print">
