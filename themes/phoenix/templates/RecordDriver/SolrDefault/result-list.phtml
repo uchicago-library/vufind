@@ -1,3 +1,6 @@
+<? /* Convenience variables */ 
+   $isMarc = isset($this->driver->isMarc) ? $this->driver->isMarc : false;
+?>
 <div class="<?=$this->driver->supportsAjaxStatus()?'ajaxItem ':''?>col-xs-11">
   <div class="row">
     <div class="col-sm-2 col-xs-3 left">
@@ -12,6 +15,17 @@
       </a>
     </div>
     <div class="col-sm-7 col-xs-6 middle">
+      <? // If it's a MARC record use the custom MarcFields view helper?>
+      <? if ($isMarc):?>
+        <div class="custom-marc-record">
+            <? /* Set the bib id and record link for each result*/ 
+               $this->MarcFields()->setId($this->escapeHtmlAttr($this->driver->getUniqueID()));
+               $this->MarcFields()->setRecordLink($this->recordLink()->getUrl($this->driver)); 
+               /*Get MARC field templates populated with the proper data*/
+               $this->MarcFields()->returnMarcData('results'); ?>
+        </div>
+      <? // If it's not a MARC record do normal VuFind stuff?>
+      <? else: ?>
       <div>
         <a href="<?=$this->recordLink()->getUrl($this->driver)?>" class="title">
         <?
@@ -34,7 +48,7 @@
         <? else: ?>
           <? $summAuthor = $this->driver->getPrimaryAuthor(); if (!empty($summAuthor)): ?>
           <?=$this->transEsc('by')?>
-          <a href="<?=$this->record($this->driver)->getLink('author', $summAuthor)?>"><?
+          <a class="author" href="<?=$this->record($this->driver)->getLink('author', $summAuthor)?>"><?
             $summHighlightedAuthor = $this->driver->getHighlightedAuthor();
             echo !empty($summHighlightedAuthor)
                 ? $this->highlight($summHighlightedAuthor)
@@ -102,24 +116,25 @@
         }?>
       </div>
       <? endif; ?>
+      <? endif;?> 
+      <? // End if/else statement for custom MARC vs. normal VuFind?>
 
       <div class="callnumAndLocation ajax-availability hidden">
         <? if ($this->driver->supportsAjaxStatus()): ?>
-          <strong class="hideIfDetailed"><?=$this->transEsc('Call Number')?>:</strong>
-          <span class="callnumber ajax-availability hidden">
-            <?=$this->transEsc('Loading')?>...<br/>
-          </span>
-          <strong><?=$this->transEsc('Located')?>:</strong>
-          <span class="location ajax-availability hidden">
+          <span class="location holdings-info ajax-availability hidden">
             <?=$this->transEsc('Loading')?>...
           </span>
-          <div class="locationDetails"></div>
+          <strong class="hideIfDetailed holdings-info">
+            <span class="callnumber ajax-availability hidden">
+              <?=$this->transEsc('Loading')?>...
+            </span>
+          </strong>
+          <!--<div class="locationDetails"></div>-->
         <? else: ?>
           <? $summCallNo = $this->driver->getCallNumber(); if (!empty($summCallNo)): ?>
-            <strong><?=$this->transEsc('Call Number')?>:</strong> <?=$this->escapeHtml($summCallNo)?>
+            <span class="callnumber holdings-info"><strong><?=$this->transEsc('Call Number')?>:</strong> <?=$this->escapeHtml($summCallNo)?></span>
           <? endif; ?>
         <? endif; ?>
-      </div>
 
       <? /* We need to find out if we're supposed to display an OpenURL link ($openUrlActive),
             but even if we don't plan to display the link, we still want to get the $openUrl
@@ -130,7 +145,6 @@
         $urls = $this->record($this->driver)->getLinkDetails();
         if ($openUrlActive || !empty($urls)): ?>
         <? if ($openUrlActive): ?>
-          <br/>
           <?=$this->openUrl($openUrl)?>
           <? if ($this->driver->replaceURLsWithOpenURL()) $urls = array(); // clear URL list if replace setting is active ?>
         <? endif; ?>
@@ -142,16 +156,15 @@
         <? endif; ?>
       <? endif; ?>
 
-      <?=str_replace('class="', 'class="label label-info ', $this->record($this->driver)->getFormatList())?>
-
       <? if (!$openUrlActive && empty($urls) && $this->driver->supportsAjaxStatus()): ?>
-        <span class="status ajax-availability hidden">
-          <span class="label label-default"><?=$this->transEsc('Loading')?>...</span>
+        <span class="status ajax-availability holdings-info hidden">
+          <span class=""><?=$this->transEsc('Loading')?>...</span>
         </span>
       <? endif; ?>
+      </div><!--/.callnumAndLocation-->
       <?=$this->record($this->driver)->getPreviews()?>
     </div>
-    <div class="col-xs-3 right hidden-print">
+    <div class="col-xs-3 right text-right hidden-print">
       <? /* Display qrcode if appropriate: */ ?>
       <? if ($QRCode = $this->record($this->driver)->getQRCode("results")): ?>
         <?
@@ -168,7 +181,7 @@
 
       <? if ($this->userlist()->getMode() !== 'disabled'): ?>
         <? /* Add to favorites */ ?>
-        <i class="fa fa-heart"></i> <a href="<?=$this->recordLink()->getActionUrl($this->driver, 'Save')?>" class="save-record modal-link" id="<?=$this->driver->getUniqueId() ?>" title="<?=$this->transEsc('Add to favorites')?>"><?=$this->transEsc('Add to favorites')?></a><br/>
+        <a href="<?=$this->recordLink()->getActionUrl($this->driver, 'Save')?>" class="save-record modal-link" id="<?=$this->driver->getUniqueId() ?>" title="<?=$this->transEsc('Add to favorites')?>"><?=$this->transEsc('Add to favorites')?></a><br/>
 
         <? /* Saved lists */ ?>
         <div class="savedLists alert alert-info hidden">
@@ -189,8 +202,8 @@
         <? endforeach; ?>
       <? endif; ?>
 
+      <abbr class="unapi-id" title="<?php echo $this->driver->getUniqueId()?>"></abbr>
+      <?=str_replace('class="', 'class="', $this->record($this->driver)->getFormatList())?>
     </div>
   </div>
 </div>
-
-<abbr class="unapi-id" title="<?php echo $this->driver->getUniqueId()?>"></abbr>

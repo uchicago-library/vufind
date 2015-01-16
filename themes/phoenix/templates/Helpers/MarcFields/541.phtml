@@ -1,0 +1,9 @@
+<!--541.phtml-->
+<? if(($data['indicator1'] == 1)) {
+       echo implode(' ', $data['subfieldData']).'<br/>';
+   }
+        
+   if (!empty($data['vernacularData'])) :
+       echo implode(' ', $data['vernacularData']);?><br />
+<? endif; ?>
+

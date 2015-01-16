@@ -1,0 +1,37 @@
+<!--246.phtml-->
+<? if($data['indicator2'] == '0') {
+       $subLabel = '<span class="subLabel">Portion of title</span>';
+   }
+   elseif($data['indicator2'] == '1') {
+       $subLabel = '<span class="subLabel">Parallel title</span>';
+   }
+   elseif($data['indicator2'] == '2') {
+       $subLabel = '<span class="subLabel">Distinctive title</span>';
+   }
+   elseif($data['indicator2'] == '3') {
+       $subLabel = '<span class="subLabel">Other title</span>';
+   }
+   elseif($data['indicator2'] == '4') {
+       $subLabel = '<span class="subLabel">Cover title</span>';
+   }
+   elseif($data['indicator2'] == '5') {
+       $subLabel = '<span class="subLabel">Added title page title</span>';
+   }
+   elseif($data['indicator2'] == '6') {
+       $subLabel = '<span class="subLabel">Caption title</span>';
+   }
+   elseif($data['indicator2'] == '7') {
+       $subLabel = '<span class="subLabel">Running title</span>';
+   }
+   elseif($data['indicator2'] == '8') {
+       $subLabel = '<span class="subLabel">Spine title</span>';
+   }
+   else {
+       $subLabel = null;
+   }
+  
+   echo $subLabel . ' '. implode(' ', $data['subfieldData']) ?><br/>
+
+   <? if (!empty($data['vernacularData'])) :
+          echo implode(' ', $data['vernacularData']);?><br/>
+   <? endif; ?>

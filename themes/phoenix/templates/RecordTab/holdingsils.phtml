@@ -37,13 +37,15 @@
     <a class="placehold modal-link" title="<?=$this->transEsc('request_place_text')?>" href="<?=$this->recordLink()->getRequestUrl($holdingTitleHold)?>"><i class="fa fa-flag"></i>&nbsp;<?=$this->transEsc('title_hold_place')?></a>
 <? endif; ?>
 <? if (!empty($urls) || $openUrl): ?>
+  <div class="holdings-unit">
   <h3><?=$this->transEsc("Internet")?></h3>
   <? if (!empty($urls)): ?>
     <? foreach ($urls as $current): ?>
-      <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>"><?=$this->escapeHtml($current['desc'])?></a><br/>
+      <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="e-holding text-success"><?=$this->escapeHtml($current['desc'])?></a><br/>
     <? endforeach; ?>
   <? endif; ?>
   <? if ($openUrl): ?><?=$this->openUrl($openUrl);?><? endif; ?>
+  </div>
 <? endif; ?>
 <? foreach ($holdings as $holding): ?>
 <div class="holdings-unit">
@@ -126,6 +128,7 @@
               <? endif; ?>
               <?=$this->ServiceLinks()->asr($row)?>
               <?=$this->ServiceLinks()->borrowDirect($row)?>
+              <?=$this->ServiceLinks()->getIt($row)?>
               <?=$this->ServiceLinks()->uBorrow($row)?>
               <?=$this->ServiceLinks()->debugging($row)?>
               <? if (isset($row['link']) && $row['link'] && !$row['claimsReturned']): ?>

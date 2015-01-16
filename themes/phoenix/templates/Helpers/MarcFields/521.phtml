@@ -1,0 +1,31 @@
+<!--521.phtml-->
+<? if(empty($data['indicator1'])) {
+       $subLabel = '<span class="subLabel">Audience</span> ';
+   }
+   elseif($data['indicator1'] == 0) {
+       $subLabel = '<span class="subLabel">Reading grade level</span> ';
+   }
+   elseif($data['indicator1'] == 1) {
+       $subLabel = '<span class="subLabel">Interest age level</span> ';
+   }
+   elseif($data['indicator1'] == 2) {
+       $subLabel = '<span class="subLabel">Interest grade level</span> ';
+   }
+   elseif($data['indicator1'] == 3) {
+       $subLabel = '<span class="subLabel">Special audience level</span> ';
+   }
+   elseif($data['indicator1'] == 4) {
+       $subLabel = '<span class="subLabel">Motivation interest level</span> ';
+   }
+   elseif($data['indicator1'] == 8) {
+       $subLabel = null;
+   } 
+   else {
+       $subLabel = null;
+   }
+  
+   echo $subLabel . ' '. implode(' ', $data['subfieldData']) ?><br/>
+
+   <? if (!empty($data['vernacularData'])) :
+          echo implode(' ', $data['vernacularData']);?><br />
+   <? endif; ?>

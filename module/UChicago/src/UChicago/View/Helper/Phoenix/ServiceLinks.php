@@ -298,6 +298,24 @@ class ServiceLinks extends AbstractHelper {
                                   'ONORDER',
                                   'RETRIEVING-FROM-MANSUETO',
                                   'UNAVAILABLE'),
+                         'getIt' =>
+                            array('DECLARED-LOST',
+                                  'FLAGGED-FOR-RESERVE',
+                                  'INPROCESS',
+                                  'INPROCESS-CRERAR',
+                                  'INPROCESS-LAW',
+                                  'INPROCESS-MANSUETO',
+                                  'INPROCESS-REGENSTEIN',
+                                  'INTRANSIT',
+                                  'INTRANSIT-FOR-HOLD',
+                                  'LOANED',
+                                  'LOST',
+                                  'MISSING',
+                                  'MISSING-FROM-MANSUETO', 
+                                  'ONHOLD',
+                                  'ONORDER',
+                                  'RETRIEVING-FROM-MANSUETO',
+                                  'UNAVAILABLE'),
                         'cantFindIt' =>
                             array('AVAILABLE',
                                   'RECENTLY-RETURNED'),
@@ -401,17 +419,19 @@ class ServiceLinks extends AbstractHelper {
     }
 
     /**
-     * Method creates a link to the Uborrow consortium 
+     * Method creates a link to the Mansueto ASR Storage system
      *
      * @param row, array of holdings and item information 
      *        	
      * @return html string
      */
-    public function uBorrow($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/relais_OLE.php?format=php&database=production&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
-        $serviceLink = $this->getLinkConfig('uBorrow', $defaultUrl);
-        $displayText = 'UBorrow';
-        if (($serviceLink) and in_array($row['status'], $this->lookupStatus['uBorrow'])) {
+    public function asr($row) {
+        $defaultUrl = '/vufind/MyResearch/Storagerequest?bib=' .  $row['id'] . '&barcode=' . $row['barcode'] . '&action=add';
+        $serviceLink = $this->getLinkConfig('mansueto', $defaultUrl); 
+        $displayText = 'Request from Mansueto Library';
+        $blacklist = array_map('strtolower', $this->lookupLocation['scrcInMansueto']);
+        if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['asr']) and $this->getLocation($row['locationCodes'], 'library') != 'spcl') and 
+            (!in_array(strtolower($this->getLocation($row['locationCodes'], 'shelving')), $blacklist))) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
@@ -451,20 +471,16 @@ class ServiceLinks extends AbstractHelper {
     }
 
     /**
-     * Method creates a link to the Scan&Deliver service
-     *
-     * @param row, array of holdings and item information 
+     * Method creates a degugging link to Brad's web api for testing.
+     * Should not be used on a production system.
      *        	
      * @return html string
      */
-    public function scanAndDeliver($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/sandd_OLE.php?database=production&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
-        $serviceLink = $this->getLinkConfig('scanAndDeliver', $defaultUrl); 
-        $displayText = 'Scan and Deliver';
-        $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
-        if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
-            (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
-                return $this->getServiceLinkTemplate($serviceLink, $displayText);
+    public function debugging($row) {
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/itemServlet.php?format=xml&bib=' . $row['id'] . '&barcode=' . $row['barcode'] . '&database=testing';         $serviceLink = $this->getLinkConfig('debugging', $defaultUrl);
+        $displayText = '<< Simple API >>';
+        if ($serviceLink) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
 
@@ -487,19 +503,17 @@ class ServiceLinks extends AbstractHelper {
     }
 
     /**
-     * Method creates a link to the Mansueto ASR Storage system
+     * Method creates a GetIt link to the Relais service  
      *
      * @param row, array of holdings and item information 
      *        	
      * @return html string
      */
-    public function asr($row) {
-        $defaultUrl = '/vufind/MyResearch/Storagerequest?bib=' .  $row['id'] . '&barcode=' . $row['barcode'] . '&action=add';
-        $serviceLink = $this->getLinkConfig('mansueto', $defaultUrl); 
-        $displayText = 'Request from Mansueto Library';
-        $blacklist = array_map('strtolower', $this->lookupLocation['scrcInMansueto']);
-        if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['asr']) and $this->getLocation($row['locationCodes'], 'library') != 'spcl') and 
-            (!in_array(strtolower($this->getLocation($row['locationCodes'], 'shelving')), $blacklist))) {
+    public function getIt($row) {
+        $defaultUrl = '#?format=php&database=production&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
+        $serviceLink = $this->getLinkConfig('getIt', $defaultUrl); 
+        $displayText = 'GetIt';
+        if (($serviceLink) and in_array($row['status'], $this->lookupStatus['getIt'])) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
@@ -523,16 +537,24 @@ class ServiceLinks extends AbstractHelper {
     }
 
     /**
-     * Method creates a degugging link to Brad's web api for testing.
-     * Should not be used on a production system.
+     * Method creates a link to the login and my research pages.
+     *
+     * @param string $defaultUrl, the url passed in from the templates.
+     * @param boolean $mobile, true if the link is for a mobile view, 
+     * defaults to false.
      *        	
-     * @return html string
+     * @return html string 
      */
-    public function debugging($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/itemServlet.php?format=xml&bib=' . $row['id'] . '&barcode=' . $row['barcode'] . '&database=testing';         $serviceLink = $this->getLinkConfig('debugging', $defaultUrl);
-        $displayText = '<< Simple API >>';
+    public function myAccount($defaultUrl, $mobile=false) {
+        $serviceLink = $this->getLinkConfig('myAccount', $defaultUrl); 
+        $displayText = $this->view->transEsc("My Account");
         if ($serviceLink) {
-            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+            if ($mobile) {
+                 return $this->getServiceLinkTemplate($serviceLink, $displayText, array('dropdown-toggle login'));      
+            }
+            else {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText, array('account'));
+            }
         }
     }
 
@@ -559,24 +581,37 @@ class ServiceLinks extends AbstractHelper {
     }
 
     /**
-     * Method creates a link to the login and my research pages.
+     * Method creates a link to the Scan&Deliver service
      *
-     * @param string $defaultUrl, the url passed in from the templates.
-     * @param boolean $mobile, true if the link is for a mobile view, 
-     * defaults to false.
+     * @param row, array of holdings and item information 
      *        	
-     * @return html string 
+     * @return html string
      */
-    public function myAccount($defaultUrl, $mobile=false) {
-        $serviceLink = $this->getLinkConfig('myAccount', $defaultUrl); 
-        $displayText = $this->view->transEsc("My Account");
-        if ($serviceLink) {
-            if ($mobile) {
-                 return $this->getServiceLinkTemplate($serviceLink, $displayText, array('dropdown-toggle login'));      
-            }
-            else {
-                return $this->getServiceLinkTemplate($serviceLink, $displayText, array('account'));
-            }
+    public function scanAndDeliver($row) {
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/sandd_OLE.php?database=production&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
+        $serviceLink = $this->getLinkConfig('scanAndDeliver', $defaultUrl); 
+        $displayText = 'Scan and Deliver';
+        $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
+        if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
+            (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
+
+    /**
+     * Method creates a link to the Uborrow consortium 
+     *
+     * @param row, array of holdings and item information 
+     *        	
+     * @return html string
+     */
+    public function uBorrow($row) {
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/relais_OLE.php?format=php&database=production&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
+        $serviceLink = $this->getLinkConfig('uBorrow', $defaultUrl);
+        $displayText = 'UBorrow';
+        if (($serviceLink) and in_array($row['status'], $this->lookupStatus['uBorrow'])) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+    }
+
 }

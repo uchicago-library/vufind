@@ -1,0 +1,13 @@
+<!--526.phtml-->
+<? if($data['indicator1'] == 0) {
+       $subLabel = '<span class="subLabel">Reading program</span> ';
+   }
+   else {
+       $subLabel = null;
+   }
+  
+   echo $subLabel . ' '. implode(' ', $data['subfieldData']) ?><br/>
+
+   <? if (!empty($data['vernacularData'])) :
+          echo implode(' ', $data['vernacularData']);?><br />
+   <? endif; ?>

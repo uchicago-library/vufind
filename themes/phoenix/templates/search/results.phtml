@@ -70,10 +70,10 @@
           <? if (isset($this->overrideSearchHeading)): ?>
             <?=$this->overrideSearchHeading?>
           <? elseif ($this->params->getSearchType() == 'basic'): ?>
-            <?=$this->transEsc('for search')?>: <strong>'<?=$this->escapeHtml($lookfor)?>'</strong>,
+            <?=$this->transEsc('for search')?>: <strong>'<?=$this->escapeHtml($lookfor)?>'</strong>
           <? endif; ?>
           <? if ($qtime = $this->results->getQuerySpeed()): ?>
-            <?=$this->transEsc('query time')?>: <?=$this->localizedNumber($qtime, 2).$this->transEsc('seconds_abbrev')?>
+            <!--<?=$this->transEsc('query time')?>: <?=$this->localizedNumber($qtime, 2).$this->transEsc('seconds_abbrev')?>-->
           <? endif; ?>
         <? else: ?>
           <p class="lead"><?=$this->transEsc('nohit_heading')?></p>
@@ -82,8 +82,8 @@
 
       <? if ($recordTotal > 0): ?>
         <div class="col-sm-6 text-right">
-          <?=$this->render('search/controls/limit.phtml')?>
           <?=$this->render('search/controls/sort.phtml')?>
+          <?=$this->render('search/controls/limit.phtml')?>
           <?=$this->render('search/controls/view.phtml')?>
         </div>
       <? endif; ?>
