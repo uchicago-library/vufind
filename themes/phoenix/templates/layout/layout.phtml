@@ -120,6 +120,7 @@
     <div role="main" class="main template-dir-<?=$this->templateDir?> template-name-<?=$this->templateName?>">
       <div class="container">
         <?=$this->layout()->content ?>
+        <?=$this->Alert()->getAlert()?>
       </div>
     </div>
     <footer role="contentinfo" class="hidden-print">

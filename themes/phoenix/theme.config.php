@@ -9,6 +9,16 @@ return array(
     ),
     'helpers' => array(
         'factories' => array(
+            'Alert' => function ($sm) {
+                $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+                $alertLabel = !isset($config->Alert->label)
+                    ? false : $config->Alert->label;
+                $alertMsg = !isset($config->Alert->paragraph)
+                    ? false : $config->Alert->paragraph;
+                $alertHtml = !isset($config->Alert->html)
+                    ? false : $config->Alert->html;
+                return new \UChicago\View\Helper\Phoenix\Alert($alertLabel, $alertMsg, $alertHtml);
+            },
             'BookPlates' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\BookPlates();
             },

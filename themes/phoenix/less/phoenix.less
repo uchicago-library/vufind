@@ -17,7 +17,7 @@
     }
 }
 .main > .container {
-    padding-bottom: @grid-gutter-width / 2;
+    padding-bottom: @container-padding-btm;
 }
 
 /*General header*/
@@ -225,6 +225,34 @@ footer a:focus {
 footer .text-right {
     color:@light-link;
 }
+
+.attention {
+    padding:15px;
+    background:#3c0000;
+    background:#FFB547;
+    color:@brand-primary-dark;
+    line-height:17px;
+    border-bottom:2px solid #3c0000;
+    margin-top:25px;
+    margin-bottom:-@container-padding-btm;
+}
+.attn-ex {
+}
+.attention .hr {
+    border-top:1px dashed @brand-primary-dark;
+    padding-bottom:0;
+    margin-bottom:0;
+    height:8px;
+}
+.attention a {
+    color:#0F425C;
+    text-decoration:underline;
+}
+.attention p {
+    padding-bottom:8px;
+    margin-bottom:0;
+}
+
 
 // Buttons
 .btn-primary:hover,
