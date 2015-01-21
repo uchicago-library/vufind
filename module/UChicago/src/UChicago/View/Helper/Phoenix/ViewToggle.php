@@ -20,7 +20,7 @@ class ViewToggle extends AbstractHelper
     public function __invoke()
     {
 
-	    print '<div class="view-toggle"><a href="" class="bv">Brief View</a> | <span class="dv">Detailed View</span></div>';
+	    print '<div class="view-toggle hidden-xs"><a href="" class="bv">Brief View</a> | <span class="dv">Detailed View</span></div>';
 
     }
 }
