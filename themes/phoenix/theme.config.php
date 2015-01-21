@@ -7,6 +7,10 @@ return array(
     'css' => array(
         '//identity.uchicago.edu/c/fonts/proximanova.css:all',
     ),
+    'js' => array(
+        'jquery.cookie.js',
+        'phoenix.js'
+    ),
     'helpers' => array(
         'factories' => array(
             'Alert' => function ($sm) {
@@ -37,6 +41,9 @@ return array(
                 $config = !isset($config->ServiceLinks) ? false : $config->ServiceLinks;
                 return new \UChicago\View\Helper\Phoenix\ServiceLinks($config);
             },
+        ),
+        'invokables' => array(
+            'ViewToggle' => 'UChicago\View\Helper\Phoenix\ViewToggle',
         )    
     ),
 );

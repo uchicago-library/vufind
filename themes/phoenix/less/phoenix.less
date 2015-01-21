@@ -489,7 +489,8 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
     margin: @vertical-padding-div 0;
 }
 .search-controls .col-sm-6:first-child {
-    padding-top: ((@input-height-base + @input-border-radius) / 2) - @font-size-base; // Vertically center text in relation to from element to the left
+    padding-top: (((@input-height-base + @input-border-radius) / 2) - (@font-size-base * 2)); // Vertically center text in relation to from element to the left
+    line-height: normal;
 }
 .template-name-results .row.result {
     margin-left: 0; //Override: default vufind puts this at -15px/
@@ -499,6 +500,18 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
 }
 .search-controls form:not(:first-of-type) {
     margin-left: 15px;
+}
+.brief-view .callnumAndLocation {
+    margin-top: 0;
+}
+.brief-view .result {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 5px;
+}
+
+.template-name-results > .container > .row {
+    margin-top: -10px;
 }
 
 /*MyResearch*/
