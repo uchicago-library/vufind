@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
     /*** Brief View / Detailed View Toggle***/
-    var upd = '?upd=' + 123456;
+    var upd = '&upd=123456';
     //set a cookie for brief/detailed view toggle, uses jquery.cookie.js
     $('a.bv').click(function(){
         $.cookie('view_toggle', 'brief', { expires: 2 });
