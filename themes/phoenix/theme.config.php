@@ -9,7 +9,8 @@ return array(
     ),
     'js' => array(
         'jquery.cookie.js',
-        'phoenix.js'
+        'phoenix.js',
+        'ga.js'
     ),
     'helpers' => array(
         'factories' => array(
