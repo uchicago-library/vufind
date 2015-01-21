@@ -37,6 +37,11 @@ return array(
                     ? false : $config->Site->url;
                 return new \UChicago\View\Helper\Phoenix\MarcFields($siteUrl);
             },
+            'SearchContext' => function ($sm) {
+                $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+                $config = !isset($config->SearchContext) ? false : $config->SearchContext;
+                return new \UChicago\View\Helper\Phoenix\SearchContext($config);
+            },
             'ServiceLinks' => function ($sm) {
                 $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
                 $config = !isset($config->ServiceLinks) ? false : $config->ServiceLinks;

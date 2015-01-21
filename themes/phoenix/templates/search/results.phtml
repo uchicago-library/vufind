@@ -70,6 +70,10 @@
             <?=$this->overrideSearchHeading?>
           <? elseif ($this->params->getSearchType() == 'basic'): ?>
             <?=$this->transEsc('for search')?>: <strong>'<?=$this->escapeHtml($lookfor)?>'</strong>
+            <span class="hidden-xs hidden-sm hidden-md">
+            <?=$this->transEsc('in the')?>
+            <?=$this->SearchContext()->getDisplay()?>
+            </span>
           <? endif; ?>
           <? if ($qtime = $this->results->getQuerySpeed()): ?>
             <!--<?=$this->transEsc('query time')?>: <?=$this->localizedNumber($qtime, 2).$this->transEsc('seconds_abbrev')?>-->
