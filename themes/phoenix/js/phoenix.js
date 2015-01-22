@@ -43,7 +43,7 @@ $(document).ready(function() {
     });*/
 
     //trim long titles
-    $('.title').each(function(){
+    $('.ajaxItem .title').each(function(){
         if ($(this).text().length > +l ) {
             $(this).text($(this).text().substr(0,+l));
             $(this).append('...');
