@@ -27,6 +27,10 @@ return array(
             'BookPlates' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\BookPlates();
             },
+            'GetConfig' => function ($sm) {
+                $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+                return new \UChicago\View\Helper\Phoenix\GetConfig($config);
+            },
             'HathiLink' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\HathiLink();
             },
