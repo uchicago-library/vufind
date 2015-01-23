@@ -8,6 +8,12 @@
 .text-shadow (@string: 1px 1px 1px rgba(0, 0, 0, 0.1)) {
     text-shadow: @string;
 }
+.red {
+    color: @red;
+}
+.gray {
+    color: lighten(@gray-base, 55%); // #8c8c8c
+}
 
 /*General*/
 .container {
@@ -571,3 +577,8 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
 .list-group-item {
     padding: 8px 13px;
 }
+.list-group-item .fa-times {
+    padding-left: 20px;
+}
+
+

@@ -6,11 +6,14 @@
 @blue: #155f83;
 @yellow: #FFA319;
 @orange: #C16622;
-@mid-green: #8A9045;
-@mid-violet: #725663;
-@mid-blue:  #5B8FA8;
+@orange-light:#D49464;
+@red: #8F3931;
+@red-light: #B1746F;
+@violet-light: #725663;
+@blue-light:  #5B8FA8;
+@green-light: #ADB17D;
 @vday-hack: #e75acb;
-@brand-primary-dark:darken(@brand-primary, 6.5%);
+@brand-primary-dark: darken(@brand-primary, 6.5%);
 @light-link: #fff;
 @gray-light:#b4b4b4;
 @brand-primary: @maroon;
@@ -40,6 +43,8 @@
 @font-size-base:          12px;
 @font-size-large:         ceil((@font-size-base * 1.25)); // ~18px
 @font-size-small:         ceil((@font-size-base * 0.85)); // ~12px
+
+@text-muted: lighten(@gray-base, 55%); // #8c8c8c
 
 
 //== General
@@ -139,4 +144,5 @@
 //## Define common padding and border radius sizes and more. Values based on 14px text and 1.428 line-height (~20px to start).
 
 //** Global background color for active items (e.g., navs or dropdowns).
-@component-active-bg:       @mid-blue;
+@component-active-bg: #806362;
+
