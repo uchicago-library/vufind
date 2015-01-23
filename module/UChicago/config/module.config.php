@@ -78,13 +78,13 @@ $config = array(
             ),//recordtab
             'resolver_driver' => array(
                 'factories' => array(
-                    'sfx' => function ($sm) {
+                    /*'sfx' => function ($sm) {
                         return new \UChicago\Resolver\Driver\Sfx(
                             $sm->getServiceLocator()->get('VuFind\Config')->get('config')->OpenURL->url,
                             $sm->getServiceLocator()->get('VuFind\Http')
                                 ->createClient()
                         );
-                    },
+                    },*/
                 ),
             ),//resolver_driver
         ),
