@@ -152,17 +152,58 @@ body > header > .container > section.visible-lg { //Fullscreen
 }
 
 /*Forms*/
+.form-inline .input-large {
+    width: 50%;
+    @media (max-width: @screen-sm) {
+        width: 100%;
+    }
+}
+.search {
+  margin-bottom: 4px;
+}
+.group .form-group {
+  position: relative;
+}
+.form-group .close {
+  position: absolute;
+  right: -14px;
+  top: -16px;
+}
+#groupJoin {
+  margin-bottom: @line-height-computed;
+}
+#groupPlaceHolder {
+  margin-top: -16px;
+  margin-bottom: 20px;
+}
+#limit_language,
+#limit_format,
+#limit_building,
+#limit_collection {
+  margin-bottom: @line-height-computed;
+}
+#advSearchForm input.btn-primary {
+}
 #searchForm .form_control {
     width:200px;
 }
 .navbar .checkbox {
     color:#111 !important;
 }
+/* JEJ commented this out on 1/29/2015.
+   Bootstrap checkboxes get a negative margin and absolute position
+by default. It seems like some of the VuFind markup is different
+from what's done in Bootstrap, and adjustments like this one pop 
+up. I'm seeing what will happen if I go back to the stock Bootstrap
+CSS rule and adjust the HTML markup to match Bootstrap's style.
+(Specifically, I'm doing this for the facets in 'edit this advanced
+search.)
 .checkbox input[type="checkbox"] {
     @media (min-width: @container-desktop) {
         margin: 0; 
     }
 }
+*/
 #searchForm a.btn {
     color:@light-link;
     //font-size:@tiny;
@@ -297,6 +338,11 @@ footer .text-right {
     @media (max-width: @screen-sm) {
         width:100%;
     }
+}
+
+.offscreen {
+    left: -2000px;
+    position: absolute;
 }
 
 /* Typeogrophy*/
@@ -559,6 +605,13 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
 }
 
 /*Sidebar*/
-.list-group-item {
+/* JEJ changed on 1/29/2015.
+   .list-group-item is a bootstrap class that gets used in lots of
+different contexts- for <li>'s and <a>'s. It seems like some of the
+HTML markup in VuFind wasn't done in the Bootstrap style, so I'm
+removing the padding here and adjusting the markup. (Specifically,
+I'm doing the facets in "edit this advanced search" right now.) 
+*/
+.facet .list-group-item {
     padding: 8px 13px;
 }
