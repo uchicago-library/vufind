@@ -12,7 +12,7 @@
 /*General*/
 .container {
     background: rgb(255, 255, 255);
-    @media (max-width: @screen-sm) {
+    @media (max-width: @screen-xs-max) {
         background:@body-bg;
     }
 }
@@ -62,7 +62,7 @@
     float:right;
     background:@brand-primary-dark;
     padding:0 8px 5px 8px;
-    @media (max-width: @screen-sm) {
+    @media (max-width: @screen-xs-max) {
         display:none;
     }
 }
@@ -154,7 +154,7 @@ body > header > .container > section.visible-lg { //Fullscreen
 /*Forms*/
 .form-inline .input-large {
     width: 50%;
-    @media (max-width: @screen-sm) {
+    @media (max-width: @screen-xs-max) {
         width: 100%;
     }
 }
@@ -208,14 +208,14 @@ search.)
     color:@light-link;
     //font-size:@tiny;
     .tiny-text-shadow();
-    @media (max-width: @screen-sm) {
+    @media (max-width: @screen-xs-max) {
         display:none;
     }
 }
 #searchForm .twitter-typeahead,
 #searchForm_type.form-control {
     margin-right:15px;
-    @media (max-width: @screen-sm) {
+    @media (max-width: @screen-xs-max) {
         margin:0 0 10px 0; 
     }
 }
@@ -320,7 +320,7 @@ footer .text-right {
 
 .btn-primary {
     #gradient.vertical(@btn-primary-bg, @brand-primary-dark);
-    @media (max-width: @screen-sm) {
+    @media (max-width: @screen-xs-max) {
         #gradient.vertical(lighten(@gray-lighter, 5%), lighten(@gray-light, 10%));
         border:1px solid lighten(@gray-light, 5%);
         color:@gray-dark;
@@ -328,14 +328,14 @@ footer .text-right {
 }
 .btn-primary:hover, 
 .btn-primary:active {    
-    @media (max-width: @screen-sm) {
+    @media (max-width: @screen-xs-max) {
         #gradient.vertical(lighten(@gray-lighter, 0%), lighten(@gray-light, 5%));
         border:1px solid lighten(@gray-light, 10%);
         color:@gray-dark;
     }
 }
 #searchForm > .btn {
-    @media (max-width: @screen-sm) {
+    @media (max-width: @screen-xs-max) {
         width:100%;
     }
 }
