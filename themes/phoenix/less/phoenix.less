@@ -160,6 +160,11 @@ body > header > .container > section.visible-lg { //Fullscreen
 }
 .search {
   margin-bottom: 4px;
+  @media (max-width: @screen-xs-max) {
+    input[type="text"] {
+      margin-bottom: 4px;
+    }
+  }
 }
 .group .form-group {
   position: relative;
