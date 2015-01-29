@@ -144,6 +144,13 @@ function addSearchJS(group)
 function switchToAdvancedSearch()
 {
     $('#advancedsearchlink').parent().hide();
+
+    //change text input's name to 'lookfor0[]' (advanced search)
+    $('#search_lookfor0_0').attr('name', 'lookfor0[]');
+
+    //change field pulldown's name to 'type0[]' (advanced search)
+    $('#search_type0_0').attr('name', 'type0[]');
+
     addSearch(0, '', '');
     addSearch(0, '', '');
 

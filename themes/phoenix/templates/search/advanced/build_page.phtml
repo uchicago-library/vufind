@@ -35,6 +35,14 @@ $(document).ready(function() {
     <? endforeach; ?>
   <? /* JS to convert the advanced search page to a basic search onload. */?>
   <? else: ?>
+    //masquerade as basic search onload. 
+
+    //change text input's name to 'lookfor'.
+    $('#search_lookfor0_0').attr('name', 'lookfor');
+
+    //change field pulldown's name to 'type'.
+    $('#search_type0_0').attr('name', 'type');
+
     //hide 2nd and 3rd search box.
     deleteSearch(0, 1);
     deleteSearch(0, 2);
