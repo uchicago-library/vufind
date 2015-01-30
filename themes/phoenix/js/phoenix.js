@@ -58,5 +58,5 @@ $(document).ready(function() {
         //window.location = location.href + '?upd=' + 123456;
         $('.view-toggle a').attr('href', location.href.replace(upd, '') + upd);
     });
-
 });
+

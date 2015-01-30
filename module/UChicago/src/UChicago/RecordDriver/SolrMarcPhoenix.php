@@ -207,9 +207,10 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
      *
      * @return array of combined subfield data.
      */
-    /*protected function combineLinkData($marcData) {
+    protected function combineLinkData($marcData) {
         $retval = array();
         $i = 0;
+
         if (isset($marcData['urls'])) {
             foreach ($marcData['urls'] as $urls) {
                 if (!empty($urls['subfieldData'])) {
@@ -225,12 +226,21 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                             break;
                         }
                     }
+                    foreach($marcData['callnumber'] as $callnumber) {
+                        if(!empty($callnumber['subfieldData'])) {
+                            foreach($callnumber['subfieldData'] as $key => $value) {
+                                $retval['urls'][$i]['subfieldData'][$key[0]] = $value; 
+                            }
+                            array_shift($marcData['callnumber']);
+                            break;
+                        }
+                    }
                 }
                 $i++;
             }
-        } 
+        }
         return $retval;
-    }*/
+    }
 
     /**
      * Get e-holdings from the marc record. Each link is returned as
@@ -259,16 +269,12 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
      *
      * @return null|array
      */
-    /*public function getEholdingsFromMarc()
+    public function getEholdingsFromMarc()
     {
         $rawMarcData = $this->crosswalk('eHoldings');
         $rawMarcData = $this->combineLinkData($rawMarcData);
         return !empty($rawMarcData) ? $rawMarcData : null;
     }
-    !!! - Above function used to be an override of getAllRecordLinks. 
-    It blows up in the VuFind 2.3 so I changed the method name. 
-    I belive this method I'm not sure what to do with this right now. - brad
-    */
 
     /**  
      * Get the call number associated with the record (empty string if
@@ -507,6 +513,8 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                   'values' => array('098|u')),
             array('label'  => 'displayText',
                   'values' => array('098|cl')),
+            array('label'  => 'callnumber',
+                  'values' => array('098|a')),
         ),
         /**
          * Array of marc fields to display for 

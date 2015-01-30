@@ -29,21 +29,21 @@ $(document).ready(function() {
 
     if ($.cookie('view_toggle') != 'brief'){
         // assign action to the openUrlEmbed link class
-        $('a.openUrlEmbed').each(function(){
+        $('.template-name-view a.openUrlEmbed, .template-name-results a.openUrlEmbed').each(function(){
             var params = extractClassParams(this);
             var openUrl = $(this).children('span.openUrl:first').attr('title');
             $(this).hide();
             loadResolverLinks($('#openUrlEmbed'+params.openurl_id).removeClass('hidden'), openUrl);
-            return false;
+            return true; //Default is fals, changing to true fixes it, I don't know why
         });
     }
     else {
-        $('.template-name-results a.openUrlEmbed').click(function(){
+        $('.template-name-view a.openUrlEmbed').click(function(){
             var params = extractClassParams(this);
             var openUrl = $(this).children('span.openUrl:first').attr('title');
             $(this).hide();
             loadResolverLinks($('#openUrlEmbed'+params.openurl_id).removeClass('hidden'), openUrl);
-            return false;
+            return true; //Default is fals, changing to true fixes it, I don't know why
         });
     }
 });

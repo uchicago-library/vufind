@@ -1,5 +1,6 @@
 <? /* Convenience variables */ 
    $isMarc = isset($this->driver->isMarc) ? $this->driver->isMarc : false;
+   $hathiLink = $this->HathiLink()->getHathiLink();
 ?>
 <div class="<?=$this->driver->supportsAjaxStatus()?'ajaxItem ':''?>col-xs-11">
   <div class="row">
@@ -142,26 +143,32 @@
           */
         $openUrl = $this->driver->getOpenURL();
         $openUrlActive = $this->driver->openURLActive('results');
-        $urls = $this->record($this->driver)->getLinkDetails();
-        if ($openUrlActive || !empty($urls)): ?>
-        <? if ($openUrlActive): ?>
-          <?=$this->openUrl($openUrl)?>
-          <? if ($this->driver->replaceURLsWithOpenURL()) $urls = array(); // clear URL list if replace setting is active ?>
-        <? endif; ?>
-        <? if (!is_array($urls)) $urls = array();
-          if(!$this->driver->isCollection()):
-            foreach ($urls as $current): ?>
-              <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext" target="new"><i class="fa fa-external-link"></i> <?=($current['url'] == $current['desc']) ? $this->transEsc('Get full text') : $this->escapeHtml($current['desc'])?></a><br/>
-          <? endforeach; ?>
-        <? endif; ?>
-      <? endif; ?>
-
+        //$urls = $this->record($this->driver)->getLinkDetails();
+        $urls = $this->Eholdings()->getEholdingLinks();//Replace default 856 urls with e-holdings from the 098 fields?>
+        
       <? if (!$openUrlActive && empty($urls) && $this->driver->supportsAjaxStatus()): ?>
         <span class="status ajax-availability holdings-info hidden">
           <span class=""><?=$this->transEsc('Loading')?>...</span>
         </span>
       <? endif; ?>
       </div><!--/.callnumAndLocation-->
+      <? if ($openUrlActive || !empty($urls)): ?>
+        <? if ($openUrlActive): ?>
+          <?=$this->openUrl($openUrl)?>
+          <? if ($this->driver->replaceURLsWithOpenURL()) $urls = array(); // clear URL list if replace setting is active ?>
+        <? endif; ?>
+        <? if (!is_array($urls)) $urls = array();?>
+          <? if(!$this->driver->isCollection()):
+            foreach ($urls as $current): ?>
+              <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext eLink text-success" target="new"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']))?></a> <?=$current['desc']?><br/>
+          <? endforeach; ?>
+        <? endif; ?>
+      <? endif; ?>
+
+      <?/*Build a Hathi link for records with a 903 field = to "Hathi" or records with a bib# beginning with ocm or ocn.*/?>
+      <? if ($hathiLink) : ?>
+        <?=$hathiLink?>
+      <? endif; ?>
       <?=$this->record($this->driver)->getPreviews()?>
     </div>
     <div class="col-xs-3 right text-right hidden-print">

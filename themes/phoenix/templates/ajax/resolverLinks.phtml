@@ -1,18 +1,14 @@
 <div>
   <? if (!empty($this->electronic)): ?>
     <div class="openurls">
-      <strong><?=$this->transEsc('Electronic')?></strong>
-      <ul>
-        <? foreach ($this->electronic as $link): ?>
-          <li>
-            <? if (isset($link['href']) && !empty($link['href'])): ?>
-              <a href="<?=$this->escapeHtmlAttr($link['href'])?>" title="<?=isset($link['service_type'])?$this->escapeHtmlAttr($link['service_type']):''?>" class="text-success eLink"><?=isset($link['title'])?$this->escapeHtml($link['title']):''?></a> <?=isset($link['coverage'])?$this->escapeHtml($link['coverage']):''?>
-            <? else: ?>
-              <?=isset($link['title'])?$this->escapeHtml($link['title']):''?> <?=isset($link['coverage'])?$this->escapeHtml($link['coverage']):''?>
-            <? endif; ?>
-          </li>
-        <? endforeach; ?>
-      </ul>
+      <? foreach ($this->electronic as $link): ?>
+        <? if (isset($link['href']) && !empty($link['href'])): ?>
+          <a href="<?=$this->escapeHtmlAttr($link['href'])?>" title="<?=isset($link['service_type'])?$this->escapeHtmlAttr($link['service_type']):''?>" class="text-success eLink"><?=isset($link['title'])?$this->escapeHtml($link['title']):''?></a> <?=isset($link['coverage'])?$this->escapeHtml($link['coverage']):''?>
+        <? else: ?>
+          <?=isset($link['title'])?$this->escapeHtml($link['title']):''?> <?=isset($link['coverage'])?$this->escapeHtml($link['coverage']):''?>
+        <? endif; ?>
+        <br/>
+      <? endforeach; ?>
     </div>
   <? endif; ?>
   <? if (!empty($this->print)): ?>
