@@ -1203,15 +1203,15 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $locationCodes = $row['location'];
 
                 /*Get e-holdings if they exist*/
-                if ($hasEholdings) {
+                /*if ($hasEholdings) {
                     $eHoldings = $this->getEholdings($id, $holdingId, end(explode('/', $locationCodes)), $holdingCallNum, $holdingCallNumDisplay);
                     foreach ($eHoldings as $eHolding) {
                         $items[] = $eHolding;
                     }
-                }
+                }*/
                 
                 /*Build a mock item for each of the holdings if no items exist*/
-                if((!$hasItems or $hasHoldingNote) and (!empty($shelvingLocation))) { 
+                if(((!$hasItems or $hasHoldingNote) and (!empty($shelvingLocation))) and !$hasEholdings) { 
                     $item['id'] = $id; 
                     $item['location'] = $shelvingLocation; 
                     $item['callnumber'] = $holdingCallNum;
