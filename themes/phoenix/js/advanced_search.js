@@ -6,8 +6,10 @@ function addSearch(link, term, field)
   var group = parseInt($(link).parents('.group').attr('id').replace('group', ''));
 
   // Add the 'match' pulldown 
-  $('select#search_bool'+group).show();
-  $('label[for="search_bool'+group+'"]').show();
+  if ($('#group' + group).find('.search').length > 0) {
+    $('select#search_bool'+group).removeClass('hidden').show();
+    $('label[for="search_bool'+group+'"]').removeClass('hidden').show();
+  }
 
   // Does anyone use this???
   if (term  == undefined) {term  = '';}
@@ -87,9 +89,6 @@ function updateGroups()
         //update the label's 'for' attribute. 
         $(match).prevAll('label').attr('for', 'search_bool' + g).eq(0);
 
-        //update group's close button.
-        //$(group).find('a.close').attr('onclick', 'deleteGroup(' + g + ')');
-
         //for each search box/field combo...
         $(group).find('.search').each(function(s, search) {
             //set the ID of this element to something like search0_0.
@@ -112,6 +111,9 @@ function updateGroups()
 
             //set the field pulldown's name to something like type0[].
             $(select).attr('name', 'type' + g + '[]');
+
+            //set the plus sign in front of the 'add search field' link. 
+            $(group).find('i[id$="Holder"]').attr('id', 'group' + g + 'Holder');
 
             //get 'add seach field link'.
             var link = $(group).find('a[id^="add_search_link"]');
@@ -136,9 +138,9 @@ function addGroup(firstTerm, firstField, join)
     + '<div class="row">'
     + '<div class="col-md-12">'
     + '<div class="form-group form-inline">'
-    + '<label for="search_bool'+nextGroup+'">'+searchMatch+':&nbsp;</label>'
+    + '<label class="hidden" for="search_bool'+nextGroup+'">'+searchMatch+':&nbsp;</label>'
     + '<a href="#" class="close hidden" onclick="deleteGroup(this)" title="'+deleteSearchGroupString+'">&times;</a>'
-    + '<select id="search_bool'+nextGroup+'" name="bool'+nextGroup+'[]" class="form-control">'
+    + '<select id="search_bool'+nextGroup+'" name="bool'+nextGroup+'[]" class="form-control hidden">'
     + '<option value="AND"';
   if(join == 'AND') {
     newGroup += ' selected';
