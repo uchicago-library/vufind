@@ -52,7 +52,9 @@
         <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&from=<?=$this->escapeHtml($current['callnumber'])?>"
            class="ablink">(Browse the Shelves)</a><br/>
       <?endif;?>
-      <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="eLink text-success"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']))?></a> <?=$current['desc']?><br/>
+      <div>
+        <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="eLink text-success"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']))?></a> <?=$current['desc']?><br/>
+      </div>
     <? endforeach; ?>
   <? endif; ?>
   <? if ($openUrl): ?><?=$this->openUrl($openUrl);?><? endif; ?>
