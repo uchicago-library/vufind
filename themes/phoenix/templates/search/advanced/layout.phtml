@@ -69,7 +69,7 @@
     
           <div class="form-group form-inline">
             <label for="search_bool0">Match:&nbsp;</label>
-            <a title="Remove Search Group" class="close hidden" onclick="deleteGroup(0)" href="#">×</a>
+            <a title="Remove Search Group" class="close hidden" onclick="deleteGroup(this)" href="#">×</a>
             <select class="form-control" name="bool0[]" id="search_bool0">
               <option value="AND">ALL Terms</option>
               <option value="OR">ANY Terms</option>
@@ -91,7 +91,7 @@
                 <option value="year">Year of Publication</option>
                 <option value="toc">Table of Contents</option>
               </select>
-              <a onclick="deleteSearch(0,0)" href="#" class="delete">×</a>
+              <a onclick="deleteSearch(this)" href="#" class="delete">×</a>
               <input class="btn btn-primary basicSearchBtn" type="submit" value="Search"/>
             </div><!-- end search0_0-->
           <div id="search0_1" class="search form-group form-inline">
@@ -108,7 +108,7 @@
                 <option value="year">Year of Publication</option>
                 <option value="toc">Table of Contents</option>
               </select>
-            <a onclick="deleteSearch(0,1)" href="#" class="delete">×</a>
+            <a onclick="deleteSearch(this)" href="#" class="delete">×</a>
           </div><!-- end search0_1-->
             <div id="search0_2" class="search form-group form-inline">
               <input type="text" value="" name="lookfor0[]" class="form-control input-large" id="search_lookfor0_2"/>
@@ -124,10 +124,10 @@
                 <option value="year">Year of Publication</option>
                 <option value="toc">Table of Contents</option>
               </select>
-              <a onclick="deleteSearch(0,2)" href="#" class="delete">×</a>
+              <a onclick="deleteSearch(this)" href="#" class="delete">×</a>
             </div><!-- end search 0_2-->
           <i class="fa fa-plus-circle" id="group0Holder" style="display: inline-block;"></i> 
-          <a onclick="addSearch(0)" id="add_search_link_0" href="#" style="display: inline;">Add Search Field</a> 
+          <a onclick="addSearch(this)" id="add_search_link_0" href="#" style="display: inline;">Add Search Field</a> 
           <a class="external" id="what_is_a_field" href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchfield" style="display: inline;"><i class="icon-info-sign icon-large" style="text-decoration: none;"></i>What is a Field?</a>
           <p id="advSearchP">
             <a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#powersearch" class="external">Power searching instructions (Boolean, etc.)</a>

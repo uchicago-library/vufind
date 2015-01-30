@@ -11,7 +11,7 @@ $(document).ready(function() {
         }
         //add a new search box, if necessary.
         if ($('#search<?=$j?>_<?=$i?>').length == 0) {
-          addSearch('', '', '');
+          addSearch($('#add_search_link_<?=$j?>'), '', '');
         }
         //update the search text. 
         $('#search<?=$j?>_<?=$i?> input[type="text"]').val('<?=addslashes($search->getString())?>');
@@ -44,8 +44,8 @@ $(document).ready(function() {
     $('#search_type0_0').attr('name', 'type');
 
     //hide 2nd and 3rd search box.
-    deleteSearch(0, 1);
-    deleteSearch(0, 2);
+    $('#search0_2').find('a.delete').click();
+    $('#search0_1').find('a.delete').click();
     
     //hide 'add search fields' links. 
     $('#group0Holder').hide();
