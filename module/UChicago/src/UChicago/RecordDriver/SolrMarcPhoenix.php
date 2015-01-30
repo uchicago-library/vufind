@@ -381,7 +381,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
         ),
         /*Array of marc fields and sub fields displayed in the description tab of the
         full record view. Included in the array is a field for labels that will be used in the html*/
-        'tab' => array(
+        'details' => array(
             array('label'  => 'Varying Form of Title',
                   'values' => array('246|abfginp')),
             array('label'  => 'Other title',

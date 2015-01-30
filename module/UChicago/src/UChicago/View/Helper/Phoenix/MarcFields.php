@@ -152,10 +152,15 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
     public function returnMarcData($pos)
     {
         $rawMarcData = $this->view->driver->crosswalk($pos);
+       
+        /*Display a message if nothing is found*/ 
+        if (empty($rawMarcData)) {
+            echo '<tr><td>' . $this->view->transEsc('no_description') . '</td></tr>';
+        }
 
         foreach($rawMarcData as $marcData) {
             
-            if ($pos == 'top' || $pos == 'tab') {
+            if ($pos == 'top' || $pos == 'details') {
  
                 /*Title: get special template*/
                 if (($marcData[0]['currentField'] == 245)) {

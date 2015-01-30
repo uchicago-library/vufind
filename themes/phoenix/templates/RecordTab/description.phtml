@@ -1,0 +1,11 @@
+<?
+    // Set page title.
+    $this->headTitle($this->translate('Description') . ': ' . $this->driver->getBreadcrumb());
+
+    // Grab clean ISBN for convenience:
+    $isbn = $this->driver->getCleanISBN();
+?>
+<table class="table table-striped" summary="<?=$this->transEsc('Description')?>">
+  <? // Use custom solrMarcPhoenix driver - brad?>
+  <? $this->MarcFields()->returnMarcData($pos='details');?>
+</table>
