@@ -4,6 +4,10 @@ var nextGroup = 0;
 
 function addSearch(group, term, field)
 {
+  // Add the 'match' pulldown 
+  $('select#search_bool'+group).show();
+  $('label[for="search_bool'+group+'"]').show();
+
   // Does anyone use this???
   if (term  == undefined) {term  = '';}
   if (field == undefined) {field = '';}
@@ -50,6 +54,11 @@ function deleteSearch(group, eq)
   if($('#group'+group+' .search').length == 1) {
     $('#group'+group+' .search .delete').addClass('hidden');
   }
+  // Hide Match pulldown. 
+  if($('#group'+group+' .search').length == 1) {
+    $('select#search_bool'+group).hide();
+    $('label[for="search_bool'+group+'"]').hide();
+  }
 }
 
 function addGroup(firstTerm, firstField, join)
@@ -90,6 +99,11 @@ function addGroup(firstTerm, firstField, join)
     // Show x
     $('.group .close').removeClass('hidden');
   }
+
+  // Hide the 'Match' pulldown in the group.
+  $('select#search_bool'+nextGroup).hide();
+  $('label[for="search_bool'+nextGroup+'"]').hide();
+
   return nextGroup++;
 }
 

@@ -1,0 +1,588 @@
+<? $single_quote = "'"; //needed for our option values with 's in the name?>
+
+<fieldset>
+<legend>Limit To</legend>
+
+<div class="row">
+	<div class="col-sm-6 col-md-3">
+
+	<label for="limit_language" class="displayBlock">Language:</label>
+	<select id="limit_language" name="filter[]" multiple="multiple" size="10">
+	<option class='all_languages' value=''>All Languages</option>
+<option value='language:"English"'>English</option>
+<option value='language:"German"'>German</option>
+<option value='language:"French"'>French</option>
+<option value='language:"Spanish"'>Spanish</option>
+<option value='language:"Chinese"'>Chinese</option>
+<option value='language:"Russian"'>Russian</option>
+<option value='language:"Italian"'>Italian</option>
+<option value='language:"Japanese"'>Japanese</option>
+<option value='language:"Abkhazian"'>Abkhazian</option>
+<option value='language:"Achinese"'>Achinese</option>
+<option value='language:"Acoli"'>Acoli</option>
+<option value='language:"Adyghe"'>Adyghe</option>
+<option value='language:"Afrikaans"'>Afrikaans</option>
+<option value='language:"Afro-Asiatic"'>Afro-Asiatic</option>
+<option value='language:"Ainu"'>Ainu</option>
+<option value='language:"Akan"'>Akan</option>
+<option value='language:"Akkadian"'>Akkadian</option>
+<option value='language:"Albanian"'>Albanian</option>
+<option value='language:"Aleut"'>Aleut</option>
+<option value='language:"Algonquian"'>Algonquian</option>
+<option value='language:"Altaic"'>Altaic</option>
+<option value='language:"Amharic"'>Amharic</option>
+<option value='language:"Ancient Egyptian"'>Ancient Egyptian</option>
+<option value='language:"Ancient Greek"'>Ancient Greek</option>
+<option value='language:"Angika"'>Angika</option>
+<option value='language:"Apache"'>Apache</option>
+<option value='language:"Arabic"'>Arabic</option>
+<option value='language:"Aragonese"'>Aragonese</option>
+<option value='language:"Aramaic"'>Aramaic</option>
+<option value='language:"Arapaho"'>Arapaho</option>
+<option value='language:"Arawak"'>Arawak</option>
+<option value='language:"Armenian"'>Armenian</option>
+<option value='language:"Aromanian"'>Aromanian</option>
+<option value='language:"Artificial"'>Artificial</option>
+<option value='language:"Assamese"'>Assamese</option>
+<option value='language:"Asturian"'>Asturian</option>
+<option value='language:"Athapascan"'>Athapascan</option>
+<option value='language:"Australian"'>Australian</option>
+<option value='language:"Austronesian"'>Austronesian</option>
+<option value='language:"Avaric"'>Avaric</option>
+<option value='language:"Avestan"'>Avestan</option>
+<option value='language:"Awadhi"'>Awadhi</option>
+<option value='language:"Aymara"'>Aymara</option>
+<option value='language:"Azerbaijani"'>Azerbaijani</option>
+<option value='language:"Balinese"'>Balinese</option>
+<option value='language:"Baltic"'>Baltic</option>
+<option value='language:"Baluchi"'>Baluchi</option>
+<option value='language:"Bambara"'>Bambara</option>
+<option value='language:"Bamileke"'>Bamileke</option>
+<option value='language:"Banda"'>Banda</option>
+<option value='language:"Bantu"'>Bantu</option>
+<option value='language:"Basa"'>Basa</option>
+<option value='language:"Bashkir"'>Bashkir</option>
+<option value='language:"Basque"'>Basque</option>
+<option value='language:"Batak"'>Batak</option>
+<option value='language:"Beja"'>Beja</option>
+<option value='language:"Belarusian"'>Belarusian</option>
+<option value='language:"Bemba"'>Bemba</option>
+<option value='language:"Bengali"'>Bengali</option>
+<option value='language:"Berber"'>Berber</option>
+<option value='language:"Bhojpuri"'>Bhojpuri</option>
+<option value='language:"Bihari"'>Bihari</option>
+<option value='language:"Bikol"'>Bikol</option>
+<option value='language:"Bini"'>Bini</option>
+<option value='language:"Bislama"'>Bislama</option>
+<option value='language:"Blin"'>Blin</option>
+<option value='language:"Bosnian"'>Bosnian</option>
+<option value='language:"Braj"'>Braj</option>
+<option value='language:"Breton"'>Breton</option>
+<option value='language:"Buginese"'>Buginese</option>
+<option value='language:"Bulgarian"'>Bulgarian</option>
+<option value='language:"Buriat"'>Buriat</option>
+<option value='language:"Burmese"'>Burmese</option>
+<option value='language:"Caddo"'>Caddo</option>
+<option value='language:"Catalan"'>Catalan</option>
+<option value='language:"Caucasian"'>Caucasian</option>
+<option value='language:"Cebuano"'>Cebuano</option>
+<option value='language:"Celtic"'>Celtic</option>
+<option value='language:"Central American Indian"'>Central American Indian</option>
+<option value='language:"Central Khmer"'>Central Khmer</option>
+<option value='language:"Chagatai"'>Chagatai</option>
+<option value='language:"Chamic"'>Chamic</option>
+<option value='language:"Chamorro"'>Chamorro</option>
+<option value='language:"Chechen"'>Chechen</option>
+<option value='language:"Cherokee"'>Cherokee</option>
+<option value='language:"Cheyenne"'>Cheyenne</option>
+<option value='language:"Chibcha"'>Chibcha</option>
+<option value='language:"Chichewa"'>Chichewa</option>
+<option value='language:"Chinese"'>Chinese</option>
+<option value='language:"Chinook"'>Chinook</option>
+<option value='language:"Chipewyan"'>Chipewyan</option>
+<option value='language:"Choctaw"'>Choctaw</option>
+<option value='language:"Church Slavic"'>Church Slavic</option>
+<option value='language:"Chuukese"'>Chuukese</option>
+<option value='language:"Chuvash"'>Chuvash</option>
+<option value='language:"Classical Syriac"'>Classical Syriac</option>
+<option value='language:"Coptic"'>Coptic</option>
+<option value='language:"Cornish"'>Cornish</option>
+<option value='language:"Corsican"'>Corsican</option>
+<option value='language:"Cree"'>Cree</option>
+<option value='language:"Creek"'>Creek</option>
+<option value='language:"Creole"'>Creole</option>
+<option value='language:"Creoles"'>Creoles</option>
+<option value='language:"Crimean Tatar"'>Crimean Tatar</option>
+<option value='language:"Croatian"'>Croatian</option>
+<option value='language:"Cushitic"'>Cushitic</option>
+<option value='language:"Czech"'>Czech</option>
+<option value='language:"Dakota"'>Dakota</option>
+<option value='language:"Danish"'>Danish</option>
+<option value='language:"Dargwa"'>Dargwa</option>
+<option value='language:"Delaware"'>Delaware</option>
+<option value='language:"Dinka"'>Dinka</option>
+<option value='language:"Divehi"'>Divehi</option>
+<option value='language:"Dogri"'>Dogri</option>
+<option value='language:"Dogrib"'>Dogrib</option>
+<option value='language:"Dravidian"'>Dravidian</option>
+<option value='language:"Duala"'>Duala</option>
+<option value='language:"Dutch"'>Dutch</option>
+<option value='language:"Dyula"'>Dyula</option>
+<option value='language:"Dzongkha"'>Dzongkha</option>
+<option value='language:"Eastern Frisian"'>Eastern Frisian</option>
+<option value='language:"Efik"'>Efik</option>
+<option value='language:"Elamite"'>Elamite</option>
+<option value='language:"English"'>English</option>
+<option value='language:"Esperanto"'>Esperanto</option>
+<option value='language:"Estonian"'>Estonian</option>
+<option value='language:"Ewe"'>Ewe</option>
+<option value='language:"Ewondo"'>Ewondo</option>
+<option value='language:"Fang"'>Fang</option>
+<option value='language:"Fanti"'>Fanti</option>
+<option value='language:"Faroese"'>Faroese</option>
+<option value='language:"Fijian"'>Fijian</option>
+<option value='language:"Filipino"'>Filipino</option>
+<option value='language:"Finnish"'>Finnish</option>
+<option value='language:"Finno-Ugrian"'>Finno-Ugrian</option>
+<option value='language:"Fon"'>Fon</option>
+<option value='language:"French"'>French</option>
+<option value='language:"Friulian"'>Friulian</option>
+<option value='language:"Fulah"'>Fulah</option>
+<option value='language:"Ga"'>Ga</option>
+<option value='language:"Gaelic"'>Gaelic</option>
+<option value='language:"Galibi Carib"'>Galibi Carib</option>
+<option value='language:"Galician"'>Galician</option>
+<option value='language:"Ganda"'>Ganda</option>
+<option value='language:"Gayo"'>Gayo</option>
+<option value='language:"Gbaya"'>Gbaya</option>
+<option value='language:"Geez"'>Geez</option>
+<option value='language:"Georgian"'>Georgian</option>
+<option value='language:"German"'>German</option>
+<option value='language:"Germanic"'>Germanic</option>
+<option value='language:"Gilbertese"'>Gilbertese</option>
+<option value='language:"Gondi"'>Gondi</option>
+<option value='language:"Gorontalo"'>Gorontalo</option>
+<option value='language:"Gothic"'>Gothic</option>
+<option value='language:"Grebo"'>Grebo</option>
+<option value='language:"Greek"'>Greek</option>
+<option value='language:"Guarani"'>Guarani</option>
+<option value='language:"Gujarati"'>Gujarati</option>
+<option value='language:"Gwich`in"'>Gwich`in</option>
+<option value='language:"Haida"'>Haida</option>
+<option value='language:"Haitian"'>Haitian</option>
+<option value='language:"Hausa"'>Hausa</option>
+<option value='language:"Hawaiian"'>Hawaiian</option>
+<option value='language:"Hebrew"'>Hebrew</option>
+<option value='language:"Herero"'>Herero</option>
+<option value='language:"Hiligaynon"'>Hiligaynon</option>
+<option value='language:"Himachali"'>Himachali</option>
+<option value='language:"Hindi"'>Hindi</option>
+<option value='language:"Hittite"'>Hittite</option>
+<option value='language:"Hmong"'>Hmong</option>
+<option value='language:"Hungarian"'>Hungarian</option>
+<option value='language:"Iban"'>Iban</option>
+<option value='language:"Icelandic"'>Icelandic</option>
+<option value='language:"Ido"'>Ido</option>
+<option value='language:"Igbo"'>Igbo</option>
+<option value='language:"Ijo"'>Ijo</option>
+<option value='language:"Iloko"'>Iloko</option>
+<option value='language:"Indic"'>Indic</option>
+<option value='language:"Indo-European"'>Indo-European</option>
+<option value='language:"Indonesian"'>Indonesian</option>
+<option value='language:"Ingush"'>Ingush</option>
+<option value='language:"Inuktitut"'>Inuktitut</option>
+<option value='language:"Inupiaq"'>Inupiaq</option>
+<option value='language:"Iranian"'>Iranian</option>
+<option value='language:"Irish"'>Irish</option>
+<option value='language:"Iroquoian"'>Iroquoian</option>
+<option value='language:"Italian"'>Italian</option>
+<option value='language:"Japanese"'>Japanese</option>
+<option value='language:"Javanese"'>Javanese</option>
+<option value='language:"Judeo-Arabic"'>Judeo-Arabic</option>
+<option value='language:"Judeo-Persian"'>Judeo-Persian</option>
+<option value='language:"Kabyle"'>Kabyle</option>
+<option value='language:"Kachin"'>Kachin</option>
+<option value='language:"Kalaallisut"'>Kalaallisut</option>
+<option value='language:"Kalmyk"'>Kalmyk</option>
+<option value='language:"Kamba"'>Kamba</option>
+<option value='language:"Kannada"'>Kannada</option>
+<option value='language:"Kanuri"'>Kanuri</option>
+<option value='language:"Kara-Kalpak"'>Kara-Kalpak</option>
+<option value='language:"Karachay-Balkar"'>Karachay-Balkar</option>
+<option value='language:"Karelian"'>Karelian</option>
+<option value='language:"Karen"'>Karen</option>
+<option value='language:"Kashmiri"'>Kashmiri</option>
+<option value='language:"Kashubian"'>Kashubian</option>
+<option value='language:"Kawi"'>Kawi</option>
+<option value='language:"Kazakh"'>Kazakh</option>
+<option value='language:"Khasi"'>Khasi</option>
+<option value='language:"Khoisan"'>Khoisan</option>
+<option value='language:"Khotanese"'>Khotanese</option>
+<option value='language:"Kikuyu"'>Kikuyu</option>
+<option value='language:"Kimbundu"'>Kimbundu</option>
+<option value='language:"Kinyarwanda"'>Kinyarwanda</option>
+<option value='language:"Kirghiz"'>Kirghiz</option>
+<option value='language:"Komi"'>Komi</option>
+<option value='language:"Kongo"'>Kongo</option>
+<option value='language:"Konkani"'>Konkani</option>
+<option value='language:"Korean"'>Korean</option>
+<option value='language:"Kosraean"'>Kosraean</option>
+<option value='language:"Kpelle"'>Kpelle</option>
+<option value='language:"Kru languages"'>Kru languages</option>
+<option value='language:"Kuanyama"'>Kuanyama</option>
+<option value='language:"Kumyk"'>Kumyk</option>
+<option value='language:"Kurdish"'>Kurdish</option>
+<option value='language:"Kurukh"'>Kurukh</option>
+<option value='language:"Ladino"'>Ladino</option>
+<option value='language:"Lahnda"'>Lahnda</option>
+<option value='language:"Lamba"'>Lamba</option>
+<option value='language:"Land Dayak"'>Land Dayak</option>
+<option value='language:"Lao"'>Lao</option>
+<option value='language:"Latin"'>Latin</option>
+<option value='language:"Latvian"'>Latvian</option>
+<option value='language:"Lezghian"'>Lezghian</option>
+<option value='language:"Lingala"'>Lingala</option>
+<option value='language:"Lithuanian"'>Lithuanian</option>
+<option value='language:"Low German"'>Low German</option>
+<option value='language:"Lower Sorbian"'>Lower Sorbian</option>
+<option value='language:"Lozi"'>Lozi</option>
+<option value='language:"Luba-Katanga"'>Luba-Katanga</option>
+<option value='language:"Luba-Lulua"'>Luba-Lulua</option>
+<option value='language:"Luiseno"'>Luiseno</option>
+<option value='language:"Lunda"'>Lunda</option>
+<option value='language:"Luo"'>Luo</option>
+<option value='language:"Lushai"'>Lushai</option>
+<option value='language:"Luxembourgish"'>Luxembourgish</option>
+<option value='language:"Macedonian"'>Macedonian</option>
+<option value='language:"Madurese"'>Madurese</option>
+<option value='language:"Magahi"'>Magahi</option>
+<option value='language:"Maithili"'>Maithili</option>
+<option value='language:"Makasar"'>Makasar</option>
+<option value='language:"Malagasy"'>Malagasy</option>
+<option value='language:"Malay"'>Malay</option>
+<option value='language:"Malayalam"'>Malayalam</option>
+<option value='language:"Maltese"'>Maltese</option>
+<option value='language:"Manchu"'>Manchu</option>
+<option value='language:"Mandingo"'>Mandingo</option>
+<option value='language:"Manipuri"'>Manipuri</option>
+<option value='language:"Manobo"'>Manobo</option>
+<option value='language:"Manx"'>Manx</option>
+<option value='language:"Maori"'>Maori</option>
+<option value='language:"Mapudungun"'>Mapudungun</option>
+<option value='language:"Marathi"'>Marathi</option>
+<option value='language:"Mari"'>Mari</option>
+<option value='language:"Marshallese"'>Marshallese</option>
+<option value='language:"Marwari"'>Marwari</option>
+<option value='language:"Masai"'>Masai</option>
+<option value='language:"Mayan"'>Mayan</option>
+<option value='language:"Mende"'>Mende</option>
+<option value='language:"Mi-kmaq"'>Mi-kmaq</option>
+<option value='language:"Middle English"'>Middle English</option>
+<option value='language:"Middle French"'>Middle French</option>
+<option value='language:"Middle High German"'>Middle High German</option>
+<option value='language:"Middle Irish"'>Middle Irish</option>
+<option value='language:"Minangkabau"'>Minangkabau</option>
+<option value='language:"Mohawk"'>Mohawk</option>
+<option value='language:"Moldavian"'>Moldavian</option>
+<option value='language:"Mon-Khmer"'>Mon-Khmer</option>
+<option value='language:"Mongo"'>Mongo</option>
+<option value='language:"Mongolian"'>Mongolian</option>
+<option value='language:"Mossi"'>Mossi</option>
+<option value='language:"Multiple"'>Multiple</option>
+<option value='language:"Munda"'>Munda</option>
+<option value='language:"Music"'>Music</option>
+<option value='language:"Nahuatl"'>Nahuatl</option>
+<option value='language:"Navajo"'>Navajo</option>
+<option value='language:"Ndonga"'>Ndonga</option>
+<option value='language:"Neapolitan"'>Neapolitan</option>
+<option value='language:"Nepal Bhasa"'>Nepal Bhasa</option>
+<option value='language:"Nepali"'>Nepali</option>
+<option value='language:"Nias"'>Nias</option>
+<option value='language:"Niger-Kordofanian"'>Niger-Kordofanian</option>
+<option value='language:"Nilo-Saharan"'>Nilo-Saharan</option>
+<option value='language:"Niuean"'>Niuean</option>
+<option value='language:"Nogai"'>Nogai</option>
+<option value='language:"North American Indian"'>North American Indian</option>
+<option value='language:"North Ndebele"'>North Ndebele</option>
+<option value='language:"Northern Frisian"'>Northern Frisian</option>
+<option value='language:"Northern Sami"'>Northern Sami</option>
+<option value='language:"Norwegian Bokmȧl"'>Norwegian Bokmȧl</option>
+<option value='language:"Norwegian Nynorsk"'>Norwegian Nynorsk</option>
+<option value='language:"Norwegian"'>Norwegian</option>
+<option value='language:"Nubian"'>Nubian</option>
+<option value='language:"Nyamwezi"'>Nyamwezi</option>
+<option value='language:"Nyankole"'>Nyankole</option>
+<option value='language:"Nyoro"'>Nyoro</option>
+<option value='language:"Occitan"'>Occitan</option>
+<option value='language:"Ojibwa"'>Ojibwa</option>
+<option value='language:"Old English"'>Old English</option>
+<option value='language:"Old French"'>Old French</option>
+<option value='language:"Old High German"'>Old High German</option>
+<option value='language:"Old Irish"'>Old Irish</option>
+<option value='language:"Old Norse"'>Old Norse</option>
+<option value='language:"Old Persian"'>Old Persian</option>
+<option value='language:"Old Provençal"'>Old Provençal</option>
+<option value='language:"Oriya"'>Oriya</option>
+<option value='language:"Oromo"'>Oromo</option>
+<option value='language:"Osage"'>Osage</option>
+<option value='language:"Ossetian"'>Ossetian</option>
+<option value='language:"Otomian"'>Otomian</option>
+<option value='language:"Ottoman Turkish"'>Ottoman Turkish</option>
+<option value='language:"Pahlavi"'>Pahlavi</option>
+<option value='language:"Palauan"'>Palauan</option>
+<option value='language:"Pali"'>Pali</option>
+<option value='language:"Pampanga"'>Pampanga</option>
+<option value='language:"Pangasinan"'>Pangasinan</option>
+<option value='language:"Panjabi"'>Panjabi</option>
+<option value='language:"Papiamento"'>Papiamento</option>
+<option value='language:"Papuan"'>Papuan</option>
+<option value='language:"Pedi"'>Pedi</option>
+<option value='language:"Persian"'>Persian</option>
+<option value='language:"Philippine"'>Philippine</option>
+<option value='language:"Phoenician"'>Phoenician</option>
+<option value='language:"Pohnpeian"'>Pohnpeian</option>
+<option value='language:"Polish"'>Polish</option>
+<option value='language:"Portuguese"'>Portuguese</option>
+<option value='language:"Prakrit languages"'>Prakrit languages</option>
+<option value='language:"Pushto"'>Pushto</option>
+<option value='language:"Quechua"'>Quechua</option>
+<option value='language:"Rajasthani"'>Rajasthani</option>
+<option value='language:"Rapanui"'>Rapanui</option>
+<option value='language:"Rarotongan"'>Rarotongan</option>
+<option value='language:"Romance"'>Romance</option>
+<option value='language:"Romanian"'>Romanian</option>
+<option value='language:"Romansh"'>Romansh</option>
+<option value='language:"Romany"'>Romany</option>
+<option value='language:"Rundi"'>Rundi</option>
+<option value='language:"Russian"'>Russian</option>
+<option value='language:"Salishan"'>Salishan</option>
+<option value='language:"Samaritan Aramaic"'>Samaritan Aramaic</option>
+<option value='language:"Sami languages"'>Sami languages</option>
+<option value='language:"Samoan"'>Samoan</option>
+<option value='language:"Sango"'>Sango</option>
+<option value='language:"Sanskrit"'>Sanskrit</option>
+<option value='language:"Santali"'>Santali</option>
+<option value='language:"Sardinian"'>Sardinian</option>
+<option value='language:"Sasak"'>Sasak</option>
+<option value='language:"Scots"'>Scots</option>
+<option value='language:"Selkup"'>Selkup</option>
+<option value='language:"Semitic"'>Semitic</option>
+<option value='language:"Serbian"'>Serbian</option>
+<option value='language:"Serer"'>Serer</option>
+<option value='language:"Shan"'>Shan</option>
+<option value='language:"Shona"'>Shona</option>
+<option value='language:"Sichuan Yi"'>Sichuan Yi</option>
+<option value='language:"Sicilian"'>Sicilian</option>
+<option value='language:"Sidamo"'>Sidamo</option>
+<option value='language:"Sign Language"'>Sign Language</option>
+<option value='language:"Siksika"'>Siksika</option>
+<option value='language:"Sindhi"'>Sindhi</option>
+<option value='language:"Sinhala"'>Sinhala</option>
+<option value='language:"Sino-Tibetan"'>Sino-Tibetan</option>
+<option value='language:"Siouan"'>Siouan</option>
+<option value='language:"Skolt Sami"'>Skolt Sami</option>
+<option value='language:"Slave"'>Slave</option>
+<option value='language:"Slavic"'>Slavic</option>
+<option value='language:"Slovak"'>Slovak</option>
+<option value='language:"Slovenian"'>Slovenian</option>
+<option value='language:"Sogdian"'>Sogdian</option>
+<option value='language:"Somali"'>Somali</option>
+<option value='language:"Songhai"'>Songhai</option>
+<option value='language:"Soninke"'>Soninke</option>
+<option value='language:"Sorbian"'>Sorbian</option>
+<option value='language:"South American Indian"'>South American Indian</option>
+<option value='language:"Southern Altai"'>Southern Altai</option>
+<option value='language:"Southern Sami"'>Southern Sami</option>
+<option value='language:"Southern Sotho"'>Southern Sotho</option>
+<option value='language:"Spanish"'>Spanish</option>
+<option value='language:"Sranan Tongo"'>Sranan Tongo</option>
+<option value='language:"Sukuma"'>Sukuma</option>
+<option value='language:"Sumerian"'>Sumerian</option>
+<option value='language:"Sundanese"'>Sundanese</option>
+<option value='language:"Susu"'>Susu</option>
+<option value='language:"Swahili"'>Swahili</option>
+<option value='language:"Swati"'>Swati</option>
+<option value='language:"Swedish"'>Swedish</option>
+<option value='language:"Swiss German"'>Swiss German</option>
+<option value='language:"Syriac"'>Syriac</option>
+<option value='language:"Tagalog"'>Tagalog</option>
+<option value='language:"Tahitian"'>Tahitian</option>
+<option value='language:"Tai"'>Tai</option>
+<option value='language:"Tajik"'>Tajik</option>
+<option value='language:"Tamashek"'>Tamashek</option>
+<option value='language:"Tamil"'>Tamil</option>
+<option value='language:"Tatar"'>Tatar</option>
+<option value='language:"Telugu"'>Telugu</option>
+<option value='language:"Tereno"'>Tereno</option>
+<option value='language:"Tetum"'>Tetum</option>
+<option value='language:"Thai"'>Thai</option>
+<option value='language:"Tibetan"'>Tibetan</option>
+<option value='language:"Tigre"'>Tigre</option>
+<option value='language:"Tigrinya"'>Tigrinya</option>
+<option value='language:"Timne"'>Timne</option>
+<option value='language:"Tiv"'>Tiv</option>
+<option value='language:"Tlingit"'>Tlingit</option>
+<option value='language:"Tok"'>Tok</option>
+<option value='language:"Tonga"'>Tonga</option>
+<option value='language:"Tsimshian"'>Tsimshian</option>
+<option value='language:"Tsonga"'>Tsonga</option>
+<option value='language:"Tswana"'>Tswana</option>
+<option value='language:"Tumbuka"'>Tumbuka</option>
+<option value='language:"Tupi"'>Tupi</option>
+<option value='language:"Turkish"'>Turkish</option>
+<option value='language:"Turkmen"'>Turkmen</option>
+<option value='language:"Tuvalu"'>Tuvalu</option>
+<option value='language:"Tuvinian"'>Tuvinian</option>
+<option value='language:"Twi"'>Twi</option>
+<option value='language:"Udmurt"'>Udmurt</option>
+<option value='language:"Ugaritic"'>Ugaritic</option>
+<option value='language:"Uighur"'>Uighur</option>
+<option value='language:"Ukrainian"'>Ukrainian</option>
+<option value='language:"Umbundu"'>Umbundu</option>
+<option value='language:"Undetermined"'>Undetermined</option>
+<option value='language:"Unknown"'>Unknown</option>
+<option value='language:"Upper Sorbian"'>Upper Sorbian</option>
+<option value='language:"Urdu"'>Urdu</option>
+<option value='language:"Uzbek"'>Uzbek</option>
+<option value='language:"Vai"'>Vai</option>
+<option value='language:"Venda"'>Venda</option>
+<option value='language:"Vietnamese"'>Vietnamese</option>
+<option value='language:"Volapük"'>Volapük</option>
+<option value='language:"Votic"'>Votic</option>
+<option value='language:"Wakashan"'>Wakashan</option>
+<option value='language:"Walloon"'>Walloon</option>
+<option value='language:"Waray"'>Waray</option>
+<option value='language:"Washo"'>Washo</option>
+<option value='language:"Welsh"'>Welsh</option>
+<option value='language:"Western Frisian"'>Western Frisian</option>
+<option value='language:"Wolof"'>Wolof</option>
+<option value='language:"Xhosa"'>Xhosa</option>
+<option value='language:"Yakut"'>Yakut</option>
+<option value='language:"Yao"'>Yao</option>
+<option value='language:"Yapese"'>Yapese</option>
+<option value='language:"Yiddish"'>Yiddish</option>
+<option value='language:"Yoruba"'>Yoruba</option>
+<option value='language:"Yupik"'>Yupik</option>
+<option value='language:"Zande"'>Zande</option>
+<option value='language:"Zapotec"'>Zapotec</option>
+<option value='language:"Zaza"'>Zaza</option>
+<option value='language:"Zenaga"'>Zenaga</option>
+<option value='language:"Zhuang"'>Zhuang</option>
+<option value='language:"Zulu"'>Zulu</option>
+<option value='language:"Zuni"'>Zuni</option>
+	</select>
+	</div> <!--end col-sm-6 col-md-3-->
+
+	<div class="col-sm-6 col-md-3">
+		<label for="limit_format" class="displayBlock">Format:</label>
+		<select id="limit_format" name="filter[]" multiple="multiple" size="10">
+		  <option class="cat all_formats" value=''>All formats</option>
+		  <option class="cat" value='format:"Archives/Manuscripts"'>Archives/Manuscripts</option>
+		  <option class="cat" value='format:"Audio"'>Audio
+			  <option value='format:"Audio cassette"'>Audio Cassette</option>
+			  <option value='format:"CD"'>CD</option>
+			  <option value='format:"LP"'>LP</option>
+			  <option value='format:"Music recording"'>Music recording</option>
+			  <option value='format:"Spoken word recording"'>Spoken word recording</option>
+		  <option class="cat" value='format:"Book"'>Book</option>
+		  <option class="cat" value='format:"Dissertations"'>Dissertations</option>
+		  <option class="cat" value='format:"E-Resource"'>E-Resource</option>
+		  <option class="cat" value='format:"Image"'>Image</option>
+			<option value='format:"Photograph"'>Photograph</option>
+		  <option class="cat" value='format:"Journal"'>Journal</option>
+		  <option class="cat" value='format:"Kit"'>Kit</option>
+		  <option class="cat" value='format:"Library website"'>Library website</option>  
+		  <option class="cat" value='format:"Map"'>Map</option>
+		  <option class="cat" value='format:"Microform"' >Microform</option>
+          <option class="cat" value='format:"Music score"'>Music score</option>
+          <option class="cat" value='format:"Print"'>Print</option>
+		  <option class="cat" value='format:"Video"' >Video</option>
+			<option value='format:"Blu-ray disc"'>Blu-ray disc</option>
+			<option value='format:"DVD"'>DVD</option>
+			<option value='format:"Laserdisc"'>Laserdisc</option>
+			<option value='format:"Video cassette"'>Video cassette</option>
+		</select>
+	</div><!--end col-sm-6 col-md-3-->
+
+	<div class="col-sm-6 col-md-3">
+		<label for="limit_building" class="displayBlock">Location:</label>
+		<select id="limit_building" name="filter[]" multiple="multiple" size="10">
+		  <option class='all_locations cat' value='' >All Locations</option>
+		  <option data-name="crerar-main" class="cat" value='building:"Crerar Library"' >Crerar Library</option>
+		  <option value='building:"Crerar Reference"'>Crerar Reference</option>
+		  <option value='building:"Crerar Reserves"'>Crerar Reserves</option>
+		  <option class="cat" value='building:"D&apos;Angelo Law Library"' >D'Angelo Law Library</option>
+		  <option value='building:"Law Reserves"'>Law Reserves</option>
+		  <option class="cat" value='building:"Eckhart Library"' >Eckhart Library</option>
+		  <option value='building:"Eckhart Reference"'>Eckhart Reference</option>
+		  <option value='building:"Eckhart Reserves"'>Eckhart Reserves</option>
+		  <option class="cat" value='building:"Regenstein Library"' >Regenstein Library</option>
+		  <option value='building:"Regenstein Recordings"'>Regenstein Recordings</option>
+		  <option value='building:"Regenstein Reference"'>Regenstein Reference</option>
+		  <option value='building:"Regenstein Reserves"'>Regenstein Reserves</option>
+		  <option value='building:"Regenstein TECHB@R"'>Regenstein TECHB@R</option>
+		  <option class="cat" value='building:"Special Collections Research Center"' >Special Collections Research Center</option>
+		  <option class="cat" value='building:"SSA"' >SSA</option>
+		  <option value='building:"SSA Reserves"'>SSA Reserves</option>
+		</select>
+	</div><!--col-sm-6 col-md-3-->
+
+	<div class="col-sm-6 col-md-3">
+		<label for="limit_collection" class="displayBlock">Collection:</label>
+		<select id="limit_collection" name="filter[]" multiple="multiple" size="10">
+		<option class='all_collections' value=''>All Collections </option>
+		<option class='ns' disabled='disabled' value=''>No sub-collection</option>
+		<option data-main-location="scrc" value='item_collection:"American Drama"'>American Drama</option>
+		<option data-main-location="scrc" value='item_collection:"American Newspapers"'>American Newspapers</option>
+		<option data-main-location="scrc" value='item_collection:"Archives/Manuscripts"'>Archives/Manuscripts</option>
+		<option data-main-location="scrc" value='item_collection:"Archives of Czechs and Slovaks Abroad"'>Archives of Czechs and Slovaks Abroad</option>
+		<option data-main-location="scrc" value='item_collection:"Atkinson Collection of American Drama"'>Atkinson Collection of American Drama</option>
+		<option data-main-location="scrc" value='item_collection:"Austrian Collection of Drama"'>Austrian Collection of Drama</option>
+		<option data-main-location="scrc" value='item_collection:"Codex Manuscripts"'>Codex Manuscripts</option>
+		<option data-main-location="crerar scrc" value='item_collection:"Crerar Manuscripts"'>Crerar Manuscripts</option>
+		<option data-main-location="crerar scrc" value='item_collection:"Crerar Rare Books"'>Crerar Rare Books</option>
+		<option data-main-location="scrc" value='item_collection:"Drama Collection"'>Drama Collection</option>
+		<option data-main-location="scrc" value='item_collection:"EB Children<?=$this->escapeHtml($single_quote)?>s Literature"'>EB Children&rsquo;s Literature</option>
+		<option data-main-location="scrc" value='item_collection:"Helen and Ruth Regenstein Collection of Rare Books"'>Helen and Ruth Regenstein Collection of Rare Books</option>
+		<option data-main-location="scrc" value='item_collection:"Historical Children<?=$this->escapeHtml($single_quote)?>s Books"'>Historical Children&rsquo;s Books</option>
+		<option data-main-location="scrc" value='item_collection:"Incunabula"'>Incunabula</option>
+		<option data-main-location="scrc" value='item_collection:"Lincke Collection of Popular German Literature"'>Lincke Collection of Popular German Literature</option>
+		<option data-main-location="scrc" value='item_collection:"Lincoln Collection"'>Lincoln Collection</option>
+		<option data-main-location="scrc" value='item_collection:"Ludwig Rosenberger Library of Judaica"'>Ludwig Rosenberger Library of Judaica</option>
+		<option data-main-location="scrc" value='item_collection:"Modern Poetry Rare"'>Modern Poetry Rare</option>
+		<option data-main-location="scrc" value='item_collection:"Rare Books"'>Rare Books</option>
+		<option data-main-location="scrc" value='item_collection:"University of Chicago Press Imprint Collection"'>University of Chicago Press Imprint Collection</option>
+        </select>
+	</div><!--end col-sm-6 col-md-3-->
+</div><!--end row-->
+
+</fieldset><!--end fieldset-->
+
+<!--<div class="row">
+	<div id="location_check" class="span6 offset6 fade">
+		<input id="online" type="checkbox" name="filter[]" value='format:"E-Resource"' /><label for="online">Include all online resources</label>
+		<input id="mansueto" type="checkbox" name="filter[]" value='building:"Mansueto Library"' /><label for="mansueto">Include items in Mansueto</label>
+	</div>
+</div>end row-->
+
+<input type="hidden" name="daterange[]" value="publishDate"/>
+
+<div class="row">
+	<div class="col-md-4">
+		<fieldset id="publishDate" class="publishDateLimit">
+		    <legend>Year of Publication</legend>
+
+            <div class="row">
+			    <div class="col-md-3">
+			    <label for="publishDatefrom" class="offscreen">From:</label>
+			    	<input type="text" value="" id="publishDatefrom" placeholder="from" name="publishDatefrom" class="left" maxlength="4" size="4">
+			    </div><!--end col-md-3-->
+			    <div class="col-md-3">
+			    	<label for="publishDateto" class="offscreen">To:</label>
+			    	<input type="text" value="" id="publishDateto" placeholder="to" name="publishDateto" class="right" maxlength="4" size="4">
+			    </div><!--end col-md-3-->
+            </div><!--end row-->
+		</fieldset>
+	</div><!--end col-md-6-->
+</div><!--end row-->
+

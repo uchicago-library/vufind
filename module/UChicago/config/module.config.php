@@ -13,6 +13,7 @@ $config = array(
         'invokables' => array(
             'feedback' => 'UChicago\Controller\FeedbackController',
             'my-research' => 'UChicago\Controller\MyResearchController',
+            'search' => 'UChicago\Controller\SearchController',
         ),
     ),
     'service_manager' => array(
