@@ -23,6 +23,8 @@
 <? $pageLinks = ob_get_contents(); ?>
 <? ob_end_clean(); ?>
 
+<div class="row">
+<div class="col-sm-12">
 <form class="form-inline" method="get" action="<?=$this->url('alphabrowse-home')?>" name="alphaBrowseForm" id="alphaBrowseForm">
   <label for="alphaBrowseForm_from"><?=$this->transEsc('starting from') ?></label>
   <input placeholder="a manual for writers of" type="text" name="from" id="alphaBrowseForm_from" value="<?=$this->escapeHtml($this->from) ?>"/>
@@ -34,9 +36,17 @@
   </select>
   <input class="btn" type="submit" value="<?=$this->transEsc('Browse') ?>"/>
 </form>
+</div><!-- end col-sm-12-->
+</div><!-- end row-->
 
 <? if ($this->result): ?>
+  <div class="row">
+  <div class="col-sm-12">
   <?=$pageLinks ?>
+  <!-- end col-sm-12-->
+  <!-- end row-->
+  <div class="row">
+  <div class="col-sm-12">
   <table class="alphabrowse table table-striped">
     <thead>
       <tr>
@@ -130,5 +140,11 @@
       <? endforeach; ?>
     </tbody>
   </table>
+  <!-- end col-sm-12-->
+  <!-- end row-->
+  <div class="row">
+  <div class="col-sm-12">
   <?= $pageLinks ?>
+  <!-- end col-sm-12-->
+  <!-- end row-->
 <? endif; ?>
