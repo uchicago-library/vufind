@@ -1,5 +1,72 @@
 /*global addSearchString, deleteSearchGroupString, searchFields, searchJoins, searchLabel, searchMatch */
 
+/*
+ * Update placeholder text for keyword searches. 
+ * Do it onload and do it when the dropdown changes.
+ */
+function update_keyword_search(select) {
+    var placeholder = '';
+    switch(select.val()) {
+        case 'AllFields':
+            placeholder = 'evolutionary biology';
+            break;
+        case 'Title':
+            placeholder = 'chicago style manual';
+            break;
+        case 'Author':
+            placeholder = 'saul bellow';
+            break;
+        case 'Subject':
+            placeholder = 'united states history';
+            break;
+        case 'JournalTitle':
+            placeholder = 'american journal of sociology';
+            break;
+        case 'StandardNumbers':
+            placeholder = '0375412328';
+            break;
+        case 'Series':
+            placeholder = 'lecture notes in computer science';
+            break;
+        case 'Publisher':
+            placeholder = 'university of chicago press';
+            break;
+    }
+    select.prevAll('input').eq(0).attr('placeholder', placeholder);
+}
+
+/*
+ * Update the placeholder text for begins with searches. 
+ * Do it on load, and do it when the dropdown changes. 
+ */
+function update_begins_with_search() {
+    var placeholder = '';
+    switch($('select#alphaBrowseForm_source').val()) {
+        case 'title':
+            placeholder = 'a manual for writers of';
+            break;
+        case 'author':
+            placeholder = 'dickens charles';
+            break;
+        case 'topic':
+            placeholder = 'world\'s columbian expo';
+            break;
+        case 'lcc':
+            placeholder = 'ps2700 f16';
+            break;
+        case 'series':
+            placeholder = 'lecture notes in math';
+            break;
+        case 'dewey':
+            placeholder = '900';
+            break;
+        case 'journal':
+            placeholder = 'chronicle of higher education';
+            break;
+    }
+    $('input#alphaBrowseForm_from').attr('placeholder', placeholder);
+}
+
 function addSearch(link, term, field)
 {
   // Get the group number. 
@@ -18,8 +85,7 @@ function addSearch(link, term, field)
   // Build the new search
   var inputIndex = $('#group'+group+' input').length;
   var inputID = group+'_'+inputIndex;
-  var newSearch = '<div class="search form-group form-inline" id="search'+inputID+'">'
-    + '<input id="search_lookfor'+inputID+'" class="form-control input-large" type="text" name="lookfor'+group+'[]" value="'+term+'"/> '
+  var newSearch = '<div class="search form-group form-inline" id="search'+inputID+'">' + '<input id="search_lookfor'+inputID+'" class="form-control input-large" type="text" name="lookfor'+group+'[]" value="'+term+'" placeholder="evolutionary biology"/> '
     + '<select id="search_type'+inputID+'" name="type'+group+'[]" class="form-control">';
   for (var key in searchFields) {
     newSearch += '<option value="' + key + '"';
@@ -40,6 +106,10 @@ function addSearch(link, term, field)
   if(inputIndex > 0) {
     $('#group'+group+' .search .delete').removeClass('hidden');
   }
+  // When the field pulldown changes, update the text box placeholder text. 
+  $('#group'+group+' .search select').change(function() {
+    update_keyword_search($(this));
+  });
 }
 
 function deleteSearch(link)
@@ -250,3 +320,15 @@ function switchToAdvancedSearch()
 
     return false;
 }
+
+$(document).ready(function() {
+    // Update keyword search placeholder text when the select pulldown changes. 
+    $('.search select').change(function() {
+        update_keyword_search($(this));
+    });
+    // Update begins with placeholder text when the select pulldown changes. 
+    $('select#alphaBrowseForm_source').change(function() {
+        update_begins_with_search();
+    });
+});
+
