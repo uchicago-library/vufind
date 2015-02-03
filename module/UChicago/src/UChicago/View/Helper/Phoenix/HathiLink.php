@@ -108,10 +108,11 @@ class HathiLink extends AbstractHelper
         $url = 'http://forms.lib.uchicago.edu/lib/hathi/info.php?q=oclc:';
         $hathiLink = false;
         $rawMarcData = $this->view->driver->crosswalk('hathiLink');
+        $graphic = '<img src="/vufind/themes/phoenix/images/hathitrustFavicon.png" alt="HathiTrust Digital Library"/>'; 
 
         if ($this->isHathi()) {
             $oclcNumber = $this->getOCLCNumbers();
-            $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . $oclcNumber . '" class="hathi eLink text-success">HathiTrust Digital Library <img src="/vufind/themes/phoenix/images/hathitrustFavicon.png" alt="HathiTrust Digital Library"/></a></div>';
+            $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . $oclcNumber . '" class="hathi eLink text-success">HathiTrust Digital Library</a></div>';
         }
         return $hathiLink;
     }
