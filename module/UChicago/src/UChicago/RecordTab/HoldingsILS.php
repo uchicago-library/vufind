@@ -39,6 +39,39 @@ namespace UChicago\RecordTab;
 class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
 {
 
+
+    /**
+     * ILS connection (or false if not applicable)
+     *
+     * @param \VuFind\ILS\Connection|bool
+     */
+    protected $catalog;
+
+    /**
+     * Configuration, the number of items and holdings_text_fields to display 
+     * before collapsing them. 
+     *
+     * @param, integer if set, blank string otherwise. 
+     */
+    protected $displayNum;
+
+    /**
+     * Constructor
+     *
+     * @param \VuFind\ILS\Connection|bool $catalog ILS connection to use to check
+     * for holdings before displaying the tab; set to false if no check is needed
+     *
+     * @param $displayNum, integer or blank string, the number of items to display
+     */
+    public function __construct($catalog, $displayNum)
+    {
+        $this->catalog = ($catalog && $catalog instanceof \VuFind\ILS\Connection)
+            ? $catalog : false;
+
+        $this->displayNum = $displayNum;
+    }
+
+
     /**
      * Support method used by template -- extract all unique call numbers from
      * an array of items.
@@ -99,5 +132,16 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
             }
         }
         return $due;
+    }
+
+    /**
+     * Gets the number of items and/or holdings_text_fields 
+     * to display by default before collapsing them. 
+     *
+     * @returns string
+     */
+    public function getDisplayNumber()
+    {
+        return (string) $this->displayNum;
     }
 }

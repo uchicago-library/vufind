@@ -465,6 +465,20 @@ div[resource="#record"] .table {
     display: inline;
     list-style: none;
 }
+.itemsToggle,
+.summaryToggle {
+    font-weight: bold;
+    font-size: @font-size-base + 1;
+    display: block;
+}
+.itemsToggle,
+.itemsToggle:active, 
+.itemsToggle:focus, 
+.summaryToggle,
+.summaryToggle:active, 
+.summaryToggle:focus {
+    outline: 0;
+}
 /*Top of full record*/
 div[resource="#record"] .table > tbody > tr:first-child > td {
     padding-bottom:0;
@@ -517,8 +531,10 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
     padding-right: 15px;
     text-align: right;
 }
-tr[typeof="Offer"] th {
-    max-width: 175px;
+tr[typeof="Offer"] th,
+.holdings-table th {
+    //max-width: 175px;
+    width: 175px;
 }
 #holdings-tab table tr,
 #holdings-tab table td,

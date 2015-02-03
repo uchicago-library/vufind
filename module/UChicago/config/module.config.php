@@ -66,6 +66,10 @@ $config = array(
                         // pass in a connection
                         // object:
                         $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+
+                        // The number of items and holdings_text_fields to display before collapsing them.
+                        $displayNum = isset($config['Catalog']['items_display_number']) ? $config['Catalog']['items_display_number'] : '';
+
                         if (isset($config->Site->hideHoldingsTabWhenEmpty)
                             && $config->Site->hideHoldingsTabWhenEmpty
                         ) { 
@@ -73,7 +77,7 @@ $config = array(
                         } else {
                             $catalog = false;
                         }   
-                        return new \UChicago\RecordTab\HoldingsILS($catalog);
+                        return new \UChicago\RecordTab\HoldingsILS($catalog, $displayNum);
                     },  
                 ),  
             ),//recordtab
