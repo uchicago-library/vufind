@@ -92,7 +92,32 @@ $config = array(
                     },*/
                 ),
             ),//resolver_driver
-        ),
+        ),//plugin_managers
+        // This section controls which tabs are used for which record driver classes.
+        // Each sub-array is a map from a tab name (as used in a record URL) to a tab
+        // service (found in recordtab_plugin_manager, below).  If a particular record
+        // driver is not defined here, it will inherit configuration from a configured
+        // parent class.  The defaultTab setting may be used to specify the default
+        // active tab; if null, the value from the relevant .ini file will be used.
+        'recorddriver_tabs' => array(
+            'VuFind\RecordDriver\SolrMarc' => array(
+                'tabs' => array(
+                    'Holdings' => 'HoldingsILS', 
+                    'Description' => 'Description',
+                    'TOC' => 'TOC', 
+                    'UserComments' => 'UserComments',
+                    'Reviews' => 'Reviews', 
+                    'Excerpt' => 'Excerpt',
+                    'Preview' => 'preview',
+                    'HierarchyTree' => 'HierarchyTree', 
+                    'Map' => 'Map',
+                    'Similar' => null,
+                    'Details' => 'StaffViewMARC',
+                ),
+                'defaultTab' => null,
+            ),
+
+        ),//recorddriver_tabs
     ),
 );
 
