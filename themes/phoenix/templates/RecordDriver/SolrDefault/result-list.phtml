@@ -160,7 +160,9 @@
         <? if (!is_array($urls)) $urls = array();?>
           <? if(!$this->driver->isCollection()):
             foreach ($urls as $current): ?>
-              <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext eLink text-success" target="new"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']))?></a> <?=$current['desc']?><br/>
+              <div class="e-holdings">
+                <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext eLink text-success" target="new"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']))?></a> <?=$current['desc']?>
+              </div>
           <? endforeach; ?>
         <? endif; ?>
       <? endif; ?>
