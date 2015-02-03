@@ -26,6 +26,15 @@
     padding-bottom: @container-padding-btm;
 }
 
+a[href^="http"]:after {
+    font-family: FontAwesome;
+    content:" \f08e";
+}
+.openurls strong a:after {
+    content:"";
+}
+
+
 /*General header*/
 .navbar-brand {
     font-family: @headings-font-family;

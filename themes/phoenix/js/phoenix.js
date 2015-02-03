@@ -181,3 +181,26 @@ $(document).ready(function() {
 
 });
 
+(function() {
+    /*
+     * Make every external link on every page open in a new tab.
+     * This should even work for links that are generated dynamically,
+     * after the page has already loaded.
+     */
+    function add_target_blank() {
+        $('a[href]').each(function() {
+            var h = $(this).attr('href');
+            if (h.substring(0, 4) == 'http' || h.substring(0, 2) == '//') {
+                $(this).attr('target', '_blank');
+                // Needed for Safari support
+                $(this).addClass('external');
+            }
+        });
+        // This makes sure services like mansueto requesting open in new
+        // tabs.
+        $('a.service').attr('target', '_blank');
+        // Find more Safari specific code related to opening links in a new tab
+        // in the document ready function above.
+    };
+    setInterval(add_target_blank, 1000);
+})();
