@@ -32,7 +32,7 @@ a[href^="http"]:after {
 }
 .openurls strong a:after,
 .bookplate a:after,
-.col-sm-2.col-xs-3.left a:after { //book covers in results view
+.col-sm-2.col-xs-0.left a:after { //book covers in results view
     content:"";
 }
 
@@ -593,6 +593,11 @@ tr[typeof="Offer"] th,
     margin-top: @vertical-padding-div;
     margin-bottom: @vertical-padding-div;
     padding: @vertical-padding-div @horizontal-padding-div;
+    @media (max-width: @screen-xs-max) {
+        margin-top: @vertical-padding-div / 2;
+        margin-bottom: @vertical-padding-div / 2;
+        padding: ceil(@vertical-padding-div / 2) ceil(@horizontal-padding-div / 2);       
+    }
 }
 .result a.title {
     font-size: ceil((@font-size-base * 1.2)); // ~15px 
@@ -633,6 +638,11 @@ tr[typeof="Offer"] th,
 
 .template-name-results > .container > .row {
     margin-top: -10px;
+}
+.result .middle {
+    @media (max-width: @screen-xs-max) {
+        width:100%;
+    }
 }
 
 /*MyResearch*/
