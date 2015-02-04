@@ -30,7 +30,9 @@ a[href^="http"]:after {
     font-family: FontAwesome;
     content:" \f08e";
 }
-.openurls strong a:after {
+.openurls strong a:after,
+.bookplate a:after,
+.col-sm-2.col-xs-3.left a:after { //book covers in results view
     content:"";
 }
 
@@ -63,7 +65,9 @@ a[href^="http"]:after {
     border-radius: 0;
 }
 
-.navbar a {
+.navbar a,
+header > .navbar li,
+.nav #searchForm a {
     color:@light-link;
 }
 
@@ -170,6 +174,9 @@ div#searchForm {
     padding-left: @grid-gutter-width / 1.5;
     padding-top: 2px;
     padding-bottom: 4px;
+    @media (max-width: @screen-sm-min) {
+        padding-top: 20px;
+    }
 }
 div#searchForm p {
     margin-bottom:0;
