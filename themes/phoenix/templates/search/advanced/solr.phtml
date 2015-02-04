@@ -573,16 +573,46 @@
 		    <legend>Year of Publication</legend>
 
             <div class="row">
-			    <div class="col-md-3">
+			    <div class="col-sm-6">
 			    <label for="publishDatefrom" class="offscreen">From:</label>
-			    	<input type="text" value="" id="publishDatefrom" placeholder="from" name="publishDatefrom" class="left" maxlength="4" size="4">
-			    </div><!--end col-md-3-->
-			    <div class="col-md-3">
+			    	<input type="text" value="" id="publishDatefrom" placeholder="from" name="publishDatefrom" class="form-control" maxlength="4" size="4">
+			    </div><!--end col-sm-6-->
+			    <div class="col-sm-6">
 			    	<label for="publishDateto" class="offscreen">To:</label>
-			    	<input type="text" value="" id="publishDateto" placeholder="to" name="publishDateto" class="right" maxlength="4" size="4">
-			    </div><!--end col-md-3-->
+			    	<input type="text" value="" id="publishDateto" placeholder="to" name="publishDateto" class="form-control" maxlength="4" size="4">
+			    </div><!--end col-sm-6-->
+            </div><!--end row-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="slider-container"><input type="text" id="publishDatedateSlider" class="hidden"></div>
+                </div><!--end col-sm-6-->
             </div><!--end row-->
 		</fieldset>
 	</div><!--end col-md-6-->
 </div><!--end row-->
+
+<? $this->headScript()->appendFile('vendor/bootstrap-slider.js'); ?>
+<?
+    $min = 1400;
+    $max = date('Y') + 1;
+    $script = <<<JS
+$(document).ready(function() {
+  var fillTexts = function() {
+    var v = $('#publishDatedateSlider').val().split(',');
+    $('#publishDatefrom').val(v[0]);
+    $('#publishDateto').val(v[1]);
+  };
+  $('#publishDatedateSlider').slider({
+     'min':$min,
+     'max':$max,
+     'handle':"square",
+     'tooltip':"hide",
+     'value':[$min,$max]
+  })
+  .on('slide', fillTexts)
+  .data('slider');
+});
+JS;
+?>
+<?=$this->inlineScript(\Zend\View\Helper\HeadScript::SCRIPT, $script, 'SET'); ?>
 
