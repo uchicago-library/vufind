@@ -187,7 +187,7 @@
       class="solr.FastLRUCache"
       size="512"
       initialSize="512"
-      autowarmCount="256"/>
+      autowarmCount="25"/>
 
    <!-- queryResultCache caches results of searches - ordered lists of
          document ids (DocList) based on a query, a sort, and the range
@@ -196,7 +196,7 @@
       class="solr.LRUCache"
       size="512"
       initialSize="512"
-      autowarmCount="256"/>
+      autowarmCount="10"/>
 
   <!-- documentCache caches Lucene Document objects (the stored fields for each document).
        Since Lucene internal document ids are transient, this cache will not be autowarmed.  -->
@@ -360,9 +360,9 @@
        <str name="fl">*</str>
        <str name="version">2.1</str>
         -->
-      <str name="spellcheck.extendedResults">true</str>
-      <str name="spellcheck.onlyMorePopular">true</str>
-      <str name="spellcheck.count">20</str>
+     <str name="spellcheck.extendedResults">true</str>
+     <str name="spellcheck.onlyMorePopular">true</str>
+     <str name="spellcheck.count">20</str>
     </lst>
     <arr name="last-components">
       <str>spellcheck</str>
@@ -379,12 +379,12 @@
   -->
   <requestHandler name="dismax" class="solr.SearchHandler">
     <lst name="defaults">
-      <str name="defType">dismax</str>
-      <!-- str name="fl">a*,b*,c*,d*,e*,first_indexed,format,fullrecord,g*,h*,i*,l*,o*,p*,r*,s*,t*,u*,*_date*,*_isn*,*_str*,*_txt*</str -->
-      <str name="echoParams">explicit</str>
-      <str name="spellcheck.extendedResults">true</str>
-      <str name="spellcheck.onlyMorePopular">true</str>
-      <str name="spellcheck.count">20</str>
+     <str name="defType">dismax</str>
+     <!-- str name="fl">a*,b*,c*,d*,e*,first_indexed,format,fullrecord,g*,h*,i*,l*,o*,p*,r*,s*,t*,u*,*_date*,*_isn*,*_str*,*_txt*</str -->
+     <str name="echoParams">explicit</str>
+     <str name="spellcheck.extendedResults">true</str>
+     <str name="spellcheck.onlyMorePopular">true</str>
+     <str name="spellcheck.count">20</str>
     </lst>
     <arr name="last-components">
       <str>spellcheck</str>
@@ -393,13 +393,13 @@
 
   <requestHandler name="edismax" class="solr.SearchHandler">
     <lst name="defaults">
-      <str name="defType">edismax</str>
-      <!-- str name="fl">a*,b*,c*,d*,e*,first_indexed,format,fullrecord,g*,h*,i*,l*,o*,p*,r*,s*,t*,u*,*_date*,*_isn*,*_str*,*_txt*</str -->
-      <str name="echoParams">explicit</str>
-      <str name="spellcheck.extendedResults">true</str>
-      <str name="spellcheck.onlyMorePopular">true</str>
-      <str name="spellcheck.count">20</str>
-      <str name="lowercaseOperators">false</str>
+     <str name="defType">edismax</str>
+     <!-- str name="fl">a*,b*,c*,d*,e*,first_indexed,format,fullrecord,g*,h*,i*,l*,o*,p*,r*,s*,t*,u*,*_date*,*_isn*,*_str*,*_txt*</str -->
+     <str name="echoParams">explicit</str>
+     <str name="spellcheck.extendedResults">true</str>
+     <str name="spellcheck.onlyMorePopular">true</str>
+     <str name="spellcheck.count">20</str>
+     <str name="lowercaseOperators">false</str>
     </lst>
     <arr name="last-components">
       <str>spellcheck</str>
@@ -433,8 +433,8 @@
     <str name="seeAlsoHeadingField">see_also</str>
     <str name="scopeNoteField">scope_note</str>
 
-
-    <str name="sources">topic,author,title,lcc,dewey,hierarchy</str>
+    <!-- UChicago: added journal, series -->
+    <str name="sources">topic,author,title,lcc,dewey,hierarchy,journal,series</str>
 
     <lst name="topic">
       <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/topic_browse.db</str>
@@ -448,24 +448,37 @@
 
     <lst name="title">
       <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/title_browse.db</str>
-      <str name="field">title_fullStr</str>
+      <str name="field">title_browse</str>
     </lst>
-
+    
     <lst name="lcc">
       <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/lcc_browse.db</str>
-      <str name="field">callnumber-a</str>
+      <str name="field">callnumber_browse</str>
+      <str name="normalizer">org.vufind.util.LCCallNormalizer</str>
     </lst>
 
     <lst name="dewey">
       <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/dewey_browse.db</str>
       <str name="field">dewey-raw</str>
-      <str name="ignoreDiacritics">yes</str>
+      <str name="normalizer">org.vufind.util.DeweyCallNormalizer</str>
     </lst>
 
     <lst name="hierarchy">
       <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/hierarchy_browse.db</str>
       <str name="field">hierarchy_browse</str>
     </lst>
+
+    <!-- Begin: UChicago additions -->
+    <lst name="journal">
+      <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/journal_browse.db</str>
+      <str name="field">journal_browse</str>
+    </lst>
+
+    <lst name="series">
+      <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/series_browse.db</str>
+      <str name="field">series_browse</str>
+    </lst>
+    <!-- End: UChicago additions -->
   </requestHandler>
 
   <searchComponent name="spellcheck" class="org.apache.solr.handler.component.SpellCheckComponent">
