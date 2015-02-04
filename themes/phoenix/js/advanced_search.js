@@ -333,5 +333,45 @@ $(document).ready(function() {
     $('#limit_format option, #limit_building option').not('.cat').each(function(){
         $(this).html('&nbsp;&nbsp;&nbsp;'+$(this).text());
     });
+
+    /*
+     * dynamic chained select boxes 
+     */
+
+    //detach the select options.
+    var save_options = $('#limit_collection option').detach();
+
+    $('#limit_building').change(function() {
+        var selected = $(this).find('option:selected');
+
+        //Get a copy of all of the options.
+        var options = save_options.clone();
+
+        //Clear the Collection box. 
+        $('#limit_collection option').remove();
+
+        //All Locations
+        if (selected.val() == '') {
+            options.filter(':not(".ns")').appendTo('#limit_collection');
+
+        //Anything without sub-collections just gets a message. 
+        } else if (selected.val().indexOf('Crerar Library') == -1 &&
+                   selected.val().indexOf('Special Collections') == -1) {
+            options.filter('.ns').appendTo('#limit_collection');
+
+        //Crerar
+        } else if (selected.val().indexOf('Crerar Library') > -1) {
+            options.filter('[data-main-location*="crerar"]').appendTo('#limit_collection');
+
+        //SCRC
+        } else if (selected.val().indexOf('Special Collections') > -1) {
+            options.filter('[data-main-location*="scrc"]').appendTo('#limit_collection');
+        }
+    }); 
+
+    //get rid of unwanted options on submit.
+    $("#advSearchForm").submit(function(){
+        $('.all, .all_languages, .all_formats, .all_locations, .all_collections').prop("selected", false);
+    }); 
 });
 
