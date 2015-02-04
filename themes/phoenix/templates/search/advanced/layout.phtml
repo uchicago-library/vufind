@@ -162,6 +162,7 @@
               </li>
             </ul>
             <? foreach ($searchFilters as $field => $data): ?>
+            <? if ($field != 'Language'): ?>
               <ul class="list-group">
                 <li class="list-group-item title"><?=$this->transEsc($field)?></li>
                 <? foreach ($data as $value): ?>
@@ -169,6 +170,7 @@
 /> <?=$this->escapeHtml($value['displayText'])?></label></div></li>
                 <? endforeach; ?>
               </ul>
+            <? endif; ?>
             <? endforeach; ?>
           <? endif; ?>
         </div><!-- end col-md-12-->
