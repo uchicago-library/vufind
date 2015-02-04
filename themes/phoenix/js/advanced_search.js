@@ -329,5 +329,9 @@ $(document).ready(function() {
     $('select#alphaBrowseForm_source').change(function() {
         update_begins_with_search();
     });
+    //indent child options on specific select boxes
+    $('#limit_format option, #limit_building option').not('.cat').each(function(){
+        $(this).html('&nbsp;&nbsp;&nbsp;'+$(this).text());
+    });
 });
 
