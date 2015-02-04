@@ -204,9 +204,8 @@ function addGroup(firstTerm, firstField, join)
 
   var nextGroup = $('.group').length;
 
-  var newGroup = '<div id="group'+nextGroup+'" class="group well">'
-    + '<div class="row">'
-    + '<div class="col-md-12">'
+  var newGroup = ''
+    + '<div id="group'+nextGroup+'" class="group well">'
     + '<div class="form-group form-inline">'
     + '<label class="hidden" for="search_bool'+nextGroup+'">'+searchMatch+':&nbsp;</label>'
     + '<a href="#" class="close hidden" onclick="deleteGroup(this)" title="'+deleteSearchGroupString+'">&times;</a>'
@@ -229,7 +228,7 @@ function addGroup(firstTerm, firstField, join)
     + '</select></div>'
     + '<i id="group'+nextGroup+'Holder" class="fa fa-plus-circle"></i> <a href="#" id="add_search_link_'+nextGroup+'" onClick="addSearch(this)">'+addSearchString+'</a>'
     + ' <a style="display: inline;" href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchfield" id="what_is_a_field" class="external"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Field?</a>'
-    + '</div></div>';
+    + '</div>';
 
   $('#groupPlaceHolder').before(newGroup);
 
