@@ -1,6 +1,14 @@
 <? $single_quote = "'"; //needed for our option values with 's in the name?>
 
 <?
+/*
+ * Prepare filter strings for comparison.
+ */
+
+function prep_string($s) {
+    return strtolower(html_entity_decode($s, ENT_QUOTES));
+}
+
 $searchFilters = ($this->saved) ?  $this->saved->getParams()->getFilterList() : array();
 
 $languages = array(
@@ -501,7 +509,7 @@ $locations = array(
 	array('data-name' => 'crerar-main', 'class' => 'cat', 'value' => 'building:"Crerar Library"', 'text' => 'Crerar Library'),
 	array('value' => 'building:"Crerar Reference"', 'text' => 'Crerar Reference'),
 	array('value' => 'building:"Crerar Reserves"', 'text' => 'Crerar Reserves'),
-	array('class' => 'cat', 'value' => 'building:"D&apos;Angelo Law Library"', 'text' => 'D&apos;Angelo Law Library'),
+	array('class' => 'cat', 'value' => 'building:"D&#39;Angelo Law Library"', 'text' => 'D&#39;Angelo Law Library'),
 	array('value' => 'building:"Law Reserves"', 'text' => 'Law Reserves'),
 	array('class' => 'cat', 'value' => 'building:"Eckhart Library"', 'text' => 'Eckhart Library'),
 	array('value' => 'building:"Eckhart Reference"', 'text' => 'Eckhart Reference'),
@@ -559,7 +567,7 @@ $collections = array(
             $selected = '';
             if (array_key_exists('Language', $searchFilters)) {
                 foreach ($searchFilters['Language'] as $l) {
-                    if (strtolower($l['displayText']) == strtolower($language['text'])) {
+                    if (prep_string($l['displayText']) == prep_string($language['text'])) {
                         $selected = ' selected="selected"';
                     }
                 }
@@ -582,7 +590,7 @@ $collections = array(
                 $selected = '';
                 if (array_key_exists('Format', $searchFilters)) {
                     foreach ($searchFilters['Format'] as $f) {
-                        if (strtolower($f['displayText']) == strtolower($format['text'])) {
+                        if (prep_string($f['displayText']) == prep_string($format['text'])) {
                             $selected = ' selected="selected"';
                         }
                     }
@@ -609,7 +617,7 @@ $collections = array(
                 $selected = '';
                 if (array_key_exists('Location', $searchFilters)) {
                     foreach ($searchFilters['Location'] as $l) {
-                        if (strtolower($l['displayText']) == strtolower($location['text'])) {
+                        if (prep_string($l['displayText']) == prep_string($location['text'])) {
                             $selected = ' selected="selected"';
                         }
                     }
@@ -637,7 +645,7 @@ $collections = array(
                 if (array_key_exists('unrecognized_facet_label', $searchFilters)) {
                     foreach ($searchFilters['unrecognized_facet_label'] as $c) {
                         if ($c['field'] == 'item_collection') {
-                            if (strtolower($c['displayText']) == strtolower($collection['text'])) {
+                            if (prep_string($c['displayText']) == prep_string($collection['text'])) {
                                 $selected = ' selected="selected"';
                             }
                         }
