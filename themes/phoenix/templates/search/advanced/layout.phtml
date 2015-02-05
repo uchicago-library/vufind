@@ -58,7 +58,11 @@
   <div class="tab-pane active" id="advSearch">
     <form role="search" name="searchForm" id="advSearchForm" method="get" action="<?=$this->url($this->options->getSearchAction())?>">
       <div class="row">
+        <? if (empty($searchFilters)): ?>
+        <div class="col-sm-12">
+        <? else: ?>
         <div class="col-sm-9">
+        <? endif; ?>
           <input type="hidden" name="sort" value="relevance">
           <div class="clearfix">
             <div id="groupJoin" class="form-inline pull-right hidden">
@@ -188,7 +192,7 @@
   <div class="tab-pane" id="alphaBrowse">
     <form action="/vufind/alphabrowse/home" class="form-inline" id="alphaBrowseForm" method="get" name="alphaBrowseForm">
       <div class="row">
-        <div class="col-sm-9">
+        <div class="col-sm-12">
           <div class="well">
             <div style="margin: 15px 0;">
             <label for="alphaBrowseForm_from" class="offscreen">starting from</label>
@@ -208,7 +212,7 @@
             <input type="submit" value="Browse" class="btn btn-primary">
           </div><!--end form-group-->
           </div><!--end well--> 
-        </div><!-- end col-md-12-->
+        </div><!-- end col-sm-12-->
       </div><!-- end row-->
     </form>
   </div><!-- end alphaBrowse-->
