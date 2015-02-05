@@ -162,7 +162,7 @@
               </li>
             </ul>
             <? foreach ($searchFilters as $field => $data): ?>
-            <? if (!in_array($field, array('Language', 'Format', 'Location'))): ?>
+            <? if (!in_array($data[0]['field'], array('language', 'format',  'building', 'item_collection'))): ?>
               <ul class="list-group">
                 <li class="list-group-item title"><?=$this->transEsc($field)?></li>
                 <? foreach ($data as $value): ?>

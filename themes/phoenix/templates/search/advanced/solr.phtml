@@ -515,6 +515,31 @@ $locations = array(
 	array('class' => 'cat', 'value' => 'building:"SSA"', 'text' => 'SSA'),
 	array('value' => 'building:"SSA Reserves"', 'text' => 'SSA Reserves'),
 );
+
+$collections = array(
+	array('class' => 'all_collections', 'value' => '', 'text' => 'All Collections'),
+	array('class' => 'ns', 'disabled' => 'disabled', 'value' => '', 'text' => 'No sub-collection'),
+ 	array('data-main-location' => 'scrc', 'value' => 'item_collection:"American Drama"', 'text' => 'American Drama'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"American Newspapers"', 'text' => 'American Newspapers'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Archives/Manuscripts"', 'text' => 'Archives/Manuscripts'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Archives of Czechs and Slovaks Abroad"', 'text' => 'Archives of Czechs and Slovaks Abroad'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Atkinson Collection of American Drama"', 'text' => 'Atkinson Collection of American Drama'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Austrian Collection of Drama"', 'text' => 'Austrian Collection of Drama'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Codex Manuscripts"', 'text' => 'Codex Manuscripts'),
+	array('data-main-location' => 'crerar scrc', 'value' => 'item_collection:"Crerar Manuscripts"', 'text' => 'Crerar Manuscripts'),
+	array('data-main-location' => 'crerar scrc', 'value' => 'item_collection:"Crerar Rare Books"', 'text' => 'Crerar Rare Books'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Drama Collection"', 'text' => 'Drama Collection'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"EB Children&rsquo;s Literature"', 'text' => 'EB Children&rsquo;s Literature'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Helen and Ruth Regenstein Collection of Rare Books"', 'text' => 'Helen and Ruth Regenstein Collection of Rare Books'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Historical Children&rsquo;s Books"', 'text' => 'Historical Children&rsquo;s Books'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Incunabula"', 'text' => 'Incunabula'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Lincke Collection of Popular German Literature"', 'text' => 'Lincke Collection of Popular German Literature'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Lincoln Collection"', 'text' => 'Lincoln Collection'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Ludwig Rosenberger Library of Judaica"', 'text' => 'Ludwig Rosenberger Library of Judaica'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Modern Poetry Rare"', 'text' => 'Modern Poetry Rare'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Rare Books"', 'text' => 'Rare Books'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"University of Chicago Press Imprint Collection"', 'text' => 'University of Chicago Press Imprint Collection'),
+);
 ?>
 
 <fieldset>
@@ -598,28 +623,30 @@ $locations = array(
 	<div class="col-sm-6 col-md-3">
 		<label for="limit_collection" class="displayBlock">Collection:</label>
 		<select id="limit_collection" name="filter[]" multiple="multiple" size="10">
-		<option class='all_collections' value=''>All Collections </option>
-		<option class='ns' disabled='disabled' value=''>No sub-collection</option>
-		<option data-main-location="scrc" value='item_collection:"American Drama"'>American Drama</option>
-		<option data-main-location="scrc" value='item_collection:"American Newspapers"'>American Newspapers</option>
-		<option data-main-location="scrc" value='item_collection:"Archives/Manuscripts"'>Archives/Manuscripts</option>
-		<option data-main-location="scrc" value='item_collection:"Archives of Czechs and Slovaks Abroad"'>Archives of Czechs and Slovaks Abroad</option>
-		<option data-main-location="scrc" value='item_collection:"Atkinson Collection of American Drama"'>Atkinson Collection of American Drama</option>
-		<option data-main-location="scrc" value='item_collection:"Austrian Collection of Drama"'>Austrian Collection of Drama</option>
-		<option data-main-location="scrc" value='item_collection:"Codex Manuscripts"'>Codex Manuscripts</option>
-		<option data-main-location="crerar scrc" value='item_collection:"Crerar Manuscripts"'>Crerar Manuscripts</option>
-		<option data-main-location="crerar scrc" value='item_collection:"Crerar Rare Books"'>Crerar Rare Books</option>
-		<option data-main-location="scrc" value='item_collection:"Drama Collection"'>Drama Collection</option>
-		<option data-main-location="scrc" value='item_collection:"EB Children<?=$this->escapeHtml($single_quote)?>s Literature"'>EB Children&rsquo;s Literature</option>
-		<option data-main-location="scrc" value='item_collection:"Helen and Ruth Regenstein Collection of Rare Books"'>Helen and Ruth Regenstein Collection of Rare Books</option>
-		<option data-main-location="scrc" value='item_collection:"Historical Children<?=$this->escapeHtml($single_quote)?>s Books"'>Historical Children&rsquo;s Books</option>
-		<option data-main-location="scrc" value='item_collection:"Incunabula"'>Incunabula</option>
-		<option data-main-location="scrc" value='item_collection:"Lincke Collection of Popular German Literature"'>Lincke Collection of Popular German Literature</option>
-		<option data-main-location="scrc" value='item_collection:"Lincoln Collection"'>Lincoln Collection</option>
-		<option data-main-location="scrc" value='item_collection:"Ludwig Rosenberger Library of Judaica"'>Ludwig Rosenberger Library of Judaica</option>
-		<option data-main-location="scrc" value='item_collection:"Modern Poetry Rare"'>Modern Poetry Rare</option>
-		<option data-main-location="scrc" value='item_collection:"Rare Books"'>Rare Books</option>
-		<option data-main-location="scrc" value='item_collection:"University of Chicago Press Imprint Collection"'>University of Chicago Press Imprint Collection</option>
+        <?php foreach ($collections as $collection): ?>
+            <?php
+                $class = '';
+                if (array_key_exists('class', $collection)) {
+                    $class = " class='" . $collection['class'] . "'";
+                }
+                $datamaincollection = '';
+                if (array_key_exists('data-main-collection', $collection)) {
+                    $datamaincollection = " data-main-collection='" .  $collection['data-main-collection'] . "'";
+                }
+                $selected = '';
+                if (array_key_exists('unrecognized_facet_label', $searchFilters)) {
+                    foreach ($searchFilters['unrecognized_facet_label'] as $c) {
+                        if ($c['field'] == 'item_collection') {
+                            if ($c['displayText'] == $collection['text']) {
+                                $selected = ' selected="selected"';
+                            }
+                        }
+                    }
+                }
+            ?>
+
+            <option<?=$class?><?=$datamaincollection?><?=$selected?> value='<?=$collection['value']?>'><?=$collection['text']?></option>
+        <?php endforeach; ?>
         </select>
 	</div><!--end col-sm-6 col-md-3-->
 </div><!--end row-->
