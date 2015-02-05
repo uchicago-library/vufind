@@ -559,7 +559,7 @@ $collections = array(
             $selected = '';
             if (array_key_exists('Language', $searchFilters)) {
                 foreach ($searchFilters['Language'] as $l) {
-                    if ($l['displayText'] == $language['text']) {
+                    if (strtolower($l['displayText']) == strtolower($language['text'])) {
                         $selected = ' selected="selected"';
                     }
                 }
@@ -582,7 +582,7 @@ $collections = array(
                 $selected = '';
                 if (array_key_exists('Format', $searchFilters)) {
                     foreach ($searchFilters['Format'] as $f) {
-                        if ($f['displayText'] == $format['text']) {
+                        if (strtolower($f['displayText']) == strtolower($format['text'])) {
                             $selected = ' selected="selected"';
                         }
                     }
@@ -609,7 +609,7 @@ $collections = array(
                 $selected = '';
                 if (array_key_exists('Location', $searchFilters)) {
                     foreach ($searchFilters['Location'] as $l) {
-                        if ($l['displayText'] == $location['text']) {
+                        if (strtolower($l['displayText']) == strtolower($location['text'])) {
                             $selected = ' selected="selected"';
                         }
                     }
@@ -637,7 +637,7 @@ $collections = array(
                 if (array_key_exists('unrecognized_facet_label', $searchFilters)) {
                     foreach ($searchFilters['unrecognized_facet_label'] as $c) {
                         if ($c['field'] == 'item_collection') {
-                            if ($c['displayText'] == $collection['text']) {
+                            if (strtolower($c['displayText']) == strtolower($collection['text'])) {
                                 $selected = ' selected="selected"';
                             }
                         }
