@@ -342,7 +342,11 @@ $(document).ready(function() {
     var save_options = $('#limit_collection option').detach();
 
     $('#limit_building').change(function() {
-        var selected = $(this).find('option:selected');
+        var selected = $('#limit_building').find('option:selected');
+
+        if (selected.length == 0) {
+            return;
+        }
 
         //Get a copy of all of the options.
         var options = save_options.clone();
@@ -368,6 +372,8 @@ $(document).ready(function() {
             options.filter('[data-main-location*="scrc"]').appendTo('#limit_collection');
         }
     }); 
+    //link up the location and collection pulldowns onload, for "edit this advanced search." 
+    $('#limit_building').change();
 
     //get rid of unwanted options on submit.
     $("#advSearchForm").submit(function(){
