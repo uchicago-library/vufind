@@ -1,7 +1,7 @@
 <? $single_quote = "'"; //needed for our option values with 's in the name?>
 
 <?
-$searchFilters = $this->saved->getParams()->getFilterList();
+$searchFilters = ($this->saved) ?  $this->saved->getParams()->getFilterList() : array();
 
 $languages = array(
 	array('class' => 'all_languages', 'value' => '', 'text' => 'All Languages'),
@@ -467,6 +467,34 @@ $languages = array(
 	array('value' => 'language:"Zulu"', 'text' => 'Zulu'),
 	array('value' => 'language:"Zuni"', 'text' => 'Zuni'),
 );
+
+$formats = array(
+	array('class' => 'cat all_formats', 'value' => '', 'text' => 'All formats'),
+	array('class' => 'cat', 'value' => 'format:"Archives/Manuscripts"', 'text' => 'Archives/Manuscripts'),
+	array('class' => 'cat', 'value' => 'format:"Audio"', 'text' => 'Audio'),
+	array('value' => 'format:"Audio cassette"', 'text' => 'Audio Cassette'),
+	array('value' => 'format:"CD"', 'text' => 'CD'),
+	array('value' => 'format:"LP"', 'text' => 'LP'),
+	array('value' => 'format:"Music recording"', 'text' => 'Music recording'),
+	array('value' => 'format:"Spoken word recording"', 'text' => 'Spoken word recording'),
+	array('class' => 'cat', 'value' => 'format:"Book"', 'text' => 'Book'),
+	array('class' => 'cat', 'value' => 'format:"Dissertations"', 'text' => 'Dissertations'),
+	array('class' => 'cat', 'value' => 'format:"E-Resource"', 'text' => 'E-Resource'),
+	array('class' => 'cat', 'value' => 'format:"Image"', 'text' => 'Image'),
+	array('value' => 'format:"Photograph"', 'text' => 'Photograph'),
+	array('class' => 'cat', 'value' => 'format:"Journal"', 'text' => 'Journal'),
+	array('class' => 'cat', 'value' => 'format:"Kit"', 'text' => 'Kit'),
+	array('class' => 'cat', 'value' => 'format:"Library website"', 'text' => 'Library website  '),
+	array('class' => 'cat', 'value' => 'format:"Map"', 'text' => 'Map'),
+	array('class' => 'cat', 'value' => 'format:"Microform"' , 'text' => 'Microform'),
+	array('class' => 'cat', 'value' => 'format:"Music score"', 'text' => 'Music score'),
+	array('class' => 'cat', 'value' => 'format:"Print"', 'text' => 'Print'),
+	array('class' => 'cat', 'value' => 'format:"Video"' , 'text' => 'Video'),
+	array('value' => 'format:"Blu-ray disc"', 'text' => 'Blu-ray disc'),
+	array('value' => 'format:"DVD"', 'text' => 'DVD'),
+	array('value' => 'format:"Laserdisc"', 'text' => 'Laserdisc'),
+	array('value' => 'format:"Video cassette"', 'text' => 'Video cassette'),
+);
 ?>
 
 <fieldset>
@@ -481,7 +509,7 @@ $languages = array(
         <?php 
             $class = '';
             if (array_key_exists('class', $language)) {
-                $class = "class='" .  $language['class'] . "'";
+                $class = " class='" .  $language['class'] . "'";
             }
             $selected = '';
             if (array_key_exists('Language', $searchFilters)) {
@@ -492,7 +520,7 @@ $languages = array(
                 }
             }
         ?>
-        <option <?=$class?><?=$selected?> value='<?=$language['value']?>'><?=$language['text']?></option>
+        <option<?=$class?><?=$selected?> value='<?=$language['value']?>'><?=$language['text']?></option>
     <?php endforeach; ?>
 	</select>
 	</div> <!--end col-sm-6 col-md-3-->
@@ -500,31 +528,23 @@ $languages = array(
 	<div class="col-sm-6 col-md-3">
 		<label for="limit_format" class="displayBlock">Format:</label>
 		<select id="limit_format" name="filter[]" multiple="multiple" size="10">
-		  <option class="cat all_formats" value=''>All formats</option>
-		  <option class="cat" value='format:"Archives/Manuscripts"'>Archives/Manuscripts</option>
-		  <option class="cat" value='format:"Audio"'>Audio
-			  <option value='format:"Audio cassette"'>Audio Cassette</option>
-			  <option value='format:"CD"'>CD</option>
-			  <option value='format:"LP"'>LP</option>
-			  <option value='format:"Music recording"'>Music recording</option>
-			  <option value='format:"Spoken word recording"'>Spoken word recording</option>
-		  <option class="cat" value='format:"Book"'>Book</option>
-		  <option class="cat" value='format:"Dissertations"'>Dissertations</option>
-		  <option class="cat" value='format:"E-Resource"'>E-Resource</option>
-		  <option class="cat" value='format:"Image"'>Image</option>
-			<option value='format:"Photograph"'>Photograph</option>
-		  <option class="cat" value='format:"Journal"'>Journal</option>
-		  <option class="cat" value='format:"Kit"'>Kit</option>
-		  <option class="cat" value='format:"Library website"'>Library website</option>  
-		  <option class="cat" value='format:"Map"'>Map</option>
-		  <option class="cat" value='format:"Microform"' >Microform</option>
-          <option class="cat" value='format:"Music score"'>Music score</option>
-          <option class="cat" value='format:"Print"'>Print</option>
-		  <option class="cat" value='format:"Video"' >Video</option>
-			<option value='format:"Blu-ray disc"'>Blu-ray disc</option>
-			<option value='format:"DVD"'>DVD</option>
-			<option value='format:"Laserdisc"'>Laserdisc</option>
-			<option value='format:"Video cassette"'>Video cassette</option>
+        <?php foreach ($formats as $format): ?>
+            <?php
+                $class = '';
+                if (array_key_exists('class', $format)) {
+                    $class = " class='" . $format['class'] . "'";
+                }
+                $selected = '';
+                if (array_key_exists('Format', $searchFilters)) {
+                    foreach ($searchFilters['Format'] as $f) {
+                        if ($f['displayText'] == $format['text']) {
+                            $selected = ' selected="selected"';
+                        }
+                    }
+                }
+            ?>
+            <option<?=$class?><?=$selected?> value='<?=$format['value']?>'><?=$format['text']?></option>
+        <?php endforeach; ?>
 		</select>
 	</div><!--end col-sm-6 col-md-3-->
 
