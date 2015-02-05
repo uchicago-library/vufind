@@ -20,6 +20,13 @@
     }
     $hasDefaultsApplied = $this->saved->getParams()->hasDefaultsApplied();
     $searchFilters = $this->saved->getParams()->getFilterList();
+
+    // When editing an advanced search, this page displays facets in the
+    // sidebar. unset the facets that get displayed as limits. 
+    unset($searchFilters['Language']);
+    unset($searchFilters['Format']);
+    unset($searchFilters['Location']);
+    unset($searchFilters['unrecognized_facet_label']);
   } else {
     $hasDefaultsApplied = $searchDetails = $searchFilters = $groups = false;
   }
