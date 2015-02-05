@@ -495,6 +495,26 @@ $formats = array(
 	array('value' => 'format:"Laserdisc"', 'text' => 'Laserdisc'),
 	array('value' => 'format:"Video cassette"', 'text' => 'Video cassette'),
 );
+
+$locations = array(
+	array('class' => 'all_locations cat', 'value' => '', 'text' => 'All Locations'),
+	array('data-name' => 'crerar-main', 'class' => 'cat', 'value' => 'building:"Crerar Library"', 'text' => 'Crerar Library'),
+	array('value' => 'building:"Crerar Reference"', 'text' => 'Crerar Reference'),
+	array('value' => 'building:"Crerar Reserves"', 'text' => 'Crerar Reserves'),
+	array('class' => 'cat', 'value' => 'building:"D&apos;Angelo Law Library"', 'text' => 'D&apos;Angelo Law Library'),
+	array('value' => 'building:"Law Reserves"', 'text' => 'Law Reserves'),
+	array('class' => 'cat', 'value' => 'building:"Eckhart Library"', 'text' => 'Eckhart Library'),
+	array('value' => 'building:"Eckhart Reference"', 'text' => 'Eckhart Reference'),
+	array('value' => 'building:"Eckhart Reserves"', 'text' => 'Eckhart Reserves'),
+	array('class' => 'cat', 'value' => 'building:"Regenstein Library"', 'text' => 'Regenstein Library'),
+	array('value' => 'building:"Regenstein Recordings"', 'text' => 'Regenstein Recordings'),
+	array('value' => 'building:"Regenstein Reference"', 'text' => 'Regenstein Reference'),
+	array('value' => 'building:"Regenstein Reserves"', 'text' => 'Regenstein Reserves'),
+	array('value' => 'building:"Regenstein TECHB@R"', 'text' => 'Regenstein TECHB@R'),
+	array('class' => 'cat', 'value' => 'building:"Special Collections Research Center"', 'text' => 'Special Collections Research Center'),
+	array('class' => 'cat', 'value' => 'building:"SSA"', 'text' => 'SSA'),
+	array('value' => 'building:"SSA Reserves"', 'text' => 'SSA Reserves'),
+);
 ?>
 
 <fieldset>
@@ -551,23 +571,27 @@ $formats = array(
 	<div class="col-sm-6 col-md-3">
 		<label for="limit_building" class="displayBlock">Location:</label>
 		<select id="limit_building" name="filter[]" multiple="multiple" size="10">
-		  <option class='all_locations cat' value='' >All Locations</option>
-		  <option data-name="crerar-main" class="cat" value='building:"Crerar Library"' >Crerar Library</option>
-		  <option value='building:"Crerar Reference"'>Crerar Reference</option>
-		  <option value='building:"Crerar Reserves"'>Crerar Reserves</option>
-		  <option class="cat" value='building:"D&apos;Angelo Law Library"' >D'Angelo Law Library</option>
-		  <option value='building:"Law Reserves"'>Law Reserves</option>
-		  <option class="cat" value='building:"Eckhart Library"' >Eckhart Library</option>
-		  <option value='building:"Eckhart Reference"'>Eckhart Reference</option>
-		  <option value='building:"Eckhart Reserves"'>Eckhart Reserves</option>
-		  <option class="cat" value='building:"Regenstein Library"' >Regenstein Library</option>
-		  <option value='building:"Regenstein Recordings"'>Regenstein Recordings</option>
-		  <option value='building:"Regenstein Reference"'>Regenstein Reference</option>
-		  <option value='building:"Regenstein Reserves"'>Regenstein Reserves</option>
-		  <option value='building:"Regenstein TECHB@R"'>Regenstein TECHB@R</option>
-		  <option class="cat" value='building:"Special Collections Research Center"' >Special Collections Research Center</option>
-		  <option class="cat" value='building:"SSA"' >SSA</option>
-		  <option value='building:"SSA Reserves"'>SSA Reserves</option>
+        <?php foreach ($locations as $location): ?>
+            <?php
+                $class = '';
+                if (array_key_exists('class', $location)) {
+                    $class = " class='" . $location['class'] . "'";
+                }
+                $dataname = '';
+                if (array_key_exists('data-name', $location)) {
+                    $dataname = " data-name='" . $location['data-name'] . "'";
+                }
+                $selected = '';
+                if (array_key_exists('Location', $searchFilters)) {
+                    foreach ($searchFilters['Location'] as $l) {
+                        if ($l['displayText'] == $location['text']) {
+                            $selected = ' selected="selected"';
+                        }
+                    }
+                }
+            ?>
+            <option<?=$class?><?=$dataname?><?=$selected?> value='<?=$location['value']?>'><?=$location['text']?></option>
+        <?php endforeach; ?>
 		</select>
 	</div><!--col-sm-6 col-md-3-->
 
