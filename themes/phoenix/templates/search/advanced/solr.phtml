@@ -637,9 +637,9 @@ $collections = array(
                 if (array_key_exists('class', $collection)) {
                     $class = " class='" . $collection['class'] . "'";
                 }
-                $datamaincollection = '';
-                if (array_key_exists('data-main-collection', $collection)) {
-                    $datamaincollection = " data-main-collection='" .  $collection['data-main-collection'] . "'";
+                $datamainlocation = '';
+                if (array_key_exists('data-main-location', $collection)) {
+                    $datamainlocation = " data-main-location='" .  $collection['data-main-location'] . "'";
                 }
                 $selected = '';
                 if (array_key_exists('unrecognized_facet_label', $searchFilters)) {
@@ -653,7 +653,7 @@ $collections = array(
                 }
             ?>
 
-            <option<?=$class?><?=$datamaincollection?><?=$selected?> value='<?=$collection['value']?>'><?=$collection['text']?></option>
+            <option<?=$class?><?=$datamainlocation?><?=$selected?> value='<?=$collection['value']?>'><?=$collection['text']?></option>
         <?php endforeach; ?>
         </select>
 	</div><!--end col-sm-6 col-md-3-->
