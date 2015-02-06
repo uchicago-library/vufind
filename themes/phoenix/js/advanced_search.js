@@ -352,6 +352,19 @@ function switchToBasicSearch()
     $('#advancedSearchSwitch a').removeClass('disabled');
     $('#basicSearchSwitch a').addClass('disabled');
 
+    //if the user was editing and advanced search and the sidebar is
+    //there, expland the main content column and delete the sidebar. 
+    if ($('.sidebar').length > 0) {
+        var oldClass = $('.sidebar').prevAll('[class^="col-"]').eq(0).attr('class');
+        var newClass = oldClass.replace(/[0-9]+$/, '12');
+
+        var mainColumn = $('.sidebar').prevAll('[class^="col-"]').eq(0);
+        mainColumn.removeClass(oldClass);
+        mainColumn.addClass(newClass);
+
+        $('.sidebar').remove();
+    }
+
     //hide 'match' pulldown. 
     $('#groupJoin').hide();
 
@@ -406,6 +419,16 @@ $(document).ready(function() {
     // Set up basic and advanced search links. 
     $('#basicSearchSwitch a').click(switchToBasicSearch);
     $('#advancedSearchSwitch a').click(switchToAdvancedSearch);
+
+    // if we're loading an 'edit this advanced search' page...
+    if ($('#advSearchForm.advancedSearch').length > 0) {
+        // hide the power searching link.
+        $('#advSearchP').hide();
+
+        // switch the basic/advanced search switch.
+        $('#basicSearchSwitch a').removeClass('disabled');
+        $('#advancedSearchSwitch a').addClass('disabled');
+    }
 
     // Update keyword search placeholder text when the select pulldown changes. 
     $('.search select').change(function() {
