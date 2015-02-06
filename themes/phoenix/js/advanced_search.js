@@ -352,12 +352,6 @@ function switchToBasicSearch()
     //remove 'match' pulldown. 
     $('#groupJoin').remove();
 
-    //change text input's name to 'lookfor' (basic search)
-    $('#search_lookfor0_0').attr('name', 'lookfor');
-
-    //change field pulldown's name to 'type' (basic search)
-    $('#search_type0_0').attr('name', 'type');
-
     //delete all but the first search group.
     $('.group:not(:first)').each(function() {
         deleteGroup($(this).find('a.close'));
@@ -367,6 +361,12 @@ function switchToBasicSearch()
     $('.group:first').find('.search:not(:first)').each(function() {
         deleteSearch($(this).find('a.delete'));
     });
+
+    //change text input's name to 'lookfor' (basic search)
+    $('.group:first .search:first').find('input:first').attr('name', 'lookfor');
+
+    //change field pulldown's name to 'type' (basic search)
+    $('.group:first .search:first').find('select').attr('name', 'type');
 
     //show 'power searching instructions'.
     $('#advSearchP').show();
