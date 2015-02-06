@@ -694,6 +694,31 @@ I'm doing the facets in "edit this advanced search" right now.)
 .list-group-item .fa-times {
     padding-left: 20px;
 }
+.slider-container {
+  .slider {
+    .slider-track {
+      background:#EEE;
+      box-shadow:inset 0 1px 0 rgba(0, 0, 0, 0.1);
+      .slider-handle {
+        background:#CCC;
+        background-image:none;
+        border-color:#AAA;
+        border-radius:3px;
+        box-shadow:none;
+        opacity:.9;
+        &:hover,&:active,&:focus {
+          opacity:1;
+          background:#DDD;
+        }
+      }
+      .slider-selection {
+        background:transparent;
+        box-shadow:inherit;
+      }
+    }
+  }
+}
+
 
 /*E-resource links*/
 .findit {
