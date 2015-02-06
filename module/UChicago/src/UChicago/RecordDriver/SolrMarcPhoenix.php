@@ -522,7 +522,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
          */
         'results' => array(
             array('label'  => 'title',
-                  'values' => array('245|abcfgknps')),
+                  'values' => array('245|abfgknps')),
             array('label'  => 'author',
                   'values' => array('100|abcdequ')),
             array('label'  => 'corporate-author',
