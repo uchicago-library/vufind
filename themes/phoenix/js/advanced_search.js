@@ -286,6 +286,10 @@ function switchToAdvancedSearch()
         return false;
     }
 
+    //switch form class from basic to advanced. 
+    $('#advSearchForm').removeClass('basicSearch');
+    $('#advSearchForm').addClass('advancedSearch');
+
     //toggle basic/advanced search links. 
     $('#advancedSearchSwitch a').addClass('disabled');
     $('#basicSearchSwitch a').removeClass('disabled');
@@ -336,6 +340,10 @@ function switchToBasicSearch()
     if ($('#basicSearchSwitch a.disabled').length > 0) {
         return false;
     }
+
+    //switch form class from advanced to basic.
+    $('#advSearchForm').addClass('basicSearch');
+    $('#advSearchForm').removeClass('advancedSearch');
 
     //toggle basic/advanced search links. 
     $('#advancedSearchSwitch a').removeClass('disabled');
