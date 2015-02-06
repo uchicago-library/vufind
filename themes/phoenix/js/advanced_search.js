@@ -466,7 +466,7 @@ $(document).ready(function() {
         $('.all, .all_languages, .all_formats, .all_locations, .all_collections').prop("selected", false);
 
         //if we're submitting the form as a basic search, get rid of a few extra inputs.
-        if ($('#advSearchForm').find('input[name="lookfor"]')) {
+        if ($('#advSearchForm').find('input[name="lookfor"]').length > 0) {
             //remove form fields for arrays of things. 
             $('[name$="[]"]').remove();
             //some other elements...
