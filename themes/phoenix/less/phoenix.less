@@ -14,6 +14,12 @@
 .gray {
     color: lighten(@gray-base, 55%); // #8c8c8c
 }
+a.disabled {
+    color: inherit;
+    cursor: auto;
+    outline: none;
+    text-decoration: none;
+}
 
 /*General*/
 .container {
@@ -178,6 +184,10 @@ div#searchForm p {
     @media (max-width: @screen-xs-max) {
         width: 100%;
     }
+}
+#basicAdvancedSearchSwitches {
+    margin-top: -11px;
+    text-align: right;
 }
 .search {
   margin-bottom: 4px;

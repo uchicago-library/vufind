@@ -56,6 +56,7 @@
 
 <div class="tab-content">
   <div class="tab-pane active" id="advSearch">
+    <p id="basicAdvancedSearchSwitches"><span id="basicSearchSwitch"><a class="disabled" href="#">Basic</a></span> | <span id="advancedSearchSwitch"><a href="#" id="advancedSearchSwitch">Advanced Search</a></span></p>
     <form role="search" name="searchForm" id="advSearchForm" method="get" action="<?=$this->url($this->options->getSearchAction())?>">
       <div class="row">
         <? if (empty($searchFilters)): ?>

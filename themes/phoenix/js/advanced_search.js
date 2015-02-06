@@ -281,7 +281,14 @@ function addSearchJS(group)
 
 function switchToAdvancedSearch()
 {
-    $('#advancedsearchlink').parent().hide();
+    //if the advanced search is already active, do nothing. 
+    if ($('#advancedSearchSwitch a.disabled').length > 0) {
+        return false;
+    }
+
+    //toggle basic/advanced search links. 
+    $('#advancedSearchSwitch a').addClass('disabled');
+    $('#basicSearchSwitch a').removeClass('disabled');
 
     //change text input's name to 'lookfor0[]' (advanced search)
     $('#search_lookfor0_0').attr('name', 'lookfor0[]');
@@ -320,7 +327,69 @@ function switchToAdvancedSearch()
     return false;
 }
 
+function switchToBasicSearch()
+{
+    //if the basic search is already active, do nothing. 
+    if ($('#basicSearchSwitch a.disabled').length > 0) {
+        return false;
+    }
+
+    //toggle basic/advanced search links. 
+    $('#advancedSearchSwitch a').removeClass('disabled');
+    $('#basicSearchSwitch a').addClass('disabled');
+
+    //remove 'match' pulldown. 
+    $('#groupJoin').remove();
+
+    //change text input's name to 'lookfor' (basic search)
+    $('#search_lookfor0_0').attr('name', 'lookfor');
+
+    //change field pulldown's name to 'type' (basic search)
+    $('#search_type0_0').attr('name', 'type');
+
+    //delete all but the first search group.
+    $('.group:not(:first)').each(function() {
+        deleteGroup($(this).find('a.close'));
+    });
+
+    //delete all but the first search box. 
+    $('.group:first').find('.search:not(:first)').each(function() {
+        deleteSearch($(this).find('a.delete'));
+    });
+    
+    //hide 'Add Search Field'
+    $('#group0Holder').hide();
+    $('#add_search_link_0').hide(); 
+
+    //hide "what is a field?" link. 
+    $('#what_is_a_field').hide();
+
+    //hide 'Add Search Group'
+    $('#groupPlaceHolder').hide();
+
+    //hide limits. 
+    $('fieldset').has('legend:contains("Limit To")').hide();
+
+    //hide results per page.
+    $('fieldset').has('legend:contains("Results per page")').hide();
+
+    //hide year of publication.
+    $('fieldset').has('legend:contains("Year of Publication")').hide();
+
+    //show basic search buttons.
+    $('.basicSearchBtn').show();
+
+    //hide advanced search buttons.
+    $('.advancedSearchBtn').hide();
+
+    return false;
+}
+
 $(document).ready(function() {
+    // Set up basic and advanced search links. 
+    $('#basicSearchSwitch a').click(switchToBasicSearch);
+    $('#advancedSearchSwitch a').click(switchToAdvancedSearch);
+
     // Update keyword search placeholder text when the select pulldown changes. 
     $('.search select').change(function() {
         update_keyword_search($(this));
