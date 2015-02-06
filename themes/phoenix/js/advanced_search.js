@@ -1,5 +1,72 @@
 /*global addSearchString, deleteSearchGroupString, searchFields, searchJoins, searchLabel, searchMatch */
 
+/*
+ * Update placeholder text for keyword searches. 
+ * Do it onload and do it when the dropdown changes.
+ */
+function update_keyword_search(select) {
+    var placeholder = '';
+    switch(select.val()) {
+        case 'AllFields':
+            placeholder = 'evolutionary biology';
+            break;
+        case 'Title':
+            placeholder = 'chicago style manual';
+            break;
+        case 'Author':
+            placeholder = 'saul bellow';
+            break;
+        case 'Subject':
+            placeholder = 'united states history';
+            break;
+        case 'JournalTitle':
+            placeholder = 'american journal of sociology';
+            break;
+        case 'StandardNumbers':
+            placeholder = '0375412328';
+            break;
+        case 'Series':
+            placeholder = 'lecture notes in computer science';
+            break;
+        case 'Publisher':
+            placeholder = 'university of chicago press';
+            break;
+    }
+    select.prevAll('input').eq(0).attr('placeholder', placeholder);
+}
+
+/*
+ * Update the placeholder text for begins with searches. 
+ * Do it on load, and do it when the dropdown changes. 
+ */
+function update_begins_with_search() {
+    var placeholder = '';
+    switch($('select#alphaBrowseForm_source').val()) {
+        case 'title':
+            placeholder = 'a manual for writers of';
+            break;
+        case 'author':
+            placeholder = 'dickens charles';
+            break;
+        case 'topic':
+            placeholder = 'world\'s columbian expo';
+            break;
+        case 'lcc':
+            placeholder = 'ps2700 f16';
+            break;
+        case 'series':
+            placeholder = 'lecture notes in math';
+            break;
+        case 'dewey':
+            placeholder = '900';
+            break;
+        case 'journal':
+            placeholder = 'chronicle of higher education';
+            break;
+    }
+    $('input#alphaBrowseForm_from').attr('placeholder', placeholder);
+}
+
 function addSearch(link, term, field)
 {
   // Get the group number. 
@@ -18,8 +85,7 @@ function addSearch(link, term, field)
   // Build the new search
   var inputIndex = $('#group'+group+' input').length;
   var inputID = group+'_'+inputIndex;
-  var newSearch = '<div class="search form-group form-inline" id="search'+inputID+'">'
-    + '<input id="search_lookfor'+inputID+'" class="form-control input-large" type="text" name="lookfor'+group+'[]" value="'+term+'"/> '
+  var newSearch = '<div class="search form-group form-inline" id="search'+inputID+'">' + '<input id="search_lookfor'+inputID+'" class="form-control input-large" type="text" name="lookfor'+group+'[]" value="'+term+'" placeholder="evolutionary biology"/> '
     + '<select id="search_type'+inputID+'" name="type'+group+'[]" class="form-control">';
   for (var key in searchFields) {
     newSearch += '<option value="' + key + '"';
@@ -40,6 +106,10 @@ function addSearch(link, term, field)
   if(inputIndex > 0) {
     $('#group'+group+' .search .delete').removeClass('hidden');
   }
+  // When the field pulldown changes, update the text box placeholder text. 
+  $('#group'+group+' .search select').change(function() {
+    update_keyword_search($(this));
+  });
 }
 
 function deleteSearch(link)
@@ -134,9 +204,8 @@ function addGroup(firstTerm, firstField, join)
 
   var nextGroup = $('.group').length;
 
-  var newGroup = '<div id="group'+nextGroup+'" class="group well">'
-    + '<div class="row">'
-    + '<div class="col-md-12">'
+  var newGroup = ''
+    + '<div id="group'+nextGroup+'" class="group well">'
     + '<div class="form-group form-inline">'
     + '<label class="hidden" for="search_bool'+nextGroup+'">'+searchMatch+':&nbsp;</label>'
     + '<a href="#" class="close hidden" onclick="deleteGroup(this)" title="'+deleteSearchGroupString+'">&times;</a>'
@@ -159,7 +228,7 @@ function addGroup(firstTerm, firstField, join)
     + '</select></div>'
     + '<i id="group'+nextGroup+'Holder" class="fa fa-plus-circle"></i> <a href="#" id="add_search_link_'+nextGroup+'" onClick="addSearch(this)">'+addSearchString+'</a>'
     + ' <a style="display: inline;" href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchfield" id="what_is_a_field" class="external"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Field?</a>'
-    + '</div></div>';
+    + '</div>';
 
   $('#groupPlaceHolder').before(newGroup);
 
@@ -212,16 +281,33 @@ function addSearchJS(group)
 
 function switchToAdvancedSearch()
 {
-    $('#advancedsearchlink').parent().hide();
+    //if the advanced search is already active, do nothing. 
+    if ($('#advancedSearchSwitch a.disabled').length > 0) {
+        return false;
+    }
+
+    //switch form class from basic to advanced. 
+    $('#advSearchForm').removeClass('basicSearch');
+    $('#advSearchForm').addClass('advancedSearch');
+
+    //toggle basic/advanced search links. 
+    $('#advancedSearchSwitch a').addClass('disabled');
+    $('#basicSearchSwitch a').removeClass('disabled');
+
+    //show 'match' pulldown. 
+    $('#groupJoin').show();
 
     //change text input's name to 'lookfor0[]' (advanced search)
-    $('#search_lookfor0_0').attr('name', 'lookfor0[]');
+    $('.group:first .search:first').find('input:first').attr('name', 'lookfor0[]');
 
     //change field pulldown's name to 'type0[]' (advanced search)
-    $('#search_type0_0').attr('name', 'type0[]');
+    $('.group:first .search:first').find('select').attr('name', 'type0[]');
 
     addSearch($('#add_search_link_0'), '', '');
     addSearch($('#add_search_link_0'), '', '');
+
+    //hide 'power searching instructions'.
+    $('#advSearchP').hide();
 
     //show 'Add Search Field'
     $('#group0Holder').show();
@@ -250,3 +336,168 @@ function switchToAdvancedSearch()
 
     return false;
 }
+
+function switchToBasicSearch()
+{
+    //if the basic search is already active, do nothing. 
+    if ($('#basicSearchSwitch a.disabled').length > 0) {
+        return false;
+    }
+
+    //switch form class from advanced to basic.
+    $('#advSearchForm').addClass('basicSearch');
+    $('#advSearchForm').removeClass('advancedSearch');
+
+    //toggle basic/advanced search links. 
+    $('#advancedSearchSwitch a').removeClass('disabled');
+    $('#basicSearchSwitch a').addClass('disabled');
+
+    //if the user was editing and advanced search and the sidebar is
+    //there, expland the main content column and delete the sidebar. 
+    if ($('.sidebar').length > 0) {
+        var oldClass = $('.sidebar').prevAll('[class^="col-"]').eq(0).attr('class');
+        var newClass = oldClass.replace(/[0-9]+$/, '12');
+
+        var mainColumn = $('.sidebar').prevAll('[class^="col-"]').eq(0);
+        mainColumn.removeClass(oldClass);
+        mainColumn.addClass(newClass);
+
+        $('.sidebar').remove();
+    }
+
+    //hide 'match' pulldown. 
+    $('#groupJoin').hide();
+
+    //delete all but the first search group.
+    $('.group:not(:first)').each(function() {
+        deleteGroup($(this).find('a.close'));
+    });
+
+    //delete all but the first search box. 
+    $('.group:first').find('.search:not(:first)').each(function() {
+        deleteSearch($(this).find('a.delete'));
+    });
+
+    //change text input's name to 'lookfor' (basic search)
+    $('.group:first .search:first').find('input:first').attr('name', 'lookfor');
+
+    //change field pulldown's name to 'type' (basic search)
+    $('.group:first .search:first').find('select').attr('name', 'type');
+
+    //show 'power searching instructions'.
+    $('#advSearchP').show();
+    
+    //hide 'Add Search Field'
+    $('#group0Holder').hide();
+    $('#add_search_link_0').hide(); 
+
+    //hide "what is a field?" link. 
+    $('#what_is_a_field').hide();
+
+    //hide 'Add Search Group'
+    $('#groupPlaceHolder').hide();
+
+    //hide limits. 
+    $('fieldset').has('legend:contains("Limit To")').hide();
+
+    //hide results per page.
+    $('fieldset').has('legend:contains("Results per page")').hide();
+
+    //hide year of publication.
+    $('fieldset').has('legend:contains("Year of Publication")').hide();
+
+    //show basic search buttons.
+    $('.basicSearchBtn').show();
+
+    //hide advanced search buttons.
+    $('.advancedSearchBtn').hide();
+
+    return false;
+}
+
+$(document).ready(function() {
+    // Set up basic and advanced search links. 
+    $('#basicSearchSwitch a').click(switchToBasicSearch);
+    $('#advancedSearchSwitch a').click(switchToAdvancedSearch);
+
+    // if we're loading an 'edit this advanced search' page...
+    if ($('#advSearchForm.advancedSearch').length > 0) {
+        // hide the power searching link.
+        $('#advSearchP').hide();
+
+        // switch the basic/advanced search switch.
+        $('#basicSearchSwitch a').removeClass('disabled');
+        $('#advancedSearchSwitch a').addClass('disabled');
+    }
+
+    // Update keyword search placeholder text when the select pulldown changes. 
+    $('.search select').change(function() {
+        update_keyword_search($(this));
+    });
+    // Update begins with placeholder text when the select pulldown changes. 
+    $('select#alphaBrowseForm_source').change(function() {
+        update_begins_with_search();
+    });
+    //indent child options on specific select boxes
+    $('#limit_format option, #limit_building option').not('.cat').each(function(){
+        $(this).html('&nbsp;&nbsp;&nbsp;'+$(this).text());
+    });
+
+    /*
+     * dynamic chained select boxes 
+     */
+
+    //detach the select options.
+    var save_options = $('#limit_collection option').detach();
+
+    $('#limit_building').change(function() {
+        var selected = $('#limit_building').find('option:selected');
+
+        if (selected.length == 0) {
+            return;
+        }
+
+        //Get a copy of all of the options.
+        var options = save_options.clone();
+
+        //Clear the Collection box. 
+        $('#limit_collection option').remove();
+
+        //All Locations
+        if (selected.val() == '') {
+            options.filter(':not(".ns")').appendTo('#limit_collection');
+
+        //Anything without sub-collections just gets a message. 
+        } else if (selected.val().indexOf('Crerar Library') == -1 &&
+                   selected.val().indexOf('Special Collections') == -1) {
+            options.filter('.ns').appendTo('#limit_collection');
+
+        //Crerar
+        } else if (selected.val().indexOf('Crerar Library') > -1) {
+            options.filter('[data-main-location*="crerar"]').appendTo('#limit_collection');
+
+        //SCRC
+        } else if (selected.val().indexOf('Special Collections') > -1) {
+            options.filter('[data-main-location*="scrc"]').appendTo('#limit_collection');
+        }
+    }); 
+    //link up the location and collection pulldowns onload, for "edit this advanced search." 
+    $('#limit_building').change();
+
+    //get rid of unwanted options on submit.
+    $("#advSearchForm").submit(function(e){
+        $('.all, .all_languages, .all_formats, .all_locations, .all_collections').prop("selected", false);
+
+        //if we're submitting the form as a basic search, get rid of a few extra inputs.
+        if ($('#advSearchForm').find('input[name="lookfor"]').length > 0) {
+            //remove form fields for arrays of things. 
+            $('[name$="[]"]').remove();
+            //some other elements...
+            $('[name="sort"]').remove();
+            $('[name="join"]').remove();
+            $('[name="publishDatefrom"]').remove();
+            $('[name="publishDateto"]').remove();
+        }
+    }); 
+});
+

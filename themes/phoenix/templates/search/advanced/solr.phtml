@@ -1,559 +1,662 @@
 <? $single_quote = "'"; //needed for our option values with 's in the name?>
 
+<?
+/*
+ * Prepare filter strings for comparison.
+ */
+
+function prep_string($s) {
+    return strtolower(html_entity_decode($s, ENT_QUOTES));
+}
+
+$searchFilters = ($this->saved) ?  $this->saved->getParams()->getFilterList() : array();
+
+$languages = array(
+	array('class' => 'all_languages', 'value' => '', 'text' => 'All Languages'),
+	array('value' => 'language:"English"', 'text' => 'English'),
+	array('value' => 'language:"German"', 'text' => 'German'),
+	array('value' => 'language:"French"', 'text' => 'French'),
+	array('value' => 'language:"Spanish"', 'text' => 'Spanish'),
+	array('value' => 'language:"Chinese"', 'text' => 'Chinese'),
+	array('value' => 'language:"Russian"', 'text' => 'Russian'),
+	array('value' => 'language:"Italian"', 'text' => 'Italian'),
+	array('value' => 'language:"Japanese"', 'text' => 'Japanese'),
+	array('value' => 'language:"Abkhazian"', 'text' => 'Abkhazian'),
+	array('value' => 'language:"Achinese"', 'text' => 'Achinese'),
+	array('value' => 'language:"Acoli"', 'text' => 'Acoli'),
+	array('value' => 'language:"Adyghe"', 'text' => 'Adyghe'),
+	array('value' => 'language:"Afrikaans"', 'text' => 'Afrikaans'),
+	array('value' => 'language:"Afro-Asiatic"', 'text' => 'Afro-Asiatic'),
+	array('value' => 'language:"Ainu"', 'text' => 'Ainu'),
+	array('value' => 'language:"Akan"', 'text' => 'Akan'),
+	array('value' => 'language:"Akkadian"', 'text' => 'Akkadian'),
+	array('value' => 'language:"Albanian"', 'text' => 'Albanian'),
+	array('value' => 'language:"Aleut"', 'text' => 'Aleut'),
+	array('value' => 'language:"Algonquian"', 'text' => 'Algonquian'),
+	array('value' => 'language:"Altaic"', 'text' => 'Altaic'),
+	array('value' => 'language:"Amharic"', 'text' => 'Amharic'),
+	array('value' => 'language:"Ancient Egyptian"', 'text' => 'Ancient Egyptian'),
+	array('value' => 'language:"Ancient Greek"', 'text' => 'Ancient Greek'),
+	array('value' => 'language:"Angika"', 'text' => 'Angika'),
+	array('value' => 'language:"Apache"', 'text' => 'Apache'),
+	array('value' => 'language:"Arabic"', 'text' => 'Arabic'),
+	array('value' => 'language:"Aragonese"', 'text' => 'Aragonese'),
+	array('value' => 'language:"Aramaic"', 'text' => 'Aramaic'),
+	array('value' => 'language:"Arapaho"', 'text' => 'Arapaho'),
+	array('value' => 'language:"Arawak"', 'text' => 'Arawak'),
+	array('value' => 'language:"Armenian"', 'text' => 'Armenian'),
+	array('value' => 'language:"Aromanian"', 'text' => 'Aromanian'),
+	array('value' => 'language:"Artificial"', 'text' => 'Artificial'),
+	array('value' => 'language:"Assamese"', 'text' => 'Assamese'),
+	array('value' => 'language:"Asturian"', 'text' => 'Asturian'),
+	array('value' => 'language:"Athapascan"', 'text' => 'Athapascan'),
+	array('value' => 'language:"Australian"', 'text' => 'Australian'),
+	array('value' => 'language:"Austronesian"', 'text' => 'Austronesian'),
+	array('value' => 'language:"Avaric"', 'text' => 'Avaric'),
+	array('value' => 'language:"Avestan"', 'text' => 'Avestan'),
+	array('value' => 'language:"Awadhi"', 'text' => 'Awadhi'),
+	array('value' => 'language:"Aymara"', 'text' => 'Aymara'),
+	array('value' => 'language:"Azerbaijani"', 'text' => 'Azerbaijani'),
+	array('value' => 'language:"Balinese"', 'text' => 'Balinese'),
+	array('value' => 'language:"Baltic"', 'text' => 'Baltic'),
+	array('value' => 'language:"Baluchi"', 'text' => 'Baluchi'),
+	array('value' => 'language:"Bambara"', 'text' => 'Bambara'),
+	array('value' => 'language:"Bamileke"', 'text' => 'Bamileke'),
+	array('value' => 'language:"Banda"', 'text' => 'Banda'),
+	array('value' => 'language:"Bantu"', 'text' => 'Bantu'),
+	array('value' => 'language:"Basa"', 'text' => 'Basa'),
+	array('value' => 'language:"Bashkir"', 'text' => 'Bashkir'),
+	array('value' => 'language:"Basque"', 'text' => 'Basque'),
+	array('value' => 'language:"Batak"', 'text' => 'Batak'),
+	array('value' => 'language:"Beja"', 'text' => 'Beja'),
+	array('value' => 'language:"Belarusian"', 'text' => 'Belarusian'),
+	array('value' => 'language:"Bemba"', 'text' => 'Bemba'),
+	array('value' => 'language:"Bengali"', 'text' => 'Bengali'),
+	array('value' => 'language:"Berber"', 'text' => 'Berber'),
+	array('value' => 'language:"Bhojpuri"', 'text' => 'Bhojpuri'),
+	array('value' => 'language:"Bihari"', 'text' => 'Bihari'),
+	array('value' => 'language:"Bikol"', 'text' => 'Bikol'),
+	array('value' => 'language:"Bini"', 'text' => 'Bini'),
+	array('value' => 'language:"Bislama"', 'text' => 'Bislama'),
+	array('value' => 'language:"Blin"', 'text' => 'Blin'),
+	array('value' => 'language:"Bosnian"', 'text' => 'Bosnian'),
+	array('value' => 'language:"Braj"', 'text' => 'Braj'),
+	array('value' => 'language:"Breton"', 'text' => 'Breton'),
+	array('value' => 'language:"Buginese"', 'text' => 'Buginese'),
+	array('value' => 'language:"Bulgarian"', 'text' => 'Bulgarian'),
+	array('value' => 'language:"Buriat"', 'text' => 'Buriat'),
+	array('value' => 'language:"Burmese"', 'text' => 'Burmese'),
+	array('value' => 'language:"Caddo"', 'text' => 'Caddo'),
+	array('value' => 'language:"Catalan"', 'text' => 'Catalan'),
+	array('value' => 'language:"Caucasian"', 'text' => 'Caucasian'),
+	array('value' => 'language:"Cebuano"', 'text' => 'Cebuano'),
+	array('value' => 'language:"Celtic"', 'text' => 'Celtic'),
+	array('value' => 'language:"Central American Indian"', 'text' => 'Central American Indian'),
+	array('value' => 'language:"Central Khmer"', 'text' => 'Central Khmer'),
+	array('value' => 'language:"Chagatai"', 'text' => 'Chagatai'),
+	array('value' => 'language:"Chamic"', 'text' => 'Chamic'),
+	array('value' => 'language:"Chamorro"', 'text' => 'Chamorro'),
+	array('value' => 'language:"Chechen"', 'text' => 'Chechen'),
+	array('value' => 'language:"Cherokee"', 'text' => 'Cherokee'),
+	array('value' => 'language:"Cheyenne"', 'text' => 'Cheyenne'),
+	array('value' => 'language:"Chibcha"', 'text' => 'Chibcha'),
+	array('value' => 'language:"Chichewa"', 'text' => 'Chichewa'),
+	array('value' => 'language:"Chinese"', 'text' => 'Chinese'),
+	array('value' => 'language:"Chinook"', 'text' => 'Chinook'),
+	array('value' => 'language:"Chipewyan"', 'text' => 'Chipewyan'),
+	array('value' => 'language:"Choctaw"', 'text' => 'Choctaw'),
+	array('value' => 'language:"Church Slavic"', 'text' => 'Church Slavic'),
+	array('value' => 'language:"Chuukese"', 'text' => 'Chuukese'),
+	array('value' => 'language:"Chuvash"', 'text' => 'Chuvash'),
+	array('value' => 'language:"Classical Syriac"', 'text' => 'Classical Syriac'),
+	array('value' => 'language:"Coptic"', 'text' => 'Coptic'),
+	array('value' => 'language:"Cornish"', 'text' => 'Cornish'),
+	array('value' => 'language:"Corsican"', 'text' => 'Corsican'),
+	array('value' => 'language:"Cree"', 'text' => 'Cree'),
+	array('value' => 'language:"Creek"', 'text' => 'Creek'),
+	array('value' => 'language:"Creole"', 'text' => 'Creole'),
+	array('value' => 'language:"Creoles"', 'text' => 'Creoles'),
+	array('value' => 'language:"Crimean Tatar"', 'text' => 'Crimean Tatar'),
+	array('value' => 'language:"Croatian"', 'text' => 'Croatian'),
+	array('value' => 'language:"Cushitic"', 'text' => 'Cushitic'),
+	array('value' => 'language:"Czech"', 'text' => 'Czech'),
+	array('value' => 'language:"Dakota"', 'text' => 'Dakota'),
+	array('value' => 'language:"Danish"', 'text' => 'Danish'),
+	array('value' => 'language:"Dargwa"', 'text' => 'Dargwa'),
+	array('value' => 'language:"Delaware"', 'text' => 'Delaware'),
+	array('value' => 'language:"Dinka"', 'text' => 'Dinka'),
+	array('value' => 'language:"Divehi"', 'text' => 'Divehi'),
+	array('value' => 'language:"Dogri"', 'text' => 'Dogri'),
+	array('value' => 'language:"Dogrib"', 'text' => 'Dogrib'),
+	array('value' => 'language:"Dravidian"', 'text' => 'Dravidian'),
+	array('value' => 'language:"Duala"', 'text' => 'Duala'),
+	array('value' => 'language:"Dutch"', 'text' => 'Dutch'),
+	array('value' => 'language:"Dyula"', 'text' => 'Dyula'),
+	array('value' => 'language:"Dzongkha"', 'text' => 'Dzongkha'),
+	array('value' => 'language:"Eastern Frisian"', 'text' => 'Eastern Frisian'),
+	array('value' => 'language:"Efik"', 'text' => 'Efik'),
+	array('value' => 'language:"Elamite"', 'text' => 'Elamite'),
+	array('value' => 'language:"English"', 'text' => 'English'),
+	array('value' => 'language:"Esperanto"', 'text' => 'Esperanto'),
+	array('value' => 'language:"Estonian"', 'text' => 'Estonian'),
+	array('value' => 'language:"Ewe"', 'text' => 'Ewe'),
+	array('value' => 'language:"Ewondo"', 'text' => 'Ewondo'),
+	array('value' => 'language:"Fang"', 'text' => 'Fang'),
+	array('value' => 'language:"Fanti"', 'text' => 'Fanti'),
+	array('value' => 'language:"Faroese"', 'text' => 'Faroese'),
+	array('value' => 'language:"Fijian"', 'text' => 'Fijian'),
+	array('value' => 'language:"Filipino"', 'text' => 'Filipino'),
+	array('value' => 'language:"Finnish"', 'text' => 'Finnish'),
+	array('value' => 'language:"Finno-Ugrian"', 'text' => 'Finno-Ugrian'),
+	array('value' => 'language:"Fon"', 'text' => 'Fon'),
+	array('value' => 'language:"French"', 'text' => 'French'),
+	array('value' => 'language:"Friulian"', 'text' => 'Friulian'),
+	array('value' => 'language:"Fulah"', 'text' => 'Fulah'),
+	array('value' => 'language:"Ga"', 'text' => 'Ga'),
+	array('value' => 'language:"Gaelic"', 'text' => 'Gaelic'),
+	array('value' => 'language:"Galibi Carib"', 'text' => 'Galibi Carib'),
+	array('value' => 'language:"Galician"', 'text' => 'Galician'),
+	array('value' => 'language:"Ganda"', 'text' => 'Ganda'),
+	array('value' => 'language:"Gayo"', 'text' => 'Gayo'),
+	array('value' => 'language:"Gbaya"', 'text' => 'Gbaya'),
+	array('value' => 'language:"Geez"', 'text' => 'Geez'),
+	array('value' => 'language:"Georgian"', 'text' => 'Georgian'),
+	array('value' => 'language:"German"', 'text' => 'German'),
+	array('value' => 'language:"Germanic"', 'text' => 'Germanic'),
+	array('value' => 'language:"Gilbertese"', 'text' => 'Gilbertese'),
+	array('value' => 'language:"Gondi"', 'text' => 'Gondi'),
+	array('value' => 'language:"Gorontalo"', 'text' => 'Gorontalo'),
+	array('value' => 'language:"Gothic"', 'text' => 'Gothic'),
+	array('value' => 'language:"Grebo"', 'text' => 'Grebo'),
+	array('value' => 'language:"Greek"', 'text' => 'Greek'),
+	array('value' => 'language:"Guarani"', 'text' => 'Guarani'),
+	array('value' => 'language:"Gujarati"', 'text' => 'Gujarati'),
+	array('value' => 'language:"Gwich`in"', 'text' => 'Gwich`in'),
+	array('value' => 'language:"Haida"', 'text' => 'Haida'),
+	array('value' => 'language:"Haitian"', 'text' => 'Haitian'),
+	array('value' => 'language:"Hausa"', 'text' => 'Hausa'),
+	array('value' => 'language:"Hawaiian"', 'text' => 'Hawaiian'),
+	array('value' => 'language:"Hebrew"', 'text' => 'Hebrew'),
+	array('value' => 'language:"Herero"', 'text' => 'Herero'),
+	array('value' => 'language:"Hiligaynon"', 'text' => 'Hiligaynon'),
+	array('value' => 'language:"Himachali"', 'text' => 'Himachali'),
+	array('value' => 'language:"Hindi"', 'text' => 'Hindi'),
+	array('value' => 'language:"Hittite"', 'text' => 'Hittite'),
+	array('value' => 'language:"Hmong"', 'text' => 'Hmong'),
+	array('value' => 'language:"Hungarian"', 'text' => 'Hungarian'),
+	array('value' => 'language:"Iban"', 'text' => 'Iban'),
+	array('value' => 'language:"Icelandic"', 'text' => 'Icelandic'),
+	array('value' => 'language:"Ido"', 'text' => 'Ido'),
+	array('value' => 'language:"Igbo"', 'text' => 'Igbo'),
+	array('value' => 'language:"Ijo"', 'text' => 'Ijo'),
+	array('value' => 'language:"Iloko"', 'text' => 'Iloko'),
+	array('value' => 'language:"Indic"', 'text' => 'Indic'),
+	array('value' => 'language:"Indo-European"', 'text' => 'Indo-European'),
+	array('value' => 'language:"Indonesian"', 'text' => 'Indonesian'),
+	array('value' => 'language:"Ingush"', 'text' => 'Ingush'),
+	array('value' => 'language:"Inuktitut"', 'text' => 'Inuktitut'),
+	array('value' => 'language:"Inupiaq"', 'text' => 'Inupiaq'),
+	array('value' => 'language:"Iranian"', 'text' => 'Iranian'),
+	array('value' => 'language:"Irish"', 'text' => 'Irish'),
+	array('value' => 'language:"Iroquoian"', 'text' => 'Iroquoian'),
+	array('value' => 'language:"Italian"', 'text' => 'Italian'),
+	array('value' => 'language:"Japanese"', 'text' => 'Japanese'),
+	array('value' => 'language:"Javanese"', 'text' => 'Javanese'),
+	array('value' => 'language:"Judeo-Arabic"', 'text' => 'Judeo-Arabic'),
+	array('value' => 'language:"Judeo-Persian"', 'text' => 'Judeo-Persian'),
+	array('value' => 'language:"Kabyle"', 'text' => 'Kabyle'),
+	array('value' => 'language:"Kachin"', 'text' => 'Kachin'),
+	array('value' => 'language:"Kalaallisut"', 'text' => 'Kalaallisut'),
+	array('value' => 'language:"Kalmyk"', 'text' => 'Kalmyk'),
+	array('value' => 'language:"Kamba"', 'text' => 'Kamba'),
+	array('value' => 'language:"Kannada"', 'text' => 'Kannada'),
+	array('value' => 'language:"Kanuri"', 'text' => 'Kanuri'),
+	array('value' => 'language:"Kara-Kalpak"', 'text' => 'Kara-Kalpak'),
+	array('value' => 'language:"Karachay-Balkar"', 'text' => 'Karachay-Balkar'),
+	array('value' => 'language:"Karelian"', 'text' => 'Karelian'),
+	array('value' => 'language:"Karen"', 'text' => 'Karen'),
+	array('value' => 'language:"Kashmiri"', 'text' => 'Kashmiri'),
+	array('value' => 'language:"Kashubian"', 'text' => 'Kashubian'),
+	array('value' => 'language:"Kawi"', 'text' => 'Kawi'),
+	array('value' => 'language:"Kazakh"', 'text' => 'Kazakh'),
+	array('value' => 'language:"Khasi"', 'text' => 'Khasi'),
+	array('value' => 'language:"Khoisan"', 'text' => 'Khoisan'),
+	array('value' => 'language:"Khotanese"', 'text' => 'Khotanese'),
+	array('value' => 'language:"Kikuyu"', 'text' => 'Kikuyu'),
+	array('value' => 'language:"Kimbundu"', 'text' => 'Kimbundu'),
+	array('value' => 'language:"Kinyarwanda"', 'text' => 'Kinyarwanda'),
+	array('value' => 'language:"Kirghiz"', 'text' => 'Kirghiz'),
+	array('value' => 'language:"Komi"', 'text' => 'Komi'),
+	array('value' => 'language:"Kongo"', 'text' => 'Kongo'),
+	array('value' => 'language:"Konkani"', 'text' => 'Konkani'),
+	array('value' => 'language:"Korean"', 'text' => 'Korean'),
+	array('value' => 'language:"Kosraean"', 'text' => 'Kosraean'),
+	array('value' => 'language:"Kpelle"', 'text' => 'Kpelle'),
+	array('value' => 'language:"Kru languages"', 'text' => 'Kru languages'),
+	array('value' => 'language:"Kuanyama"', 'text' => 'Kuanyama'),
+	array('value' => 'language:"Kumyk"', 'text' => 'Kumyk'),
+	array('value' => 'language:"Kurdish"', 'text' => 'Kurdish'),
+	array('value' => 'language:"Kurukh"', 'text' => 'Kurukh'),
+	array('value' => 'language:"Ladino"', 'text' => 'Ladino'),
+	array('value' => 'language:"Lahnda"', 'text' => 'Lahnda'),
+	array('value' => 'language:"Lamba"', 'text' => 'Lamba'),
+	array('value' => 'language:"Land Dayak"', 'text' => 'Land Dayak'),
+	array('value' => 'language:"Lao"', 'text' => 'Lao'),
+	array('value' => 'language:"Latin"', 'text' => 'Latin'),
+	array('value' => 'language:"Latvian"', 'text' => 'Latvian'),
+	array('value' => 'language:"Lezghian"', 'text' => 'Lezghian'),
+	array('value' => 'language:"Lingala"', 'text' => 'Lingala'),
+	array('value' => 'language:"Lithuanian"', 'text' => 'Lithuanian'),
+	array('value' => 'language:"Low German"', 'text' => 'Low German'),
+	array('value' => 'language:"Lower Sorbian"', 'text' => 'Lower Sorbian'),
+	array('value' => 'language:"Lozi"', 'text' => 'Lozi'),
+	array('value' => 'language:"Luba-Katanga"', 'text' => 'Luba-Katanga'),
+	array('value' => 'language:"Luba-Lulua"', 'text' => 'Luba-Lulua'),
+	array('value' => 'language:"Luiseno"', 'text' => 'Luiseno'),
+	array('value' => 'language:"Lunda"', 'text' => 'Lunda'),
+	array('value' => 'language:"Luo"', 'text' => 'Luo'),
+	array('value' => 'language:"Lushai"', 'text' => 'Lushai'),
+	array('value' => 'language:"Luxembourgish"', 'text' => 'Luxembourgish'),
+	array('value' => 'language:"Macedonian"', 'text' => 'Macedonian'),
+	array('value' => 'language:"Madurese"', 'text' => 'Madurese'),
+	array('value' => 'language:"Magahi"', 'text' => 'Magahi'),
+	array('value' => 'language:"Maithili"', 'text' => 'Maithili'),
+	array('value' => 'language:"Makasar"', 'text' => 'Makasar'),
+	array('value' => 'language:"Malagasy"', 'text' => 'Malagasy'),
+	array('value' => 'language:"Malay"', 'text' => 'Malay'),
+	array('value' => 'language:"Malayalam"', 'text' => 'Malayalam'),
+	array('value' => 'language:"Maltese"', 'text' => 'Maltese'),
+	array('value' => 'language:"Manchu"', 'text' => 'Manchu'),
+	array('value' => 'language:"Mandingo"', 'text' => 'Mandingo'),
+	array('value' => 'language:"Manipuri"', 'text' => 'Manipuri'),
+	array('value' => 'language:"Manobo"', 'text' => 'Manobo'),
+	array('value' => 'language:"Manx"', 'text' => 'Manx'),
+	array('value' => 'language:"Maori"', 'text' => 'Maori'),
+	array('value' => 'language:"Mapudungun"', 'text' => 'Mapudungun'),
+	array('value' => 'language:"Marathi"', 'text' => 'Marathi'),
+	array('value' => 'language:"Mari"', 'text' => 'Mari'),
+	array('value' => 'language:"Marshallese"', 'text' => 'Marshallese'),
+	array('value' => 'language:"Marwari"', 'text' => 'Marwari'),
+	array('value' => 'language:"Masai"', 'text' => 'Masai'),
+	array('value' => 'language:"Mayan"', 'text' => 'Mayan'),
+	array('value' => 'language:"Mende"', 'text' => 'Mende'),
+	array('value' => 'language:"Mi-kmaq"', 'text' => 'Mi-kmaq'),
+	array('value' => 'language:"Middle English"', 'text' => 'Middle English'),
+	array('value' => 'language:"Middle French"', 'text' => 'Middle French'),
+	array('value' => 'language:"Middle High German"', 'text' => 'Middle High German'),
+	array('value' => 'language:"Middle Irish"', 'text' => 'Middle Irish'),
+	array('value' => 'language:"Minangkabau"', 'text' => 'Minangkabau'),
+	array('value' => 'language:"Mohawk"', 'text' => 'Mohawk'),
+	array('value' => 'language:"Moldavian"', 'text' => 'Moldavian'),
+	array('value' => 'language:"Mon-Khmer"', 'text' => 'Mon-Khmer'),
+	array('value' => 'language:"Mongo"', 'text' => 'Mongo'),
+	array('value' => 'language:"Mongolian"', 'text' => 'Mongolian'),
+	array('value' => 'language:"Mossi"', 'text' => 'Mossi'),
+	array('value' => 'language:"Multiple"', 'text' => 'Multiple'),
+	array('value' => 'language:"Munda"', 'text' => 'Munda'),
+	array('value' => 'language:"Music"', 'text' => 'Music'),
+	array('value' => 'language:"Nahuatl"', 'text' => 'Nahuatl'),
+	array('value' => 'language:"Navajo"', 'text' => 'Navajo'),
+	array('value' => 'language:"Ndonga"', 'text' => 'Ndonga'),
+	array('value' => 'language:"Neapolitan"', 'text' => 'Neapolitan'),
+	array('value' => 'language:"Nepal Bhasa"', 'text' => 'Nepal Bhasa'),
+	array('value' => 'language:"Nepali"', 'text' => 'Nepali'),
+	array('value' => 'language:"Nias"', 'text' => 'Nias'),
+	array('value' => 'language:"Niger-Kordofanian"', 'text' => 'Niger-Kordofanian'),
+	array('value' => 'language:"Nilo-Saharan"', 'text' => 'Nilo-Saharan'),
+	array('value' => 'language:"Niuean"', 'text' => 'Niuean'),
+	array('value' => 'language:"Nogai"', 'text' => 'Nogai'),
+	array('value' => 'language:"North American Indian"', 'text' => 'North American Indian'),
+	array('value' => 'language:"North Ndebele"', 'text' => 'North Ndebele'),
+	array('value' => 'language:"Northern Frisian"', 'text' => 'Northern Frisian'),
+	array('value' => 'language:"Northern Sami"', 'text' => 'Northern Sami'),
+	array('value' => 'language:"Norwegian Bokmȧl"', 'text' => 'Norwegian Bokmȧl'),
+	array('value' => 'language:"Norwegian Nynorsk"', 'text' => 'Norwegian Nynorsk'),
+	array('value' => 'language:"Norwegian"', 'text' => 'Norwegian'),
+	array('value' => 'language:"Nubian"', 'text' => 'Nubian'),
+	array('value' => 'language:"Nyamwezi"', 'text' => 'Nyamwezi'),
+	array('value' => 'language:"Nyankole"', 'text' => 'Nyankole'),
+	array('value' => 'language:"Nyoro"', 'text' => 'Nyoro'),
+	array('value' => 'language:"Occitan"', 'text' => 'Occitan'),
+	array('value' => 'language:"Ojibwa"', 'text' => 'Ojibwa'),
+	array('value' => 'language:"Old English"', 'text' => 'Old English'),
+	array('value' => 'language:"Old French"', 'text' => 'Old French'),
+	array('value' => 'language:"Old High German"', 'text' => 'Old High German'),
+	array('value' => 'language:"Old Irish"', 'text' => 'Old Irish'),
+	array('value' => 'language:"Old Norse"', 'text' => 'Old Norse'),
+	array('value' => 'language:"Old Persian"', 'text' => 'Old Persian'),
+	array('value' => 'language:"Old Provençal"', 'text' => 'Old Provençal'),
+	array('value' => 'language:"Oriya"', 'text' => 'Oriya'),
+	array('value' => 'language:"Oromo"', 'text' => 'Oromo'),
+	array('value' => 'language:"Osage"', 'text' => 'Osage'),
+	array('value' => 'language:"Ossetian"', 'text' => 'Ossetian'),
+	array('value' => 'language:"Otomian"', 'text' => 'Otomian'),
+	array('value' => 'language:"Ottoman Turkish"', 'text' => 'Ottoman Turkish'),
+	array('value' => 'language:"Pahlavi"', 'text' => 'Pahlavi'),
+	array('value' => 'language:"Palauan"', 'text' => 'Palauan'),
+	array('value' => 'language:"Pali"', 'text' => 'Pali'),
+	array('value' => 'language:"Pampanga"', 'text' => 'Pampanga'),
+	array('value' => 'language:"Pangasinan"', 'text' => 'Pangasinan'),
+	array('value' => 'language:"Panjabi"', 'text' => 'Panjabi'),
+	array('value' => 'language:"Papiamento"', 'text' => 'Papiamento'),
+	array('value' => 'language:"Papuan"', 'text' => 'Papuan'),
+	array('value' => 'language:"Pedi"', 'text' => 'Pedi'),
+	array('value' => 'language:"Persian"', 'text' => 'Persian'),
+	array('value' => 'language:"Philippine"', 'text' => 'Philippine'),
+	array('value' => 'language:"Phoenician"', 'text' => 'Phoenician'),
+	array('value' => 'language:"Pohnpeian"', 'text' => 'Pohnpeian'),
+	array('value' => 'language:"Polish"', 'text' => 'Polish'),
+	array('value' => 'language:"Portuguese"', 'text' => 'Portuguese'),
+	array('value' => 'language:"Prakrit languages"', 'text' => 'Prakrit languages'),
+	array('value' => 'language:"Pushto"', 'text' => 'Pushto'),
+	array('value' => 'language:"Quechua"', 'text' => 'Quechua'),
+	array('value' => 'language:"Rajasthani"', 'text' => 'Rajasthani'),
+	array('value' => 'language:"Rapanui"', 'text' => 'Rapanui'),
+	array('value' => 'language:"Rarotongan"', 'text' => 'Rarotongan'),
+	array('value' => 'language:"Romance"', 'text' => 'Romance'),
+	array('value' => 'language:"Romanian"', 'text' => 'Romanian'),
+	array('value' => 'language:"Romansh"', 'text' => 'Romansh'),
+	array('value' => 'language:"Romany"', 'text' => 'Romany'),
+	array('value' => 'language:"Rundi"', 'text' => 'Rundi'),
+	array('value' => 'language:"Russian"', 'text' => 'Russian'),
+	array('value' => 'language:"Salishan"', 'text' => 'Salishan'),
+	array('value' => 'language:"Samaritan Aramaic"', 'text' => 'Samaritan Aramaic'),
+	array('value' => 'language:"Sami languages"', 'text' => 'Sami languages'),
+	array('value' => 'language:"Samoan"', 'text' => 'Samoan'),
+	array('value' => 'language:"Sango"', 'text' => 'Sango'),
+	array('value' => 'language:"Sanskrit"', 'text' => 'Sanskrit'),
+	array('value' => 'language:"Santali"', 'text' => 'Santali'),
+	array('value' => 'language:"Sardinian"', 'text' => 'Sardinian'),
+	array('value' => 'language:"Sasak"', 'text' => 'Sasak'),
+	array('value' => 'language:"Scots"', 'text' => 'Scots'),
+	array('value' => 'language:"Selkup"', 'text' => 'Selkup'),
+	array('value' => 'language:"Semitic"', 'text' => 'Semitic'),
+	array('value' => 'language:"Serbian"', 'text' => 'Serbian'),
+	array('value' => 'language:"Serer"', 'text' => 'Serer'),
+	array('value' => 'language:"Shan"', 'text' => 'Shan'),
+	array('value' => 'language:"Shona"', 'text' => 'Shona'),
+	array('value' => 'language:"Sichuan Yi"', 'text' => 'Sichuan Yi'),
+	array('value' => 'language:"Sicilian"', 'text' => 'Sicilian'),
+	array('value' => 'language:"Sidamo"', 'text' => 'Sidamo'),
+	array('value' => 'language:"Sign Language"', 'text' => 'Sign Language'),
+	array('value' => 'language:"Siksika"', 'text' => 'Siksika'),
+	array('value' => 'language:"Sindhi"', 'text' => 'Sindhi'),
+	array('value' => 'language:"Sinhala"', 'text' => 'Sinhala'),
+	array('value' => 'language:"Sino-Tibetan"', 'text' => 'Sino-Tibetan'),
+	array('value' => 'language:"Siouan"', 'text' => 'Siouan'),
+	array('value' => 'language:"Skolt Sami"', 'text' => 'Skolt Sami'),
+	array('value' => 'language:"Slave"', 'text' => 'Slave'),
+	array('value' => 'language:"Slavic"', 'text' => 'Slavic'),
+	array('value' => 'language:"Slovak"', 'text' => 'Slovak'),
+	array('value' => 'language:"Slovenian"', 'text' => 'Slovenian'),
+	array('value' => 'language:"Sogdian"', 'text' => 'Sogdian'),
+	array('value' => 'language:"Somali"', 'text' => 'Somali'),
+	array('value' => 'language:"Songhai"', 'text' => 'Songhai'),
+	array('value' => 'language:"Soninke"', 'text' => 'Soninke'),
+	array('value' => 'language:"Sorbian"', 'text' => 'Sorbian'),
+	array('value' => 'language:"South American Indian"', 'text' => 'South American Indian'),
+	array('value' => 'language:"Southern Altai"', 'text' => 'Southern Altai'),
+	array('value' => 'language:"Southern Sami"', 'text' => 'Southern Sami'),
+	array('value' => 'language:"Southern Sotho"', 'text' => 'Southern Sotho'),
+	array('value' => 'language:"Spanish"', 'text' => 'Spanish'),
+	array('value' => 'language:"Sranan Tongo"', 'text' => 'Sranan Tongo'),
+	array('value' => 'language:"Sukuma"', 'text' => 'Sukuma'),
+	array('value' => 'language:"Sumerian"', 'text' => 'Sumerian'),
+	array('value' => 'language:"Sundanese"', 'text' => 'Sundanese'),
+	array('value' => 'language:"Susu"', 'text' => 'Susu'),
+	array('value' => 'language:"Swahili"', 'text' => 'Swahili'),
+	array('value' => 'language:"Swati"', 'text' => 'Swati'),
+	array('value' => 'language:"Swedish"', 'text' => 'Swedish'),
+	array('value' => 'language:"Swiss German"', 'text' => 'Swiss German'),
+	array('value' => 'language:"Syriac"', 'text' => 'Syriac'),
+	array('value' => 'language:"Tagalog"', 'text' => 'Tagalog'),
+	array('value' => 'language:"Tahitian"', 'text' => 'Tahitian'),
+	array('value' => 'language:"Tai"', 'text' => 'Tai'),
+	array('value' => 'language:"Tajik"', 'text' => 'Tajik'),
+	array('value' => 'language:"Tamashek"', 'text' => 'Tamashek'),
+	array('value' => 'language:"Tamil"', 'text' => 'Tamil'),
+	array('value' => 'language:"Tatar"', 'text' => 'Tatar'),
+	array('value' => 'language:"Telugu"', 'text' => 'Telugu'),
+	array('value' => 'language:"Tereno"', 'text' => 'Tereno'),
+	array('value' => 'language:"Tetum"', 'text' => 'Tetum'),
+	array('value' => 'language:"Thai"', 'text' => 'Thai'),
+	array('value' => 'language:"Tibetan"', 'text' => 'Tibetan'),
+	array('value' => 'language:"Tigre"', 'text' => 'Tigre'),
+	array('value' => 'language:"Tigrinya"', 'text' => 'Tigrinya'),
+	array('value' => 'language:"Timne"', 'text' => 'Timne'),
+	array('value' => 'language:"Tiv"', 'text' => 'Tiv'),
+	array('value' => 'language:"Tlingit"', 'text' => 'Tlingit'),
+	array('value' => 'language:"Tok"', 'text' => 'Tok'),
+	array('value' => 'language:"Tonga"', 'text' => 'Tonga'),
+	array('value' => 'language:"Tsimshian"', 'text' => 'Tsimshian'),
+	array('value' => 'language:"Tsonga"', 'text' => 'Tsonga'),
+	array('value' => 'language:"Tswana"', 'text' => 'Tswana'),
+	array('value' => 'language:"Tumbuka"', 'text' => 'Tumbuka'),
+	array('value' => 'language:"Tupi"', 'text' => 'Tupi'),
+	array('value' => 'language:"Turkish"', 'text' => 'Turkish'),
+	array('value' => 'language:"Turkmen"', 'text' => 'Turkmen'),
+	array('value' => 'language:"Tuvalu"', 'text' => 'Tuvalu'),
+	array('value' => 'language:"Tuvinian"', 'text' => 'Tuvinian'),
+	array('value' => 'language:"Twi"', 'text' => 'Twi'),
+	array('value' => 'language:"Udmurt"', 'text' => 'Udmurt'),
+	array('value' => 'language:"Ugaritic"', 'text' => 'Ugaritic'),
+	array('value' => 'language:"Uighur"', 'text' => 'Uighur'),
+	array('value' => 'language:"Ukrainian"', 'text' => 'Ukrainian'),
+	array('value' => 'language:"Umbundu"', 'text' => 'Umbundu'),
+	array('value' => 'language:"Undetermined"', 'text' => 'Undetermined'),
+	array('value' => 'language:"Unknown"', 'text' => 'Unknown'),
+	array('value' => 'language:"Upper Sorbian"', 'text' => 'Upper Sorbian'),
+	array('value' => 'language:"Urdu"', 'text' => 'Urdu'),
+	array('value' => 'language:"Uzbek"', 'text' => 'Uzbek'),
+	array('value' => 'language:"Vai"', 'text' => 'Vai'),
+	array('value' => 'language:"Venda"', 'text' => 'Venda'),
+	array('value' => 'language:"Vietnamese"', 'text' => 'Vietnamese'),
+	array('value' => 'language:"Volapük"', 'text' => 'Volapük'),
+	array('value' => 'language:"Votic"', 'text' => 'Votic'),
+	array('value' => 'language:"Wakashan"', 'text' => 'Wakashan'),
+	array('value' => 'language:"Walloon"', 'text' => 'Walloon'),
+	array('value' => 'language:"Waray"', 'text' => 'Waray'),
+	array('value' => 'language:"Washo"', 'text' => 'Washo'),
+	array('value' => 'language:"Welsh"', 'text' => 'Welsh'),
+	array('value' => 'language:"Western Frisian"', 'text' => 'Western Frisian'),
+	array('value' => 'language:"Wolof"', 'text' => 'Wolof'),
+	array('value' => 'language:"Xhosa"', 'text' => 'Xhosa'),
+	array('value' => 'language:"Yakut"', 'text' => 'Yakut'),
+	array('value' => 'language:"Yao"', 'text' => 'Yao'),
+	array('value' => 'language:"Yapese"', 'text' => 'Yapese'),
+	array('value' => 'language:"Yiddish"', 'text' => 'Yiddish'),
+	array('value' => 'language:"Yoruba"', 'text' => 'Yoruba'),
+	array('value' => 'language:"Yupik"', 'text' => 'Yupik'),
+	array('value' => 'language:"Zande"', 'text' => 'Zande'),
+	array('value' => 'language:"Zapotec"', 'text' => 'Zapotec'),
+	array('value' => 'language:"Zaza"', 'text' => 'Zaza'),
+	array('value' => 'language:"Zenaga"', 'text' => 'Zenaga'),
+	array('value' => 'language:"Zhuang"', 'text' => 'Zhuang'),
+	array('value' => 'language:"Zulu"', 'text' => 'Zulu'),
+	array('value' => 'language:"Zuni"', 'text' => 'Zuni'),
+);
+
+$formats = array(
+	array('class' => 'cat all_formats', 'value' => '', 'text' => 'All formats'),
+	array('class' => 'cat', 'value' => 'format:"Archives/Manuscripts"', 'text' => 'Archives/Manuscripts'),
+	array('class' => 'cat', 'value' => 'format:"Audio"', 'text' => 'Audio'),
+	array('value' => 'format:"Audio cassette"', 'text' => 'Audio Cassette'),
+	array('value' => 'format:"CD"', 'text' => 'CD'),
+	array('value' => 'format:"LP"', 'text' => 'LP'),
+	array('value' => 'format:"Music recording"', 'text' => 'Music recording'),
+	array('value' => 'format:"Spoken word recording"', 'text' => 'Spoken word recording'),
+	array('class' => 'cat', 'value' => 'format:"Book"', 'text' => 'Book'),
+	array('class' => 'cat', 'value' => 'format:"Dissertations"', 'text' => 'Dissertations'),
+	array('class' => 'cat', 'value' => 'format:"E-Resource"', 'text' => 'E-Resource'),
+	array('class' => 'cat', 'value' => 'format:"Image"', 'text' => 'Image'),
+	array('value' => 'format:"Photograph"', 'text' => 'Photograph'),
+	array('class' => 'cat', 'value' => 'format:"Journal"', 'text' => 'Journal'),
+	array('class' => 'cat', 'value' => 'format:"Kit"', 'text' => 'Kit'),
+	array('class' => 'cat', 'value' => 'format:"Library website"', 'text' => 'Library website  '),
+	array('class' => 'cat', 'value' => 'format:"Map"', 'text' => 'Map'),
+	array('class' => 'cat', 'value' => 'format:"Microform"' , 'text' => 'Microform'),
+	array('class' => 'cat', 'value' => 'format:"Music score"', 'text' => 'Music score'),
+	array('class' => 'cat', 'value' => 'format:"Print"', 'text' => 'Print'),
+	array('class' => 'cat', 'value' => 'format:"Video"' , 'text' => 'Video'),
+	array('value' => 'format:"Blu-ray disc"', 'text' => 'Blu-ray disc'),
+	array('value' => 'format:"DVD"', 'text' => 'DVD'),
+	array('value' => 'format:"Laserdisc"', 'text' => 'Laserdisc'),
+	array('value' => 'format:"Video cassette"', 'text' => 'Video cassette'),
+);
+
+$locations = array(
+	array('class' => 'all_locations cat', 'value' => '', 'text' => 'All Locations'),
+	array('data-name' => 'crerar-main', 'class' => 'cat', 'value' => 'building:"Crerar Library"', 'text' => 'Crerar Library'),
+	array('value' => 'building:"Crerar Reference"', 'text' => 'Crerar Reference'),
+	array('value' => 'building:"Crerar Reserves"', 'text' => 'Crerar Reserves'),
+	array('class' => 'cat', 'value' => 'building:"D&#39;Angelo Law Library"', 'text' => 'D&#39;Angelo Law Library'),
+	array('value' => 'building:"Law Reserves"', 'text' => 'Law Reserves'),
+	array('class' => 'cat', 'value' => 'building:"Eckhart Library"', 'text' => 'Eckhart Library'),
+	array('value' => 'building:"Eckhart Reference"', 'text' => 'Eckhart Reference'),
+	array('value' => 'building:"Eckhart Reserves"', 'text' => 'Eckhart Reserves'),
+	array('class' => 'cat', 'value' => 'building:"Regenstein Library"', 'text' => 'Regenstein Library'),
+	array('value' => 'building:"Regenstein Recordings"', 'text' => 'Regenstein Recordings'),
+	array('value' => 'building:"Regenstein Reference"', 'text' => 'Regenstein Reference'),
+	array('value' => 'building:"Regenstein Reserves"', 'text' => 'Regenstein Reserves'),
+	array('value' => 'building:"Regenstein TECHB@R"', 'text' => 'Regenstein TECHB@R'),
+	array('class' => 'cat', 'value' => 'building:"Special Collections Research Center"', 'text' => 'Special Collections Research Center'),
+	array('class' => 'cat', 'value' => 'building:"SSA"', 'text' => 'SSA'),
+	array('value' => 'building:"SSA Reserves"', 'text' => 'SSA Reserves'),
+);
+
+$collections = array(
+	array('class' => 'all_collections', 'value' => '', 'text' => 'All Collections'),
+	array('class' => 'ns', 'disabled' => 'disabled', 'value' => '', 'text' => 'No sub-collection'),
+ 	array('data-main-location' => 'scrc', 'value' => 'item_collection:"American Drama"', 'text' => 'American Drama'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"American Newspapers"', 'text' => 'American Newspapers'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Archives/Manuscripts"', 'text' => 'Archives/Manuscripts'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Archives of Czechs and Slovaks Abroad"', 'text' => 'Archives of Czechs and Slovaks Abroad'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Atkinson Collection of American Drama"', 'text' => 'Atkinson Collection of American Drama'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Austrian Collection of Drama"', 'text' => 'Austrian Collection of Drama'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Codex Manuscripts"', 'text' => 'Codex Manuscripts'),
+	array('data-main-location' => 'crerar scrc', 'value' => 'item_collection:"Crerar Manuscripts"', 'text' => 'Crerar Manuscripts'),
+	array('data-main-location' => 'crerar scrc', 'value' => 'item_collection:"Crerar Rare Books"', 'text' => 'Crerar Rare Books'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Drama Collection"', 'text' => 'Drama Collection'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"EB Children&rsquo;s Literature"', 'text' => 'EB Children&rsquo;s Literature'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Helen and Ruth Regenstein Collection of Rare Books"', 'text' => 'Helen and Ruth Regenstein Collection of Rare Books'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Historical Children&rsquo;s Books"', 'text' => 'Historical Children&rsquo;s Books'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Incunabula"', 'text' => 'Incunabula'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Lincke Collection of Popular German Literature"', 'text' => 'Lincke Collection of Popular German Literature'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Lincoln Collection"', 'text' => 'Lincoln Collection'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Ludwig Rosenberger Library of Judaica"', 'text' => 'Ludwig Rosenberger Library of Judaica'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Modern Poetry Rare"', 'text' => 'Modern Poetry Rare'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"Rare Books"', 'text' => 'Rare Books'),
+	array('data-main-location' => 'scrc', 'value' => 'item_collection:"University of Chicago Press Imprint Collection"', 'text' => 'University of Chicago Press Imprint Collection'),
+);
+?>
+
 <fieldset>
 <legend>Limit To</legend>
 
 <div class="row">
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6">
 
 	<label for="limit_language" class="displayBlock">Language:</label>
 	<select id="limit_language" name="filter[]" multiple="multiple" size="10">
-	<option class='all_languages' value=''>All Languages</option>
-<option value='language:"English"'>English</option>
-<option value='language:"German"'>German</option>
-<option value='language:"French"'>French</option>
-<option value='language:"Spanish"'>Spanish</option>
-<option value='language:"Chinese"'>Chinese</option>
-<option value='language:"Russian"'>Russian</option>
-<option value='language:"Italian"'>Italian</option>
-<option value='language:"Japanese"'>Japanese</option>
-<option value='language:"Abkhazian"'>Abkhazian</option>
-<option value='language:"Achinese"'>Achinese</option>
-<option value='language:"Acoli"'>Acoli</option>
-<option value='language:"Adyghe"'>Adyghe</option>
-<option value='language:"Afrikaans"'>Afrikaans</option>
-<option value='language:"Afro-Asiatic"'>Afro-Asiatic</option>
-<option value='language:"Ainu"'>Ainu</option>
-<option value='language:"Akan"'>Akan</option>
-<option value='language:"Akkadian"'>Akkadian</option>
-<option value='language:"Albanian"'>Albanian</option>
-<option value='language:"Aleut"'>Aleut</option>
-<option value='language:"Algonquian"'>Algonquian</option>
-<option value='language:"Altaic"'>Altaic</option>
-<option value='language:"Amharic"'>Amharic</option>
-<option value='language:"Ancient Egyptian"'>Ancient Egyptian</option>
-<option value='language:"Ancient Greek"'>Ancient Greek</option>
-<option value='language:"Angika"'>Angika</option>
-<option value='language:"Apache"'>Apache</option>
-<option value='language:"Arabic"'>Arabic</option>
-<option value='language:"Aragonese"'>Aragonese</option>
-<option value='language:"Aramaic"'>Aramaic</option>
-<option value='language:"Arapaho"'>Arapaho</option>
-<option value='language:"Arawak"'>Arawak</option>
-<option value='language:"Armenian"'>Armenian</option>
-<option value='language:"Aromanian"'>Aromanian</option>
-<option value='language:"Artificial"'>Artificial</option>
-<option value='language:"Assamese"'>Assamese</option>
-<option value='language:"Asturian"'>Asturian</option>
-<option value='language:"Athapascan"'>Athapascan</option>
-<option value='language:"Australian"'>Australian</option>
-<option value='language:"Austronesian"'>Austronesian</option>
-<option value='language:"Avaric"'>Avaric</option>
-<option value='language:"Avestan"'>Avestan</option>
-<option value='language:"Awadhi"'>Awadhi</option>
-<option value='language:"Aymara"'>Aymara</option>
-<option value='language:"Azerbaijani"'>Azerbaijani</option>
-<option value='language:"Balinese"'>Balinese</option>
-<option value='language:"Baltic"'>Baltic</option>
-<option value='language:"Baluchi"'>Baluchi</option>
-<option value='language:"Bambara"'>Bambara</option>
-<option value='language:"Bamileke"'>Bamileke</option>
-<option value='language:"Banda"'>Banda</option>
-<option value='language:"Bantu"'>Bantu</option>
-<option value='language:"Basa"'>Basa</option>
-<option value='language:"Bashkir"'>Bashkir</option>
-<option value='language:"Basque"'>Basque</option>
-<option value='language:"Batak"'>Batak</option>
-<option value='language:"Beja"'>Beja</option>
-<option value='language:"Belarusian"'>Belarusian</option>
-<option value='language:"Bemba"'>Bemba</option>
-<option value='language:"Bengali"'>Bengali</option>
-<option value='language:"Berber"'>Berber</option>
-<option value='language:"Bhojpuri"'>Bhojpuri</option>
-<option value='language:"Bihari"'>Bihari</option>
-<option value='language:"Bikol"'>Bikol</option>
-<option value='language:"Bini"'>Bini</option>
-<option value='language:"Bislama"'>Bislama</option>
-<option value='language:"Blin"'>Blin</option>
-<option value='language:"Bosnian"'>Bosnian</option>
-<option value='language:"Braj"'>Braj</option>
-<option value='language:"Breton"'>Breton</option>
-<option value='language:"Buginese"'>Buginese</option>
-<option value='language:"Bulgarian"'>Bulgarian</option>
-<option value='language:"Buriat"'>Buriat</option>
-<option value='language:"Burmese"'>Burmese</option>
-<option value='language:"Caddo"'>Caddo</option>
-<option value='language:"Catalan"'>Catalan</option>
-<option value='language:"Caucasian"'>Caucasian</option>
-<option value='language:"Cebuano"'>Cebuano</option>
-<option value='language:"Celtic"'>Celtic</option>
-<option value='language:"Central American Indian"'>Central American Indian</option>
-<option value='language:"Central Khmer"'>Central Khmer</option>
-<option value='language:"Chagatai"'>Chagatai</option>
-<option value='language:"Chamic"'>Chamic</option>
-<option value='language:"Chamorro"'>Chamorro</option>
-<option value='language:"Chechen"'>Chechen</option>
-<option value='language:"Cherokee"'>Cherokee</option>
-<option value='language:"Cheyenne"'>Cheyenne</option>
-<option value='language:"Chibcha"'>Chibcha</option>
-<option value='language:"Chichewa"'>Chichewa</option>
-<option value='language:"Chinese"'>Chinese</option>
-<option value='language:"Chinook"'>Chinook</option>
-<option value='language:"Chipewyan"'>Chipewyan</option>
-<option value='language:"Choctaw"'>Choctaw</option>
-<option value='language:"Church Slavic"'>Church Slavic</option>
-<option value='language:"Chuukese"'>Chuukese</option>
-<option value='language:"Chuvash"'>Chuvash</option>
-<option value='language:"Classical Syriac"'>Classical Syriac</option>
-<option value='language:"Coptic"'>Coptic</option>
-<option value='language:"Cornish"'>Cornish</option>
-<option value='language:"Corsican"'>Corsican</option>
-<option value='language:"Cree"'>Cree</option>
-<option value='language:"Creek"'>Creek</option>
-<option value='language:"Creole"'>Creole</option>
-<option value='language:"Creoles"'>Creoles</option>
-<option value='language:"Crimean Tatar"'>Crimean Tatar</option>
-<option value='language:"Croatian"'>Croatian</option>
-<option value='language:"Cushitic"'>Cushitic</option>
-<option value='language:"Czech"'>Czech</option>
-<option value='language:"Dakota"'>Dakota</option>
-<option value='language:"Danish"'>Danish</option>
-<option value='language:"Dargwa"'>Dargwa</option>
-<option value='language:"Delaware"'>Delaware</option>
-<option value='language:"Dinka"'>Dinka</option>
-<option value='language:"Divehi"'>Divehi</option>
-<option value='language:"Dogri"'>Dogri</option>
-<option value='language:"Dogrib"'>Dogrib</option>
-<option value='language:"Dravidian"'>Dravidian</option>
-<option value='language:"Duala"'>Duala</option>
-<option value='language:"Dutch"'>Dutch</option>
-<option value='language:"Dyula"'>Dyula</option>
-<option value='language:"Dzongkha"'>Dzongkha</option>
-<option value='language:"Eastern Frisian"'>Eastern Frisian</option>
-<option value='language:"Efik"'>Efik</option>
-<option value='language:"Elamite"'>Elamite</option>
-<option value='language:"English"'>English</option>
-<option value='language:"Esperanto"'>Esperanto</option>
-<option value='language:"Estonian"'>Estonian</option>
-<option value='language:"Ewe"'>Ewe</option>
-<option value='language:"Ewondo"'>Ewondo</option>
-<option value='language:"Fang"'>Fang</option>
-<option value='language:"Fanti"'>Fanti</option>
-<option value='language:"Faroese"'>Faroese</option>
-<option value='language:"Fijian"'>Fijian</option>
-<option value='language:"Filipino"'>Filipino</option>
-<option value='language:"Finnish"'>Finnish</option>
-<option value='language:"Finno-Ugrian"'>Finno-Ugrian</option>
-<option value='language:"Fon"'>Fon</option>
-<option value='language:"French"'>French</option>
-<option value='language:"Friulian"'>Friulian</option>
-<option value='language:"Fulah"'>Fulah</option>
-<option value='language:"Ga"'>Ga</option>
-<option value='language:"Gaelic"'>Gaelic</option>
-<option value='language:"Galibi Carib"'>Galibi Carib</option>
-<option value='language:"Galician"'>Galician</option>
-<option value='language:"Ganda"'>Ganda</option>
-<option value='language:"Gayo"'>Gayo</option>
-<option value='language:"Gbaya"'>Gbaya</option>
-<option value='language:"Geez"'>Geez</option>
-<option value='language:"Georgian"'>Georgian</option>
-<option value='language:"German"'>German</option>
-<option value='language:"Germanic"'>Germanic</option>
-<option value='language:"Gilbertese"'>Gilbertese</option>
-<option value='language:"Gondi"'>Gondi</option>
-<option value='language:"Gorontalo"'>Gorontalo</option>
-<option value='language:"Gothic"'>Gothic</option>
-<option value='language:"Grebo"'>Grebo</option>
-<option value='language:"Greek"'>Greek</option>
-<option value='language:"Guarani"'>Guarani</option>
-<option value='language:"Gujarati"'>Gujarati</option>
-<option value='language:"Gwich`in"'>Gwich`in</option>
-<option value='language:"Haida"'>Haida</option>
-<option value='language:"Haitian"'>Haitian</option>
-<option value='language:"Hausa"'>Hausa</option>
-<option value='language:"Hawaiian"'>Hawaiian</option>
-<option value='language:"Hebrew"'>Hebrew</option>
-<option value='language:"Herero"'>Herero</option>
-<option value='language:"Hiligaynon"'>Hiligaynon</option>
-<option value='language:"Himachali"'>Himachali</option>
-<option value='language:"Hindi"'>Hindi</option>
-<option value='language:"Hittite"'>Hittite</option>
-<option value='language:"Hmong"'>Hmong</option>
-<option value='language:"Hungarian"'>Hungarian</option>
-<option value='language:"Iban"'>Iban</option>
-<option value='language:"Icelandic"'>Icelandic</option>
-<option value='language:"Ido"'>Ido</option>
-<option value='language:"Igbo"'>Igbo</option>
-<option value='language:"Ijo"'>Ijo</option>
-<option value='language:"Iloko"'>Iloko</option>
-<option value='language:"Indic"'>Indic</option>
-<option value='language:"Indo-European"'>Indo-European</option>
-<option value='language:"Indonesian"'>Indonesian</option>
-<option value='language:"Ingush"'>Ingush</option>
-<option value='language:"Inuktitut"'>Inuktitut</option>
-<option value='language:"Inupiaq"'>Inupiaq</option>
-<option value='language:"Iranian"'>Iranian</option>
-<option value='language:"Irish"'>Irish</option>
-<option value='language:"Iroquoian"'>Iroquoian</option>
-<option value='language:"Italian"'>Italian</option>
-<option value='language:"Japanese"'>Japanese</option>
-<option value='language:"Javanese"'>Javanese</option>
-<option value='language:"Judeo-Arabic"'>Judeo-Arabic</option>
-<option value='language:"Judeo-Persian"'>Judeo-Persian</option>
-<option value='language:"Kabyle"'>Kabyle</option>
-<option value='language:"Kachin"'>Kachin</option>
-<option value='language:"Kalaallisut"'>Kalaallisut</option>
-<option value='language:"Kalmyk"'>Kalmyk</option>
-<option value='language:"Kamba"'>Kamba</option>
-<option value='language:"Kannada"'>Kannada</option>
-<option value='language:"Kanuri"'>Kanuri</option>
-<option value='language:"Kara-Kalpak"'>Kara-Kalpak</option>
-<option value='language:"Karachay-Balkar"'>Karachay-Balkar</option>
-<option value='language:"Karelian"'>Karelian</option>
-<option value='language:"Karen"'>Karen</option>
-<option value='language:"Kashmiri"'>Kashmiri</option>
-<option value='language:"Kashubian"'>Kashubian</option>
-<option value='language:"Kawi"'>Kawi</option>
-<option value='language:"Kazakh"'>Kazakh</option>
-<option value='language:"Khasi"'>Khasi</option>
-<option value='language:"Khoisan"'>Khoisan</option>
-<option value='language:"Khotanese"'>Khotanese</option>
-<option value='language:"Kikuyu"'>Kikuyu</option>
-<option value='language:"Kimbundu"'>Kimbundu</option>
-<option value='language:"Kinyarwanda"'>Kinyarwanda</option>
-<option value='language:"Kirghiz"'>Kirghiz</option>
-<option value='language:"Komi"'>Komi</option>
-<option value='language:"Kongo"'>Kongo</option>
-<option value='language:"Konkani"'>Konkani</option>
-<option value='language:"Korean"'>Korean</option>
-<option value='language:"Kosraean"'>Kosraean</option>
-<option value='language:"Kpelle"'>Kpelle</option>
-<option value='language:"Kru languages"'>Kru languages</option>
-<option value='language:"Kuanyama"'>Kuanyama</option>
-<option value='language:"Kumyk"'>Kumyk</option>
-<option value='language:"Kurdish"'>Kurdish</option>
-<option value='language:"Kurukh"'>Kurukh</option>
-<option value='language:"Ladino"'>Ladino</option>
-<option value='language:"Lahnda"'>Lahnda</option>
-<option value='language:"Lamba"'>Lamba</option>
-<option value='language:"Land Dayak"'>Land Dayak</option>
-<option value='language:"Lao"'>Lao</option>
-<option value='language:"Latin"'>Latin</option>
-<option value='language:"Latvian"'>Latvian</option>
-<option value='language:"Lezghian"'>Lezghian</option>
-<option value='language:"Lingala"'>Lingala</option>
-<option value='language:"Lithuanian"'>Lithuanian</option>
-<option value='language:"Low German"'>Low German</option>
-<option value='language:"Lower Sorbian"'>Lower Sorbian</option>
-<option value='language:"Lozi"'>Lozi</option>
-<option value='language:"Luba-Katanga"'>Luba-Katanga</option>
-<option value='language:"Luba-Lulua"'>Luba-Lulua</option>
-<option value='language:"Luiseno"'>Luiseno</option>
-<option value='language:"Lunda"'>Lunda</option>
-<option value='language:"Luo"'>Luo</option>
-<option value='language:"Lushai"'>Lushai</option>
-<option value='language:"Luxembourgish"'>Luxembourgish</option>
-<option value='language:"Macedonian"'>Macedonian</option>
-<option value='language:"Madurese"'>Madurese</option>
-<option value='language:"Magahi"'>Magahi</option>
-<option value='language:"Maithili"'>Maithili</option>
-<option value='language:"Makasar"'>Makasar</option>
-<option value='language:"Malagasy"'>Malagasy</option>
-<option value='language:"Malay"'>Malay</option>
-<option value='language:"Malayalam"'>Malayalam</option>
-<option value='language:"Maltese"'>Maltese</option>
-<option value='language:"Manchu"'>Manchu</option>
-<option value='language:"Mandingo"'>Mandingo</option>
-<option value='language:"Manipuri"'>Manipuri</option>
-<option value='language:"Manobo"'>Manobo</option>
-<option value='language:"Manx"'>Manx</option>
-<option value='language:"Maori"'>Maori</option>
-<option value='language:"Mapudungun"'>Mapudungun</option>
-<option value='language:"Marathi"'>Marathi</option>
-<option value='language:"Mari"'>Mari</option>
-<option value='language:"Marshallese"'>Marshallese</option>
-<option value='language:"Marwari"'>Marwari</option>
-<option value='language:"Masai"'>Masai</option>
-<option value='language:"Mayan"'>Mayan</option>
-<option value='language:"Mende"'>Mende</option>
-<option value='language:"Mi-kmaq"'>Mi-kmaq</option>
-<option value='language:"Middle English"'>Middle English</option>
-<option value='language:"Middle French"'>Middle French</option>
-<option value='language:"Middle High German"'>Middle High German</option>
-<option value='language:"Middle Irish"'>Middle Irish</option>
-<option value='language:"Minangkabau"'>Minangkabau</option>
-<option value='language:"Mohawk"'>Mohawk</option>
-<option value='language:"Moldavian"'>Moldavian</option>
-<option value='language:"Mon-Khmer"'>Mon-Khmer</option>
-<option value='language:"Mongo"'>Mongo</option>
-<option value='language:"Mongolian"'>Mongolian</option>
-<option value='language:"Mossi"'>Mossi</option>
-<option value='language:"Multiple"'>Multiple</option>
-<option value='language:"Munda"'>Munda</option>
-<option value='language:"Music"'>Music</option>
-<option value='language:"Nahuatl"'>Nahuatl</option>
-<option value='language:"Navajo"'>Navajo</option>
-<option value='language:"Ndonga"'>Ndonga</option>
-<option value='language:"Neapolitan"'>Neapolitan</option>
-<option value='language:"Nepal Bhasa"'>Nepal Bhasa</option>
-<option value='language:"Nepali"'>Nepali</option>
-<option value='language:"Nias"'>Nias</option>
-<option value='language:"Niger-Kordofanian"'>Niger-Kordofanian</option>
-<option value='language:"Nilo-Saharan"'>Nilo-Saharan</option>
-<option value='language:"Niuean"'>Niuean</option>
-<option value='language:"Nogai"'>Nogai</option>
-<option value='language:"North American Indian"'>North American Indian</option>
-<option value='language:"North Ndebele"'>North Ndebele</option>
-<option value='language:"Northern Frisian"'>Northern Frisian</option>
-<option value='language:"Northern Sami"'>Northern Sami</option>
-<option value='language:"Norwegian Bokmȧl"'>Norwegian Bokmȧl</option>
-<option value='language:"Norwegian Nynorsk"'>Norwegian Nynorsk</option>
-<option value='language:"Norwegian"'>Norwegian</option>
-<option value='language:"Nubian"'>Nubian</option>
-<option value='language:"Nyamwezi"'>Nyamwezi</option>
-<option value='language:"Nyankole"'>Nyankole</option>
-<option value='language:"Nyoro"'>Nyoro</option>
-<option value='language:"Occitan"'>Occitan</option>
-<option value='language:"Ojibwa"'>Ojibwa</option>
-<option value='language:"Old English"'>Old English</option>
-<option value='language:"Old French"'>Old French</option>
-<option value='language:"Old High German"'>Old High German</option>
-<option value='language:"Old Irish"'>Old Irish</option>
-<option value='language:"Old Norse"'>Old Norse</option>
-<option value='language:"Old Persian"'>Old Persian</option>
-<option value='language:"Old Provençal"'>Old Provençal</option>
-<option value='language:"Oriya"'>Oriya</option>
-<option value='language:"Oromo"'>Oromo</option>
-<option value='language:"Osage"'>Osage</option>
-<option value='language:"Ossetian"'>Ossetian</option>
-<option value='language:"Otomian"'>Otomian</option>
-<option value='language:"Ottoman Turkish"'>Ottoman Turkish</option>
-<option value='language:"Pahlavi"'>Pahlavi</option>
-<option value='language:"Palauan"'>Palauan</option>
-<option value='language:"Pali"'>Pali</option>
-<option value='language:"Pampanga"'>Pampanga</option>
-<option value='language:"Pangasinan"'>Pangasinan</option>
-<option value='language:"Panjabi"'>Panjabi</option>
-<option value='language:"Papiamento"'>Papiamento</option>
-<option value='language:"Papuan"'>Papuan</option>
-<option value='language:"Pedi"'>Pedi</option>
-<option value='language:"Persian"'>Persian</option>
-<option value='language:"Philippine"'>Philippine</option>
-<option value='language:"Phoenician"'>Phoenician</option>
-<option value='language:"Pohnpeian"'>Pohnpeian</option>
-<option value='language:"Polish"'>Polish</option>
-<option value='language:"Portuguese"'>Portuguese</option>
-<option value='language:"Prakrit languages"'>Prakrit languages</option>
-<option value='language:"Pushto"'>Pushto</option>
-<option value='language:"Quechua"'>Quechua</option>
-<option value='language:"Rajasthani"'>Rajasthani</option>
-<option value='language:"Rapanui"'>Rapanui</option>
-<option value='language:"Rarotongan"'>Rarotongan</option>
-<option value='language:"Romance"'>Romance</option>
-<option value='language:"Romanian"'>Romanian</option>
-<option value='language:"Romansh"'>Romansh</option>
-<option value='language:"Romany"'>Romany</option>
-<option value='language:"Rundi"'>Rundi</option>
-<option value='language:"Russian"'>Russian</option>
-<option value='language:"Salishan"'>Salishan</option>
-<option value='language:"Samaritan Aramaic"'>Samaritan Aramaic</option>
-<option value='language:"Sami languages"'>Sami languages</option>
-<option value='language:"Samoan"'>Samoan</option>
-<option value='language:"Sango"'>Sango</option>
-<option value='language:"Sanskrit"'>Sanskrit</option>
-<option value='language:"Santali"'>Santali</option>
-<option value='language:"Sardinian"'>Sardinian</option>
-<option value='language:"Sasak"'>Sasak</option>
-<option value='language:"Scots"'>Scots</option>
-<option value='language:"Selkup"'>Selkup</option>
-<option value='language:"Semitic"'>Semitic</option>
-<option value='language:"Serbian"'>Serbian</option>
-<option value='language:"Serer"'>Serer</option>
-<option value='language:"Shan"'>Shan</option>
-<option value='language:"Shona"'>Shona</option>
-<option value='language:"Sichuan Yi"'>Sichuan Yi</option>
-<option value='language:"Sicilian"'>Sicilian</option>
-<option value='language:"Sidamo"'>Sidamo</option>
-<option value='language:"Sign Language"'>Sign Language</option>
-<option value='language:"Siksika"'>Siksika</option>
-<option value='language:"Sindhi"'>Sindhi</option>
-<option value='language:"Sinhala"'>Sinhala</option>
-<option value='language:"Sino-Tibetan"'>Sino-Tibetan</option>
-<option value='language:"Siouan"'>Siouan</option>
-<option value='language:"Skolt Sami"'>Skolt Sami</option>
-<option value='language:"Slave"'>Slave</option>
-<option value='language:"Slavic"'>Slavic</option>
-<option value='language:"Slovak"'>Slovak</option>
-<option value='language:"Slovenian"'>Slovenian</option>
-<option value='language:"Sogdian"'>Sogdian</option>
-<option value='language:"Somali"'>Somali</option>
-<option value='language:"Songhai"'>Songhai</option>
-<option value='language:"Soninke"'>Soninke</option>
-<option value='language:"Sorbian"'>Sorbian</option>
-<option value='language:"South American Indian"'>South American Indian</option>
-<option value='language:"Southern Altai"'>Southern Altai</option>
-<option value='language:"Southern Sami"'>Southern Sami</option>
-<option value='language:"Southern Sotho"'>Southern Sotho</option>
-<option value='language:"Spanish"'>Spanish</option>
-<option value='language:"Sranan Tongo"'>Sranan Tongo</option>
-<option value='language:"Sukuma"'>Sukuma</option>
-<option value='language:"Sumerian"'>Sumerian</option>
-<option value='language:"Sundanese"'>Sundanese</option>
-<option value='language:"Susu"'>Susu</option>
-<option value='language:"Swahili"'>Swahili</option>
-<option value='language:"Swati"'>Swati</option>
-<option value='language:"Swedish"'>Swedish</option>
-<option value='language:"Swiss German"'>Swiss German</option>
-<option value='language:"Syriac"'>Syriac</option>
-<option value='language:"Tagalog"'>Tagalog</option>
-<option value='language:"Tahitian"'>Tahitian</option>
-<option value='language:"Tai"'>Tai</option>
-<option value='language:"Tajik"'>Tajik</option>
-<option value='language:"Tamashek"'>Tamashek</option>
-<option value='language:"Tamil"'>Tamil</option>
-<option value='language:"Tatar"'>Tatar</option>
-<option value='language:"Telugu"'>Telugu</option>
-<option value='language:"Tereno"'>Tereno</option>
-<option value='language:"Tetum"'>Tetum</option>
-<option value='language:"Thai"'>Thai</option>
-<option value='language:"Tibetan"'>Tibetan</option>
-<option value='language:"Tigre"'>Tigre</option>
-<option value='language:"Tigrinya"'>Tigrinya</option>
-<option value='language:"Timne"'>Timne</option>
-<option value='language:"Tiv"'>Tiv</option>
-<option value='language:"Tlingit"'>Tlingit</option>
-<option value='language:"Tok"'>Tok</option>
-<option value='language:"Tonga"'>Tonga</option>
-<option value='language:"Tsimshian"'>Tsimshian</option>
-<option value='language:"Tsonga"'>Tsonga</option>
-<option value='language:"Tswana"'>Tswana</option>
-<option value='language:"Tumbuka"'>Tumbuka</option>
-<option value='language:"Tupi"'>Tupi</option>
-<option value='language:"Turkish"'>Turkish</option>
-<option value='language:"Turkmen"'>Turkmen</option>
-<option value='language:"Tuvalu"'>Tuvalu</option>
-<option value='language:"Tuvinian"'>Tuvinian</option>
-<option value='language:"Twi"'>Twi</option>
-<option value='language:"Udmurt"'>Udmurt</option>
-<option value='language:"Ugaritic"'>Ugaritic</option>
-<option value='language:"Uighur"'>Uighur</option>
-<option value='language:"Ukrainian"'>Ukrainian</option>
-<option value='language:"Umbundu"'>Umbundu</option>
-<option value='language:"Undetermined"'>Undetermined</option>
-<option value='language:"Unknown"'>Unknown</option>
-<option value='language:"Upper Sorbian"'>Upper Sorbian</option>
-<option value='language:"Urdu"'>Urdu</option>
-<option value='language:"Uzbek"'>Uzbek</option>
-<option value='language:"Vai"'>Vai</option>
-<option value='language:"Venda"'>Venda</option>
-<option value='language:"Vietnamese"'>Vietnamese</option>
-<option value='language:"Volapük"'>Volapük</option>
-<option value='language:"Votic"'>Votic</option>
-<option value='language:"Wakashan"'>Wakashan</option>
-<option value='language:"Walloon"'>Walloon</option>
-<option value='language:"Waray"'>Waray</option>
-<option value='language:"Washo"'>Washo</option>
-<option value='language:"Welsh"'>Welsh</option>
-<option value='language:"Western Frisian"'>Western Frisian</option>
-<option value='language:"Wolof"'>Wolof</option>
-<option value='language:"Xhosa"'>Xhosa</option>
-<option value='language:"Yakut"'>Yakut</option>
-<option value='language:"Yao"'>Yao</option>
-<option value='language:"Yapese"'>Yapese</option>
-<option value='language:"Yiddish"'>Yiddish</option>
-<option value='language:"Yoruba"'>Yoruba</option>
-<option value='language:"Yupik"'>Yupik</option>
-<option value='language:"Zande"'>Zande</option>
-<option value='language:"Zapotec"'>Zapotec</option>
-<option value='language:"Zaza"'>Zaza</option>
-<option value='language:"Zenaga"'>Zenaga</option>
-<option value='language:"Zhuang"'>Zhuang</option>
-<option value='language:"Zulu"'>Zulu</option>
-<option value='language:"Zuni"'>Zuni</option>
+    <?php foreach ($languages as $language): ?>
+        <?php 
+            $class = '';
+            if (array_key_exists('class', $language)) {
+                $class = " class='" .  $language['class'] . "'";
+            }
+            $selected = '';
+            if (array_key_exists('Language', $searchFilters)) {
+                foreach ($searchFilters['Language'] as $l) {
+                    if (prep_string($l['displayText']) == prep_string($language['text'])) {
+                        $selected = ' selected="selected"';
+                    }
+                }
+            }
+        ?>
+        <option<?=$class?><?=$selected?> value='<?=$language['value']?>'><?=$language['text']?></option>
+    <?php endforeach; ?>
 	</select>
-	</div> <!--end col-sm-6 col-md-3-->
+	</div> <!--end col-sm-6-->
 
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6">
 		<label for="limit_format" class="displayBlock">Format:</label>
 		<select id="limit_format" name="filter[]" multiple="multiple" size="10">
-		  <option class="cat all_formats" value=''>All formats</option>
-		  <option class="cat" value='format:"Archives/Manuscripts"'>Archives/Manuscripts</option>
-		  <option class="cat" value='format:"Audio"'>Audio
-			  <option value='format:"Audio cassette"'>Audio Cassette</option>
-			  <option value='format:"CD"'>CD</option>
-			  <option value='format:"LP"'>LP</option>
-			  <option value='format:"Music recording"'>Music recording</option>
-			  <option value='format:"Spoken word recording"'>Spoken word recording</option>
-		  <option class="cat" value='format:"Book"'>Book</option>
-		  <option class="cat" value='format:"Dissertations"'>Dissertations</option>
-		  <option class="cat" value='format:"E-Resource"'>E-Resource</option>
-		  <option class="cat" value='format:"Image"'>Image</option>
-			<option value='format:"Photograph"'>Photograph</option>
-		  <option class="cat" value='format:"Journal"'>Journal</option>
-		  <option class="cat" value='format:"Kit"'>Kit</option>
-		  <option class="cat" value='format:"Library website"'>Library website</option>  
-		  <option class="cat" value='format:"Map"'>Map</option>
-		  <option class="cat" value='format:"Microform"' >Microform</option>
-          <option class="cat" value='format:"Music score"'>Music score</option>
-          <option class="cat" value='format:"Print"'>Print</option>
-		  <option class="cat" value='format:"Video"' >Video</option>
-			<option value='format:"Blu-ray disc"'>Blu-ray disc</option>
-			<option value='format:"DVD"'>DVD</option>
-			<option value='format:"Laserdisc"'>Laserdisc</option>
-			<option value='format:"Video cassette"'>Video cassette</option>
+        <?php foreach ($formats as $format): ?>
+            <?php
+                $class = '';
+                if (array_key_exists('class', $format)) {
+                    $class = " class='" . $format['class'] . "'";
+                }
+                $selected = '';
+                if (array_key_exists('Format', $searchFilters)) {
+                    foreach ($searchFilters['Format'] as $f) {
+                        if (prep_string($f['displayText']) == prep_string($format['text'])) {
+                            $selected = ' selected="selected"';
+                        }
+                    }
+                }
+            ?>
+            <option<?=$class?><?=$selected?> value='<?=$format['value']?>'><?=$format['text']?></option>
+        <?php endforeach; ?>
 		</select>
-	</div><!--end col-sm-6 col-md-3-->
+	</div><!--end col-sm-6-->
 
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6">
 		<label for="limit_building" class="displayBlock">Location:</label>
 		<select id="limit_building" name="filter[]" multiple="multiple" size="10">
-		  <option class='all_locations cat' value='' >All Locations</option>
-		  <option data-name="crerar-main" class="cat" value='building:"Crerar Library"' >Crerar Library</option>
-		  <option value='building:"Crerar Reference"'>Crerar Reference</option>
-		  <option value='building:"Crerar Reserves"'>Crerar Reserves</option>
-		  <option class="cat" value='building:"D&apos;Angelo Law Library"' >D'Angelo Law Library</option>
-		  <option value='building:"Law Reserves"'>Law Reserves</option>
-		  <option class="cat" value='building:"Eckhart Library"' >Eckhart Library</option>
-		  <option value='building:"Eckhart Reference"'>Eckhart Reference</option>
-		  <option value='building:"Eckhart Reserves"'>Eckhart Reserves</option>
-		  <option class="cat" value='building:"Regenstein Library"' >Regenstein Library</option>
-		  <option value='building:"Regenstein Recordings"'>Regenstein Recordings</option>
-		  <option value='building:"Regenstein Reference"'>Regenstein Reference</option>
-		  <option value='building:"Regenstein Reserves"'>Regenstein Reserves</option>
-		  <option value='building:"Regenstein TECHB@R"'>Regenstein TECHB@R</option>
-		  <option class="cat" value='building:"Special Collections Research Center"' >Special Collections Research Center</option>
-		  <option class="cat" value='building:"SSA"' >SSA</option>
-		  <option value='building:"SSA Reserves"'>SSA Reserves</option>
+        <?php foreach ($locations as $location): ?>
+            <?php
+                $class = '';
+                if (array_key_exists('class', $location)) {
+                    $class = " class='" . $location['class'] . "'";
+                }
+                $dataname = '';
+                if (array_key_exists('data-name', $location)) {
+                    $dataname = " data-name='" . $location['data-name'] . "'";
+                }
+                $selected = '';
+                if (array_key_exists('Location', $searchFilters)) {
+                    foreach ($searchFilters['Location'] as $l) {
+                        if (prep_string($l['displayText']) == prep_string($location['text'])) {
+                            $selected = ' selected="selected"';
+                        }
+                    }
+                }
+            ?>
+            <option<?=$class?><?=$dataname?><?=$selected?> value='<?=$location['value']?>'><?=$location['text']?></option>
+        <?php endforeach; ?>
 		</select>
-	</div><!--col-sm-6 col-md-3-->
+	</div><!--col-sm-6-->
 
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6">
 		<label for="limit_collection" class="displayBlock">Collection:</label>
 		<select id="limit_collection" name="filter[]" multiple="multiple" size="10">
-		<option class='all_collections' value=''>All Collections </option>
-		<option class='ns' disabled='disabled' value=''>No sub-collection</option>
-		<option data-main-location="scrc" value='item_collection:"American Drama"'>American Drama</option>
-		<option data-main-location="scrc" value='item_collection:"American Newspapers"'>American Newspapers</option>
-		<option data-main-location="scrc" value='item_collection:"Archives/Manuscripts"'>Archives/Manuscripts</option>
-		<option data-main-location="scrc" value='item_collection:"Archives of Czechs and Slovaks Abroad"'>Archives of Czechs and Slovaks Abroad</option>
-		<option data-main-location="scrc" value='item_collection:"Atkinson Collection of American Drama"'>Atkinson Collection of American Drama</option>
-		<option data-main-location="scrc" value='item_collection:"Austrian Collection of Drama"'>Austrian Collection of Drama</option>
-		<option data-main-location="scrc" value='item_collection:"Codex Manuscripts"'>Codex Manuscripts</option>
-		<option data-main-location="crerar scrc" value='item_collection:"Crerar Manuscripts"'>Crerar Manuscripts</option>
-		<option data-main-location="crerar scrc" value='item_collection:"Crerar Rare Books"'>Crerar Rare Books</option>
-		<option data-main-location="scrc" value='item_collection:"Drama Collection"'>Drama Collection</option>
-		<option data-main-location="scrc" value='item_collection:"EB Children<?=$this->escapeHtml($single_quote)?>s Literature"'>EB Children&rsquo;s Literature</option>
-		<option data-main-location="scrc" value='item_collection:"Helen and Ruth Regenstein Collection of Rare Books"'>Helen and Ruth Regenstein Collection of Rare Books</option>
-		<option data-main-location="scrc" value='item_collection:"Historical Children<?=$this->escapeHtml($single_quote)?>s Books"'>Historical Children&rsquo;s Books</option>
-		<option data-main-location="scrc" value='item_collection:"Incunabula"'>Incunabula</option>
-		<option data-main-location="scrc" value='item_collection:"Lincke Collection of Popular German Literature"'>Lincke Collection of Popular German Literature</option>
-		<option data-main-location="scrc" value='item_collection:"Lincoln Collection"'>Lincoln Collection</option>
-		<option data-main-location="scrc" value='item_collection:"Ludwig Rosenberger Library of Judaica"'>Ludwig Rosenberger Library of Judaica</option>
-		<option data-main-location="scrc" value='item_collection:"Modern Poetry Rare"'>Modern Poetry Rare</option>
-		<option data-main-location="scrc" value='item_collection:"Rare Books"'>Rare Books</option>
-		<option data-main-location="scrc" value='item_collection:"University of Chicago Press Imprint Collection"'>University of Chicago Press Imprint Collection</option>
+        <?php foreach ($collections as $collection): ?>
+            <?php
+                $class = '';
+                if (array_key_exists('class', $collection)) {
+                    $class = " class='" . $collection['class'] . "'";
+                }
+                $datamainlocation = '';
+                if (array_key_exists('data-main-location', $collection)) {
+                    $datamainlocation = " data-main-location='" .  $collection['data-main-location'] . "'";
+                }
+                $selected = '';
+                if (array_key_exists('unrecognized_facet_label', $searchFilters)) {
+                    foreach ($searchFilters['unrecognized_facet_label'] as $c) {
+                        if ($c['field'] == 'item_collection') {
+                            if (prep_string($c['displayText']) == prep_string($collection['text'])) {
+                                $selected = ' selected="selected"';
+                            }
+                        }
+                    }
+                }
+            ?>
+
+            <option<?=$class?><?=$datamainlocation?><?=$selected?> value='<?=$collection['value']?>'><?=$collection['text']?></option>
+        <?php endforeach; ?>
         </select>
-	</div><!--end col-sm-6 col-md-3-->
+	</div><!--end col-sm-6-->
 </div><!--end row-->
 
 </fieldset><!--end fieldset-->
@@ -573,16 +676,46 @@
 		    <legend>Year of Publication</legend>
 
             <div class="row">
-			    <div class="col-md-3">
+			    <div class="col-sm-6">
 			    <label for="publishDatefrom" class="offscreen">From:</label>
-			    	<input type="text" value="" id="publishDatefrom" placeholder="from" name="publishDatefrom" class="left" maxlength="4" size="4">
-			    </div><!--end col-md-3-->
-			    <div class="col-md-3">
+			    	<input type="text" value="" id="publishDatefrom" placeholder="from" name="publishDatefrom" class="form-control" maxlength="4" size="4">
+			    </div><!--end col-sm-6-->
+			    <div class="col-sm-6">
 			    	<label for="publishDateto" class="offscreen">To:</label>
-			    	<input type="text" value="" id="publishDateto" placeholder="to" name="publishDateto" class="right" maxlength="4" size="4">
-			    </div><!--end col-md-3-->
+			    	<input type="text" value="" id="publishDateto" placeholder="to" name="publishDateto" class="form-control" maxlength="4" size="4">
+			    </div><!--end col-sm-6-->
+            </div><!--end row-->
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="slider-container"><input type="text" id="publishDatedateSlider" class="hidden"></div>
+                </div><!--end col-sm-6-->
             </div><!--end row-->
 		</fieldset>
 	</div><!--end col-md-6-->
 </div><!--end row-->
+
+<? $this->headScript()->appendFile('vendor/bootstrap-slider.js'); ?>
+<?
+    $min = 1400;
+    $max = date('Y') + 1;
+    $script = <<<JS
+$(document).ready(function() {
+  var fillTexts = function() {
+    var v = $('#publishDatedateSlider').val().split(',');
+    $('#publishDatefrom').val(v[0]);
+    $('#publishDateto').val(v[1]);
+  };
+  $('#publishDatedateSlider').slider({
+     'min':$min,
+     'max':$max,
+     'handle':"square",
+     'tooltip':"hide",
+     'value':[$min,$max]
+  })
+  .on('slide', fillTexts)
+  .data('slider');
+});
+JS;
+?>
+<?=$this->inlineScript(\Zend\View\Helper\HeadScript::SCRIPT, $script, 'SET'); ?>
 

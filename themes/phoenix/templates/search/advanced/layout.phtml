@@ -20,6 +20,13 @@
     }
     $hasDefaultsApplied = $this->saved->getParams()->hasDefaultsApplied();
     $searchFilters = $this->saved->getParams()->getFilterList();
+
+    // When editing an advanced search, this page displays facets in the
+    // sidebar. unset the facets that get displayed as limits. 
+    unset($searchFilters['Language']);
+    unset($searchFilters['Format']);
+    unset($searchFilters['Location']);
+    unset($searchFilters['unrecognized_facet_label']);
   } else {
     $hasDefaultsApplied = $searchDetails = $searchFilters = $groups = false;
   }
@@ -42,16 +49,23 @@
 
 <?=$this->flashmessages()?>
 
-<ul style="position: relative; top: 1px;" class="nav nav-tabs">
+<ul style="position: relative; top: 1px;" class="nav nav-tabs" id="homepageNavTabs">
   <li style="position: relative; top: 0px;" class="active"><a data-toggle="tab" href="#advSearch">Keyword</a></li>
   <li role="presentation"><a data-toggle="tab" href="#alphaBrowse">Begins With</a></li>
 </ul>
 
 <div class="tab-content">
   <div class="tab-pane active" id="advSearch">
-    <form role="search" name="searchForm" id="advSearchForm" method="get" action="<?=$this->url($this->options->getSearchAction())?>">
+    <p id="basicAdvancedSearchSwitches"><span id="basicSearchSwitch"><a class="disabled" href="#">Basic</a></span> | <span id="advancedSearchSwitch"><a href="#" id="advancedSearchSwitch">Advanced Search</a></span></p>
+
+    <? $basicOrAdvancedSearch = (isset($this->saved) && is_object($this->saved)) ? 'advancedSearch' : 'basicSearch'; ?>
+    <form role="search" class="<?=$basicOrAdvancedSearch?>" name="searchForm" id="advSearchForm" method="get" action="<?=$this->url($this->options->getSearchAction())?>">
       <div class="row">
+        <? if (empty($searchFilters)): ?>
+        <div class="col-sm-12">
+        <? else: ?>
         <div class="col-sm-9">
+        <? endif; ?>
           <input type="hidden" name="sort" value="relevance">
           <div class="clearfix">
             <div id="groupJoin" class="form-inline pull-right hidden">
@@ -64,8 +78,6 @@
           </div>
     
     <div class="group well" id="group0">
-      <div class="row">
-        <div class="col-md-12">
     
           <div class="form-group form-inline">
             <label for="search_bool0">Match:&nbsp;</label>
@@ -78,51 +90,45 @@
           </div><!-- end form-group-->
     
             <div id="search0_0" class="search form-group form-inline">
-              <input type="text" value="" name="lookfor0[]" class="form-control input-large" id="search_lookfor0_0">
+              <input type="text" value="" name="lookfor0[]" class="form-control input-large" id="search_lookfor0_0" placeholder="evolutionary biology">
               <select class="form-control" name="type0[]" id="search_type0_0">
                 <option value="AllFields">All Fields</option>
                 <option value="Title">Title</option>
                 <option value="Author">Author</option>
                 <option value="Subject">Subject</option>
-                <option value="CallNumber">Call Number</option>
-                <option value="ISN">ISBN/ISSN</option>
-                <option value="publisher">Publisher</option>
+                <option value="JournalTitle">Journal Title</option>
+                <option value="StandardNumbers">ISBN, ISSN, etc.</option>
                 <option value="Series">Series</option>
-                <option value="year">Year of Publication</option>
-                <option value="toc">Table of Contents</option>
+                <option value="Publisher">Publisher</option>
               </select>
               <a onclick="deleteSearch(this)" href="#" class="delete">×</a>
               <input class="btn btn-primary basicSearchBtn" type="submit" value="Search"/>
             </div><!-- end search0_0-->
           <div id="search0_1" class="search form-group form-inline">
-            <input type="text" value="" name="lookfor0[]" class="form-control input-large" id="search_lookfor0_1">
+            <input type="text" value="" name="lookfor0[]" class="form-control input-large" id="search_lookfor0_1" placeholder="evolutionary biology">
               <select class="form-control" name="type0[]" id="search_type0_1">
                 <option value="AllFields">All Fields</option>
                 <option value="Title">Title</option>
                 <option value="Author">Author</option>
                 <option value="Subject">Subject</option>
-                <option value="CallNumber">Call Number</option>
-                <option value="ISN">ISBN/ISSN</option>
-                <option value="publisher">Publisher</option>
+                <option value="JournalTitle">Journal Title</option>
+                <option value="StandardNumbers">ISBN, ISSN, etc.</option>
                 <option value="Series">Series</option>
-                <option value="year">Year of Publication</option>
-                <option value="toc">Table of Contents</option>
+                <option value="Publisher">Publisher</option>
               </select>
             <a onclick="deleteSearch(this)" href="#" class="delete">×</a>
           </div><!-- end search0_1-->
             <div id="search0_2" class="search form-group form-inline">
-              <input type="text" value="" name="lookfor0[]" class="form-control input-large" id="search_lookfor0_2"/>
+              <input type="text" value="" name="lookfor0[]" class="form-control input-large" id="search_lookfor0_2" placeholder="evolutionary biology"/>
               <select class="form-control" name="type0[]" id="search_type0_2">
                 <option value="AllFields">All Fields</option>
                 <option value="Title">Title</option>
                 <option value="Author">Author</option>
                 <option value="Subject">Subject</option>
-                <option value="CallNumber">Call Number</option>
-                <option value="ISN">ISBN/ISSN</option>
-                <option value="publisher">Publisher</option>
+                <option value="JournalTitle">Journal Title</option>
+                <option value="StandardNumbers">ISBN, ISSN, etc.</option>
                 <option value="Series">Series</option>
-                <option value="year">Year of Publication</option>
-                <option value="toc">Table of Contents</option>
+                <option value="Publisher">Publisher</option>
               </select>
               <a onclick="deleteSearch(this)" href="#" class="delete">×</a>
             </div><!-- end search 0_2-->
@@ -132,8 +138,6 @@
           <p id="advSearchP">
             <a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#powersearch" class="external">Power searching instructions (Boolean, etc.)</a>
           </p>
-        </div><!-- end col-md-9-->
-      </div><!-- end row-->
     </div><!-- end group/well-->
     
     
@@ -172,6 +176,7 @@
               </li>
             </ul>
             <? foreach ($searchFilters as $field => $data): ?>
+            <? if (!in_array($data[0]['field'], array('language', 'format',  'building', 'item_collection'))): ?>
               <ul class="list-group">
                 <li class="list-group-item title"><?=$this->transEsc($field)?></li>
                 <? foreach ($data as $value): ?>
@@ -179,6 +184,7 @@
 /> <?=$this->escapeHtml($value['displayText'])?></label></div></li>
                 <? endforeach; ?>
               </ul>
+            <? endif; ?>
             <? endforeach; ?>
           <? endif; ?>
         </div><!-- end col-md-12-->
@@ -187,9 +193,9 @@
   </div><!-- end advSearch-->
 
   <div class="tab-pane" id="alphaBrowse">
-    <form action="/vufind/alphabrowse/results" class="form-inline" id="alphaBrowseForm" method="get" name="alphaBrowseForm">
+    <form action="/vufind/alphabrowse/home" class="form-inline" id="alphaBrowseForm" method="get" name="alphaBrowseForm">
       <div class="row">
-        <div class="col-sm-9">
+        <div class="col-sm-12">
           <div class="well">
             <div style="margin: 15px 0;">
             <label for="alphaBrowseForm_from" class="offscreen">starting from</label>
@@ -209,8 +215,23 @@
             <input type="submit" value="Browse" class="btn btn-primary">
           </div><!--end form-group-->
           </div><!--end well--> 
-        </div><!-- end col-md-12-->
+        </div><!-- end col-sm-12-->
       </div><!-- end row-->
     </form>
   </div><!-- end alphaBrowse-->
 </div><!-- end tab-content-->
+
+<div class="row">
+  <div class="col-md-12">
+    <div id="about-beta"> 
+      <p class="title">
+        <a href="http://www.lib.uchicago.edu/e/using/catalog/about.html" target="_blank" class="external">About the Library Catalog</a>
+      </p>
+      <ul>
+        <li><a href="http://www.lib.uchicago.edu/e/using/catalog/about.html" target="_blank" class="external">Features</a></li>
+        <li><a href="http://www.lib.uchicago.edu/e/using/catalog/about.html" target="_blank" class="external">Coming soon</a></li>
+        <li><a href="http://www.lib.uchicago.edu/e/using/catalog/mydiscoveries-migration-2014.html" target="_blank" class="external">Migrating your Lens MyDiscoveries</a></li>
+      </ul>
+    </div><!-- end about-beta-->
+  </div><!-- end col-md-12-->
+</div><!-- end row-->
