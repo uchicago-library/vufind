@@ -499,5 +499,23 @@ $(document).ready(function() {
             $('[name="publishDateto"]').remove();
         }
     }); 
+
+    //append the 90 second video. 
+    /*
+    $('.main .container').append('<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="myModalLabel">Searching the new Library Catalog</h4></div><div class="modal-body"><iframe width="560" height="315" src="//www.youtube-nocookie.com/embed/I4kOECCepew?rel=0" frameborder="0" allowfullscreen></iframe></div><div class="modal-footer"></div></div></div></div>');
+    */
+
+    //append links for 'which search should I use?' and the 90 second video.
+    $('.main .container ul:last li:first').after('<li><a href="#" id="searchtabinfolink">Which search should I use?</a> <a class="external" href="https://www.youtube.com/watch?v=I4kOECCepew" target="_blank">90 second video on search types <i class="fa fa-video-camera"></i></a></li>');
+
+    //popover for 'which search should I use?' link. 
+    $('#searchtabinfolink').popover({
+        'container': '#searchtabinfolink',
+        'content': '<div style="padding: 0 10px;"><p>Keyword searches produce lists of records sorted by relevance:</p><p style="padding-left: 10px;"><strong>Basic Keyword Search</strong><br/>Use for exploring a general topic, or if the exact title or author of a book is unknown.</p><p style="padding-left: 10px;"><strong>Advanced Keyword Search</strong><br/>Use for very specific or complex topics.</p><p><strong>Begins With</strong><br/>Begins With allows you to browse through an alphabetical list of titles, authors, subjects, etc. Use to locate a book when the exact title or author\'s entire name is known, or when searching for items on a specific subject.</p><p><a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchtypes" target="_blank">More info</a></p></div>',
+        'delay': 500,
+        'html': true,
+        'placement': 'right',
+        'trigger': 'hover focus'
+    });
 });
 
