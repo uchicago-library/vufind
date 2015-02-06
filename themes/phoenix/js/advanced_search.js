@@ -299,6 +299,9 @@ function switchToAdvancedSearch()
     addSearch($('#add_search_link_0'), '', '');
     addSearch($('#add_search_link_0'), '', '');
 
+    //hide 'power searching instructions'.
+    $('#advSearchP').hide();
+
     //show 'Add Search Field'
     $('#group0Holder').show();
     $('#add_search_link_0').show(); 
@@ -356,6 +359,9 @@ function switchToBasicSearch()
     $('.group:first').find('.search:not(:first)').each(function() {
         deleteSearch($(this).find('a.delete'));
     });
+
+    //show 'power searching instructions'.
+    $('#advSearchP').show();
     
     //hide 'Add Search Field'
     $('#group0Holder').hide();
