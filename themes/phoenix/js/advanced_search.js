@@ -459,8 +459,19 @@ $(document).ready(function() {
     $('#limit_building').change();
 
     //get rid of unwanted options on submit.
-    $("#advSearchForm").submit(function(){
+    $("#advSearchForm").submit(function(e){
         $('.all, .all_languages, .all_formats, .all_locations, .all_collections').prop("selected", false);
+
+        //if we're submitting the form as a basic search, get rid of a few extra inputs.
+        if ($('#advSearchForm').find('input[name="lookfor"]')) {
+            //remove form fields for arrays of things. 
+            $('[name$="[]"]').remove();
+            //some other elements...
+            $('[name="sort"]').remove();
+            $('[name="join"]').remove();
+            $('[name="publishDatefrom"]').remove();
+            $('[name="publishDateto"]').remove();
+        }
     }); 
 });
 
