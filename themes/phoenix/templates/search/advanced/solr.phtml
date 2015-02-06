@@ -554,7 +554,7 @@ $collections = array(
 <legend>Limit To</legend>
 
 <div class="row">
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6">
 
 	<label for="limit_language" class="displayBlock">Language:</label>
 	<select id="limit_language" name="filter[]" multiple="multiple" size="10">
@@ -576,9 +576,9 @@ $collections = array(
         <option<?=$class?><?=$selected?> value='<?=$language['value']?>'><?=$language['text']?></option>
     <?php endforeach; ?>
 	</select>
-	</div> <!--end col-sm-6 col-md-3-->
+	</div> <!--end col-sm-6-->
 
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6">
 		<label for="limit_format" class="displayBlock">Format:</label>
 		<select id="limit_format" name="filter[]" multiple="multiple" size="10">
         <?php foreach ($formats as $format): ?>
@@ -599,9 +599,9 @@ $collections = array(
             <option<?=$class?><?=$selected?> value='<?=$format['value']?>'><?=$format['text']?></option>
         <?php endforeach; ?>
 		</select>
-	</div><!--end col-sm-6 col-md-3-->
+	</div><!--end col-sm-6-->
 
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6">
 		<label for="limit_building" class="displayBlock">Location:</label>
 		<select id="limit_building" name="filter[]" multiple="multiple" size="10">
         <?php foreach ($locations as $location): ?>
@@ -626,9 +626,9 @@ $collections = array(
             <option<?=$class?><?=$dataname?><?=$selected?> value='<?=$location['value']?>'><?=$location['text']?></option>
         <?php endforeach; ?>
 		</select>
-	</div><!--col-sm-6 col-md-3-->
+	</div><!--col-sm-6-->
 
-	<div class="col-sm-6 col-md-3">
+	<div class="col-sm-6">
 		<label for="limit_collection" class="displayBlock">Collection:</label>
 		<select id="limit_collection" name="filter[]" multiple="multiple" size="10">
         <?php foreach ($collections as $collection): ?>
@@ -656,7 +656,7 @@ $collections = array(
             <option<?=$class?><?=$datamainlocation?><?=$selected?> value='<?=$collection['value']?>'><?=$collection['text']?></option>
         <?php endforeach; ?>
         </select>
-	</div><!--end col-sm-6 col-md-3-->
+	</div><!--end col-sm-6-->
 </div><!--end row-->
 
 </fieldset><!--end fieldset-->
