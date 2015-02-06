@@ -306,8 +306,8 @@ function switchToAdvancedSearch()
     addSearch($('#add_search_link_0'), '', '');
     addSearch($('#add_search_link_0'), '', '');
 
-    //hide 'power searching instructions'.
-    $('#advSearchP').hide();
+    //remove 'power searching instructions'.
+    $('#advSearchP').remove();
 
     //show 'Add Search Field'
     $('#group0Holder').show();
@@ -384,8 +384,8 @@ function switchToBasicSearch()
     //change field pulldown's name to 'type' (basic search)
     $('.group:first .search:first').find('select').attr('name', 'type');
 
-    //show 'power searching instructions'.
-    $('#advSearchP').show();
+    //add 'power searching instructions'.
+    $('.group:first').append('<p id="advSearchP"><a class="external" href="http://www.lib.uchicago.edu/e/using/catalog/help.html#powersearch">Power searching instructions (Boolean, etc.)</a></p>');
     
     //hide 'Add Search Field'
     $('#group0Holder').hide();
@@ -419,6 +419,12 @@ $(document).ready(function() {
     // Set up basic and advanced search links. 
     $('#basicSearchSwitch a').click(switchToBasicSearch);
     $('#advancedSearchSwitch a').click(switchToAdvancedSearch);
+
+    // assume we're working with a basic search (not an 'edit this advanced search') if the first text box is empty. 
+    if ($('.group .search input:first').val() == '') {
+        $('#basicSearchSwitch a').removeClass('disabled');
+        switchToBasicSearch();
+    }
 
     // if we're loading an 'edit this advanced search' page...
     if ($('#advSearchForm.advancedSearch').length > 0) {

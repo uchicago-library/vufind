@@ -33,40 +33,5 @@ $(document).ready(function() {
       <? endforeach; ?>
       <? $j++; ?>
     <? endforeach; ?>
-  <? /* JS to convert the advanced search page to a basic search onload. */?>
-  <? else: ?>
-    //masquerade as basic search onload. 
-
-    //change text input's name to 'lookfor'.
-    $('#search_lookfor0_0').attr('name', 'lookfor');
-
-    //change field pulldown's name to 'type'.
-    $('#search_type0_0').attr('name', 'type');
-
-    //hide 2nd and 3rd search box.
-    $('#search0_2').find('a.delete').click();
-    $('#search0_1').find('a.delete').click();
-    
-    //hide 'add search fields' links. 
-    $('#group0Holder').hide();
-    $('#add_search_link_0').hide();
-    $('#what_is_a_field').hide();
-
-    //hide 'add search group' link. 
-    $('#groupPlaceHolder').hide();
-
-    //hide limits.
-    $('fieldset').has('legend:contains("Limit To")').hide();
-
-    //hide results per page.
-    $('fieldset').has('legend:contains("Results per page")').hide();
-
-    //hide year of publication.
-    $('fieldset').has('legend:contains("Year of Publication")').hide();
-
-    //hide advanced search buttons.
-    $('.advancedSearchBtn').hide();
-
   <? endif; ?>
-
 });
