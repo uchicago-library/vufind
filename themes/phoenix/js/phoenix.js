@@ -67,8 +67,8 @@ $(document).ready(function() {
     // Text for various states
     var viewItemsText = 'View more items <i class="fa fa-arrow-circle-right"></i>';
     var hideItemsText = 'Hide items <i class="fa fa-arrow-circle-down"></i>';
-    var viewSummaryText = 'View more volumes <i class="fa fa-arrow-circle-right"></i>';
-    var hideSummaryText = 'Hide volumes <i class="fa fa-arrow-circle-down"></i>'; 
+    var viewSummaryText = 'View more holdings <i class="fa fa-arrow-circle-right"></i>';
+    var hideSummaryText = 'Hide holdings <i class="fa fa-arrow-circle-down"></i>'; 
 
     // Links to display for various states
     var viewItems = '<a href="#" class="itemsToggle text-success hide">' + viewItemsText + '</a>';
