@@ -294,9 +294,6 @@ function switchToAdvancedSearch()
     $('#advancedSearchSwitch a').addClass('disabled');
     $('#basicSearchSwitch a').removeClass('disabled');
 
-    //show 'match' pulldown. 
-    $('#groupJoin').show();
-
     //change text input's name to 'lookfor0[]' (advanced search)
     $('.group:first .search:first').find('input:first').attr('name', 'lookfor0[]');
 
@@ -364,9 +361,6 @@ function switchToBasicSearch()
 
         $('.sidebar').remove();
     }
-
-    //hide 'match' pulldown. 
-    $('#groupJoin').hide();
 
     //delete all but the first search group.
     $('.group:not(:first)').each(function() {
