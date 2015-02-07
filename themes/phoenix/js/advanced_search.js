@@ -410,6 +410,9 @@ function switchToBasicSearch()
 }
 
 $(document).ready(function() {
+    // Add basic/advanced search switch links.
+    $('#advSearch').prepend('<p id="basicAdvancedSearchSwitches"><span id="basicSearchSwitch"><a class="disabled" href="#">Basic</a></span> | <span id="advancedSearchSwitch"><a href="#" id="advancedSearchSwitch">Advanced Search</a></span></p>');
+
     // Set up basic and advanced search links. 
     $('#basicSearchSwitch a').click(switchToBasicSearch);
     $('#advancedSearchSwitch a').click(switchToAdvancedSearch);
