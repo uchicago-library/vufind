@@ -325,8 +325,8 @@ function switchToAdvancedSearch()
     //show year of publication.
     $('fieldset').has('legend:contains("Year of Publication")').show();
 
-    //hide basic search buttons.
-    $('.basicSearchBtn').hide();
+    //remove basic search buttons.
+    $('.basicSearchBtn').remove();
 
     //show advanced search buttons.
     $('.advancedSearchBtn').show();
@@ -400,8 +400,8 @@ function switchToBasicSearch()
     //hide year of publication.
     $('fieldset').has('legend:contains("Year of Publication")').hide();
 
-    //show basic search buttons.
-    $('.basicSearchBtn').show();
+    //make a basic search button.
+    $('.group:first .search:first').append('<input type="submit" value="Search" class="btn btn-primary basicSearchBtn">');
 
     //hide advanced search buttons.
     $('.advancedSearchBtn').hide();
@@ -499,11 +499,6 @@ $(document).ready(function() {
             $('[name="publishDateto"]').remove();
         }
     }); 
-
-    //append the 90 second video. 
-    /*
-    $('.main .container').append('<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"><div class="modal-dialog"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title" id="myModalLabel">Searching the new Library Catalog</h4></div><div class="modal-body"><iframe width="560" height="315" src="//www.youtube-nocookie.com/embed/I4kOECCepew?rel=0" frameborder="0" allowfullscreen></iframe></div><div class="modal-footer"></div></div></div></div>');
-    */
 
     //append links for 'which search should I use?' and the 90 second video.
     $('.main .container ul:last li:first').after('<li><a href="#" id="searchtabinfolink">Which search should I use?</a> <a class="external" href="https://www.youtube.com/watch?v=I4kOECCepew" target="_blank">90 second video on search types <i class="fa fa-video-camera"></i></a></li>');
