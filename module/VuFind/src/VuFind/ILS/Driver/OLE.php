@@ -28,6 +28,7 @@
  */
 namespace VuFind\ILS\Driver;
 use File_MARC, PDO, PDOException, Exception,
+    File_MARCXML,
     VuFind\Exception\ILS as ILSException,
     VuFindSearch\Backend\Exception\HttpErrorException,
     Zend\Json\Json,
@@ -1254,9 +1255,100 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         catch (Exception $e){
             /*Do nothing*/
         }
-        
+
+        // Get bound-withs
+        if ($stmt->fetch()===false) {
+            $item = array();
+            /*Convenience variables.*/
+            $shelvingLocation = $row['locn_name'];
+            $boundwiths = $this->lookupBoundWith($id);
+            $callNumber = $this->getCallNumberForBoundWithBib($id);
+            $item['boundwiths']=$boundwiths;
+            $item['callnumber'] = $callNumber;
+            $item['id'] = $id;
+
+            if (!empty($item['boundwiths'])) {
+                $items[] = $item;
+            }
+        }
+
         //print_r($items);
         return $items;
+    }
+
+    /**
+     * Get bound-with items.
+     *
+     * @param $bibid string, the bib number.
+     *
+     * @returns an array of arays, related bound with items. Subarrays 
+     * contain the following keys: bib_id, title, url.
+     */
+    public function lookupBoundWith($bibid) {
+
+        $sql = "select bib_id from ole_ds_bib_holdings_t where holdings_id in
+                   (select holdings_id from ole_ds_bib_holdings_t where bib_id = '" . $bibid . "')";
+
+        try {
+            $sqlStmt = $this->db->prepare($sql);
+            $sqlStmt->bindParam(
+                ':bibid', strtolower(utf8_decode($bibid)), PDO::PARAM_STR
+            );
+            $sqlStmt->execute();
+            $check = $sqlStmt->fetchAll(PDO::FETCH_ASSOC);
+            $arrayofrelatedbibs = array();
+            $callNumberFieldSaved = "";
+            foreach ($check as $id) {
+                $bibinfo = array();
+                $bibid = $id['bib_id'];
+                //TODO:
+                //GET RID OF THIS HARDCODING
+                //$xml = file_get_contents("http://ole.lib.lehigh.edu/oledocstore/documentrest/bib?bibId=$bibid");
+                $xml = file_get_contents("http://ole.uchicago.edu:8080/oledocstore/documentrest/bib?bibId=" . $bibid);
+                $marc_source = new File_MARCXML($xml,File_MARCXML::SOURCE_STRING);
+                $record = $marc_source->next();
+                $title = $record->getField('245');
+                $titleString = $title->getSubfield('a')->getData();
+                $bibinfo['bib_id'] = $bibid;
+                $bibinfo['title'] = $titleString;
+                $recordurl = $bibid;
+                $bibinfo['url'] = $recordurl;
+                array_push($arrayofrelatedbibs,$bibinfo);
+            }
+            if (!empty($arrayofrelatedbibs)) {
+                $arrayofrelatedbibs['cn'] = $this->getCallNumberForBoundWithBib($bibid);
+            }
+            return $arrayofrelatedbibs;
+        } catch (PDOException $e) {
+            throw new ILSException($e->getMessage());
+        }
+    }
+
+    /**
+     * Get the callnumber for bound-with by bib id. 
+     *
+     * @param $bibid string, the bib number.
+     *
+     * @returns string, call number.
+     */
+    public function getCallNumberForBoundWithBib($bibid) {
+
+        //$sql = "select call_number from ole_ds_item_t where holdings_id in (select holdings_id from ole_ds_bib_holdings_t where bib_id =" . $bibid . ") limit 1";
+        $sql = "select h.CALL_NUMBER_PREFIX,  h.CALL_NUMBER from ole_ds_holdings_t h where bib_id=" . $bibid;
+
+        try {
+            $sqlStmt = $this->db->prepare($sql);
+            $sqlStmt->execute();
+            $row = $sqlStmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (isset($row['call_number'])) {
+                return $row['call_number'];
+            } else {
+                return null;
+            }
+        } catch (PDOException $e) {
+            throw new ILSException($e->getMessage());
+        }
     }
 
     /**

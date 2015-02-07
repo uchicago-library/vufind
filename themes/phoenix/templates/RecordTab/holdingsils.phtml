@@ -73,6 +73,20 @@
 <?$isRelatedTextOnline = $holding['location'] == 'Related'?>
 
 <div class="holdings-unit">
+
+<?//Bound-withs?>
+<? if (!empty($holding['items'][0]['boundwiths'])): ?>
+  <h3>This item is bound with: </h3>
+  <p><?=!empty($holding['items'][0]['boundwiths']['cn']) ? '<strong>Call Number: </strong>' . $holding['items'][0]['boundwiths']['cn'] : ''; ?></p>
+  <p>
+  <? foreach ($holding['items'][0]['boundwiths'] as $key): ?>
+    <? if (array_key_exists('title', $key)):?>
+      <?="<a href='" . $key['url'] . "'>" . $key['title'] . "</a>"; ?>
+    <?endif;?><br/>
+  <? endforeach; ?></p>
+<? endif; ?>
+<?//End Bound-withs?>
+
 <h3><?=$this->transEsc('location_' . $holding['location'], array(), $holding['location'])?></h3>
 <? //print_r($holding);?>
 <? if ($isFullTextOnline):?>
@@ -88,8 +102,9 @@
 <span class="maplink"><?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $firstBarcode)?></span>
 <table class="holdings-table" data-display="<?=$this->tab->getDisplayNumber()?>" summary="<?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?>">
   <? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
+  <? $hasCallNos = implode('', $callNos); ?>
   <tr>
-    <th><?=$this->transEsc("Call Number")?>: </th>
+    <th><?=$hasCallNos ? $this->transEsc("Call Number") . ': ' : ''?></th>
     <td>
       <?foreach ($callNos['display'] as $numKey => $callNo): ?>
         <?=$this->escapeHtml($callNo)?>
@@ -212,6 +227,7 @@
     </tr>
   <? endif; ?>
 </table>
+
 </div><!--/.holdings-unit-->
 <? endforeach; ?>
 

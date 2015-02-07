@@ -634,6 +634,9 @@ tr[typeof="Offer"] th,
 }
 .bulkActionButtons #updateCart {
     margin-left:0;
+}
+.bulkActionButtons label input {
+    margin-top:0;
 } 
 .search-controls {
     margin: @vertical-padding-div 0;
@@ -667,6 +670,10 @@ tr[typeof="Offer"] th,
     @media (max-width: @screen-xs-max) {
         width:100%;
     }
+}
+.template-name-results .checkbox-select-item,
+.template-name-results .checkbox-select-all {
+    top: 2px;//Center checkboxes vertically next to text on results pages
 }
 
 /*MyResearch*/
@@ -714,9 +721,6 @@ tr[typeof="Offer"] th,
     margin-right:0;
     padding-right:0; 
 }*/
-.result .left img {
-    max-width: 70px;
-}
 
 .callnumAndLocation {
     margin-bottom:10px;
@@ -777,4 +781,32 @@ a.tool:hover .arrow-left {
     display: inline-block;
     position:absolute;
     margin-left: 3px;
-} 
+}
+
+/* --- Search --- */
+.result {
+  a.title {font-weight:bold}
+  .left {
+    text-align:center;
+    padding:0;
+    img {max-width:70px;}
+  }
+  .middle {
+    padding:0;
+  }
+  /*@media (min-width:991px) {
+    .middle {padding:0;}
+    .left {padding:0;}
+  }*/
+  @media (max-width:767px) {
+    a {text-decoration:underline}
+    .middle,.right {padding:0}
+  }
+  @media (max-width:530px) {
+    .checkbox {display: none !important;}
+    .left {width:30%}
+    .middle {width:70%}
+    .right {display:none}
+  }
+}
+ 
