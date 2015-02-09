@@ -18,7 +18,7 @@ local/import/import.properties
 local/import/import_auth.properties
 vufind.bat
 
-# local
+# Local
 local/cache/
 local/config/
 
@@ -31,9 +31,7 @@ solr/biblio/spellShingle/
 solr/biblio/spellchecker/
 solr/stats/index/
 solr/biblio/tlog/tlog*
-
 solr/jetty/work
-
 jetty_logs/
 
 # Directories for loading records
@@ -50,6 +48,9 @@ import/solrmarc.log*
 solr/website/spellchecker/*
 solr/website/spellShingle/*
 solr/website/index/*
+
+# Compiled css
+themes/phoenix/css/compiled.css
 
 # Logs 
 solr/website/tlog/
