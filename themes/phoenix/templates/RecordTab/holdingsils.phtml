@@ -96,14 +96,21 @@
   <br/><strong><?=$this->transEsc("Related Links:")?></strong>
 <? endif; ?>
 
-
 <?/*Get the first barcode to pass to the map links*/
   $firstBarcode = $this->tab->getFirstBarcode($holding);?>
-<span class="maplink"><?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $firstBarcode)?></span>
+<span class="maplink"><?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $firstBarcode)?></span><br/>
+
+<?/*Callnumbers*/?>
+<? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
+<? $hasCallNos = implode('', $callNos); ?>
+<?foreach ($callNos['display'] as $numKey => $callNo): ?>
+   <h4><span><?=$hasCallNos ? $this->transEsc("Call Number") . ': ' : ''?></span> <?=$this->escapeHtml($callNo)?></h4>
+   <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
+      class="ablink">(Browse the Shelves)</a><br/>
+ <? endforeach; ?>
+
 <table class="holdings-table" data-display="<?=$this->tab->getDisplayNumber()?>" summary="<?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?>">
-  <? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
-  <? $hasCallNos = implode('', $callNos); ?>
-  <tr>
+  <!--<tr>
     <th><?=$hasCallNos ? $this->transEsc("Call Number") . ': ' : ''?></th>
     <td>
       <?foreach ($callNos['display'] as $numKey => $callNo): ?>
@@ -112,11 +119,11 @@
            class="ablink">(Browse the Shelves)</a><br/>
       <? endforeach; ?>
     </td>
-  </tr>
+  </tr>-->
   <? endif; ?>
   <? foreach ($this->ils()->getHoldingsTextFieldNames() as $textField): ?>
     <? if (!empty($holding[$textField])): ?>
-      <tr>
+      <tr class="section">
         <? // Translation for summary is a special case for backwards-compatibility ?>
         <th><?=$textField == 'summary' ? $this->transEsc("Volume Holdings") : $this->transEsc(ucfirst($textField))?>:</th>
         <td>

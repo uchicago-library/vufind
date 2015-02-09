@@ -564,18 +564,25 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
 }
 #holdings-tab table th {
     padding-right: 15px;
-    text-align: right;
+    //text-align: right;
+    color: @gray;
 }
 tr[typeof="Offer"] th,
 .holdings-table th {
     //max-width: 175px;
-    width: 175px;
+    width: 155px;
+}
+#holdings-tab table.holdings-table {
+    margin-top: 10px;
+}
+#holdings-tab table tr.section td:last-child {
+    padding-bottom:15px;
 }
 #holdings-tab table tr,
 #holdings-tab table td,
 #holdings-tab table th  {
-    padding-top: 3px;
-    padding-bottom: 3px;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 #record-tabs > div {
     margin-top: 10px;
@@ -603,6 +610,22 @@ tr[typeof="Offer"] th,
     font-family: @font-family-sans-serif;
     font-weight: normal;
 }
+.template-name-view h4 {
+    display: inline;
+    font-family: "ProximaNova-Semibold";
+}
+.template-name-view h4 span {
+    font-family: "ProximaNova-Regular";
+    color: @gray;
+}
+#holdings-tab h3,
+#holdings-tab h4 {
+    line-height: 17px;
+}  
+
+.maplink .service {
+    margin-left: 0;
+}
 
 /*Alphabrowse*/
 .pager {
@@ -625,7 +648,7 @@ tr[typeof="Offer"] th,
 }
 .result a.title {
     font-size: ceil((@font-size-base * 1.2)); // ~15px 
-    font-weight: normal;
+    font-weight: normal !important;
     line-height: normal;
     .text-shadow();
 }
@@ -675,6 +698,7 @@ tr[typeof="Offer"] th,
 .template-name-results .checkbox-select-all {
     top: 2px;//Center checkboxes vertically next to text on results pages
 }
+
 
 /*MyResearch*/
 .template-dir-myresearch.template-name-checkedout .table tr > th:first-child {
