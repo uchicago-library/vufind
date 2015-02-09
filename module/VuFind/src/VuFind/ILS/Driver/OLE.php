@@ -982,9 +982,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     $summary['location'] = $location;
                     //$summary['notes'] = array($summary->note[0]->value);
                     //$summary['summary'] = array($summary->textualHoldings);
-                    $summary['library has'] = ($summaryType == 'Basic Bibliographic Unit' ? array($row['TEXT'], $row['note']) : null);
-                    $summary['indexes'] =  ($summaryType == 'Indexes' ? array($row['TEXT'], $row['note']) : null);
-                    $summary['supplements'] = ($summaryType == 'Supplementary Material' ? array($row['TEXT'], $row['note']) : null);
+                    $summary['library has'] = ($summaryType == 'Basic Bibliographic Unit' ? array($row['TEXT'] . ' ' . $row['note']) : null);
+                    $summary['indexes'] =  ($summaryType == 'Indexes' ? array($row['TEXT'] . ' ' . $row['note']) : null);
+                    $summary['supplements'] = ($summaryType == 'Supplementary Material' ? array($row['TEXT'] . ' ' .$row['note']) : null);
                     $summary['availability'] = true;
                     $summary['status'] = '';
                     $summary['is_holdable'] = true;
