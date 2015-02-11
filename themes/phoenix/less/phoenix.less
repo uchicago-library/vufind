@@ -202,6 +202,14 @@ div#searchForm p {
       margin-bottom: 4px;
     }
   }
+  @media (min-width: @screen-sm) {
+    input[type="text"] {
+      margin-right: 4px;
+    }
+    select {
+      margin-right: 4px;
+    }
+  }
 }
 .group .form-group {
   position: relative;
@@ -215,12 +223,12 @@ div#searchForm p {
   margin-bottom: @line-height-computed;
 }
 .basicSearch {
-    #groupJoin, .advancedSearchBtn {
+    #groupJoin, .search_bool, .search .delete, #group0Holder, .searchPlaceHolder, #groupPlaceHolder, .advancedSearchBtn, #advSearchLimits, #publishDate {
         display: none;
     }
 }
 .advancedSearch {
-    .basicSearchBtn {
+    .basicSearchBtn, #advSearchP {
         display: none;
     }
 }
