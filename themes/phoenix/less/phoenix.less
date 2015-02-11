@@ -221,6 +221,14 @@ div#searchForm p {
       margin-bottom: 4px;
     }
   }
+  @media (min-width: @screen-sm) {
+    input[type="text"] {
+      margin-right: 4px;
+    }
+    select {
+      margin-right: 4px;
+    }
+  }
 }
 .group .form-group {
   position: relative;
@@ -232,6 +240,16 @@ div#searchForm p {
 }
 #groupJoin {
   margin-bottom: @line-height-computed;
+}
+.basicSearch {
+    #groupJoin, .search_bool, .search .delete, #group0Holder, .searchPlaceHolder, #groupPlaceHolder, .advancedSearchBtn, #advSearchLimits, #publishDate {
+        display: none;
+    }
+}
+.advancedSearch {
+    .basicSearchBtn, #advSearchP {
+        display: none;
+    }
 }
 #groupPlaceHolder {
   margin-top: -16px;
@@ -253,6 +271,11 @@ div#searchForm p {
 #limit_building,
 #limit_collection {
     width: 100%;
+}
+#publishDatefrom {
+    @media (max-width: @screen-xs-max) {
+        margin-bottom: 4px;
+    }
 }
 .navbar .checkbox {
     color:#111 !important;
@@ -794,6 +817,32 @@ I'm doing the facets in "edit this advanced search" right now.)
 .list-group-item .fa-times {
     padding-left: 20px;
 }
+.slider-container {
+  margin-top: 8px;
+  .slider {
+    .slider-track {
+      background:#EEE;
+      box-shadow:inset 0 1px 0 rgba(0, 0, 0, 0.1);
+      .slider-handle {
+        background:#CCC;
+        background-image:none;
+        border-color:#AAA;
+        border-radius:3px;
+        box-shadow:none;
+        opacity:.9;
+        &:hover,&:active,&:focus {
+          opacity:1;
+          background:#DDD;
+        }
+      }
+      .slider-selection {
+        background:transparent;
+        box-shadow:inherit;
+      }
+    }
+  }
+}
+
 
 /*E-resource links*/
 .findit {

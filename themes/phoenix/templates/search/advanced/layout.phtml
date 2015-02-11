@@ -38,13 +38,15 @@
   $this->headScript()->appendFile(
     isset($this->advancedSearchJsOverride) ? $this->advancedSearchJsOverride : 'advanced_search.js'
   );
-  // Step 3: Build the page
-  $this->headScript()->appendScript(
-    $this->partial(
-      isset($this->buildPageOverride) ? $this->buildPageOverride : 'search/advanced/build_page.phtml',
-      array('searchDetails' => $searchDetails)
-    )
-  );
+  // Step 3: Build the page (if an override is necessary) 
+  if ($this->buildPageOverride) {
+    $this->headScript()->appendScript(
+      $this->partial(
+        $this->buildPageOverride, 
+        array('searchDetails' => $searchDetails)
+      )
+    );
+  }
 ?>
 
 <?=$this->flashmessages()?>
@@ -56,10 +58,7 @@
 
 <div class="tab-content">
   <div class="tab-pane active" id="advSearch">
-    <p id="basicAdvancedSearchSwitches"><span id="basicSearchSwitch"><a class="disabled" href="#">Basic</a></span> | <span id="advancedSearchSwitch"><a href="#" id="advancedSearchSwitch">Advanced Search</a></span></p>
-
-    <? $basicOrAdvancedSearch = (isset($this->saved) && is_object($this->saved)) ? 'advancedSearch' : 'basicSearch'; ?>
-    <form role="search" class="<?=$basicOrAdvancedSearch?>" name="searchForm" id="advSearchForm" method="get" action="<?=$this->url($this->options->getSearchAction())?>">
+    <form role="search" class="advancedSearch" name="searchForm" id="advSearchForm" method="get" action="<?=$this->url($this->options->getSearchAction())?>">
       <div class="row">
         <? if (empty($searchFilters)): ?>
         <div class="col-sm-12">
@@ -76,81 +75,85 @@
               </select>
             </div>
           </div>
+
+    <? ($groups == false) ? $group_count = 1 : $group_count = count($groups); ?>
+    <? for ($g = 0; $g < $group_count; $g++): ?>
+        <div class="group well" id="group0">
+            <div class="form-group form-inline">
+                <div class="search_bool">
+	                <label for="search_bool<?=$g?>">Match:&nbsp;</label>
+	                <select class="form-control" name="bool<?=$g?>[]" id="search_bool<?=$g?>">
+	                    <?
+	                        $operator = 'AND';
+	                        if ($groups != false) {
+	                            if ($groups[$g]->isNegated()) {
+	                                $operator = 'NOT';
+	                            } else {
+	                                $operator = $groups[$g]->getOperator();
+	                            }
+	                        }
+	                        foreach (array(
+	                            array('value' => 'AND', 'text' => 'ALL Terms'),
+	                            array('value' => 'OR', 'text' => 'ANY Terms'),
+	                            array('value' => 'NOT', 'text' => 'NO Terms'),
+	                        ) as $option): 
+	                            $selected = '';
+	                            if ($option['value'] == $operator) {
+	                                $selected = 'selected="selected" ';
+	                            }
+	                            $value = $option['value'];
+	                            $text = $option['text'];
+	                    ?>
+	                        <option <?=$selected?>value="<?=$value?>"><?=$text?></option>
+	                    <? endforeach; ?>
+	                </select>
+                </div><!-- end search_bool-->
+            </div><!-- end form-group-->
+
+            <? ($groups == false) ? $search_count = 3 : $search_count = count($groups[$g]->getQueries()); ?>
+
+            <? for ($s = 0; $s < $search_count; $s++): ?>
+                <div id="search<?=$g?>_<?=$s?>" class="search form-group form-inline">
+                    <? ($groups == false) ? $value = '' : $value = $groups[$g]->getQueries()[$s]->getString(); ?>
+                    <input type="text" value="<?=$value?>" name="lookfor<?=$g?>[]" class="form-control input-large" id="search_lookfor<?=$g?>_<?=$s?>" placeholder="evolutionary biology"/>
+                    <select class="form-control" name="type<?=$g?>[]" id="search_type<?=$g?>_<?=$s?>">
+                        <? 
+                            foreach (array(
+								array('value' => 'AllFields', 'text' => 'All Fields'),
+								array('value' => 'Tltle', 'text' => 'Title'),
+								array('value' => 'JournalTitle', 'text' => 'Journal Title'),
+								array('value' => 'Author', 'text' => 'Author '),
+								array('value' => 'Performer', 'text' => 'Performer'),
+								array('value' => 'Subject', 'text' => 'Subject'),
+								array('value' => 'CallNumber', 'text' => 'Call Number'),
+								array('value' => 'StandardNumbers', 'text' => 'ISBN, ISSN, etc.'),
+								array('value' => 'publisher', 'text' => 'Publisher'),
+								array('value' => 'publication_place', 'text' => 'Publication Place'),
+								array('value' => 'Series', 'text' => 'Series'),
+								array('value' => 'year', 'text' => 'Year of Publication'),
+								array('value' => 'toc', 'text' => 'Table of Contents'),
+								array('value' => 'Donor', 'text' => 'Donor'),
+								array('value' => 'Title Uniform', 'text' => 'Uniform Title'),
+								array('value' => 'Notes', 'text' => 'Notes'),
+                            ) as $o): 
+                                $value = $o['value']; 
+                                $text = $o['text']; 
+                                $selected = '';
+                                if ($groups != false) {
+                                    if ($groups[$g]->getQueries()[$s]->getHandler() == $value) {
+                                        $selected = 'selected="selected" ';
+                                    }
+                                }
+                        ?>
+                            <option <?=$selected?>value="<?=$value?>"><?=$text?></option>
+                        <? endforeach; ?>
+                    </select>
+                </div><!-- end search-->
+            <? endfor; ?>
+
+        </div><!-- end group/well-->
+    <? endfor; ?>
     
-    <div class="group well" id="group0">
-    
-          <div class="form-group form-inline">
-            <label for="search_bool0">Match:&nbsp;</label>
-            <a title="Remove Search Group" class="close hidden" onclick="deleteGroup(this)" href="#">×</a>
-            <select class="form-control" name="bool0[]" id="search_bool0">
-              <option value="AND">ALL Terms</option>
-              <option value="OR">ANY Terms</option>
-              <option value="NOT">NO Terms</option>
-            </select>
-          </div><!-- end form-group-->
-    
-            <div id="search0_0" class="search form-group form-inline">
-              <input type="text" value="" name="lookfor0[]" class="form-control input-large" id="search_lookfor0_0" placeholder="evolutionary biology">
-              <select class="form-control" name="type0[]" id="search_type0_0">
-                <option value="AllFields">All Fields</option>
-                <option value="Title">Title</option>
-                <option value="Author">Author</option>
-                <option value="Subject">Subject</option>
-                <option value="JournalTitle">Journal Title</option>
-                <option value="StandardNumbers">ISBN, ISSN, etc.</option>
-                <option value="Series">Series</option>
-                <option value="Publisher">Publisher</option>
-              </select>
-              <a onclick="deleteSearch(this)" href="#" class="delete">×</a>
-              <input class="btn btn-primary basicSearchBtn" type="submit" value="Search"/>
-            </div><!-- end search0_0-->
-          <div id="search0_1" class="search form-group form-inline">
-            <input type="text" value="" name="lookfor0[]" class="form-control input-large" id="search_lookfor0_1" placeholder="evolutionary biology">
-              <select class="form-control" name="type0[]" id="search_type0_1">
-                <option value="AllFields">All Fields</option>
-                <option value="Title">Title</option>
-                <option value="Author">Author</option>
-                <option value="Subject">Subject</option>
-                <option value="JournalTitle">Journal Title</option>
-                <option value="StandardNumbers">ISBN, ISSN, etc.</option>
-                <option value="Series">Series</option>
-                <option value="Publisher">Publisher</option>
-              </select>
-            <a onclick="deleteSearch(this)" href="#" class="delete">×</a>
-          </div><!-- end search0_1-->
-            <div id="search0_2" class="search form-group form-inline">
-              <input type="text" value="" name="lookfor0[]" class="form-control input-large" id="search_lookfor0_2" placeholder="evolutionary biology"/>
-              <select class="form-control" name="type0[]" id="search_type0_2">
-                <option value="AllFields">All Fields</option>
-                <option value="Title">Title</option>
-                <option value="Author">Author</option>
-                <option value="Subject">Subject</option>
-                <option value="JournalTitle">Journal Title</option>
-                <option value="StandardNumbers">ISBN, ISSN, etc.</option>
-                <option value="Series">Series</option>
-                <option value="Publisher">Publisher</option>
-              </select>
-              <a onclick="deleteSearch(this)" href="#" class="delete">×</a>
-            </div><!-- end search 0_2-->
-          <i class="fa fa-plus-circle" id="group0Holder" style="display: inline-block;"></i> 
-          <a onclick="addSearch(this)" id="add_search_link_0" href="#" style="display: inline;">Add Search Field</a> 
-          <a class="external" id="what_is_a_field" href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchfield" style="display: inline;"><i class="icon-info-sign icon-large" style="text-decoration: none;"></i>What is a Field?</a>
-          <p id="advSearchP">
-            <a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#powersearch" class="external">Power searching instructions (Boolean, etc.)</a>
-          </p>
-    </div><!-- end group/well-->
-    
-    
-    
-    
-    
-    
-          <div id="groupPlaceHolder">
-            <i class="fa fa-plus-circle"></i> <a href="#" onClick="addGroup()"><?= $this->transEsc('add_search_group') ?></a>
-       <a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchgroup" id="what_is_a_group" target="_blank" class="external">
-         <i style="text-decoration: none;" class="icon-info-sign icon-l arge"></i>What is a Group?
-       </a>
-          </div>
           <div style="text-align: right;">
             <input class="btn btn-primary advancedSearchBtn" type="submit" value="Search"/>
           </div>
@@ -230,8 +233,9 @@
       <ul>
         <li><a href="http://www.lib.uchicago.edu/e/using/catalog/about.html" target="_blank" class="external">Features</a></li>
         <li><a href="http://www.lib.uchicago.edu/e/using/catalog/about.html" target="_blank" class="external">Coming soon</a></li>
-        <li><a href="http://www.lib.uchicago.edu/e/using/catalog/mydiscoveries-migration-2014.html" target="_blank" class="external">Migrating your Lens MyDiscoveries</a></li>
       </ul>
     </div><!-- end about-beta-->
   </div><!-- end col-md-12-->
 </div><!-- end row-->
+
+
