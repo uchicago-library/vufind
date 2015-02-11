@@ -6,10 +6,11 @@
     * the knowledge tracker form */ 
     $_SESSION['Referrer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : ''; ?>
 
-<ul>
-    <li><a href="">Library Home</a></li>
-    <li><a href="">Ask a Librarian</a></li>
-    <li><a href="">ArticlesPlus</a></li>
+<ul class="top-tabs">
+    <li><a href="http://www.lib.uchicago.edu/">Library Home</a></li>
+    <li><a href="http://www.lib.uchicago.edu/ask">Ask a Librarian</a></li>
+    <li><a href="http://www.lib.uchicago.edu/h/articlesplus">ArticlesPlus</a></li>
+    <li><a href="http://www.lib.uchicago.edu/h/WorldCat">WorldCat</a></li>
 </ul>
 
 <div class="navbar-header">
@@ -87,6 +88,7 @@
           </ul>
         </li>
       <? endif; ?>
+      <li><a href="http://www.lib.uchicago.edu/e/using/catalog/help.html" title="Help"><?=$this->transEsc("Help")?></a></li>
     </ul>
   </div>
 <? endif; ?>

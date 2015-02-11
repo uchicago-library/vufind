@@ -292,7 +292,11 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             implode(', ', $this->fields['callnumber_browse']) : '';
     } 
 
-
+    /**
+     * Gets bookplate 097 abnd 098 fields from the MARC record.
+     *
+     * @returns string
+     */
     public function getBookPlate()
     {
         // 097 or 098
@@ -300,7 +304,13 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                      $this->getFieldArray('098', array('d','e'), false));
     }
     
-    public function ReportBook()
+    /**
+     * Generates a link to the report a record form and forwards
+     * along information about the record.
+     *
+     * @returns string
+     */
+    public function ReportRecord()
     {
     	$url='http://forms.lib.uchicago.edu/lib/problemreport/problemreport.php?';
    	
