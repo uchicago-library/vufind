@@ -14,6 +14,9 @@
     $hasFullTextOnline = $this->HathiLink()->hasFullTextOnline($holdings);
     $hasRelatedTextOnline = $this->HathiLink()->hasFullTextOnline($holdings, $related=true);
 
+    // Whitelist for things without a barcode that need to display when a barcode isn't present.
+    $itemStatusWhitelist = array('INPROCESS', 'ONORDER');
+
     // Set page title.
     $this->headTitle($this->translate('Holdings') . ': ' . $this->driver->getBreadcrumb());
 ?>
@@ -46,12 +49,12 @@
   <div class="holdings-unit">
   <h3><?=$this->transEsc("Internet")?></h3>
   <? if (!empty($urls)): ?>
-    <? $lookup = array('FullText' => 'Full text online', 'Related' => 'Related text online');?>
-    <? foreach ($urls as $current): ?>
-      <? if (isset($current['callnumber'])):?>
-        <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&from=<?=$this->escapeHtml($current['callnumber'])?>"
+      <?/*For now, only display a browse link if the first e-holding has a callnumber - Fix later*/?>
+      <? if (isset($urls[0]['callnumber'])):?>
+        <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&from=<?=$this->escapeHtml($urls[0]['callnumber'])?>"
            class="ablink">(Browse the Shelves)</a><br/>
       <?endif;?>
+    <? foreach ($urls as $current): ?>
       <div>
         <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="eLink text-success"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']))?></a> <?=$current['desc']?><br/>
       </div>
@@ -144,7 +147,7 @@
     <? $check = (isset($row['check']) && $row['check']); ?>
     <? $checkStorageRetrievalRequest = (isset($row['checkStorageRetrievalRequest']) && $row['checkStorageRetrievalRequest']); ?>
     <? $checkILLRequest = (isset($row['checkILLRequest']) && $row['checkILLRequest']); ?>
-    <? if (isset($row['barcode']) && $row['barcode'] != ""): ?>
+    <? if (isset($row['barcode']) && $row['barcode'] != "" || (in_array($row['status'], $itemStatusWhitelist))): ?>
       <tr vocab="http://schema.org/" typeof="Offer">
         <th><?=$this->transEsc("Copy")?> <?=$this->escapeHtml($row['number'])?></th>
         <td>
@@ -186,8 +189,10 @@
               <span class="text-danger"><?=$this->transEsc($row['status'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
               <? if (isset($row['returnDate']) && $row['returnDate']): ?>&ndash; <span class="small"><?=$this->escapeHtml($row['returnDate'])?></span><? endif; ?>
               <? if (isset($row['duedate']) && $row['duedate']): ?>
-                <? $duedate = $row['status'] == 'LOANED' ? $this->tab->getDuedate($row) : $row['duedate'];?>
-                &ndash; <span class="small"><?=$this->transEsc("Due")?>: <?=$this->escapeHtml($duedate)?></span>
+                <?/*Only display duedates for loaned items*/?>
+                <? $duedate = ($row['status'] == 'LOANED' ? $this->tab->getDuedate($row) : '');?>
+                <? $dueHtml = (!empty($duedate) ? '&ndash; <span class="small">' . $this->transEsc("Due") . ': ' . $this->escapeHtml($duedate) . '</span>' : '');?>
+                <?=$dueHtml?>
               <? endif; ?>
               <? if (isset($row['requests_placed']) && $row['requests_placed'] > 0): ?>
                 <span><?=$this->transEsc("Requests")?>: <?=$this->escapeHtml($row['requests_placed'])?></span>

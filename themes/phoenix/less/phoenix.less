@@ -38,6 +38,7 @@ a[href^="http"]:after {
 }
 .openurls strong a:after,
 .bookplate a:after,
+a.service:after,
 .col-sm-2.col-xs-0.left a:after { //book covers in results view
     content:"";
 }
@@ -689,14 +690,12 @@ tr[typeof="Offer"] th,
 .template-name-results > .container > .row {
     margin-top: -10px;
 }
-.result .middle {
-    @media (max-width: @screen-xs-max) {
-        width:100%;
-    }
-}
 .template-name-results .checkbox-select-item,
 .template-name-results .checkbox-select-all {
     top: 2px;//Center checkboxes vertically next to text on results pages
+}
+.template-name-results .callnumber {
+    font-size: @font-size-base + 1;
 }
 
 
@@ -728,7 +727,11 @@ tr[typeof="Offer"] th,
 .iconlabel {
     display: block;
     font-weight: bold;
-    color:#555;
+    color: lighten(@gray, 10%);
+    font-size: @font-size-base - 1.5;
+}
+.col-xs-0.right.text-right.hidden-print.hidden-xs { // Right txt (formats and save a record) 
+    line-height: @line-height-base - .1;
 }
 .custom-marc-record {
     line-height: @line-height-base * 1.05;
@@ -747,7 +750,28 @@ tr[typeof="Offer"] th,
 }*/
 
 .callnumAndLocation {
-    margin-bottom:10px;
+    margin-bottom: 10px;
+}
+.authmethod1 {
+    margin-top: 15px;
+}
+#authcontainer [class^="col"],
+#login-txt[class^="col"],
+#login-toggle[class^="col"]{
+    float:none !important;
+}
+.login-toggle-wrapper {
+    padding-bottom:15px;
+}
+#login-toggle {
+    padding-left:0;
+}
+#login-toggle:after {
+    font-family: FontAwesome;
+    content: " \f101";
+}
+.login-toggle-content {
+    display: none;
 }
 
 /*Sidebar*/
@@ -833,4 +857,8 @@ a.tool:hover .arrow-left {
     .right {display:none}
   }
 }
- 
+.result .middle {
+    @media (max-width: @screen-xs-max) {
+        width:100%;
+    }
+}

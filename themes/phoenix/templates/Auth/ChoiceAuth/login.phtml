@@ -1,0 +1,16 @@
+<h3 class="col-sm-12"><?=$this->transEsc('choose_login_method')?></h3>
+<div id="authcontainer">
+<? foreach ($this->auth()->getManager()->getSelectableAuthOptions() as $loop=>$method):?>
+  <div class="authmethod<?=$loop?>">
+    <? $this->auth()->getManager()->setAuthMethod($method) ?>
+    <?//=$this->auth()->getLoginDesc() ?>
+    <?=$this->auth()->getLogin() ?>
+  </div>
+<? endforeach ?>
+</div>
+<div class="clearer"></div>
+<? $this->auth()->getManager()->setAuthMethod('ChoiceAuth') ?>
+<div id="login-txt" class="col-sm-12">
+    <p class="">Email services will be expanded for the official launch this summer.<br />
+    Forthcoming email features will include the ability to send multiple records simultaneously.</p>
+</div>
