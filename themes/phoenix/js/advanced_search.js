@@ -567,48 +567,5 @@ $(document).ready(function() {
         'placement': 'right',
         'trigger': 'hover focus'
     });
-
-    // Cookie to remember what kind of search we did...
-    var cookie_settings = { expires: 365, path: '/' };
-
-    // If we're on the homepage...
-    if ($('#advSearchForm').length > 0) {
-        // If the homepage cookie is set...
-        if ($.cookie('keyword_or_begins_with') == 'keyword') {
-            if ($.cookie('basic_or_advanced') == 'basic') {
-                switchToBasicSearch();
-            } else if ($.cookie('basic_or_advanced') == 'advanced') {
-                switchToAdvancedSearch();
-            }
-        } else if ($.cookie('keyword_or_begins_with') == 'begins with') {
-            $('#homepageNavTabs li:nth-child(2) a').click();
-        }
-        // When a user clicks Keyword...
-        $('#homepageNavTabs li:nth-child(1) a').click(function(e) {
-            if ($.cookie('basic_or_advanced') == 'basic') {
-                switchToBasicSearch();
-            } else if ($.cookie('basic_or_advanced') == 'advanced') {
-                switchToAdvancedSearch();
-            }
-        });
-        // When a user clicks Keyword or Begins With...
-        $('#homepageNavTabs li:nth-child(1) a, #homepageNavTabs li:nth-child(2) a').click(function(e) {
-            if ($(this).text() == 'Keyword') {
-                $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
-            }
-            if ($(this).text() == 'Begins With') {
-                $.cookie('keyword_or_begins_with', 'begins with', cookie_settings);
-            }
-        });
-        // When a user clicks Basic or Advanced Search...
-        $('#basicSearchSwitch a, #advancedSearchSwitch a').click(function(e) {
-            if ($(this).text() == 'Basic') {
-                $.cookie('basic_or_advanced', 'basic', cookie_settings);
-            }
-            if ($(this).text() == 'Advanced Search') {
-                $.cookie('basic_or_advanced', 'advanced', cookie_settings);
-            }
-        });
-    }
 });
 

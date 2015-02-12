@@ -193,6 +193,77 @@ $(document).ready(function() {
             window.location.href = $(e.target).attr('href');
         }
     });
+
+    // Homepage cookies. 
+    var cookie_settings = { expires: 365, path: '/' };
+
+    function setup_homepage_cookies() {
+        // If we're not on the homepage, do nothing.
+        if ($('#advSearchForm').length == 0) {
+            clearInterval(setup_homepage_cookies_interval_id);
+            return;
+        }
+
+        // If all four links haven't loaded yet, try again next time.
+        if ($('#homepageNavTabs li:nth-child(1) a, #homepageNavTabs li:nth-child(2) a, #basicSearchSwitch a, #advancedSearchSwitch a').length < 4) {
+            return;
+        }
+
+        // If we made it this far, clear the timer and proceed. 
+        clearInterval(setup_homepage_cookies_interval_id);
+    
+        // If the homepage cookie is set...
+        if ($.cookie('keyword_or_begins_with') == 'keyword') {
+            if ($.cookie('basic_or_advanced') == 'basic') {
+                switchToBasicSearch();
+            } else if ($.cookie('basic_or_advanced') == 'advanced') {
+                switchToAdvancedSearch();
+            }
+        } else if ($.cookie('keyword_or_begins_with') == 'begins with') {
+            $('#homepageNavTabs li:nth-child(2) a').click();
+        }
+        // When a user clicks Keyword...
+        $('#homepageNavTabs li:nth-child(1) a').click(function(e) {
+            if ($.cookie('basic_or_advanced') == 'basic') {
+                switchToBasicSearch();
+            } else if ($.cookie('basic_or_advanced') == 'advanced') {
+                switchToAdvancedSearch();
+            }
+        });
+        // When a user clicks Keyword or Begins With...
+        $('#homepageNavTabs li:nth-child(1) a, #homepageNavTabs li:nth-child(2) a').click(function(e) {
+            if ($(this).text() == 'Keyword') {
+                $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
+            }
+            if ($(this).text() == 'Begins With') {
+                $.cookie('keyword_or_begins_with', 'begins with', cookie_settings);
+            }
+        });
+        // When a user clicks Basic or Advanced Search...
+        $('#basicSearchSwitch a, #advancedSearchSwitch a').click(function(e) {
+            if ($(this).text() == 'Basic') {
+                $.cookie('basic_or_advanced', 'basic', cookie_settings);
+            }
+            if ($(this).text() == 'Advanced Search') {
+                $.cookie('basic_or_advanced', 'advanced', cookie_settings);
+            }
+        });
+    }
+    // Set up cookies after a short delay, because some of the things we
+    // need are loaded in via javascript. 
+    var setup_homepage_cookies_interval_id = setInterval(setup_homepage_cookies, 100);
+   
+    // When the document loads, if we've landed on a search result,
+    // set the cookie to "keyword".
+    if (window.location.href.indexOf('/vufind/Search/Results') > -1) {
+        $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
+    }
+
+    // When the document loads, if we've landed on a search result,
+    // set the cookie to "begins with".
+    if (window.location.href.indexOf('/vufind/alphabrowse') > -1) {
+        $.cookie('keyword_or_begins_with', 'begins with', cookie_settings);
+    }
 });
 
 (function() {
