@@ -61,7 +61,7 @@ class GetConfig extends \Zend\View\Helper\AbstractHelper
     public function __construct($siteConfig)
     {
         $this->siteEmail = isset($siteConfig->Site->email) ? $siteConfig->Site->email : false;
-        $this->alphabrowseSearchTypes = isset($config->AlphaBrowse_Types) ? $config->AlphaBrowse_Types : false;
+        $this->alphabrowseSearchTypes = isset($siteConfig->AlphaBrowse_Types) ? $siteConfig->AlphaBrowse_Types : false;
     }
 
     /**

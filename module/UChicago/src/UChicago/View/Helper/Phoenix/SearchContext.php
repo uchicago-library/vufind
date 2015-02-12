@@ -60,4 +60,46 @@ class SearchContext extends AbstractHelper
     public function isWebsiteSearch() {
         return $this->view->params->getsearchClassId() == "SolrWeb";
     }
+
+    /**
+     * Gets the current search context alphabrowse, basic-keyword, or advanced-keyword based on 
+     * what's found (or not found) in the keyword_or_begins_with and basic_or_advanced cookies.
+     *
+     * @returns string, "alphabrowse", "basic-keyword", or "advanced-keyword".
+     */
+    public function getCurrentContext() {
+        /*Get the cookies if they exist*/
+        $searchType = isset($_COOKIE['keyword_or_begins_with']) ? $_COOKIE['keyword_or_begins_with'] : null;
+        $keywordType = isset($_COOKIE['basic_or_advanced']) ? $_COOKIE['basic_or_advanced'] : null;
+        
+        /*Build a data structure*/
+        $contextTypes = array('searchType' => $searchType, 
+                              'keywordType' => $keywordType);
+
+        /*Vocabulary mappings*/
+        $lookup = array('begins with' => 'alphabrowse',
+                        'basic' => 'basic-keyword',
+                        'advanced' => 'advanced-keyword');
+
+        /*Build the proper return string based on search context*/
+        switch ($contextTypes) {
+            case ($contextTypes['searchType'] == 'begins with'):
+                /*Alphabrowse*/
+                $retval = $lookup[$contextTypes['searchType']];
+                break;
+            case ($contextTypes['searchType'] == 'keyword' && $contextTypes['keywordType'] == 'basic') :
+                /*Basic Keyword*/
+                $retval = $lookup[$contextTypes['keywordType']];
+                break;
+            case ($contextTypes['searchType'] == 'keyword' && $contextTypes['keywordType'] == 'advanced') :
+                /*Advanced Keyword*/
+                $retval = $lookup[$contextTypes['keywordType']];
+                break;
+            default:
+                /*Default*/
+                $retval = $lookup[$contextTypes['searchType']];
+        }
+
+        return $retval;
+    }
 }

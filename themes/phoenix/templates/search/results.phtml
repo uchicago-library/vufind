@@ -16,22 +16,35 @@
       'type' => 'application/xml'
     )
   );
+  
+  // Get the mini search box 
+  $this->context($this)->renderInContext('search/miniSearchBox.phtml', array('searchClassId' => 'Solr'));
 
-  // Set up search box:
-  $this->layout()->searchbox = $this->context($this)->renderInContext(
-      'search/searchbox.phtml',
-      array(
-        'lookfor' => $lookfor,
-        'searchIndex' => $this->params->getSearchHandler(),
-        'searchType' => $this->params->getSearchType(),
-        'searchId' => $this->results->getSearchId(),
-        'searchClassId' => $this->params->getsearchClassId(),
-        'checkboxFilters' => $this->params->getCheckboxFacets(),
-        'filterList' => $this->params->getFilters(),
-        'hasDefaultsApplied' => $this->params->hasDefaultsApplied(),
-        'selectedShards' => $this->params->getSelectedShards()
-      )
-  );
+  // Get the current search context and build the proper searchbox
+  /*$searchContext = $this->SearchContext()->getCurrentContext();
+  switch ($searchContext) {
+    case ($searchContext == 'alphabrowse'):
+        // Set up the browse box:
+        $this->alphaBrowseTypes = $this->GetConfig()->getAlphabrowseSearchTypes();
+        $this->layout()->searchbox = $this->context($this)->renderInContext('alphabrowse/alphabrowseMini.phtml', array('searchClassId' => 'Solr'));
+        break;
+    default:
+        // Set up search box:
+        $this->layout()->searchbox = $this->context($this)->renderInContext(
+            'search/searchbox.phtml',
+            array(
+              'lookfor' => $lookfor,
+              'searchIndex' => $this->params->getSearchHandler(),
+              'searchType' => $this->params->getSearchType(),
+              'searchId' => $this->results->getSearchId(),
+              'searchClassId' => $this->params->getsearchClassId(),
+              'checkboxFilters' => $this->params->getCheckboxFacets(),
+              'filterList' => $this->params->getFilters(),
+              'hasDefaultsApplied' => $this->params->hasDefaultsApplied(),
+              'selectedShards' => $this->params->getSelectedShards()
+            )
+        );
+  }*/
 
   // Set up breadcrumbs:
   if (isset($this->overrideTitle)) {

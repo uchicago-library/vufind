@@ -178,6 +178,16 @@ $(document).ready(function() {
         $(this).parent().parent().find('div.toToggle').toggle();
     });
 
+    //Test
+    $('#mini-browse-toggle').click(function() {
+        //$('.mini-search-form').remove();
+        //$('.visible-lg').load(document.URL + ' .mini-search-form');
+        $('.mini-search-form').load(document.URL + ' .mini-search-form', function() {
+            $(this).children().unwrap();
+        });
+        console.log('test');
+    });
+
 });
 
 (function() {

@@ -204,6 +204,9 @@ div#searchForm p {
 #alphaBrowseForm {
     text-align: center;
 }
+header #alphaBrowseForm {
+    text-align: left;
+}
 .form-inline .input-large {
     width: 50%;
     @media (max-width: @screen-xs-max) {
@@ -303,12 +306,17 @@ search.)
     }
 }
 #searchForm .twitter-typeahead,
-#searchForm_type.form-control {
-    margin-right:15px;
+#searchForm_type.form-control,
+#alphaBrowseForm .twitter-typeahead,
+#alphaBrowseForm_source.form-control{
+    margin-right:12px;
     @media (max-width: @screen-xs-max) {
         margin:0 0 10px 0; 
     }
 }
+#alphaBrowseForm label {
+    margin-right:5px;
+} 
 #searchForm_lookfor.form-control {
     @media (min-width: @container-desktop) {
         width:250px;

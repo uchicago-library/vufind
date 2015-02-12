@@ -25,17 +25,7 @@
 
 <div class="row">
 <div class="col-sm-12">
-<form class="form-inline" method="get" action="<?=$this->url('alphabrowse-home')?>" name="alphaBrowseForm" id="alphaBrowseForm">
-  <label for="alphaBrowseForm_from"><?=$this->transEsc('starting from') ?></label>
-  <input placeholder="a manual for writers of" type="text" name="from" id="alphaBrowseForm_from" value="<?=$this->escapeHtml($this->from) ?>"/>
-  <label class="offscreen"  for="alphaBrowseForm_source"><?=$this->transEsc('Browse Alphabetically') ?></label>
-  <select id="alphaBrowseForm_source" name="source">
-    <? foreach ($this->alphaBrowseTypes as $key => $item): ?>
-      <option value="<?=$this->escapeHtml($key) ?>"<? if ($this->source == $key): ?> selected="selected"<? endif; ?>><?=$this->transEsc($item) ?></option>
-    <? endforeach; ?>	
-  </select>
-  <input class="btn" type="submit" value="<?=$this->transEsc('Browse') ?>"/>
-</form>
+  <?$this->context($this)->renderInContext('search/miniSearchBox.phtml', array('searchClassId' => 'Solr'));?>
 </div><!-- end col-sm-12-->
 </div><!-- end row-->
 
