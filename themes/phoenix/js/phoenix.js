@@ -178,6 +178,21 @@ $(document).ready(function() {
         $(this).parent().parent().find('div.toToggle').toggle();
     });
 
+    $('#searchtabinfolink').popover({
+        'container': '#searchtabinfolink',
+        'content': '<div style="padding: 0 10px;"><p>Keyword searches produce lists of records sorted by relevance:</p><p style="padding-left: 10px;"><strong>Basic Keyword Search</strong><br/>Use for exploring a general topic, or if the exact title or author of a book is unknown.</p><p style="padding-left: 10px;"><strong>Advanced Keyword Search</strong><br/>Use for very specific or complex topics.</p><p><strong>Begins With</strong><br/>Begins With allows you to browse through an alphabetical list of titles, authors, subjects, etc. Use to locate a book when the exact title or author\'s entire name is known, or when searching for items on a specific subject.</p><p><a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchtypes" target="_blank">More info</a><br/><a href="http://youtu.be/I4kOECCepew" target="_blank">90 second video on search types <i style="text-decoration: none;" class="icon-facetime-video "></i></a></p></div>',
+        'delay': 500,
+        'html': true,
+        'placement': 'right',
+        'trigger': 'hover focus'
+    });
+    $('#searchtabinfolink').click(function(e) {
+        // fix for Chrome- make sure the link gets focus when it is clicked.
+        $(this).focus();
+        if ($(e.target).hasClass('external')) {
+            window.location.href = $(e.target).attr('href');
+        }
+    });
 });
 
 (function() {

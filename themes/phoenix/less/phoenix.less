@@ -129,6 +129,12 @@ header > .navbar li,
 
 body > .main > .container {
     padding-top: 10px;
+    @media (min-width: @screen-sm) { 
+       padding-top: 25px; 
+    }
+    @media (min-width: @screen-md) { 
+       padding-top: 50px; 
+    }
     @media (min-width: @screen-lg) { 
        padding-top: 75px; 
     }
@@ -193,6 +199,19 @@ div#searchForm p {
 }
 
 /*Forms*/
+#searchtabinfolink {
+    outline: none;
+}
+.popover {
+    width: 300px !important;
+}
+.popover-content {
+    color: black;
+    a {
+        position: relative;
+        z-index: 1;
+    }
+}
 #homepageNavTabs {
     li > a {
         border: 1px solid #cccccc;
@@ -209,6 +228,19 @@ div#searchForm p {
             border-color: #cccccc;
             border-bottom: 1px solid #eeeeee;
             color: #650000;
+        }
+    }
+    .which-search-links {
+        position: relative;
+        top: 11px;
+        a {
+            background-color: transparent;
+            border: none;
+            border-radius: 0;
+            color: #155f83;
+            display: inline;
+            margin-right: 0;
+            padding: 0 0 0 10px;
         }
     }
 }
