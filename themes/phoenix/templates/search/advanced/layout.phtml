@@ -54,9 +54,12 @@
 <ul style="position: relative; top: 1px;" class="nav nav-tabs" id="homepageNavTabs">
   <li style="position: relative; top: 0px;" class="active"><a data-toggle="tab" href="#advSearch">Keyword</a></li>
   <li role="presentation"><a data-toggle="tab" href="#alphaBrowse">Begins With</a></li>
+  <li class="hidden-xs which-search-links">
+    <a href="#" id="searchtabinfolink" data-original-title="">Which one? <i class="fa fa-lg fa-info-circle"></i></a> <a href="https://www.youtube.com/watch?v=I4kOECCepew">Video <i class="fa fa-video-camera"></i></a>
+  </li>
 </ul>
 
-<div class="tab-content">
+<div class="tab-content" id="homepageNavContent">
   <div class="tab-pane active" id="advSearch">
     <form role="search" class="advancedSearch" name="searchForm" id="advSearchForm" method="get" action="<?=$this->url($this->options->getSearchAction())?>">
       <div class="row">

@@ -188,6 +188,92 @@ $(document).ready(function() {
         console.log('test');
     });
 
+    $('#searchtabinfolink').popover({
+        'container': '#searchtabinfolink',
+        'content': '<div style="padding: 0 10px;"><p>Keyword searches produce lists of records sorted by relevance:</p><p style="padding-left: 10px;"><strong>Basic Keyword Search</strong><br/>Use for exploring a general topic, or if the exact title or author of a book is unknown.</p><p style="padding-left: 10px;"><strong>Advanced Keyword Search</strong><br/>Use for very specific or complex topics.</p><p><strong>Begins With</strong><br/>Begins With allows you to browse through an alphabetical list of titles, authors, subjects, etc. Use to locate a book when the exact title or author\'s entire name is known, or when searching for items on a specific subject.</p><p><a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchtypes" target="_blank">More info</a><br/><a href="http://youtu.be/I4kOECCepew" target="_blank">90 second video on search types <i style="text-decoration: none;" class="icon-facetime-video "></i></a></p></div>',
+        'delay': 500,
+        'html': true,
+        'placement': 'right',
+        'trigger': 'hover focus'
+    });
+    $('#searchtabinfolink').click(function(e) {
+        // fix for Chrome- make sure the link gets focus when it is clicked.
+        $(this).focus();
+        if ($(e.target).hasClass('external')) {
+            window.location.href = $(e.target).attr('href');
+        }
+    });
+
+    // Homepage cookies. 
+    var cookie_settings = { expires: 365, path: '/' };
+
+    function setup_homepage_cookies() {
+        // If we're not on the homepage, do nothing.
+        if ($('#advSearchForm').length == 0) {
+            clearInterval(setup_homepage_cookies_interval_id);
+            return;
+        }
+
+        // If all four links haven't loaded yet, try again next time.
+        if ($('#homepageNavTabs li:nth-child(1) a, #homepageNavTabs li:nth-child(2) a, #basicSearchSwitch a, #advancedSearchSwitch a').length < 4) {
+            return;
+        }
+
+        // If we made it this far, clear the timer and proceed. 
+        clearInterval(setup_homepage_cookies_interval_id);
+    
+        // If the homepage cookie is set...
+        if ($.cookie('keyword_or_begins_with') == 'keyword') {
+            if ($.cookie('basic_or_advanced') == 'basic') {
+                switchToBasicSearch();
+            } else if ($.cookie('basic_or_advanced') == 'advanced') {
+                switchToAdvancedSearch();
+            }
+        } else if ($.cookie('keyword_or_begins_with') == 'begins with') {
+            $('#homepageNavTabs li:nth-child(2) a').click();
+        }
+        // When a user clicks Keyword...
+        $('#homepageNavTabs li:nth-child(1) a').click(function(e) {
+            if ($.cookie('basic_or_advanced') == 'basic') {
+                switchToBasicSearch();
+            } else if ($.cookie('basic_or_advanced') == 'advanced') {
+                switchToAdvancedSearch();
+            }
+        });
+        // When a user clicks Keyword or Begins With...
+        $('#homepageNavTabs li:nth-child(1) a, #homepageNavTabs li:nth-child(2) a').click(function(e) {
+            if ($(this).text() == 'Keyword') {
+                $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
+            }
+            if ($(this).text() == 'Begins With') {
+                $.cookie('keyword_or_begins_with', 'begins with', cookie_settings);
+            }
+        });
+        // When a user clicks Basic or Advanced Search...
+        $('#basicSearchSwitch a, #advancedSearchSwitch a').click(function(e) {
+            if ($(this).text() == 'Basic') {
+                $.cookie('basic_or_advanced', 'basic', cookie_settings);
+            }
+            if ($(this).text() == 'Advanced Search') {
+                $.cookie('basic_or_advanced', 'advanced', cookie_settings);
+            }
+        });
+    }
+    // Set up cookies after a short delay, because some of the things we
+    // need are loaded in via javascript. 
+    var setup_homepage_cookies_interval_id = setInterval(setup_homepage_cookies, 100);
+   
+    // When the document loads, if we've landed on a search result,
+    // set the cookie to "keyword".
+    if (window.location.href.indexOf('/vufind/Search/Results') > -1) {
+        $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
+    }
+
+    // When the document loads, if we've landed on a search result,
+    // set the cookie to "begins with".
+    if (window.location.href.indexOf('/vufind/alphabrowse') > -1) {
+        $.cookie('keyword_or_begins_with', 'begins with', cookie_settings);
+    }
 });
 
 (function() {
