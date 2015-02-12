@@ -558,9 +558,6 @@ $(document).ready(function() {
         }
     }); 
 
-    //append links for 'which search should I use?' and the 90 second video.
-    $('.main .container ul:last li:first').after('<li><a href="#" id="searchtabinfolink">Which search should I use?</a> <a class="external" href="https://www.youtube.com/watch?v=I4kOECCepew" target="_blank">90 second video on search types <i class="fa fa-video-camera"></i></a></li>');
-
     //popover for 'which search should I use?' link. 
     $('#searchtabinfolink').popover({
         'container': '#searchtabinfolink',

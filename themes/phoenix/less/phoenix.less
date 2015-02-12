@@ -128,9 +128,7 @@ header > .navbar li,
 }
 
 body > .main > .container {
-    @media (min-width: @container-desktop) { 
-       padding-top: 10px; 
-    }   
+    padding-top: 10px;
     @media (min-width: @screen-lg) { 
        padding-top: 75px; 
     }
@@ -197,23 +195,27 @@ div#searchForm p {
 /*Forms*/
 #homepageNavTabs {
     li > a {
-        border: 1px solid #ddd;
-        border-bottom: none;
+        border: 1px solid #cccccc;
+        background-color: #dddddd;
+        border-bottom: 1px solid #dddddd;
+        color: #5c5c5c;
     }
     li > a:hover {
-        background-color: #ddd;
+        text-decoration: underline;
     }
     li.active {
         a {
-            background-color: #f5f5f5;
+            background-color: #eeeeee;
+            border-color: #cccccc;
+            border-bottom: 1px solid #eeeeee;
+            color: #650000;
         }
     }
 }
 #homepageNavContent {
-    background-color: #f5f5f5;
-    border: 1px solid #e3e3e3;
-    border-radius: 4px;
-    border-top-left-radius: 0;
+    background-color: #eeeeee;
+    border: 1px solid #cccccc;
+    border-top: none;
     margin-bottom: @line-height-computed;
     padding: 15px;
     .well {
@@ -221,6 +223,30 @@ div#searchForm p {
     }
     legend {
         border-color: #ccc;
+    }
+}
+#about-beta {
+    clear: left; 
+    color:#787878; 
+    display: block; 
+    padding-left: 20px;
+    a {
+        color: inherit;
+    }
+    li { 
+        list-style-type: square;
+    }
+    p {
+        font-family: ProximaNova-Regular;
+        font-size: 20px; 
+        margin-bottom: 5px; 
+        margin-top: 25px;
+    }
+    ul { 
+        font-family: ProximaNova-Regular; 
+        font-size: 16px; 
+        margin-bottom: 50px; 
+        padding-left: 20px;
     }
 }
 #advSearchForm.advancedSearch {
@@ -255,6 +281,12 @@ div#searchForm p {
 }
 #basicAdvancedSearchSwitches {
     margin-top: -5px;
+    a {
+        color: #650000;
+    }
+    a.disabled {
+        color: #5c5c5c;
+    }
 }
 .search {
   margin-bottom: 4px;
@@ -283,10 +315,16 @@ div#searchForm p {
 #groupJoin {
   margin-bottom: @line-height-computed;
 }
+.searchPlaceHolder a {
+    color: #5c5c5c;
+}
 .basicSearch {
     #groupJoin, .search_bool, .search .delete, #group0Holder, .searchPlaceHolder, #groupPlaceHolder, .advancedSearchBtn, #advSearchLimits, #publishDate {
         display: none;
     }
+}
+#advSearchP a {
+    color: #5c5c5c;
 }
 .advancedSearch {
     .basicSearchBtn, #advSearchP {
@@ -296,6 +334,9 @@ div#searchForm p {
 #groupPlaceHolder {
   margin-top: -16px;
   margin-bottom: 20px;
+  a {
+    color: #5c5c5c;
+  }
 }
 #limit_language,
 #limit_format,
@@ -863,10 +904,10 @@ I'm doing the facets in "edit this advanced search" right now.)
   margin-top: 8px;
   .slider {
     .slider-track {
-      background:#EEE;
+      background:#e0e0e0;
       box-shadow:inset 0 1px 0 rgba(0, 0, 0, 0.1);
       .slider-handle {
-        background:#CCC;
+        background:#bbbbbb;
         background-image:none;
         border-color:#AAA;
         border-radius:3px;

@@ -88,9 +88,11 @@
         <?=$this->render('header.phtml')?>
       </div>
       <div class="container">
-        <nav class="nav searchbox hidden-lg hidden-print">
-          <?=$this->layout()->searchbox ?>
-        </nav>
+        <? if ($this->layout()->searchbox != false): ?>
+          <nav class="nav searchbox hidden-lg hidden-print">
+            <?=$this->layout()->searchbox ?>
+          </nav>
+        <? endif; ?>
         <? if((!isset($this->layout()->showBreadcrumbs) || $this->layout()->showBreadcrumbs == true)
           && !empty($this->layout()->breadcrumbs)
           && $this->layout()->breadcrumbs !== false
