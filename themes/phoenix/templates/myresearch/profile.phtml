@@ -27,7 +27,7 @@
         );
        ?>
       <? if ($showHomeLibForm): ?>
-        <tr><th><?=$this->transEsc('Preferred Library')?>:</th>
+        <tr><th>Preferred Recall Pickup Library:</th>
         <?
           $selected = (isset($this->profile['home_library']) && $this->profile['home_library'] != "")
               ? $this->profile['home_library'] : $this->defaultPickupLocation
