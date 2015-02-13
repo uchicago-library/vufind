@@ -83,10 +83,10 @@
             ?><br/>
             <? $listAuthor = $resource->getPrimaryAuthor(); if (!empty($listAuthor)): ?>
               <?=$this->transEsc('by')?>:
-              <a href="<?=$this->record($resource)->getLink('author', $listAuthor)?>"><?=$this->escapeHtml($listAuthor)?></a><br/>
+              <?=$this->escapeHtml($listAuthor)?><br/>
             <? endif; ?>
             <? $formats = $resource->getFormats(); if (count($formats) > 0): ?>
-              <?=str_replace('class="', 'class="label label-info ', $this->record($resource)->getFormatList())?>
+              <?=$this->record($resource)->getFormatList()?>
               <br/>
             <? endif; ?>
 
