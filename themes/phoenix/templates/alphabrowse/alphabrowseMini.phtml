@@ -1,11 +1,29 @@
-<form class="form-inline navbar-form navbar-left mini-search-form"  method="get" action="<?=$this->url('alphabrowse-home')?>" name="alphaBrowseForm" id="alphaBrowseForm">
+<? // Set default value if necessary:
+   if (!isset($this->searchClassId)) {
+       $this->searchClassId = 'Solr';
+   }
+    // Load search actions and settings (if any):
+    $options = $this->searchOptions($this->searchClassId);
+    $advSearch = $options->getAdvancedSearchAction();
+
+    // Initial show or hide based on location ("home" = alphabrowse)
+    $state = ($this->layout()->templateName == 'home' ? 'on' : 'off');
+    
+    // Due to my failure to access the search object parameters correctly here - brad
+    $this->from = isset($_GET["from"]) ? $_GET["from"] : '';
+    $this->source = isset($_GET["source"]) ? $_GET["source"] : '';
+?>
+
+<form class="form-inline navbar-form navbar-left mini-search mini-search-<?=$this->SearchContext()->getInitialSearchboxPref('browse')?>"  method="get" action="<?=$this->url('alphabrowse-home')?>" name="alphaBrowseForm" id="alphaBrowseForm">
   <label for="alphaBrowseForm_from"><?=$this->transEsc('starting from') ?></label>
-  <span class="twitter-typhead"><input placeholder="a manual for writers of" class="form-control search-query autocomplete searcher:Solr tt-input" type="text" name="from" id="alphaBrowseForm_from" value="<?=$this->escapeHtml($this->from) ?>"/></span>
-  <label class="offscreen"  for="alphaBrowseForm_source"><?=$this->transEsc('Browse Alphabetically') ?></label>
+  <input placeholder="a manual for writers of" class="form-control search-query autocomplete searcher:Solr" type="text" name="from" id="alphaBrowseForm_from" value="<?=$this->escapeHtml($this->from) ?>"/>
+  <label for="alphaBrowseForm_source"><i class="fa fa-sort-alpha-asc"></i></label>
   <select id="alphaBrowseForm_source" name="source" class="form-control">
     <? foreach ($this->alphaBrowseTypes as $key => $item): ?>
       <option value="<?=$this->escapeHtml($key) ?>"<? if ($this->source == $key): ?> selected="selected"<? endif; ?>><?=$this->transEsc($item) ?></option>
     <? endforeach; ?>
   </select>
-  <input class="btn btn-primary" type="submit" value="<?=$this->transEsc('Browse') ?>"/>
+  <!--<input class="btn btn-primary" type="submit" value="<?=$this->transEsc('Browse') ?>"/>-->
+  <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> <?=$this->transEsc("Browse")?></button>
+  <a href="#" role="button" class="btn btn-link mini-box-toggle"><?=$this->transEsc("Keyword")?></a> | <a href="<?=$this->url($advSearch)?>" role="button" class="btn btn-link mini-adv-link"><?=$this->transEsc("Advanced")?></a>
 </form>

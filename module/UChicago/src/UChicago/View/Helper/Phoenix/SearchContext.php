@@ -102,4 +102,44 @@ class SearchContext extends AbstractHelper
 
         return $retval;
     }
+
+    /**
+     * Gets the initial searchbox display preference to help choose
+     * which searchbox to display by default.
+     *
+     * @param string $boxType, "browse" or "keyword".
+     *
+     * @returns string, "off" or "on".
+     */
+    public function getInitialSearchboxPref($boxType) {
+        /*Get the cookies if they exist*/
+        $searchType = isset($_COOKIE['keyword_or_begins_with']) ? $_COOKIE['keyword_or_begins_with'] : null;
+        $keywordType = isset($_COOKIE['basic_or_advanced']) ? $_COOKIE['basic_or_advanced'] : null;
+        
+        /*Build a data structure*/
+        $contextTypes = array('searchType' => $searchType, 
+                              'keywordType' => $keywordType);
+
+        /*Build the proper return string based on search context*/
+        switch ($contextTypes) {
+            /*The searchbox is an alphabrowse box and the preference is browse*/
+            case ($boxType == 'browse' && $contextTypes['searchType'] == 'begins with'):
+                $retval = 'on';
+                break;
+            /*The searchbox is a keyword box and the preference is keyword*/
+            case ($boxType == 'keyword' && $contextTypes['searchType'] == 'keyword') :
+                $retval = 'on';
+                break;
+            /*The searchbox is a keyword box and no preference is set*/
+            case ($boxType == 'keyword' && $contextTypes['searchType'] == null) :
+                $retval = 'on';
+                break;
+            default:
+                $retval = 'off';
+        }
+
+        return $retval;
+
+
+    }
 }

@@ -198,6 +198,28 @@ div#searchForm p {
     margin-right: 10px;
 }
 
+/*Mini search toggle*/
+.mini-search-off {
+    display: none;
+}
+.btn.mini-box-toggle,
+.mini-search-on .btn-link,
+.mini-search-off .btn-link {
+    padding: 6px 4px;
+}
+#alphaBrowseForm .fa-sort-alpha-asc {
+    font-size: @font-size-base + 6;
+}
+
+.mini-search .input-clear {
+    position: absolute;
+    cursor: pointer;
+    font-size: @clear-input-size;
+    color: lighten(@gray-light, 10%);
+    margin-left: -@form-control-padding - 3;
+    margin-top: (@input-height-base / 2) - (@clear-input-size / 2);
+}
+
 /*Forms*/
 #searchtabinfolink {
     outline: none;
@@ -424,7 +446,7 @@ search.)
 #searchForm_type.form-control,
 #alphaBrowseForm .twitter-typeahead,
 #alphaBrowseForm_source.form-control{
-    margin-right:12px;
+    margin-right:@form-control-padding;
     @media (max-width: @screen-xs-max) {
         margin:0 0 10px 0; 
     }

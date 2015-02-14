@@ -1,15 +1,15 @@
 <?
   $this->headTitle($this->translate('Browse the Collection Alphabetically'));
   //$this->layout()->breadcrumbs = '<a href="' . $this->url('alphabrowse-home') . '">' . $this->transEsc('Browse Alphabetically') . '</a>';
-  $this->layout()->searchbox= false;
+  //$this->layout()->searchbox= true;
   $baseQuery = array('source' => $this->source, 'from' => $this->from);
 ?>
 
 <? /* LOAD THE LINK INFORMATION INTO $pageLinks, similar to smarty's {capture} */ ?>
 <? ob_start(); ?>
-  <ul class="pager">
+  <ul class="pager-phoenix">
     <? if (isset($this->prevpage)): ?>
-      <li><a href="<?=$this->escapeHtmlAttr($this->url('alphabrowse-home', array(), array('query' => $baseQuery + array('page' => $this->prevpage))))?>">&laquo; <?=$this->transEsc('Prev')?></a></li>
+      <li><a href="<?=$this->escapeHtmlAttr($this->url('alphabrowse-home', array(), array('query' => $baseQuery + array('page' => $this->prevpage))))?>">&laquo; <?=$this->transEsc('Prev')?></a>&nbsp;&nbsp;</li>
     <? else: ?>
       <li class="disabled"><a href="#">&laquo; <?=$this->transEsc('Prev')?></a></li>
     <? endif; ?>
@@ -22,12 +22,6 @@
   </ul>
 <? $pageLinks = ob_get_contents(); ?>
 <? ob_end_clean(); ?>
-
-<div class="row">
-<div class="col-sm-12">
-  <?$this->context($this)->renderInContext('search/miniSearchBox.phtml', array('searchClassId' => 'Solr'));?>
-</div><!-- end col-sm-12-->
-</div><!-- end row-->
 
 <? if ($this->result): ?>
   <div class="row">

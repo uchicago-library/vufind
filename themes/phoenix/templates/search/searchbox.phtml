@@ -30,7 +30,7 @@
     <? if (!empty($tabs)): ?></div><? endif; ?>
   </div>
 <? else: ?>
-  <form role="search" class="navbar-form navbar-left mini-search-form" method="get" action="<?=$this->url($basicSearch)?>" name="searchForm" id="searchForm" autocomplete="off">
+  <form role="search" class="navbar-form navbar-left mini-search mini-search-<?=$this->SearchContext()->getInitialSearchboxPref('keyword')?>" method="get" action="<?=$this->url($basicSearch)?>" name="searchForm" id="searchForm" autocomplete="off">
     <?= $this->render('search/searchTabs'); ?>
     <input class="form-control search-query<? if($this->searchbox()->autocompleteEnabled($this->searchClassId)):?> autocomplete searcher:<?=$this->escapeHtmlAttr($this->searchClassId) ?><? endif ?>" id="searchForm_lookfor" type="text" name="lookfor" value="<?=$this->escapeHtmlAttr($this->lookfor)?>"/>
     <? if ($handlerCount > 1): ?>
@@ -44,7 +44,7 @@
     <? endif; ?>
     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> <?=$this->transEsc("Find")?></button>
     <? if ($advSearch): ?>
-      <a href="#" id="mini-browse-toggle" class="btn btn-link"><?=$this->transEsc("Browse")?></a> | <a href="<?=$this->url($advSearch)?>" class="btn btn-link"><?=$this->transEsc("Advanced")?></a>
+      <a href="#" class="btn btn-link mini-box-toggle"><?=$this->transEsc("Browse")?></a> | <a href="<?=$this->url($advSearch)?>" class="btn btn-link mini-adv-link"><?=$this->transEsc("Advanced")?></a>
     <? endif; ?>
 
     <? $shards = $options->getShards(); if ($options->showShardCheckboxes() && !empty($shards)): ?>

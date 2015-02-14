@@ -178,14 +178,25 @@ $(document).ready(function() {
         $(this).parent().parent().find('div.toToggle').toggle();
     });
 
-    //Test
-    $('#mini-browse-toggle').click(function() {
-        //$('.mini-search-form').remove();
-        //$('.visible-lg').load(document.URL + ' .mini-search-form');
-        $('.mini-search-form').load(document.URL + ' .mini-search-form', function() {
-            $(this).children().unwrap();
+    // Toggle the mini-search box and keep search box terms between windows
+    window.searchTerms = $('.mini-search-on .search-query').attr('value');
+    $('.mini-box-toggle').click(function() {
+        $('.search-query').each(function() {
+            $(this).val(window.searchTerms);
         });
-        console.log('test');
+        // Toggle the mini-search box in the gray bar
+        $('.mini-search-on, .mini-search-off').toggle();
+    });
+    $(".search-query").change(function(){ 
+        window.searchTerms = $(this).val();
+    })
+
+    // Clear inputs on the mini-search box in the gray bar
+    $('.mini-search #alphaBrowseForm_from, .mini-search #searchForm_lookfor').after('<i class="input-clear fa fa-times-circle-o"></i>');
+    $('.mini-search .input-clear').click(function(){
+        $(this).parent().find('input').val('');
+        $(this).parent().find('input').attr('placeholder',' ');
+        window.searchTerms = '';
     });
 
     $('#searchtabinfolink').popover({
@@ -259,6 +270,14 @@ $(document).ready(function() {
             }
         });
     }
+
+    // Setup cookies for the Advanced search link on mini form in the gray bar header
+    $('.mini-adv-link').click(function(e) {
+        $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
+        $.cookie('basic_or_advanced', 'advanced', cookie_settings);
+    });
+
+
     // Set up cookies after a short delay, because some of the things we
     // need are loaded in via javascript. 
     var setup_homepage_cookies_interval_id = setInterval(setup_homepage_cookies, 100);
