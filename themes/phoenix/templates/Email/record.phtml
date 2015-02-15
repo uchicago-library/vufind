@@ -1,0 +1,40 @@
+<? // This is a text-only email template; do not include HTML! ?>
+<? $pubDetails = $this->driver->tryMethod('getPublicationDetails');
+   $edition = $this->driver->tryMethod('getEdition');
+   $imprint = implode("\n", $pubDetails) . "\n" . $edition;
+   $holdings = $this->driver->getRealTimeHoldings();
+?>
+<?=$this->driver->getTitle() . ' ' . $this->driver->getTitleStatement()?>
+
+<?=$imprint?>
+
+<? foreach ($holdings as $location => $holding): ?><? if (($location == 'Full Text' || $location == 'FullText') && !array_key_exists('eHolding', $holding['items'][0])): continue; endif; ?>
+<?=$location; ?>
+<? if(!empty($holding)):?><? if (isset($holding['items'][0]['callnumberDisplay'])): ?>
+
+<?=$holding['items'][0]['callnumberDisplay'];?>
+<? endif; ?>
+<? if (array_key_exists('eHolding', $holding['items'][0])): ?>
+
+<?=$holding['items'][0]['eHolding']['uri'];?>
+<? endif; ?>
+
+<? if (isset($holding['library has']) && count($holding['library has']) > 0): ?>
+<? foreach($holding['library has'] as $libraryHas): ?>
+<? echo $libraryHas . "\n"; ?>
+<? endforeach; ?>
+<? endif; ?>
+<? if (isset($holding['indexes']) && count($holding['indexes']) > 0): ?>
+<? echo "Indexes\n"; ?>
+<? foreach($holding['indexes'] as $index): ?>
+<? echo $index . "\n"; ?>
+<? endforeach; ?>
+<? endif; ?>
+<? endif; ?>
+
+<? endforeach; ?><?=$this->serverUrl($this->recordLink()->getUrl($this->driver))."\n\n"?>
+
+<? if (!empty($this->message)): ?><?="\n"?><?=$this->translate("Message From Sender")?>:<?="\n"?>
+
+<?=$this->message?>
+<? endif; ?>
