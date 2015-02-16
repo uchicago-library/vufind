@@ -198,6 +198,28 @@ div#searchForm p {
     margin-right: 10px;
 }
 
+/*Mini search toggle*/
+.mini-search-off {
+    display: none;
+}
+.btn.mini-box-toggle,
+.mini-search-on .btn-link,
+.mini-search-off .btn-link {
+    padding: 6px 4px;
+}
+#alphaBrowseForm .fa-sort-alpha-asc {
+    font-size: @font-size-base + 6;
+}
+
+.mini-search .input-clear {
+    position: absolute;
+    cursor: pointer;
+    font-size: @clear-input-size;
+    color: lighten(@gray-light, 10%);
+    margin-left: -@form-control-padding - 3;
+    margin-top: (@input-height-base / 2) - (@clear-input-size / 2);
+}
+
 /*Forms*/
 #searchtabinfolink {
     outline: none;
@@ -304,6 +326,9 @@ div#searchForm p {
         margin: 0;
         padding: 0;
     }
+}
+header #alphaBrowseForm {
+    text-align: left;
 }
 .form-inline .input-large {
     width: 50%;
@@ -418,12 +443,17 @@ search.)
     }
 }
 #searchForm .twitter-typeahead,
-#searchForm_type.form-control {
-    margin-right:15px;
+#searchForm_type.form-control,
+#alphaBrowseForm .twitter-typeahead,
+#alphaBrowseForm_source.form-control{
+    margin-right:@form-control-padding;
     @media (max-width: @screen-xs-max) {
         margin:0 0 10px 0; 
     }
 }
+#alphaBrowseForm label {
+    margin-right:5px;
+} 
 #searchForm_lookfor.form-control {
     @media (min-width: @container-desktop) {
         width:250px;
@@ -795,9 +825,11 @@ tr[typeof="Offer"] th,
 }
 .bulkActionButtons .checkbox {
     padding:@nav-link-padding;
+    padding-right: 0;
 }
 .bulkActionButtons #updateCart {
     margin-left:0;
+    padding-left:0;
 }
 .bulkActionButtons label input {
     margin-top:0;

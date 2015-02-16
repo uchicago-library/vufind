@@ -178,6 +178,27 @@ $(document).ready(function() {
         $(this).parent().parent().find('div.toToggle').toggle();
     });
 
+    // Toggle the mini-search box and keep search box terms between windows
+    window.searchTerms = $('.mini-search-on .search-query').attr('value');
+    $('.mini-box-toggle').click(function() {
+        $('.search-query').each(function() {
+            $(this).val(window.searchTerms);
+        });
+        // Toggle the mini-search box in the gray bar
+        $('.mini-search-on, .mini-search-off').toggle();
+    });
+    $(".search-query").change(function(){ 
+        window.searchTerms = $(this).val();
+    })
+
+    // Clear inputs on the mini-search box in the gray bar
+    $('.mini-search #alphaBrowseForm_from, .mini-search #searchForm_lookfor').after('<i class="input-clear fa fa-times-circle-o"></i>');
+    $('.mini-search .input-clear').click(function(){
+        $(this).parent().find('input').val('');
+        $(this).parent().find('input').attr('placeholder',' ');
+        window.searchTerms = '';
+    });
+
     $('#searchtabinfolink').popover({
         'container': '#searchtabinfolink',
         'content': '<div style="padding: 0 10px;"><p>Keyword searches produce lists of records sorted by relevance:</p><p style="padding-left: 10px;"><strong>Basic Keyword Search</strong><br/>Use for exploring a general topic, or if the exact title or author of a book is unknown.</p><p style="padding-left: 10px;"><strong>Advanced Keyword Search</strong><br/>Use for very specific or complex topics.</p><p><strong>Begins With</strong><br/>Begins With allows you to browse through an alphabetical list of titles, authors, subjects, etc. Use to locate a book when the exact title or author\'s entire name is known, or when searching for items on a specific subject.</p><p><a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchtypes" target="_blank">More info</a><br/><a href="http://youtu.be/I4kOECCepew" target="_blank">90 second video on search types <i style="text-decoration: none;" class="icon-facetime-video "></i></a></p></div>',
@@ -249,6 +270,14 @@ $(document).ready(function() {
             }
         });
     }
+
+    // Setup cookies for the Advanced search link on mini form in the gray bar header
+    $('.mini-adv-link').click(function(e) {
+        $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
+        $.cookie('basic_or_advanced', 'advanced', cookie_settings);
+    });
+
+
     // Set up cookies after a short delay, because some of the things we
     // need are loaded in via javascript. 
     var setup_homepage_cookies_interval_id = setInterval(setup_homepage_cookies, 100);

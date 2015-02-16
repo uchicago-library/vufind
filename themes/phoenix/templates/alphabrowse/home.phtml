@@ -1,15 +1,15 @@
 <?
   $this->headTitle($this->translate('Browse the Collection Alphabetically'));
   //$this->layout()->breadcrumbs = '<a href="' . $this->url('alphabrowse-home') . '">' . $this->transEsc('Browse Alphabetically') . '</a>';
-  $this->layout()->searchbox= false;
+  //$this->layout()->searchbox= true;
   $baseQuery = array('source' => $this->source, 'from' => $this->from);
 ?>
 
 <? /* LOAD THE LINK INFORMATION INTO $pageLinks, similar to smarty's {capture} */ ?>
 <? ob_start(); ?>
-  <ul class="pager">
+  <ul class="pager-phoenix">
     <? if (isset($this->prevpage)): ?>
-      <li><a href="<?=$this->escapeHtmlAttr($this->url('alphabrowse-home', array(), array('query' => $baseQuery + array('page' => $this->prevpage))))?>">&laquo; <?=$this->transEsc('Prev')?></a></li>
+      <li><a href="<?=$this->escapeHtmlAttr($this->url('alphabrowse-home', array(), array('query' => $baseQuery + array('page' => $this->prevpage))))?>">&laquo; <?=$this->transEsc('Prev')?></a>&nbsp;&nbsp;</li>
     <? else: ?>
       <li class="disabled"><a href="#">&laquo; <?=$this->transEsc('Prev')?></a></li>
     <? endif; ?>
@@ -22,22 +22,6 @@
   </ul>
 <? $pageLinks = ob_get_contents(); ?>
 <? ob_end_clean(); ?>
-
-<div class="row">
-<div class="col-sm-12">
-<form class="form-inline" method="get" action="<?=$this->url('alphabrowse-home')?>" name="alphaBrowseForm" id="alphaBrowseForm">
-  <label for="alphaBrowseForm_from"><?=$this->transEsc('starting from') ?></label>
-  <input placeholder="a manual for writers of" type="text" name="from" id="alphaBrowseForm_from" value="<?=$this->escapeHtml($this->from) ?>"/>
-  <label class="offscreen"  for="alphaBrowseForm_source"><?=$this->transEsc('Browse Alphabetically') ?></label>
-  <select id="alphaBrowseForm_source" name="source">
-    <? foreach ($this->alphaBrowseTypes as $key => $item): ?>
-      <option value="<?=$this->escapeHtml($key) ?>"<? if ($this->source == $key): ?> selected="selected"<? endif; ?>><?=$this->transEsc($item) ?></option>
-    <? endforeach; ?>	
-  </select>
-  <input class="btn" type="submit" value="<?=$this->transEsc('Browse') ?>"/>
-</form>
-</div><!-- end col-sm-12-->
-</div><!-- end row-->
 
 <? if ($this->result): ?>
   <div class="row">
@@ -72,7 +56,7 @@
               <? else: ?>
                 <? $query = array('type' => ucwords($this->source) . 'Browse', 'lookfor' => '"' . addcslashes($item['heading'], '"') . '"'); ?>
               <? endif; ?>
-              <b><a href="<?=$this->escapeHtmlAttr($this->url('search-results', array(), array('query' => $query)))?>"><?=$this->escapeHtml($item['heading'])?></a></b>
+              <a href="<?=$this->escapeHtmlAttr($this->url('search-results', array(), array('query' => $query)))?>"><?=$this->escapeHtml($item['heading'])?></a>
             <? else: ?>
               <b><?=$this->escapeHtml($item['heading'])?></b>
             <? endif; ?>

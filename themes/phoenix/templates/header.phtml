@@ -23,7 +23,11 @@
 </div>
 <? if ($this->layout()->searchbox !== false): ?>
   <section class="visible-lg">
+    <?/*Smart search box (default VuFind)*/?> 
     <?=$this->layout()->searchbox ?>
+    <?/*Dumb browse box*/?>
+    <? $this->alphaBrowseTypes = $this->GetConfig()->getAlphabrowseSearchTypes(); ?>
+    <?=$this->layout()->searchbox = $this->context($this)->renderInContext('alphabrowse/alphabrowseMini.phtml', array('searchClassId' => 'Solr')); ?>
   </section>
 <? endif; ?>
 <? if (!isset($this->layout()->renderingError)): ?>

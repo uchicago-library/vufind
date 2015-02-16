@@ -26,7 +26,7 @@
 //## Font, line-height, and color for body text, headings, and more.
 
 @tiny:10.5px;
-@font-size-base: 12px;
+@font-size-base: 12.5px;
 @logo:"ProximaNova-Regular";
 @tagline:"ProximaNovaT-Thin";
 @headings-font-family:    @logo;
@@ -40,7 +40,7 @@
 @font-family-monospace:   Menlo, Monaco, Consolas, "Courier New", monospace;
 @font-family-base:        @font-family-sans-serif;
 
-@font-size-base:          12px;
+@font-size-base:          12.5px;
 @font-size-large:         ceil((@font-size-base * 1.25)); // ~18px
 @font-size-small:         ceil((@font-size-base * 0.85)); // ~12px
 
@@ -141,6 +141,8 @@
 @state-danger-bg:                #f2dede;
 @state-danger-border:            darken(spin(@state-danger-bg, -10), 5%); 
 
+@clear-input-size: @font-size-base + 2;
+@form-control-padding: 12px;
 
 //== Components
 //
