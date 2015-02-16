@@ -45,9 +45,9 @@
         </li>
       <? endif; ?>
       <? $cart = $this->cart(); if ($cart->isActive()): ?>
-        <li id="cartSummary">
+        <!--<li id="cartSummary">
           <a id="cartItems" class="modal-link" title="<?=$this->transEsc('View Book Bag')?>" href="<?=$this->url('cart-home')?>"><i class="fa fa-suitcase"></i> <strong><?=count($cart->getItems())?></strong> <?=$this->transEsc('items')?><?=$cart->isFull() ? ' (' .  $this->transEsc('bookbag_full') . ')' : ''?></a>
-        </li>
+        </li>-->
       <? endif; ?>
       <? if (is_object($account) && $account->loginEnabled()): // hide login/logout if unavailable ?>
         <li class="logoutOptions<? if(!$account->isLoggedIn()): ?> hidden<? endif ?>">
@@ -80,7 +80,7 @@
       <? endif; ?>
 
       <? if (isset($this->layout()->allLangs) && count($this->layout()->allLangs) > 1): ?>
-        <li class="dropdown">
+        <!--<li class="dropdown">
           <form method="post" name="langForm" action="" id="langForm">
             <input type="hidden" name="mylang"/>
           </form>
@@ -90,7 +90,7 @@
             <li<?=$this->layout()->userLang == $langCode ? ' class="active"' : ''?>><a href="#" onClick="document.langForm.mylang.value='<?=$langCode?>';document.langForm.submit()"><?=$this->displayLanguageOption($langName)?></a></li>
           <? endforeach; ?>
           </ul>
-        </li>
+        </li>-->
       <? endif; ?>
       <li><a href="http://www.lib.uchicago.edu/e/using/catalog/help.html" title="Help"><?=$this->transEsc("Help")?></a></li>
     </ul>
