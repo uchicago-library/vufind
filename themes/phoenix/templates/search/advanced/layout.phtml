@@ -118,7 +118,7 @@
             <? for ($s = 0; $s < $search_count; $s++): ?>
                 <div id="search<?=$g?>_<?=$s?>" class="search form-group form-inline">
                     <? ($groups == false) ? $value = '' : $value = $groups[$g]->getQueries()[$s]->getString(); ?>
-                    <input type="text" value="<?=$value?>" name="lookfor<?=$g?>[]" class="form-control input-large" id="search_lookfor<?=$g?>_<?=$s?>" placeholder="evolutionary biology"/>
+                    <input type="text" value="<?=$value?>" name="lookfor<?=$g?>[]" class="form-control input-large" id="search_lookfor<?=$g?>_<?=$s?>"/>
                     <select class="form-control" name="type<?=$g?>[]" id="search_type<?=$g?>_<?=$s?>">
                         <? 
                             foreach (array(
