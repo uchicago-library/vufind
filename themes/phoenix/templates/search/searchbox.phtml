@@ -16,6 +16,12 @@
     $advSearch = $options->getAdvancedSearchAction();
     $lastSort = $options->getLastSort();
     $lastLimit = $options->getLastLimit();
+
+    // I'm resetting these (not default VuFind behavior). I think this is required because the mini searchbox also displays on browse pages - brad
+    //$this->lookfor = isset($_GET["lookfor"]) ? $_GET["lookfor"] : '';
+    //$this->from = isset($_GET["from"]) ? $_GET["from"] : '';
+    //$this->lookfor = !empty($this->lookfor) ? $this->lookfor : $this->from; 
+ 
 ?>
 <? if ($this->searchType == 'advanced'): ?>
   <div id="searchForm">
@@ -30,7 +36,7 @@
     <? if (!empty($tabs)): ?></div><? endif; ?>
   </div>
 <? else: ?>
-  <form role="search" class="navbar-form navbar-left mini-search mini-search-<?=$this->SearchContext()->getInitialSearchboxPref('keyword')?>" method="get" action="<?=$this->url($basicSearch)?>" name="searchForm" id="searchForm" autocomplete="off">
+  <form role="search" class="navbar-form navbar-left mini-search mini-search-<?=$this->SearchContext()->getInitialSearchboxPref('keyword', $this->templateDir, $this->templateName)?>" method="get" action="<?=$this->url($basicSearch)?>" name="searchForm" id="searchForm" autocomplete="off">
     <?= $this->render('search/searchTabs'); ?>
     <input class="form-control search-query<? if($this->searchbox()->autocompleteEnabled($this->searchClassId)):?> autocomplete searcher:<?=$this->escapeHtmlAttr($this->searchClassId) ?><? endif ?>" id="searchForm_lookfor" type="text" name="lookfor" value="<?=$this->escapeHtmlAttr($this->lookfor)?>"/>
     <? if ($handlerCount > 1): ?>

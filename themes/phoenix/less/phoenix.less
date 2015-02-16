@@ -284,8 +284,13 @@ div#searchForm p {
     color:#787878; 
     display: block; 
     padding-left: 20px;
+    margin-top: -15px;
+    line-height: @line-height-computed - .3;
     a {
         color: inherit;
+    }
+    a:after {
+        font-size: 13px;
     }
     li { 
         list-style-type: square;
@@ -293,7 +298,7 @@ div#searchForm p {
     p {
         font-family: ProximaNova-Regular;
         font-size: 20px; 
-        margin-bottom: 5px; 
+        margin-bottom: 2px; 
         margin-top: 25px;
     }
     ul { 
@@ -338,9 +343,6 @@ header #alphaBrowseForm {
 }
 #basicAdvancedSearchSwitches {
     margin-top: -5px;
-    a {
-        color: #650000;
-    }
     a.disabled {
         color: #5c5c5c;
     }
@@ -360,6 +362,10 @@ header #alphaBrowseForm {
       margin-right: 4px;
     }
   }
+}
+.template-name-advanced > .container {
+    padding-left: 75px;
+    padding-right: 75px;
 }
 .group .form-group {
   position: relative;

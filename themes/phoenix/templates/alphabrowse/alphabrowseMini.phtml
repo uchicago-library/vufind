@@ -14,9 +14,9 @@
     $this->source = isset($_GET["source"]) ? $_GET["source"] : '';
 ?>
 
-<form class="form-inline navbar-form navbar-left mini-search mini-search-<?=$this->SearchContext()->getInitialSearchboxPref('browse')?>"  method="get" action="<?=$this->url('alphabrowse-home')?>" name="alphaBrowseForm" id="alphaBrowseForm">
+<form class="form-inline navbar-form navbar-left mini-search mini-search-<?=$this->SearchContext()->getInitialSearchboxPref('browse', $this->templateDir, $this->templateName)?>"  method="get" action="<?=$this->url('alphabrowse-home')?>" name="alphaBrowseForm" id="alphaBrowseForm">
   <label for="alphaBrowseForm_from"><?=$this->transEsc('starting from') ?></label>
-  <input placeholder="a manual for writers of" class="form-control search-query autocomplete searcher:Solr" type="text" name="from" id="alphaBrowseForm_from" value="<?=$this->escapeHtml($this->from) ?>"/>
+  <input class="form-control search-query autocomplete searcher:Solr" type="text" name="from" id="alphaBrowseForm_from" value="<?=$this->escapeHtml($this->from) ?>"/>
   <label for="alphaBrowseForm_source"><i class="fa fa-sort-alpha-asc"></i></label>
   <select id="alphaBrowseForm_source" name="source" class="form-control">
     <? foreach ($this->alphaBrowseTypes as $key => $item): ?>

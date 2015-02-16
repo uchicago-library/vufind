@@ -108,20 +108,40 @@ class SearchContext extends AbstractHelper
      * which searchbox to display by default.
      *
      * @param string $boxType, "browse" or "keyword".
+     * @param string $templateDir, the template directory of the current constructed view.
+     * @param string $templateName, the name of the current constuctec view.
      *
      * @returns string, "off" or "on".
      */
-    public function getInitialSearchboxPref($boxType) {
+    public function getInitialSearchboxPref($boxType, $templateDir=false, $templateName=false) {
         /*Get the cookies if they exist*/
         $searchType = isset($_COOKIE['keyword_or_begins_with']) ? $_COOKIE['keyword_or_begins_with'] : null;
         $keywordType = isset($_COOKIE['basic_or_advanced']) ? $_COOKIE['basic_or_advanced'] : null;
         
+        /*Build the view descriptions*/
+        $templateDesc = !empty($templateDir) && !empty($templateName) ? $templateDir . '-' . $templateName : null;
+        error_log($templateDesc);
+
         /*Build a data structure*/
         $contextTypes = array('searchType' => $searchType, 
                               'keywordType' => $keywordType);
 
         /*Build the proper return string based on search context*/
         switch ($contextTypes) {
+            /*We are on a browse results page*/
+            case ($boxType == 'browse' && $templateDesc == 'alphabrowse-home'):
+                $retval = 'on';
+                break;
+            case ($boxType == 'browse' && $templateDesc == 'search-results'):
+                $retval = 'off';
+                break;
+            /*We are on a search results page*/
+            case ($boxType == 'keyword' && $templateDesc == 'search-results'):
+                $retval = 'on';
+                break;
+            case ($boxType == 'keyword' && $templateDesc == 'alphabrowse-home'):
+                $retval = 'off';
+                break;
             /*The searchbox is an alphabrowse box and the preference is browse*/
             case ($boxType == 'browse' && $contextTypes['searchType'] == 'begins with'):
                 $retval = 'on';
@@ -135,7 +155,7 @@ class SearchContext extends AbstractHelper
                 $retval = 'on';
                 break;
             default:
-                $retval = 'off';
+                $retval = 'on'; //this is risky, I wanted it to be off but this seems to work better
         }
 
         return $retval;
