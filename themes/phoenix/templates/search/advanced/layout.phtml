@@ -117,7 +117,13 @@
 
             <? for ($s = 0; $s < $search_count; $s++): ?>
                 <div id="search<?=$g?>_<?=$s?>" class="search form-group form-inline">
-                    <? ($groups == false) ? $value = '' : $value = $groups[$g]->getQueries()[$s]->getString(); ?>
+                    <?php
+                        $value = '';
+                        if ($groups != false) {
+                            $tmp = $groups[$g]->getQueries();
+                            $value = $tmp[$s]->getString();
+                        }
+                    ?>
                     <input type="text" value="<?=$value?>" name="lookfor<?=$g?>[]" class="form-control input-large" id="search_lookfor<?=$g?>_<?=$s?>"/>
                     <select class="form-control" name="type<?=$g?>[]" id="search_type<?=$g?>_<?=$s?>">
                         <? 
@@ -143,7 +149,8 @@
                                 $text = $o['text']; 
                                 $selected = '';
                                 if ($groups != false) {
-                                    if ($groups[$g]->getQueries()[$s]->getHandler() == $value) {
+                                    $tmp = $groups[$g]->getQueries();
+                                    if ($tmp[$s]->getHandler() == $value) {
                                         $selected = 'selected="selected" ';
                                     }
                                 }
