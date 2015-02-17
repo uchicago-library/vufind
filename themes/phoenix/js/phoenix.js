@@ -282,16 +282,12 @@ $(document).ready(function() {
     // need are loaded in via javascript. 
     var setup_homepage_cookies_interval_id = setInterval(setup_homepage_cookies, 100);
    
-    // When the document loads, if we've landed on a search result,
-    // set the cookie to "keyword".
-    if (window.location.href.indexOf('/vufind/Search/Results') > -1) {
+    // Set default cookie values on page load. 
+    if ($.cookie('keyword_or_begins_with') == null) {
         $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
     }
-
-    // When the document loads, if we've landed on a search result,
-    // set the cookie to "begins with".
-    if (window.location.href.indexOf('/vufind/alphabrowse') > -1) {
-        $.cookie('keyword_or_begins_with', 'begins with', cookie_settings);
+    if ($.cookie('basic_or_advanced') == null) {
+        $.cookie('basic_or_advanced', 'basic', cookie_settings);
     }
 });
 

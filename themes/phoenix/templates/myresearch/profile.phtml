@@ -27,7 +27,7 @@
         );
        ?>
       <? if ($showHomeLibForm): ?>
-        <tr><th><?=$this->transEsc('Preferred Library')?>:</th>
+        <tr><th>Preferred Recall Pickup Library:</th>
         <?
           $selected = (isset($this->profile['home_library']) && $this->profile['home_library'] != "")
               ? $this->profile['home_library'] : $this->defaultPickupLocation
@@ -53,6 +53,7 @@
             $this->transEsc('City') => 'city',
             $this->transEsc('Country') => 'country',
             $this->transEsc('Phone Number') => 'phone',
+            $this->transEsc('Email Address') => 'email',
             $this->transEsc('Group') => 'group'
           )
         );

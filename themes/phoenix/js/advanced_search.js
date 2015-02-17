@@ -5,34 +5,36 @@
  * Do it onload and do it when the dropdown changes.
  */
 function update_keyword_search(select) {
-    var placeholder = '';
-    switch(select.val()) {
-        case 'AllFields':
-            placeholder = 'evolutionary biology';
-            break;
-        case 'Title':
-            placeholder = 'chicago style manual';
-            break;
-        case 'Author':
-            placeholder = 'saul bellow';
-            break;
-        case 'Subject':
-            placeholder = 'united states history';
-            break;
-        case 'JournalTitle':
-            placeholder = 'american journal of sociology';
-            break;
-        case 'StandardNumbers':
-            placeholder = '0375412328';
-            break;
-        case 'Series':
-            placeholder = 'lecture notes in computer science';
-            break;
-        case 'Publisher':
-            placeholder = 'university of chicago press';
-            break;
+    if ($(select).parents('form').eq(0).hasClass('basicSearch')) {
+	    var placeholder = '';
+	    switch(select.val()) {
+	        case 'AllFields':
+	            placeholder = 'evolutionary biology';
+	            break;
+	        case 'Title':
+	            placeholder = 'chicago style manual';
+	            break;
+	        case 'Author':
+	            placeholder = 'saul bellow';
+	            break;
+	        case 'Subject':
+	            placeholder = 'united states history';
+	            break;
+	        case 'JournalTitle':
+	            placeholder = 'american journal of sociology';
+	            break;
+	        case 'StandardNumbers':
+	            placeholder = '0375412328';
+	            break;
+	        case 'Series':
+	            placeholder = 'lecture notes in computer science';
+	            break;
+	        case 'Publisher':
+	            placeholder = 'university of chicago press';
+	            break;
+	    }
+	    select.prevAll('input').eq(0).attr('placeholder', placeholder);
     }
-    select.prevAll('input').eq(0).attr('placeholder', placeholder);
 }
 
 /*
@@ -96,7 +98,7 @@ $.fn.addSearch = function(term = '', field = '')
   $(this).find('.searchPlaceHolder').before(newSearch);
 
   // Build new search term. 
-  var newTerm = $('<input id="search_lookfor'+inputID+'" class="form-control input-large" type="text" name="lookfor'+group+'[]" value="'+term+'" placeholder="evolutionary biology"/>');
+  var newTerm = $('<input id="search_lookfor'+inputID+'" class="form-control input-large" type="text" name="lookfor'+group+'[]" value="'+term+'"/>');
 
   // Append the new search term. 
   newSearch.append(newTerm);
@@ -405,6 +407,9 @@ function switchToBasicSearch()
 
     //change field pulldown's name to 'type' (basic search)
     $('.group:first .search:first select').attr('name', 'type');
+
+    //update the placeholder text.
+    update_keyword_search($('.group:first .search:first select'));
 
     //save the advanced search field value. 
     var selectedField = $('.group:first .search:first select').val();
