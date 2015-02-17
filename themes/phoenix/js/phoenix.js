@@ -271,10 +271,18 @@ $(document).ready(function() {
         });
     }
 
-    // Setup cookies for the Advanced search link on mini form in the gray bar header
+    // When a user clicks Advanced in a gray bar mini-searchbox
     $('.mini-adv-link').click(function(e) {
         $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
         $.cookie('basic_or_advanced', 'advanced', cookie_settings);
+    });
+    // When a user clicks Browse in a gray bar mini-searchbox...
+    $('.mini-box-toggle.browse').click(function(e) {
+        $.cookie('keyword_or_begins_with', 'begins with', cookie_settings);
+    });
+    // When a user clicks Keyword in a gray bar mini-searchbox...
+    $('.mini-box-toggle.keyword').click(function(e) {
+        $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
     });
 
 

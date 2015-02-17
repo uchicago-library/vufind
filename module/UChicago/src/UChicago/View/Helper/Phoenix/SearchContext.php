@@ -128,20 +128,6 @@ class SearchContext extends AbstractHelper
 
         /*Build the proper return string based on search context*/
         switch ($contextTypes) {
-            /*We are on a browse results page*/
-            case ($boxType == 'browse' && $templateDesc == 'alphabrowse-home'):
-                $retval = 'on';
-                break;
-            case ($boxType == 'browse' && $templateDesc == 'search-results'):
-                $retval = 'off';
-                break;
-            /*We are on a search results page*/
-            case ($boxType == 'keyword' && $templateDesc == 'search-results'):
-                $retval = 'on';
-                break;
-            case ($boxType == 'keyword' && $templateDesc == 'alphabrowse-home'):
-                $retval = 'off';
-                break;
             /*The searchbox is an alphabrowse box and the preference is browse*/
             case ($boxType == 'browse' && $contextTypes['searchType'] == 'begins with'):
                 $retval = 'on';
