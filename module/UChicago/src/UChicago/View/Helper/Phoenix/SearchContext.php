@@ -155,7 +155,7 @@ class SearchContext extends AbstractHelper
                 $retval = 'on';
                 break;
             default:
-                $retval = 'on'; //this is risky, I wanted it to be off but this seems to work better
+                $retval = 'off'; 
         }
 
         return $retval;
