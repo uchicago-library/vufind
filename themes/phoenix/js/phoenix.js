@@ -297,6 +297,13 @@ $(document).ready(function() {
     if ($.cookie('basic_or_advanced') == null) {
         $.cookie('basic_or_advanced', 'basic', cookie_settings);
     }
+
+    // It can take about a minute to recall an item. When a user clicks
+    // the submit button, disable it to discourage them from submitting
+    // it twice. 
+    $('form[name="placeHold"]').submit(function() {
+        $(this).find('input[type="submit"]').attr('disabled', 'disabled');
+    });
 });
 
 (function() {

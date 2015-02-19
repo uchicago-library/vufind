@@ -36,7 +36,7 @@
             'sms_success' => 'sms_success'
           )
         );
-        if ($cart->isActive()) {
+        if ($cart->isActive() || true) {
           $this->headScript()->appendFile("vendor/cookies.js");
           $this->headScript()->appendFile("cart.js");
           $domain = $cart->getCookieDomain();
