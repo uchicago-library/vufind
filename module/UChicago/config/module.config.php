@@ -4,11 +4,7 @@ namespace UChicago\Module\Configuration;
 $config = array(
     'controllers' => array(
         'factories' => array(
-            'record' => function ($sm) {
-                return new \UChicago\Controller\RecordController(
-                    $sm->getServiceLocator()->get('VuFind\Config')->get('config')
-                );
-            },
+            'record' => 'UChicago\Controller\Factory::getRecordController',
         ),
         'invokables' => array(
             'feedback' => 'UChicago\Controller\FeedbackController',
@@ -26,72 +22,16 @@ $config = array(
         'plugin_managers' => array(
             'recorddriver' => array(
                 'factories' => array(
-                    'solrmarc' => function ($sm) {
-                        $driver = new \UChicago\RecordDriver\SolrMarcPhoenix(
-                            $sm->getServiceLocator()->get('VuFind\Config')->get('config'),
-                            null,
-                            $sm->getServiceLocator()->get('VuFind\Config')->get('searches')
-                        );
-                        $driver->attachILS(
-                            $sm->getServiceLocator()->get('VuFind\ILSConnection'),
-                            $sm->getServiceLocator()->get('VuFind\ILSHoldLogic'),
-                            $sm->getServiceLocator()->get('VuFind\ILSTitleHoldLogic')
-                        );
-                        return $driver;
-                    },
-                    'SolrSfx' => function ($sm) {
-                        $driver = new \UChicago\RecordDriver\SolrMarcPhoenix(
-                            $sm->getServiceLocator()->get('VuFind\Config')->get('config'),
-                            null,
-                            $sm->getServiceLocator()->get('VuFind\Config')->get('searches')
-                        );
-                        return $driver;
-                    },
-                    'SolrHathi' => function ($sm) {
-                        $driver = new \UChicago\RecordDriver\SolrMarcPhoenix(
-                            $sm->getServiceLocator()->get('VuFind\Config')->get('config'),
-                            null,
-                            $sm->getServiceLocator()->get('VuFind\Config')->get('searches')
-                        );
-                        return $driver;
-                    },
+                    'solrmarc' => 'UChicago\RecordDriver\Factory::getSolrMarc',
+                    'solrsfx' => 'UChicago\RecordDriver\Factory::getSolrSfx',
+                    'solrhathi' => 'UChicago\RecordDriver\Factory::getSolrHathi',
                 ),
             ),//recorddriver
             'recordtab' => array(
                 'factories' => array(
-                    'holdingsils' => function ($sm) {
-                        // If VuFind is configured to suppress the
-                        // holdings tab when the
-                        // ILS driver specifies no holdings, we need to
-                        // pass in a connection
-                        // object:
-                        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
-
-                        // The number of items and holdings_text_fields to display before collapsing them.
-                        $displayNum = isset($config['Catalog']['items_display_number']) ? $config['Catalog']['items_display_number'] : '';
-
-                        if (isset($config->Site->hideHoldingsTabWhenEmpty)
-                            && $config->Site->hideHoldingsTabWhenEmpty
-                        ) { 
-                            $catalog = $sm->getServiceLocator()->get('VuFind\ILSConnection');
-                        } else {
-                            $catalog = false;
-                        }   
-                        return new \UChicago\RecordTab\HoldingsILS($catalog, $displayNum);
-                    },  
+                    'holdingsils' => 'UChicago\RecordTab\Factory::getHoldingsILS', 
                 ),  
             ),//recordtab
-            'resolver_driver' => array(
-                'factories' => array(
-                    /*'sfx' => function ($sm) {
-                        return new \UChicago\Resolver\Driver\Sfx(
-                            $sm->getServiceLocator()->get('VuFind\Config')->get('config')->OpenURL->url,
-                            $sm->getServiceLocator()->get('VuFind\Http')
-                                ->createClient()
-                        );
-                    },*/
-                ),
-            ),//resolver_driver
         ),//plugin_managers
         // This section controls which tabs are used for which record driver classes.
         // Each sub-array is a map from a tab name (as used in a record URL) to a tab
