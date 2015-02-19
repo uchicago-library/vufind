@@ -366,6 +366,10 @@ header #alphaBrowseForm {
 .template-name-advanced > .container {
     padding-left: 75px;
     padding-right: 75px;
+    @media (max-width: @screen-sm) {
+        padding-left: @padding-small-horizontal;
+        padding-right: @padding-small-horizontal;
+    }
 }
 .group .form-group {
   position: relative;
