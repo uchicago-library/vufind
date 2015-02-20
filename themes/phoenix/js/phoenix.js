@@ -290,11 +290,19 @@ $(document).ready(function() {
         $.cookie('basic_or_advanced', 'basic', cookie_settings);
     }
 
-    // It can take about a minute to recall an item. When a user clicks
-    // the submit button, disable it to discourage them from submitting
-    // it twice. 
-    $('form[name="placeHold"]').submit(function() {
-        $(this).find('input[type="submit"]').attr('disabled', 'disabled');
+    // It can take about a minute to recall an item or place a Mansueto
+    // request. When a user clicks the submit button, disable it to
+    // discourage them from submitting it twice. 
+    $('form[name="placeHold"], form[name="mansuetoRequests"]').submit(function(e) {
+        var $form = $(this);
+
+        if ($form.data('submitted') === true) {
+            // Previously submitted - don't submit again
+            e.preventDefault();
+        } else {
+            // Mark it so that the next submit can be ignored
+            $form.data('submitted', true);
+        }
     });
 });
 
