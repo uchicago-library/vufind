@@ -52,9 +52,9 @@
                 doing searches for headings, but headings give shorter
                 queries and don't look as strange. */?>
               <? if ($item['count'] < 5): ?>
-                <? $query = array('type' => 'ids', 'lookfor' => implode(' ', $item['ids'])); ?>
+                <? $query = array('type' => 'ids', 'lookfor' => implode(' ', $item['ids']), 'sort' => 'title'); ?>
               <? else: ?>
-                <? $query = array('type' => ucwords($this->source) . 'Browse', 'lookfor' => '"' . addcslashes($item['heading'], '"') . '"'); ?>
+                <? $query = array('type' => ucwords($this->source) .  'Browse', 'lookfor' => '"' . addcslashes($item['heading'], '"') . '"', 'sort' => 'title'); ?>
               <? endif; ?>
               <a href="<?=$this->escapeHtmlAttr($this->url('search-results', array(), array('query' => $query)))?>"><?=$this->escapeHtml($item['heading'])?></a>
             <? else: ?>
