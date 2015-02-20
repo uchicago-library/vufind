@@ -1,0 +1,51 @@
+<?
+    // Set up page title:
+    $this->headTitle($this->translate('Update PIN'));
+
+    // Set up breadcrumbs:
+    /*$this->layout()->breadcrumbs = '<a href="' . $this->url('myresearch-home') . '">'
+        . $this->transEsc('Your Account') . '</a>' . '<span>&gt;</span><em>'
+        . $this->transEsc('Account') . '</em>';*/
+
+    // Set the searchbox based on user preference (past action for now)
+    //$this->render('/search/user-search-preferences.phtml');
+?>
+
+<div class="span10">
+<h2>Update VuFind PIN</h2>
+<?=$this->flashmessages()?>
+
+<? if ($this->barcode): ?>
+<form method="post" action="" name="updatePinForm" id="updatePinForm">
+<label class="span-3" for="account_username">Barcode:</label>
+<?=$this->escapeHtml($this->barcode)?>
+<br class="clear"/>
+
+<label class="span-3" for="account_lastname">First Name:</label>
+<?=$this->escapeHtml($this->firstname)?>
+<br class="clear"/>
+
+<label class="span-3" for="account_lastname">Last Name:</label>
+<?=$this->escapeHtml($this->lastname)?>
+<br class="clear"/>
+
+<label class="span-3" for="account_lastname">Current PIN:</label>
+<?=$this->escapeHtml($this->pin)?>
+<br class="clear"/>
+
+<label class="span-3" for="account_pin1">New PIN:</label>
+<input type="password" name="pin1" autocomplete="off"/>
+<br class="clear"/>
+
+<label class="span-3" for="account_pin2">New PIN (repeat):</label>
+<input type="password" name="pin2" autocomplete="off"/>
+<br class="clear"/>
+
+<input class="push-3 button" type="submit" name="submit" value="Update this PIN"/>
+</form>
+<? else: ?>
+<p><a href="/vufind/Admin/Pin">Return to accounts view.</a></p>
+<? endif; ?>
+
+</div>
+<br class="clear"/>

@@ -7,9 +7,28 @@ $config = array(
             'record' => 'UChicago\Controller\Factory::getRecordController',
         ),
         'invokables' => array(
+            'adminpin' => 'VuFindAdmin\Controller\PinController',
             'feedback' => 'UChicago\Controller\FeedbackController',
             'my-research' => 'UChicago\Controller\MyResearchController',
             'search' => 'UChicago\Controller\SearchController',
+        ),
+    ),
+    'router' => array(
+        'routes' => array(
+            'admin' => array(
+                'child_routes' => array(
+                    'pin' => array(
+                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'options' => array(
+                            'route'    => '/Pin[/:action]',
+                            'defaults' => array(
+                                'controller' => 'AdminPin',
+                                'action'     => 'Home',
+                            )
+                        )
+                    ),
+                ),
+            ),
         ),
     ),
     'service_manager' => array(
