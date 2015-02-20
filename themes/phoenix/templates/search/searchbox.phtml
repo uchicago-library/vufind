@@ -50,7 +50,7 @@
     <? endif; ?>
     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> <?=$this->transEsc("Find")?></button>
     <? if ($advSearch): ?>
-      <a href="#" class="btn btn-link mini-box-toggle"><?=$this->transEsc("Browse")?></a> | <a href="<?=$this->url($advSearch)?>" class="btn btn-link mini-adv-link"><?=$this->transEsc("Advanced")?></a>
+      <a href="#" class="btn btn-link mini-box-toggle browse"><?=$this->transEsc("Browse")?></a> | <a href="<?=$this->url($advSearch)?>" class="btn btn-link mini-adv-link"><?=$this->transEsc("Advanced")?></a>
     <? endif; ?>
 
     <? $shards = $options->getShards(); if ($options->showShardCheckboxes() && !empty($shards)): ?>

@@ -69,7 +69,9 @@ function update_begins_with_search() {
     $('input#alphaBrowseForm_from').attr('placeholder', placeholder);
 }
 
-$.fn.addSearch = function(term = '', field = '') 
+var term = '';
+var field = '';
+$.fn.addSearch = function(term, field) 
 { 
   // Be sure this is being executed on a .group
   if (!$(this).hasClass('group')) {
