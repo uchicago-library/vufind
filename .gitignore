@@ -49,9 +49,6 @@ solr/website/spellchecker/*
 solr/website/spellShingle/*
 solr/website/index/*
 
-# Compiled css
-themes/phoenix/css/compiled.css
-
 # Logs 
 solr/website/tlog/
 webcrawl.log
