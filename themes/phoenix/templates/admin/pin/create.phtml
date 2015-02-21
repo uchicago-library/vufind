@@ -16,20 +16,36 @@
 <?=$this->flashmessages()?>
 
 <? if (!$this->success): ?>
-	<form method="post" action="" name="accountForm" id="accountForm">
-	<label class="span-3" for="account_username">Barcode:</label>
-	<input id="account_barcode" type="text" name="barcode" value="<?=$this->escapeHtml($this->barcode)?>" size="30" class="<?=$this->jqueryValidation(array('required'=>'This field is required'))?>"/>
-	<br class="clear"/>
-	<label class="span-3" for="account_lastname">Last Name:</label>
-	<input id="account_lastname" type="text" name="lastname" value="<?=$this->escapeHtml($this->lastname)?>" size="30" class="<?=$this->jqueryValidation(array('required'=>'This field is required'))?>"/>
-	<br class="clear"/>
-	<label class="span-3" for="account_pin">PIN:</label>
-	<input id="account_pin" type="password" autocomplete="off" name="pin1" value="" size="30" class="<?=$this->jqueryValidation(array('required'=>'This field is required'))?>"/>
-	<br class="clear"/>
-	<label class="span-3" for="account_pin">PIN (repeat):</label>
-	<input id="account_pin" type="password" autocomplete="off" name="pin2" value="" size="30" class="<?=$this->jqueryValidation(array('required'=>'This field is required'))?>"/>
-	<br class="clear"/>
-	<input class="push-3 button" type="submit" name="submit" value="Add this account to VuFind"/>
+	<form method="post" action="" name="accountForm" class="form-horizontal" id="accountForm">
+        <div class="form-group">
+	        <label for="account_username" class="control-label col-sm-2">Barcode:</label>
+            <div class="col-sm-10">
+	            <input id="account_barcode" type="text" name="barcode" value="<?=$this->escapeHtml($this->barcode)?>" class="<?=$this->jqueryValidation(array('required'=>'This field is required'))?> form-control"/>
+            </div><!--/col-->
+        </div><!--/form-group-->
+        <div class="form-group">
+	        <label for="account_lastname" class="control-label col-sm-2">Last Name:</label>
+            <div class="col-sm-10">
+	            <input id="account_lastname" type="text" name="lastname" value="<?=$this->escapeHtml($this->lastname)?>" class="<?=$this->jqueryValidation(array('required'=>'This field is required'))?> form-control"/>
+            </div><!--/col-->
+        </div><!--/form-group-->
+        <div class="form-group">
+	        <label for="account_pin" class="control-label col-sm-2">PIN:</label>
+            <div class="col-sm-10">
+	            <input id="account_pin" type="password" autocomplete="off" name="pin1" value="" class="<?=$this->jqueryValidation(array('required'=>'This field is required'))?> form-control"/>
+            </div><!--/col-->
+        </div><!--/form-group-->
+        <div class="form-group">
+	        <label for="account_pin" class="control-label col-sm-2">PIN (repeat):</label>
+            <div class="col-sm-10">
+	            <input id="account_pin" type="password" autocomplete="off" name="pin2" value="" class="<?=$this->jqueryValidation(array('required'=>'This field is required'))?> form-control"/>
+            </div><!--/col-->
+        </div><!--/form-group-->
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+	            <input class="btn btn-primary" type="submit" name="submit" value="Add this account to VuFind"/>
+            </div><!--/col-->
+        </div><!--/form-group-->
 	</form>
 <? else: ?>
     <p><a href="/vufind/Admin/Pin">Return to accounts view.</a></p>
