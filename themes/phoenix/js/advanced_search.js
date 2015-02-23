@@ -541,6 +541,10 @@ $(document).ready(function() {
         } else if (selected.val().indexOf('Crerar Library') > -1) {
             options.filter('[data-main-location*="crerar"]').appendTo('#limit_collection');
 
+        //Regenstein
+        } else if (selected.val().indexOf('Regenstein Library') > -1) {
+            options.filter('[data-main-location*="reg"]').appendTo('#limit_collection');
+
         //SCRC
         } else if (selected.val().indexOf('Special Collections') > -1) {
             options.filter('[data-main-location*="scrc"]').appendTo('#limit_collection');
