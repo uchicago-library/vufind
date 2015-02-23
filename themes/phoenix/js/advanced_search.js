@@ -534,6 +534,7 @@ $(document).ready(function() {
 
         //Anything without sub-collections just gets a message. 
         } else if (selected.val().indexOf('Crerar Library') == -1 &&
+                   selected.val().indexOf('Regenstein Library') == -1 &&
                    selected.val().indexOf('Special Collections') == -1) {
             options.filter('.ns').appendTo('#limit_collection');
 
