@@ -90,6 +90,7 @@
       <div class="container">
         <? if ($this->layout()->searchbox != false): ?>
           <nav class="nav searchbox hidden-lg hidden-print">
+            <?=$this->render('search/searchbox.phtml')?>
             <?=$this->layout()->searchbox ?>
           </nav>
         <? endif; ?>
