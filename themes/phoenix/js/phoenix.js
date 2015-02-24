@@ -195,6 +195,7 @@ $(document).ready(function() {
     $('.mini-search .input-clear').click(function(){
         $(this).parent().find('input').val('');
         $(this).parent().find('input').attr('placeholder',' ');
+        $(this).parent().find('input').focus();
         window.searchTerms = '';
     });
 
