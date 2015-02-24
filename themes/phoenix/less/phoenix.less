@@ -845,6 +845,9 @@ table.alphabrowse {
                 content: '';
             }
         }
+        td {
+            padding: 6px 8px;
+        }
     }
 }
 
@@ -895,6 +898,16 @@ table.alphabrowse {
             width: 50px;
             @media (min-width: @screen-sm-min) {
                 width: 10%;
+            }
+        }
+        td.author {
+            div {
+                padding-left: 20px;;
+                ul, ul li {
+                    display: inline;
+                    list-style: none;
+                    padding-left: 0;
+                }
             }
         }
     }
