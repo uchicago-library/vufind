@@ -59,6 +59,20 @@ a.report-a-record:after,
         width: 433px;
     }
 }
+header {
+    .navbar-right {
+        margin-top: 0;
+    }
+}
+
+/*Hamburger menu*/
+.navbar-toggle {
+    background:@brand-primary-dark;
+    padding: 6px 10px;
+    i.fa-bars {
+        color: @light-link;
+    }
+}
 
 .tagline {
     font-family: @tagline;
@@ -131,13 +145,13 @@ header > .navbar li,
 body > .main > .container {
     padding-top: 10px;
     @media (min-width: @screen-sm) { 
-       padding-top: 25px; 
+       padding-top: 10px; 
     }
     @media (min-width: @screen-md) { 
-       padding-top: 50px; 
+       padding-top: 11px; 
     }
     @media (min-width: @screen-lg) { 
-       padding-top: 75px; 
+       padding-top: 71px; 
     }
 }
 
@@ -167,7 +181,7 @@ body > header > .container > section.visible-lg,
 }
 body > header > .container > section.visible-lg { //Fullscreen
     position:absolute;
-    margin: 31px 0 0 -16px;
+    margin: 29px 0 0 -16px;
     padding: 6px 0;
     width:1170px;
 }
