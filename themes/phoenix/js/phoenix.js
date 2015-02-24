@@ -17,11 +17,10 @@ $(document).ready(function() {
     
         //hide some stuff
         //$('[class^="googlePreviewDiv"], .format-list, .detailed').addClass('hide');
-        $('.ajaxItem .iconlabel, .edition, .description, .imprint, .col-sm-2.col-xs-3, .googlePreviewDiv, .olPreviewDiv, .hathiPreviewDiv, .openUrlEmbed, .e-holdings').addClass('hide');
+        $('.ajaxItem .iconlabel, .edition, .description, .imprint, .col-sm-2.col-xs-0, .googlePreviewDiv, .olPreviewDiv, .hathiPreviewDiv, .openUrlEmbed, .e-holdings').addClass('hide');
 
         //make the title column wider
-        $('.ajaxItem .col-sm-7').removeClass('col-sm-7').addClass('col-sm-9');
-        $('.ajaxItem .col-xs-6').removeClass('col-xs-6').addClass('col-xs-9');
+        $('.ajaxItem .col-sm-8').removeClass('col-sm-8').addClass('col-sm-9');
 
         //regenerate the view toggle links
         $('.bv').replaceWith('<span class="bv">Brief View</span>');
