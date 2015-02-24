@@ -24,7 +24,17 @@
                $this->MarcFields()->setRecordLink($this->recordLink()->getUrl($this->driver)); 
                /*Get MARC field templates populated with the proper data*/
                $this->MarcFields()->returnMarcData('results'); ?>
-        </div>
+
+            <?/* Add snippets to the custom MARC view*/?>
+            <? if ($snippet = $this->driver->getHighlightedSnippet()): ?>
+              <? if (!empty($snippet['caption'])): ?>
+                <strong><?=$this->transEsc($snippet['caption']) ?>:</strong> ';
+              <? endif; ?>
+              <? if (!empty($snippet['snippet'])): ?>
+                <span class="quotestart">&#8220;</span>...<?=$this->highlight($snippet['snippet']) ?>...<span class="quoteend">&#8221;</span><br/>
+              <? endif; ?>
+            <? endif; ?>
+        </div><!--/.custom-marc-record-->
       <? // If it's not a MARC record do normal VuFind stuff?>
       <? else: ?>
       <div>
