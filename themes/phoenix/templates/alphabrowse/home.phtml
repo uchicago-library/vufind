@@ -31,7 +31,7 @@
   <!-- end row-->
   <div class="row">
   <div class="col-sm-12">
-  <table class="alphabrowse table table-striped">
+  <table class="alphabrowse table table-striped <?=$this->source . '-browse'?>">
     <thead>
       <tr>
         <th class="<?=$this->source ?>">
@@ -117,7 +117,7 @@
 
           <td class="titles">
             <? if ($item['count'] > 0): ?>
-              <?=$item['count']; ?>
+               <a href="<?=$this->escapeHtmlAttr($this->url('search-results', array(), array('query' => $query)))?>"><?=$item['count']; ?></a>
             <? endif; ?>
           </td>
         </tr>

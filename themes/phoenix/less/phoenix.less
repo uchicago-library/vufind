@@ -817,6 +817,88 @@ tr[typeof="Offer"] th,
 .pager {
     text-align: left;
 }
+.template-dir-alphabrowse.template-name-home {
+    footer {
+        margin-left: -15px;
+        margin-bottom: -15px;
+        margin-top: 15px; 
+    }
+}
+
+/*All browse pages*/
+table.alphabrowse {
+    tr {
+        th.titles {
+            text-indent: -9999px;
+            line-height: 0;
+            @media (min-width: @screen-sm-min) {
+                text-indent: 0;
+                line-height: normal;
+            }
+        }
+        th.titles:after {
+            text-indent: 0;
+            display: block;
+            line-height: normal;
+            content: '#';
+            @media (min-width: @screen-sm-min) {
+                content: '';
+            }
+        }
+    }
+}
+
+/*Title browse*/
+.title-browse {
+    tr {
+        th:nth-child(2),
+        td:nth-child(2) {
+            width: 25%;
+        }
+        th:nth-child(3),
+        td:nth-child(3) {
+            width: 0;
+            display: none;
+            @media (min-width: @screen-sm-min) {
+                width: auto;
+                display: table-cell;    
+            }
+        }
+        .title {
+            width: 45%;    
+        }
+        th:nth-child(4) {
+            text-indent: -9999px;
+            line-height: 0;
+            @media (min-width: @screen-md-min) {
+                text-indent: 0;
+                line-height: normal;
+            }
+        }
+        th:nth-child(4):after {
+            text-indent: 0;
+            display: block;
+            line-height: normal;
+            content: 'Year';
+            @media (min-width: @screen-md-min) {
+                content: '';
+            }
+        }
+    }
+}
+
+/*Author browse*/
+.author-browse {
+    tr {
+        th.titles, 
+        td.titles {
+            width: 50px;
+            @media (min-width: @screen-sm-min) {
+                width: 10%;
+            }
+        }
+    }
+} 
 
 /*Results*/
 .result:nth-child(odd) {
