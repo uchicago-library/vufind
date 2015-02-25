@@ -167,12 +167,8 @@ function registerLightboxEvents() {
   });
  // Expand and collapse of No-CNet-ID login
  $(modal).find('#login-toggle').click(function() {
-    $('.login-toggle-content').toggle();
+    $(this).parents('.login-toggle-wrapper').next('.login-toggle-content').toggle();
  });
- $(modal).find('#login-toggle').focus(function() {
-    $('.login-toggle-content').toggle();
- });
-
 }
 function updatePageForLogin() {
   // Hide "log in" options and show "log out" options:
@@ -494,5 +490,9 @@ $(document).ready(function() {
   $('.save-record').click(function() {
     var parts = this.href.split('/');
     return Lightbox.get(parts[parts.length-3],'Save',{id:$(this).attr('id')});
+  });
+  // Expand and collapse of No-CNet-ID login, when the page is 
+  $('#login-toggle').click(function() {
+    $(this).parents('.login-toggle-wrapper').next('.login-toggle-content').toggle();
   });
 });
