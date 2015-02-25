@@ -81,7 +81,9 @@
         <? else: ?>
           <p class="lead"><?=$this->transEsc('nohit_heading')?></p>
         <? endif; ?>
-        <? $this->ViewToggle(); ?>
+        <? if (($recordTotal = $this->results->getResultTotal()) > 0): // only display this if we have results ?>
+            <? $this->ViewToggle(); ?>
+        <?endif;?>
       </div>
 
       <? if ($recordTotal > 0): ?>
