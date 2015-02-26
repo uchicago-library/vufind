@@ -235,7 +235,26 @@ class Citation extends \Zend\View\Helper\AbstractHelper
      */
     public function getCitationChicago()
     {
-        return $this->getCitationMLA(9, ', no. ');
+        $chicago = array(
+            'title' => $this->getMLATitle(),
+            'authors' => $this->getChicagoAuthors(4),
+        );
+        $chicago['periodAfterTitle'] = !$this->isPunctuated($chicago['title']);
+
+        // Behave differently for books vs. journals:
+        $partial = $this->getView()->plugin('partial');
+        if (empty($this->details['journal'])) {
+            $chicago['publisher'] = $this->getPublisher();
+            $chicago['year'] = $this->getYear();
+            $chicago['edition'] = $this->getEdition();
+            return $partial('Citation/chicago.phtml', $chicago);
+        } else {
+            // Add other journal-specific details:
+            $chicago['pageRange'] = $this->getPageRange();
+            $chicago['journal'] =  $this->capitalizeTitle($this->details['journal']);
+            $chicago['numberAndDate'] = $this->getMLANumberAndDate($volNumSeparator);
+            return $partial('Citation/chicago-article.phtml', $chicago);
+        }
     }
 
     /**
@@ -714,6 +733,44 @@ class Citation extends \Zend\View\Helper\AbstractHelper
                     } else {
                         // First
                         $authorStr .= $this->cleanNameDates($author);
+                    }
+                    $i++;
+                }
+            }
+        }
+        return (empty($authorStr) ? false : $this->stripPunctuation($authorStr));
+    }
+
+    /**
+     * Get an array of authors for an MLA or Chicago Style citation.
+     *
+     * @param int $etAlThreshold The number of authors to abbreviate with 'et al.'
+     * This is the only difference between MLA/Chicago Style.
+     *
+     * @return array
+     */
+    protected function getChicagoAuthors($etAlThreshold = 4)
+    {
+        $authorStr = '';
+        if (isset($this->details['authors'])
+            && is_array($this->details['authors'])
+        ) {
+            $i = 0;
+            if (count($this->details['authors']) > $etAlThreshold) {
+                $author = $this->details['authors'][0];
+                $authorStr = $this->reverseName($this->stripPunctuation($this->cleanNameDates($author))) . ' et al.';
+            } else {
+                foreach ($this->details['authors'] as $author) {
+                    $author = $this->reverseName($this->stripPunctuation($this->cleanNameDates($author)));
+                    
+                    if (($i+1 == count($this->details['authors'])) && ($i > 0)) {
+                        // Last
+                        $authorStr .= ' and ' . $author;
+                    } elseif ($i > 0) {
+                        $authorStr .= ', ' . $author;
+                    } else {
+                        // First
+                        $authorStr .= $author;
                     }
                     $i++;
                 }
