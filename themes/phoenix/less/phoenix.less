@@ -832,6 +832,21 @@ tr[typeof="Offer"] th,
 .maplink .service {
     margin-left: 0;
 }
+.template-dir-record.template-name-view {
+    > .container {
+        > .nav.nav-pills {
+            padding: 10px 0;
+            > li {
+                > a {
+                    padding: 3px 5px;
+                    @media (min-width: @screen-sm-min) {
+                        padding: 0 15px;
+                    }
+                }
+            }
+        }
+    }  
+}
 
 /*Alphabrowse*/
 .pager {
