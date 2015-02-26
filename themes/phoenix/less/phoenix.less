@@ -147,16 +147,28 @@ header > .navbar li,
     }*/
 }
 
-body > .main > .container {
-    padding-top: 10px;
-    @media (min-width: @screen-sm) { 
-       padding-top: 10px; 
+body { 
+    > .main { 
+        > .container {
+            padding-top: 10px;
+            @media (min-width: @screen-md) { 
+               padding-top: 10px; 
+            }
+            @media (min-width: @screen-lg) { 
+               padding-top: 71px; 
+            }
+        }
     }
-    @media (min-width: @screen-md) { 
-       padding-top: 11px; 
-    }
-    @media (min-width: @screen-lg) { 
-       padding-top: 71px; 
+    > .main.template-name-advanced {
+        > .container {
+            padding-top: 30px;
+            @media (min-width: @screen-sm) { 
+               padding-top: 50px; 
+            }
+            @media (min-width: @screen-lg) { 
+               padding-top: 71px; 
+            }
+        }
     }
 }
 
@@ -746,7 +758,10 @@ div[resource="#record"] .table > tbody > tr:first-child > td {
 
 /* Full Record */
 #record .recordcover {
-    margin-top:47px;
+    margin: 8px 0 10px 0;
+    @media (min-width: @screen-md) { 
+        margin-top:47px;
+    }
 }
 #record-tabs h3 {
     display: inline;
