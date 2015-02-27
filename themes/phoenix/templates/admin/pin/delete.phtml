@@ -16,20 +16,36 @@
 <?=$this->flashmessages()?>
 
 <? if ($this->barcode): ?>
-<form method="post" action="" name="deletePinForm" id="deletePinForm">
-<label class="span-3" for="account_username">Barcode:</label>
-<?=$this->escapeHtml($this->barcode)?>
-<br class="clear"/>
-
-<label class="span-3" for="account_lastname">First Name:</label>
-<?=$this->escapeHtml($this->firstname)?>
-<br class="clear"/>
-
-<label class="span-3" for="account_lastname">Last Name:</label>
-<?=$this->escapeHtml($this->lastname)?>
-<br class="clear"/>
-
-<input class="push-3 button" type="submit" name="submit" value="Delete this account from VuFind"/>
+<form method="post" action="" name="deletePinForm" class="form-horizontal" id="deletePinForm">
+    <div class="row">
+        <label class="control-label col-sm-2" for="account_username">Barcode:</label>
+        <div class="col-sm-10">
+            <p style="margin-top: 8px;">
+                <?=$this->escapeHtml($this->barcode)?>
+            </p>
+        </div><!--/col-->
+    </div><!--/row-->
+    <div class="row">
+        <label class="control-label col-sm-2" for="account_lastname">First Name:</label>
+        <div class="col-sm-10">
+            <p style="margin-top: 8px;">
+                <?=$this->escapeHtml($this->firstname)?>
+            </p>
+        </div><!--/col-->
+    </div><!--/row-->
+    <div class="row">
+        <label class="control-label col-sm-2" for="account_lastname">Last Name:</label>
+        <div class="col-sm-10">
+            <p style="margin-top: 8px;">
+                <?=$this->escapeHtml($this->lastname)?>
+            </p>
+        </div><!--/col-->
+    </div><!--/row-->
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <input class="btn btn-primary" type="submit" name="submit" value="Delete this account from VuFind"/>
+        </div><!--/col-->
+    </div><!--/form-group-->
 </form>
 <? else: ?>
 <p><a href="/vufind/Admin/Pin">Return to accounts view.</a></p>
