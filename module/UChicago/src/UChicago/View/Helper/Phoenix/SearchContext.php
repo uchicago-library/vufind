@@ -120,7 +120,6 @@ class SearchContext extends AbstractHelper
         
         /*Build the view descriptions*/
         $templateDesc = !empty($templateDir) && !empty($templateName) ? $templateDir . '-' . $templateName : null;
-        error_log($templateDesc);
 
         /*Build a data structure*/
         $contextTypes = array('searchType' => $searchType, 
