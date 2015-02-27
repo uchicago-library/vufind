@@ -17,4 +17,25 @@ class Mailer extends \VuFind\Mailer\Mailer
         );
         return $this->send($to, $from, $subject, $body);
     }
+
+    public function sendRecords($to, $from, $msg, $records, $view)
+    {
+        $subject = $this->translate('Library Catalog Records');
+
+        $body = '';
+        for ($r = 0; $r < count($records); $r++) {
+            if ($r == count($records) - 1) {
+                $m = $msg;
+            } else {
+                $m = '';
+            }
+            $body .= $view->partial(
+                'Email/record.phtml',
+                array(
+                    'driver' => $records[$r], 'to' => $to, 'from' => $from, 'message' => $m
+                )
+            );
+        }
+        return $this->send($to, $from, $subject, $body);
+    }
 }
