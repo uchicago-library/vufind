@@ -17,10 +17,22 @@
     $lastSort = $options->getLastSort();
     $lastLimit = $options->getLastLimit();
 
-    // I'm resetting these (not default VuFind behavior). I think this is required because the mini searchbox also displays on browse pages - brad
-    $this->lookfor = isset($_GET["lookfor"]) ? $_GET["lookfor"] : '';
-    $this->from = isset($_GET["from"]) ? $_GET["from"] : '';
-    $this->lookfor = !empty($this->lookfor) ? $this->lookfor : $this->from; 
+    // Resetting $this->lookfor (not default VuFind behavior). I think this is required because the mini searchbox also displays on browse pages - brad
+    $searchTerms = isset($_GET["lookfor"]) ? $_GET["lookfor"] : '';
+    $browseTerms = isset($_GET["from"]) ? $_GET["from"] : '';
+    switch ($this->lookfor) {
+        case (!empty($this->lookfor)):
+            $this->lookfor = $this->lookfor;
+            break;
+        case (!empty($searchTerms)):
+            $this->lookfor = $searchTerms;
+            break;
+        case (!empty($browseTerms)):
+            $this->lookfor = $browseTerms;
+            break;
+        default:
+            $this->lookfor = $this->lookfor;
+    }
  
 ?>
 <? if ($this->searchType == 'advanced'): ?>
@@ -29,9 +41,9 @@
     <? if (!empty($tabs)): ?><?=$tabs ?><div class="tab-content clearfix"><? endif; ?>
       <p class="adv_search_terms"><?=$this->transEsc("Your search terms")?> : "<strong><?=$this->escapeHtml($this->lookfor)?></strong>"</p>
       <p class="adv_search_links">
-        <a href="<?=$this->url($advSearch)?>?edit=<?=$this->escapeHtmlAttr($this->searchId)?>"><?=$this->transEsc("Edit this Advanced Search")?></a>
-        <a href="<?=$this->url($advSearch)?>"><?=$this->transEsc("Start a new Advanced Search")?></a>
-        <a href="<?=$this->url($searchHome)?>"><?=$this->transEsc("Start a new Basic Search")?></a>
+        <a href="<?=$this->url($advSearch)?>?edit=<?=$this->escapeHtmlAttr($this->searchId)?>" class="mini-adv-link"><?=$this->transEsc("Edit this Advanced Search")?></a>
+        <a href="<?=$this->url($advSearch)?>" class="mini-adv-link"><?=$this->transEsc("Start a new Advanced Search")?></a>
+        <a href="<?=$this->url($searchHome)?>" class="keyword"><?=$this->transEsc("Start a new Basic Search")?></a>
       </p>
     <? if (!empty($tabs)): ?></div><? endif; ?>
   </div>
