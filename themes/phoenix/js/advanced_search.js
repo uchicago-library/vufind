@@ -457,6 +457,7 @@ function switchToBasicSearch()
 }
 
 $(document).ready(function() {
+
     // Add basic/advanced search switch links.
     $('#advSearch').prepend('<p id="basicAdvancedSearchSwitches"><span id="basicSearchSwitch"><a class="disabled" href="#">Basic</a></span> | <span id="advancedSearchSwitch"><a href="#" id="advancedSearchSwitch">Advanced Search</a></span></p>');
 
@@ -568,7 +569,21 @@ $(document).ready(function() {
             $('[name="publishDatefrom"]').remove();
             $('[name="publishDateto"]').remove();
         }
-    }); 
+    });
+
+    // Preserve search box terms between begins with and keyword tabs 
+    $(' #alphaBrowseForm_from,  #search_lookfor0_0').change(function() {
+        window.searchTerms = $(this).val();
+    });
+    $('.template-name-advanced [data-toggle="tab"]').click(function() {
+        window.searchTerms = $(this).parent().parent().parent().find('#homepageNavContent .active .input-large:first').val();
+        $('#search_lookfor0_0').each(function() {
+            $(this).val(window.searchTerms);
+        });
+        $('#alphaBrowseForm_from').each(function() {
+            $(this).val(window.searchTerms);
+        });
+    });
 
     //popover for 'which search should I use?' link. 
     $('#searchtabinfolink').popover({
@@ -579,5 +594,6 @@ $(document).ready(function() {
         'placement': 'right',
         'trigger': 'hover focus'
     });
+
 });
 

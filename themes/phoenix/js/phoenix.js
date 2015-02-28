@@ -188,7 +188,7 @@ $(document).ready(function() {
     });
     $(".search-query").change(function(){ 
         window.searchTerms = $(this).val();
-    })
+    });
 
     // Clear inputs on the mini-search box in the gray bar
     $('.mini-search #alphaBrowseForm_from, .mini-search #searchForm_lookfor').after('<i class="input-clear fa fa-times-circle-o"></i>');
@@ -271,18 +271,23 @@ $(document).ready(function() {
         });
     }
 
-    // When a user clicks Advanced in a gray bar mini-searchbox
+    // When a user clicks "Advanced" in a gray bar mini-searchbox
     $('.mini-adv-link').click(function(e) {
         $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
         $.cookie('basic_or_advanced', 'advanced', cookie_settings);
     });
-    // When a user clicks Browse in a gray bar mini-searchbox...
+    // When a user clicks "Browse" in a gray bar mini-searchbox...
     $('.mini-box-toggle.browse').click(function(e) {
         $.cookie('keyword_or_begins_with', 'begins with', cookie_settings);
     });
-    // When a user clicks Keyword in a gray bar mini-searchbox...
+    // When a user clicks "Keyword" in a gray bar mini-searchbox...
     $('.mini-box-toggle.keyword').click(function(e) {
         $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
+    });
+    // When a user clicks "Start a new Basic Search" in a gray bar mini-searchbox...
+    $('.mini-basic-link').click(function(e) {
+        $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
+        $.cookie('basic_or_advanced', 'basic', cookie_settings);
     });
 
 
