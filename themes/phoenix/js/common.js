@@ -455,10 +455,6 @@ $(document).ready(function() {
     return false;
   });
 
-  /*Lightbox.('#login-toggle').click(function() {
-    console.log('YEEEEEEEEEEEEEEESSSSSSSSSSS!!!!');
-  });*/
-
   // Feedback
   $('#feedbackLink').click(function() {
     return Lightbox.get('Feedback', 'Home');
