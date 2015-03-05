@@ -17,7 +17,7 @@ $(document).ready(function() {
     
         //hide some stuff
         //$('[class^="googlePreviewDiv"], .format-list, .detailed').addClass('hide');
-        $('.ajaxItem .iconlabel, .edition, .description, .imprint, .col-sm-2.col-xs-0, .googlePreviewDiv, .olPreviewDiv, .hathiPreviewDiv, .openUrlEmbed, .e-holdings').addClass('hide');
+        $('.ajaxItem .iconlabel, .edition, .description, .imprint, .col-sm-2.col-xs-0').addClass('hide');
 
         //make the title column wider
         $('.ajaxItem .col-sm-8').removeClass('col-sm-8').addClass('col-sm-9');
