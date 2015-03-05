@@ -317,6 +317,22 @@ $(document).ready(function() {
             $form.data('submitted', true);
         }
     });
+
+    /*
+     * Add a referrer parameter to the help link.
+     * Use that to give context-specific help.
+     */
+    $("a[title='Help']").attr('href',
+        $("a[title='Help']").attr('href') +
+            '?r=' +
+            encodeURIComponent(window.location)
+        );
+
+    /*Required for opening new tabs in Safari*/
+    $('a.service, a.external').click(function() {
+        window.open(url,'_blank');
+    });
+
 });
 
 (function() {
