@@ -1,3 +1,4 @@
+import org.marc4j.marc.MarcFactory;
 import org.marc4j.marc.Record;
 import org.marc4j.marc.ControlField;
 import org.marc4j.marc.DataField;
@@ -7,6 +8,7 @@ import org.marc4j.marc.impl.DataFieldImpl;
 import java.util.regex.Pattern;  // FOR   int ind2 = Pattern.matches("\\d", s) ? Integer.parseInt(s) : 0;
 
 import org.solrmarc.index.SolrIndexer;
+import org.solrmarc.index.VuFindIndexer;
 import org.solrmarc.tools.Utils;
 
 //import java.lang.Character;
@@ -231,8 +233,7 @@ protected static Set getSubfieldDataAsSet(Record record, String fldTag, String s
     // Loop through Data and Control Fields
     
     List varFlds = record.getVariableFields(fldTag);
-    for (VariableField vf : varFlds)
-    {
+    for (VariableField vf : varFlds) {
 	if (!fldTag.substring(0,2).equals("00") && subfldsSrt != null)
     //  if (!SolrIndexer.isControlField(fldTag) && subfldsStr != null)   <-- Original line. it was changed for the next line(did'not work with Maura's Series Title  Browse (bug#10722)
         {
@@ -340,7 +341,6 @@ public static List titleBrowse(Record record, String tagStr)
 
     Record filteredRec = titleDoubleEntryFilter(record, tagStr);
     List fields = indexer.getFieldListAsList(filteredRec, tagStr);
-    
     Iterator iter = fields.iterator();
    
     String f;
@@ -392,8 +392,9 @@ public static List titleBrowseSort(Record record, String tagStr)
  */
 public static Record titleDoubleEntryFilter(Record record, String tagStr)
 {
-    // Record newRecord = newe org.marc4j.marc.impl.RecordImpl();
-    Record newRecord = new org.solrmarc.marcoverride.NoSortRecordImpl();
+    // factory is the recommended way to get record objects
+    MarcFactory factory = MarcFactory.newInstance();
+    Record newRecord = factory.newRecord();
     
     Set titleFields = new HashSet();
     Set titleLinkingFields = new HashSet();
@@ -489,12 +490,24 @@ public static Record titleDoubleEntryFilter(Record record, String tagStr)
 
 // Debugging utils
 public static void examineObject(Object obj) {
-    System.err.println("Examining " + obj.getClass().getName());
+    Class cl = obj.getClass();
+    System.err.println("Examining: " + obj.getClass().getName());
+    System.err.println("\tValue = " + (obj == null ? "null" : obj.toString()) );
+    examineObjectMethods(obj);
+}
+
+public static void examineObject(Object obj, String name) {
+    System.err.println("Examining \"" + name + "\":\t" + obj.getClass().getName());
+    System.err.println("\tValue = " + (obj == null ? "null" : obj.toString()) );
+    examineObjectMethods(obj);
+}
+
+public static void examineObjectMethods(Object obj) {
     java.lang.reflect.Method[] methods = obj.getClass().getMethods();
     if (methods.length > 0) {
 	System.err.println("Methods:");
-	for (int i=0; i < methods.length; i++) {
-	    System.err.println("\t" + methods[i].toGenericString());
+	for (java.lang.reflect.Method m : methods) {
+	    System.err.println("\t" + m.toGenericString());
 	}
     }
 }
