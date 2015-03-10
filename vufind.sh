@@ -138,7 +138,7 @@ findDirectory()
 # JAVA_OPTIONS="-server -Xmx1024m -XX:+UseParallelGC -XX:NewRatio=5"
 if [ -z "$JAVA_OPTIONS" ]
 then
-  JAVA_OPTIONS="-server -Xms1024m -Xmx1024m -XX:+UseParallelGC -XX:NewRatio=5"
+  JAVA_OPTIONS="-server -Xms2048m -Xmx2048m -XX:+UseParallelGC -XX:NewRatio=5"
 fi
 
 ##################################################
@@ -440,11 +440,55 @@ esac
 #####################################################
 JAVA_OPTIONS="$JAVA_OPTIONS -Djetty.home=$JETTY_HOME "
 
+
+#####################################################
+# JETTY_ARGS hack for FreeBSD:
+#
+# load the Zentus SQLlite JDBC, as Xerial version does
+# not support FreeBSD and Zentus is the ports.
+#
+# See:
+# http://www.eclipse.org/jetty/documentation/current/advanced-jetty-start.html
+#####################################################
+
+OS="$(uname -s)"
+if [ -z "$ZENTUS_SQLITE_JDBC"]
+then 
+    ZENTUS_SQLITE_JDBC="/usr/local/share/java/classes/sqlitejdbc-native.jar"
+fi
+if [ $OS = FreeBSD -a -f $ZENTUS_SQLITE_JDBC ]
+then
+    JETTY_ARGS="path=$ZENTUS_SQLITE_JDBC $JETTY_ARGS"
+fi
+
+
 #####################################################
 # This is how the Jetty server will be started
 #####################################################
 RUN_CMD="$JAVA $JAVA_OPTIONS -jar $JETTY_HOME/start.jar $JETTY_ARGS $CONFIGS"
 
+
+#####################################################
+# RUN_CMD hack for FreeBSD:
+#
+# load the Zentus SQLlite JDBC, as Xerial version does
+# not support FreeBSD and Zentus is the ports.
+#
+# In Jetty 6 we cannot invoke with -jar as we need to 
+# alter the class path. More recent versions of Jetty
+# have options to configure the class path when run
+# with -jar, so re-examin when we upgrade Jetty. See
+# http://www.eclipse.org/jetty/documentation/current/advanced-jetty-start.html
+#####################################################
+
+# OS="$(uname -s)"
+# ZENTUS_SQLITE_JDBC="/usr/local/share/java/classes/sqlitejdbc-native.jar"
+# if [ $OS = FreeBSD -a -f $ZENTUS_SQLITE_JDBC ]
+# then
+#     CLASSPATH=$JETTY_HOME/start.jar:$ZENTUS_SQLITE_JDBC:.
+#     JAVA_OPTIONS="$JAVA_OPTIONS -cp $CLASSPATH"
+#     # RUN_CMD="$JAVA $JAVA_OPTIONS org.mortbay.start.Main $JETTY_ARGS $CONFIGS"
+# fi
 
 ##################################################
 # Do the action
