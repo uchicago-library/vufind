@@ -255,9 +255,15 @@ $(document).ready(function() {
         $('#homepageNavTabs li:nth-child(1) a, #homepageNavTabs li:nth-child(2) a').click(function(e) {
             if ($(this).text() == 'Keyword') {
                 $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
+    
+                // Update the title tag
+                $('head title').text(getTitleTag());
             }
             if ($(this).text() == 'Begins With') {
                 $.cookie('keyword_or_begins_with', 'begins with', cookie_settings);
+                    
+                // Update the title tag
+                $('head title').text(getTitleTag());
             }
         });
         // When a user clicks Basic or Advanced Search...
@@ -334,6 +340,22 @@ $(document).ready(function() {
     });
 
 });
+
+/**
+ * Convert a string to title case.
+ */
+function getTitleCase(str) {
+    return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+}
+
+/**
+ * Constructs the proper text for a title tag based on the cookie settings.
+ */
+function getTitleTag() {
+    var title_tag = '';
+    ($.cookie('keyword_or_begins_with') == 'keyword') ? title_tag = $.cookie('basic_or_advanced') + ' ' + $.cookie('keyword_or_begins_with') + ' Search' : title_tag = $.cookie('keyword_or_begins_with') + ' Search';
+    return getTitleCase(title_tag); 
+}
 
 (function() {
     /*

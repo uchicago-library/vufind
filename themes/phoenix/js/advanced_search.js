@@ -363,6 +363,11 @@ function switchToAdvancedSearch()
     $('.group:first').addSearch();
     $('.group:first').addSearch();
 
+    // Update the title tag
+    setTimeout(function() {
+        $('head title').text(getTitleTag);
+    }, 100);
+    
     return false;
 }
 
@@ -452,6 +457,11 @@ function switchToBasicSearch()
     if ($('.basicSearchBtn').length == 0) {
         $('.group:first .search:first').append('<input type="submit" value="Search" class="btn btn-primary basicSearchBtn">');
     }
+
+    //Update the title tag
+    setTimeout(function() {
+        $('head title').text(getTitleTag());
+    }, 100);
 
     return false;
 }
@@ -584,6 +594,9 @@ $(document).ready(function() {
             $(this).val(window.searchTerms);
         });
     });
+
+    // Set the initial title tag when a user comes to the page
+    $('head title').text(getTitleTag());
 
     //popover for 'which search should I use?' link. 
     $('#searchtabinfolink').popover({
