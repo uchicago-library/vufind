@@ -26,25 +26,25 @@
  * http://stackoverflow.com/questions/26698141/google-universal-analytics-form-submit
  */
 
-/* This is universal analytics. */
-
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-45852123-1', 'uchicago.edu');
-
-String.prototype.endsWith = function(suffix) {
-	return this.indexOf(suffix, this.length - suffix.length) !== -1;
-};
-
-/* Uncomment the lines below to test event logging. */
-function catalogevent(a, b, c, d) {
-    //var s = '/vufind/themes/phoenix/js/empty.js?analyticstest=on&event=' + c + '&label=' + d;
-    var s = 'https://www.lib.uchicago.edu/e/jej/empty.js?analyticstest=on&event=' + c + '&label=' + d;
-    $('head').append("<script src='" + s + "' type='text/javascript'></script>");
-    ga(a, b, c, d);
-}
-
 $(document).ready(function() {
+	/* This is universal analytics. */
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-45852123-1', 'uchicago.edu');
+	
+	String.prototype.endsWith = function(suffix) {
+		return this.indexOf(suffix, this.length - suffix.length) !== -1;
+	};
+	
+	/* Uncomment the lines below to test event logging. */
+	function catalogevent(a, b, c, d) {
+	    //var s = '/vufind/themes/phoenix/js/empty.js?analyticstest=on&event=' + c + '&label=' + d;
+	    var s = 'https://www.lib.uchicago.edu/e/jej/empty.js?analyticstest=on&event=' + c + '&label=' + d;
+	    $('head').append("<script src='" + s + "' type='text/javascript'></script>");
+	    ga(a, b, c, d);
+	}
+	
     var q = 'https://www.lib.uchicago.edu/cgi-bin/subnetclass?jsoncallback=?';
     $.getJSON(q, function(data) {
 
