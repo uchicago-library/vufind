@@ -8,6 +8,7 @@ $config = array(
         ),
         'invokables' => array(
             'adminpin' => 'VuFindAdmin\Controller\PinController',
+            'ajax' => 'UChicago\Controller\AjaxController',
             'cart' => 'UChicago\Controller\CartController',
             'feedback' => 'UChicago\Controller\FeedbackController',
             'my-research' => 'UChicago\Controller\MyResearchController',

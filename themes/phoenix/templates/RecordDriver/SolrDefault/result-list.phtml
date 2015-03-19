@@ -183,7 +183,7 @@
       <? endif; ?>
       <?=$this->record($this->driver)->getPreviews()?>
     </div>
-    <div class="col-xs-0 right text-right hidden-print hidden-xs">
+    <div class="col-xs-0 right text-right hidden-print hidden-xs format-list">
       <? /* Display qrcode if appropriate: */ ?>
       <? if ($QRCode = $this->record($this->driver)->getQRCode("results")): ?>
         <?

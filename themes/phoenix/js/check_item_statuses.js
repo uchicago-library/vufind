@@ -1,5 +1,14 @@
 /*global path*/
 
+function buildFormatList(formatObjects) {
+    formatList = [];
+    formatsLength = formatObjects.length;
+    for (i = 0; i < formatsLength; i++) {
+        formatList.push(formatObjects[i].textContent);
+    }
+    return formatList;
+}
+
 function checkItemStatuses() {
   var id = $.map($('.ajaxItem'), function(i) {
     return $(i).find('.hiddenId')[0].value;
@@ -19,6 +28,17 @@ function checkItemStatuses() {
           var item = $($('.ajaxItem')[result.record_number]);
 
           item.find('.status').empty().append(result.availability_message);
+
+          // Get formats to hide availability from Journals.
+          formatObjects = item.find('.format-list span').contents().toArray();
+          formats = buildFormatList(formatObjects);
+
+          // Remove the status for analytics and journals. A code change for analytics 
+          // is also found in UChicago\Controller\AjaxController
+          if (result.availability_message == '' || $.inArray('Journal', formats) > -1) { 
+            item.find('.status').remove();
+          }
+
           if (typeof(result.full_status) != 'undefined'
             && result.full_status.length > 0
             && item.find('.callnumAndLocation').length > 0
