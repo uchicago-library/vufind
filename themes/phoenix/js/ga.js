@@ -1,7 +1,7 @@
 /* 
  * Google Analytics Event tracking for the catalog interface
  * 
- * rev. 2014/04/17 jej
+ * rev. 2015/03/11 jej
  * 
  * Note: Google Analytics has a limit of 10 simultaneous events. 
  * To keep the count of events down, especially in the advanced 
@@ -23,26 +23,28 @@
  * phoenix/templates/search/searchbox.phtml
  * phoenix/templates/search/searchbox_mini.phtml
  * phoenix/templates/search/advanced/layout.phtml
+ * http://stackoverflow.com/questions/26698141/google-universal-analytics-form-submit
  */
 
-/* This is universal analytics. */
-
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-45852123-1', 'uchicago.edu');
-
-String.prototype.endsWith = function(suffix) {
-	return this.indexOf(suffix, this.length - suffix.length) !== -1;
-};
-
-/* Uncomment the lines below to test event logging. */
-function catalogevent(a, b, c, d) {
-    //var s = '/vufind/themes/phoenix/js/empty.js?analyticstest=on&event=' + c + '&label=' + d;
-    //$('head').append("<script src='" + s + "' type='text/javascript'></script>");
-    ga(a, b, c, d);
-}
-
 $(document).ready(function() {
+	/* This is universal analytics. */
+	
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	
+	ga('create', 'UA-45852123-1', 'uchicago.edu');
+	
+	String.prototype.endsWith = function(suffix) {
+		return this.indexOf(suffix, this.length - suffix.length) !== -1;
+	};
+	
+	/* Uncomment the lines below to test event logging. */
+	function catalogevent(a, b, c, d) {
+	    //var s = '/vufind/themes/phoenix/js/empty.js?analyticstest=on&event=' + c + '&label=' + d;
+	    var s = 'https://www.lib.uchicago.edu/e/jej/empty.js?analyticstest=on&event=' + c + '&label=' + d;
+	    $('head').append("<script src='" + s + "' type='text/javascript'></script>");
+	    ga(a, b, c, d);
+	}
+	
     var q = 'https://www.lib.uchicago.edu/cgi-bin/subnetclass?jsoncallback=?';
     $.getJSON(q, function(data) {
 
@@ -53,19 +55,36 @@ $(document).ready(function() {
 		/**************************************** 
 		 ******** BASIC KEYWORD SEARCHES ******** 
 		 ****************************************/
-	
-	    $('#searchForm').on('submit.googleAnalytics', function(e) {
-	        $('#searchForm').unbind('submit.googleAnalytics');
+
+        /* Basic search, from homepage. */	
+	    $('#advSearchForm').on('submit.googleAnalytics', function(e) {
+            /* Make sure it's a basic search. */
+            if (!$(this).hasClass('basicSearch')) {
+                return;
+            }
+	        $('#advSearchForm').unbind('submit.googleAnalytics');
 	
 	        e.preventDefault();
 	
 	        catalogevent('send', 'event', 'searchType', 'Basic Keyword Search');
-		    /* Catalog homepage basic keyword search */
-		    if (window.location.href.endsWith('/vufind/')) {
-			    catalogevent('send', 'event', 'submitSearchFrom', 'Catalog Homepage');
-		    }
+			catalogevent('send', 'event', 'submitSearchFrom', 'Catalog Homepage');
+	        catalogevent('send', 'event', 'searchField', $(this).find('.search select').val());
+
+	        /* Short delay for analytics. */
+	        var form = this;
+	        setTimeout(function() {
+	            $(form).submit();
+	        }, 100);
+        });
+
+        /* Basic search, from a search result page or the full record view. */
+        $('#searchForm').on('submit.googleAnalytics', function(e) {
+	        $('#searchForm').unbind('submit.googleAnalytics');
+	
+	        e.preventDefault();
+
 		    /* Keyword search result page */
-		    else if (window.location.href.indexOf('/vufind/Search/Results') !== -1) {
+		    if (window.location.href.indexOf('/vufind/Search/Results') !== -1) {
 			    catalogevent('send', 'event', 'submitSearchFrom', 'Result Page');
 		    }
 		    /* Full record view */
@@ -81,16 +100,16 @@ $(document).ready(function() {
 	        }, 100);
 	    });
 	    
-	    /* User changes the field pulldown. */
-		$('#searchForm_type').change(function() {
-			catalogevent('send', 'event', 'changeSearchField', 'basicKeywordSearch');
-		}); 
-	
 		/**************************************** 
 		 ******* ADVANCED KEYWORD SEARCHES ****** 
 		 ****************************************/
 	
 		$('#advSearchForm').on('submit.googleAnalytics', function(e) {
+            /* Make sure it's an advanced search. */
+            if (!$(this).hasClass('advancedSearch')) {
+                return;
+            }
+
 	        $('#advSearchForm').unbind('submit.googleAnalytics');
 	
 	        e.preventDefault();
@@ -122,7 +141,7 @@ $(document).ready(function() {
 	        /* Record the fields submitted. First check to be sure there is
 	         * something in the text box next to the field. */
 	        $('select[id^="search_type"]').each(function() {
-	            if ($(this).parent('div').prev('div').find('input[id^="search_lookfor"]').val() != '') {
+	            if ($(this).prev('input[id^="search_lookfor"]').val() != '') {
 			        catalogevent('send', 'event', 'searchField', $(this).val());
 	            }
 	        });
@@ -172,7 +191,7 @@ $(document).ready(function() {
 	                $.each($('select#limit_collection').val(), function(i, v) {
 	                    collection_limits.push(v);
 				    });
-					catalogevent('send', 'event', 'advancedSearchCollectionLimit', collection_limits('|'));
+					catalogevent('send', 'event', 'advancedSearchCollectionLimit', collection_limits.join('|'));
 	            }
 	        } catch (e) {}
 	
@@ -192,7 +211,12 @@ $(document).ready(function() {
 	        $('select[id^="search_type"]:not(.changeEventBound)').each(function() {
 	            $(this).addClass('changeEventBound');
 	            $(this).change(function() {
-		            catalogevent('send', 'event', 'changeSearchField', 'advancedKeywordSearch');
+                    if ($(this).parents('form:first').hasClass('basicSearch')) {
+		                var search = 'basicKeywordSearch';
+                    } else {
+                        var search = 'advancedKeywordSearch';
+                    }
+		            catalogevent('send', 'event', 'changeSearchField', search);
 	            });
 	        });
 	    }, 250);
@@ -200,23 +224,17 @@ $(document).ready(function() {
 		/**************************************** 
 		 ******** BEGINS WITH SEARCHES **********
 		 ****************************************/
-	
-		$('#alphaBrowseForm').on('submit.googleAnalytics', function(e) {
-	        $('#alphaBrowseForm').unbind('submit.googleAnalytics');
 
+    	/* Catalog homepage begins with search */
+		$('#alphaBrowseForm').on('submit.googleAnalytics', function(e) {
+            if ($(this).parents('div.template-name-advanced').length == 0) {
+                return;
+            }
+	        $('#alphaBrowseForm').unbind('submit.googleAnalytics');
 	        e.preventDefault();
 	
 			catalogevent('send', 'event', 'searchType', 'beginsWithSearch');
-
-			/* Catalog homepage begins with search */
-			if (window.location.href.endsWith('/vufind/alphabrowse')) {
-				catalogevent('send', 'event', 'submitSearchFrom', 'Catalog Homepage');
-			}
-		
-			/* Begins with search results page */
-			else if (window.location.href.indexOf('/vufind/alphabrowse/results') !== -1) {
-				catalogevent('send', 'event', 'submitSearchFrom', 'Result Page');
-			}
+	    	catalogevent('send', 'event', 'submitSearchFrom', 'Catalog Homepage');
 		    catalogevent('send', 'event', 'searchField', $(this).find('#alphaBrowseForm_source option:selected').text());
 
 	        /* Short delay for analytics. */
@@ -225,7 +243,38 @@ $(document).ready(function() {
 	            $(form).submit();
 	        }, 100);
 		});
-	
+
+	    /* Begins with form on the search result page. Because these
+         * forms get added via JavaScript, check to see if there are any
+	     * new ones on the page every so often. If there is a new one, add a
+	     * class to it to "tag" it so we don't bound multiple events to it,
+	     * and bind one change event. */
+	    setInterval(function() {
+	        $('header form:not(.submitEventBound)').each(function() {
+	            $(this).addClass('submitEventBound');
+
+		        $(this).on('submit.googleAnalytics', function(e) {
+					if (window.location.href.toUpperCase().indexOf('/VUFIND/ALPHABROWSE/') == -1) {
+		                return;
+		            }
+		            if ($(this).attr('id') != 'alphaBrowseForm') {
+		                return;
+		            }
+			        $('#alphaBrowseForm').unbind('submit.googleAnalytics');
+			        e.preventDefault();
+		
+					catalogevent('send', 'event', 'searchType', 'beginsWithSearch');
+					catalogevent('send', 'event', 'submitSearchFrom', 'Result Page');
+				    catalogevent('send', 'event', 'searchField', $(this).find('#alphaBrowseForm_source option:selected').text());
+			        /* Short delay for analytics. */
+			        var form = this;
+			        setTimeout(function() {
+			            $(form).submit();
+			        }, 100);
+		        });
+	        });
+	    }, 250);
+
 		/* User changes field pulldown. */
 		$('#alphaBrowseForm_source').change(function() {
 		    catalogevent('send', 'event', 'changeSearchField', 'beginsWithSearch');
@@ -237,28 +286,42 @@ $(document).ready(function() {
 	
 	    /* FACETS */
 	
-	    /* Get a count of the number of active facets. 
-	     * Note that since you click facets one at a time, there will
-	     * be a '0' for every '1', and so on.
+	    /* Get a count of the number of active facets, if at least
+         * one facet is active. Note that since the most common way to
+         * get facets is to add them from a result page, there will be a
+         * '0' for every '1', and so on. (The other way is to use
+         * filters on an advanced search- those will show up as facets
+         * too.)
 	     */
 	    if ($('ul.filters').length > 0) {
-	        var facetCount = $('ul.filters li').length;
+	        var facetCount = $('ul.filters a.list-group-item').length;
 	        catalogevent('send', 'event', 'facetCount', facetCount);
 	    }
 	
 		/* User clicked a facet. */
-	    $('#narrowsearch dl a[href]').on('click touchstart', function(e) {
+        $('ul.facet li:not(.title), ul.facet a.list-group-item:not(.active)').on('click touchstart', function(e) {
 	        e.preventDefault();
+
+            /* Make sure we're dealing with an <a> element. */
+            var link = e.target;
+            if (!$(link).is('a')) {
+                link = $(link).parents('a').eq(0);
+            }
 	
-	        var f = $(this).parents('dl').eq(0).find('dt').text();
-	        if ($(this).text().indexOf('more') == 0) {
+	        var f = $(link).parents('ul.facet:first').find('li:first').text().trim();
+
+            /* Check to see if this was a "NOT" facet. If so, add the NOT. */
+            if ($(link).attr('title') && $(link).attr('title').indexOf('exclude') > -1) { 
+                f = 'NOT ' + f;
+            }
+
+	        if ($(link).text().indexOf('more') == 0) {
 	    	    catalogevent('send', 'event', 'moreFacets', f);
 	        } else {
 	    	    catalogevent('send', 'event', 'selectFacet', f);
 	        }
 	
 	        /* Short delay for analytics. */
-	        var link = this;
 	        setTimeout(function() {
                 var target = $(link).attr('target');
                 var href = $(link).attr('href');
@@ -271,11 +334,10 @@ $(document).ready(function() {
 	    });
 	
 	    /* User removes a facet. */
-	    $('#narrowsearch ul.filters a').on('click touchstart', function(e) {
+	    $('ul.filters a.list-group-item').on('click touchstart', function(e) {
 	        e.preventDefault();
 	
-	        var element = $(e.target).parents('li').find('a').eq(1);
-	        var facetType = element.text().split(':')[0];
+	        var facetType = $(this).text().split(':')[0].trim();
 	        catalogevent('send', 'event', 'deleteFacet', facetType);
 	
 	        /* Short delay for analytics. */
@@ -367,7 +429,7 @@ $(document).ready(function() {
 		});
 		
 		/* User clicks a link to go to a different result page. */
-		$('div.pagination a[href]').on('click touchstart', function(e) {
+		$('ul.pagination a[href]').on('click touchstart', function(e) {
 	        e.preventDefault();
 
 			// extract the page number from the href. 
@@ -391,17 +453,18 @@ $(document).ready(function() {
 	        }, 100);
 		});
 	
-		/* User clicked a result on the search result page. Which one? */
-		$('a.title').on('click touchstart', function(e) {
-            var li = $(this).parents('li.result').eq(0);
+		/* User clicked a result on the search result page- either the
+         * thumbnail or the title itself. Which result did they click? */
+		$('div.template-dir-search.template-name-results .ajaxItem a:has("img.recordcover"), div.template-dir-search.template-name-results .ajaxItem a.title').on('click touchstart', function(e) {
+            var result = $(this).parents('div.result').eq(0);
 
             /* In a saved list, the id will be undefined. Skip those. */
-            if (li.attr('id') == undefined) {
+            if (result.attr('id') == undefined) {
                 return;
             } else {
 	            e.preventDefault();
 	
-			    var n = parseInt(li.attr('id').replace('result', '')) + 1;
+			    var n = parseInt(result.attr('id').replace('result', '')) + 1;
 			    catalogevent('send', 'event', 'resultNumber', n);
 	
 	            /* Short delay for analytics. */
@@ -423,10 +486,28 @@ $(document).ready(function() {
 		 ****************************************/
 	
 		/* User clicks next or previous links in full record view. */
-		$('div.resultscroller a[href]').on('click touchstart', function(e) {
+		$('ul.pager-phoenix a[href]').on('click touchstart', function(e) {
+            /* There are three links in the pager- prev, next, and
+             * number of results. Only log an event for the prev and next links. 
+             */
+            if ($(this).attr('href').indexOf('/vufind/Record') == -1) {
+                return;
+            }
+
+            var text = '';
+            if ($(this).text().indexOf('Prev') > -1) {
+                text = 'Prev';
+            } else if ($(this).text().indexOf('Next') > -1) {
+                text = 'Next';
+            }
+    
+            if (text == '') {
+                return;
+            }
+
 	        e.preventDefault();
-	
-			catalogevent('send', 'event', 'nextOrPrevious', $(this).text().trim());
+
+			catalogevent('send', 'event', 'nextOrPrevious', text);
 	
 	        /* Short delay for analytics. */
 	        var link = this;
@@ -442,15 +523,20 @@ $(document).ready(function() {
 		});
 	
 		/* User clicks toolbar link. */
-		$('div.toolbar a[href]').on('click touchstart', function(e) {
+		$('div.main ul.nav:not(.recordTabs) a[href]').on('click touchstart', function(e) {
+            /* Skip homepage tabs. */
+            if ($(this).parents('.template-dir-search.template-name-advanced').length > 0) {
+                return;
+            }
+            
 			/* Skip "Text this", "Email this", and "Export Records" because
 	         * the real event happens when a form is submitted or submenu is
 	         * clicked. */
-			if ($(this).hasClass('smsRecord')) {
+            if ($(this).attr('id') == 'sms-record') {
 				return;
-			} else if ($(this).hasClass('mailRecord')) {
+            } else if ($(this).attr('id') == 'mail-record') {
 				return;
-			} else if ($(this).hasClass('export')) {
+			} else if ($(this).hasClass('export-toggle')) {
 				return;
 			} else {
 			    catalogevent('send', 'event', 'toolbarItem', $(this).text().trim());
@@ -483,7 +569,12 @@ $(document).ready(function() {
 	    }, 250);
 	
 		/* User clicks linked fields in full record view. */
-		$('table.citation a[href]').on('click touchstart', function(e) {
+		$('.record table a[href]').on('click touchstart', function(e) {
+            /* Skip the "Add Tag" link. */
+            if ($(this).attr('id') == 'tagRecord') {
+                return;
+            }
+
 			/* check to be sure this link is going to a browse. */
 			if ($(this).attr('href').indexOf('source=') !== -1 && $(this).attr('href').indexOf('from=') !== -1) {
 	            e.preventDefault();
@@ -509,7 +600,7 @@ $(document).ready(function() {
 		});
 	
 		/* User switches tabs. */
-		$('div#tabnav a[href]').on('click touchstart', function(e) {
+		$('ul.recordTabs a[href]').on('click touchstart', function(e) {
 	        e.preventDefault();
 	
 			catalogevent('send', 'event', 'changeFullRecordTab', $(this).text());
@@ -587,7 +678,7 @@ $(document).ready(function() {
 		});
 	
 	    /* User clicks "view availability" for serial holdings. */
-	    $('.va a[href]').on('click touchstart', function() {
+	    $('a.summaryToggle').on('click touchstart', function() {
 			catalogevent('send', 'event', 'viewSerialHoldings', 'viewSerialHoldings');
 	        /* link opens via javascript, no need for a delay. */
 	    });
@@ -596,7 +687,7 @@ $(document).ready(function() {
 		 ************ HEADER LINKS **************
 		 ****************************************/
 	
-	    $('#headerRight a[href]').on('click touchstart', function(e) {
+	    $('ul.top-tabs a[href]').on('click touchstart', function(e) {
 	        e.preventDefault();
 	
 	        var t = $(e.target).text();
@@ -615,7 +706,7 @@ $(document).ready(function() {
 	        }, 100);
 	    });
 	
-	    $('#nav a[href]').on('click touchstart', function(e) {
+	    $('#header-collapse a[href]').on('click touchstart', function(e) {
 	        /* deal with the help link separately. */
 	        if ($(e.target).attr('title') == 'Help') {
 	            return;
@@ -648,19 +739,21 @@ $(document).ready(function() {
 	        e.preventDefault();
 	
 			var c = '';
-	        if (/\/vufind\/$/.test(window.location.href)) {
-	            c = 'Basic Keyword Search';
-			} else if (/\/Search\/Advanced$/.test(window.location.href)) {
-				c = 'Advanced Keyword Search';
-			} else if (/\/alphabrowse$/.test(window.location.href)) {
+            if ($('ul#homepageNavTabs li:first').hasClass('active')) {
+                if ($('#advSearchForm').hasClass('basicSearch')) {
+	                c = 'Basic Keyword Search';
+                } else if ($('#advSearchForm').hasClass('advancedSearch')) {
+				    c = 'Advanced Keyword Search';
+                }
+            } else if ($('ul#homepageNavTabs li:nth-child(2)').hasClass('active')) {
 				c = 'Begins With Search';
-			} else if (/\/Search\/Results.*$/.test(window.location.href)) {
+			} else if (window.location.href.toUpperCase().indexOf('/VUFIND/SEARCH/RESULTS') > -1) {
 				c = 'Keyword Results';
-			} else if (/\/alphabrowse\/results.*$/.test(window.location.href)) {
+			} else if (window.location.href.toUpperCase().indexOf('/VUFIND/ALPHABROWSE/') > -1) {
 				c = 'Begins With Results';
-			} else if (/\/Record\/.*$/.test(window.location.href)) {
+			} else if (window.location.href.toUpperCase().indexOf('/VUFIND/RECORD/') > -1) {
 				c = 'Full Record';
-			} else if (/\/MyResearch.*$/.test(window.location.href)) {
+			} else if (window.location.href.toUpperCase().indexOf('/VUFIND/MYRESEARCH/') > -1) {
 				c = 'My Account';
 			}
 			catalogevent('send', 'event', 'contextualHelp', c);
@@ -679,7 +772,7 @@ $(document).ready(function() {
 		});
 	
 		/* User clicks the Hathi Trust preview link. */
-		$('a.previewHT').on('click touchstart', function(e) {
+		$('a.eLink.hathi').on('click touchstart', function(e) {
 	        e.preventDefault();
 	
 			catalogevent('send', 'event', 'preview', 'Hathi Trust');
