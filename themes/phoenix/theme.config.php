@@ -12,6 +12,7 @@ return array(
         'phoenix.js',
         'ga.js'
     ),
+    'favicon' => 'favicon.ico',
     'helpers' => array(
         'factories' => array(
             'Alert' => function ($sm) {
