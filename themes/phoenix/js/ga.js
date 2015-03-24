@@ -40,8 +40,8 @@ $(document).ready(function() {
 	/* Uncomment the lines below to test event logging. */
 	function catalogevent(a, b, c, d) {
 	    //var s = '/vufind/themes/phoenix/js/empty.js?analyticstest=on&event=' + c + '&label=' + d;
-	    var s = 'https://www.lib.uchicago.edu/e/jej/empty.js?analyticstest=on&event=' + c + '&label=' + d;
-	    $('head').append("<script src='" + s + "' type='text/javascript'></script>");
+	    //var s = 'https://www.lib.uchicago.edu/e/jej/empty.js?analyticstest=on&event=' + c + '&label=' + d;
+	    //$('head').append("<script src='" + s + "' type='text/javascript'></script>");
 	    ga(a, b, c, d);
 	}
 	
