@@ -706,9 +706,10 @@ $(document).ready(function() {
 	        }, 100);
 	    });
 	
+        /*Only affects logout link currently, but this would affect general links inside #header-collapse*/
 	    $('#header-collapse a[href]').on('click touchstart', function(e) {
 	        /* deal with the help and leave feedback (knowledge tracker) links separately. */
-	        if ($(e.target).attr('title') == 'Help' || $(e.target).attr('id') == 'knowledgeTrackerLink') {
+	        if ($(e.target).attr('title') == 'Help' || $(e.target).attr('class') == 'modal-link') {
 	            return;
 	        }
             	
@@ -730,7 +731,7 @@ $(document).ready(function() {
 	        }, 100);
 	    });
 
-		$('a[id="knowledgeTrackerLink"]').on('click touchstart', function(e) {
+		$('#header-collapse .modal-link').on('click touchstart', function(e) {
 	        var t = $(e.target).text().trim();
 	        catalogevent('send', 'event', 'headerLink', t);
         });
