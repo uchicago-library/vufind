@@ -300,6 +300,11 @@ $(document).ready(function() {
 	
 		/* User clicked a facet. */
         $('ul.facet li:not(.title), ul.facet a.list-group-item:not(.active)').on('click touchstart', function(e) {
+            /* Skip the facet containing the year of publication slider. */
+            if ($(this).find('form#publishDateFilter').length > 0) {
+                return;
+            }
+
 	        e.preventDefault();
 
             /* Make sure we're dealing with an <a> element. */
@@ -332,6 +337,21 @@ $(document).ready(function() {
                 }
 	        }, 100);
 	    });
+
+		/* User submits the year of publication form. */
+        $('form#publishDateFilter').on('submit.googleAnalytics', function(e) {
+	        e.preventDefault();
+	        $(this).unbind('submit.googleAnalytics');
+
+	        var f = $(this).parents('ul.facet:first').find('li:first').text().trim();
+			catalogevent('send', 'event', 'moreFacets', f);
+	
+	        /* Short delay for analytics. */
+	        var form = this;
+	        setTimeout(function() {
+	            $(form).submit();
+	        }, 100);
+        });
 	
 	    /* User removes a facet. */
 	    $('ul.filters a.list-group-item').on('click touchstart', function(e) {
