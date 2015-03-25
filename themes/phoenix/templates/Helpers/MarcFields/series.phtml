@@ -14,7 +14,7 @@
                       unset($data['subfieldData'][$v]);
                       $link = implode(' ', $data['subfieldData']);
                   ?>
-                  <a href="<? echo '/vufind/alphabrowse'.'/results?source=series&from='.strip_tags(urlencode(trim($link)), ' ') ?>"><? echo $marcValue ?></a><br/>
+                  <a href="<? echo '/vufind/alphabrowse'.'/home?source=series&from='.strip_tags(urlencode(trim($link)), ' ') ?>"><? echo $marcValue ?></a><br/>
                   <? if (!empty($data['vernacularData'])) :
                       echo implode(' ', $data['vernacularData']);?><br />
                   <? endif; ?>
