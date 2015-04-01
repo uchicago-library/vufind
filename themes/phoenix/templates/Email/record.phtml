@@ -10,13 +10,27 @@
 
 <? foreach ($holdings as $location => $holding): ?><? if (($location == 'Full Text' || $location == 'FullText') && !array_key_exists('eHolding', $holding['items'][0])): continue; endif; ?>
 <?=$location; ?>
-<? if(!empty($holding)):?><? if (isset($holding['items'][0]['callnumberDisplay'])): ?>
+<? $callnumbers = array();
+   foreach ($holding['items'] as $item):
+     if (array_key_exists('callnumberDisplay', $item) && !empty($item['callnumberDisplay'])):
+       $callnumbers[$item['callnumberDisplay']] = true;
+     endif;
+   endforeach;
+   $callnumbers = implode(", ", array_keys($callnumbers)); ?>
+<? if(!empty($callnumbers)): ?>
 
-<?=$holding['items'][0]['callnumberDisplay'];?>
+<?=$callnumbers;?>
 <? endif; ?>
-<? if (array_key_exists('eHolding', $holding['items'][0])): ?>
+<? $eholdings = array();
+   foreach ($holding['items'] as $item):
+     if (array_key_exists('eHolding', $item) && !empty($item['eHolding'])):
+       $eholdings[$item['eHolding']['uri']] = true;
+     endif;
+   endforeach;
+   $eholdings = implode(", ", array_keys($eholdings)); ?>
+<? if (!empty($eholdings)): ?>
 
-<?=$holding['items'][0]['eHolding']['uri'];?>
+<?=$eholdings;?>
 <? endif; ?>
 
 <? if (isset($holding['library has']) && count($holding['library has']) > 0): ?>
@@ -29,7 +43,6 @@
 <? foreach($holding['indexes'] as $index): ?>
 <? echo $index . "\n"; ?>
 <? endforeach; ?>
-<? endif; ?>
 <? endif; ?>
 
 <? endforeach; ?><?=$this->serverUrl($this->recordLink()->getUrl($this->driver))."\n\n"?>
