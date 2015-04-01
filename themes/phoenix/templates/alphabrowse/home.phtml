@@ -58,7 +58,7 @@
               <? endif; ?>
               <a href="<?=$this->escapeHtmlAttr($this->url('search-results', array(), array('query' => $query)))?>"><?=$this->escapeHtml($item['heading'])?></a>
             <? else: ?>
-              <b><?=$this->escapeHtml($item['heading'])?></b>
+              <?=$this->escapeHtml($item['heading'])?>
             <? endif; ?>
 
             <? if (count($item['useInstead']) > 0): ?>
