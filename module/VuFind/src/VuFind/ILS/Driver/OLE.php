@@ -819,11 +819,50 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     }
 
     /**
+     * Checks to see if a record has analytic records. 
+     *
+     * @param string $id, the bib numer for the current record.
+     * 
+     * @return boolean
+     */
+    protected function hasAnalytics($id)
+    {
+        $retval = false;
+        $sql = 'SELECT count(*) analytic_count from ole_ds_item_t
+                        WHERE item_id in (
+                            SELECT item_id from ole_ds_item_holdings_t
+                                WHERE HOLDINGS_ID in (
+                                    SELECT holdings_id from ole_ds_holdings_t
+                                        WHERE BIB_ID = :id))';
+        try {
+            /*Query the database*/
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(array(':id' => $id));
+
+            /*Return array*/
+            while ($row = $stmt->fetch()) {
+
+                /*Set convenience variables.*/
+                $count = $row['analytic_count'];
+                
+                if ($count > 0) {
+                    $retval = true;
+                    break;
+                }
+            }
+        }
+        catch (Exception $e){
+            /*Do nothing*/
+        }
+        return $retval;
+    }
+
+    /**
      *
      */
     protected function getItems($id, $holdingId, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay) {
 
-        /*Bet items by holding id*/
+        /*Get items by holding id*/
         $sql = 'SELECT i.ITEM_ID AS item_id, i.HOLDINGS_ID AS holdings_id, i.BARCODE AS barcode, i.URI AS uri, 
                     i.ITEM_TYPE_ID AS item_type_id, i.TEMP_ITEM_TYPE_ID as temp_item_type_id, 
                     itype.ITM_TYP_CD AS itype_code, itype.ITM_TYP_NM AS itype_name, 
@@ -900,6 +939,15 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         catch (Exception $e){
             /*Do nothing*/
         }
+
+        /*Check for analytics*/
+        if ($this->hasAnalytics($id)) {
+            $analytics = $this->getAnalytics($id, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay);
+            foreach($analytics as $anal) {
+                $items[] = $anal;
+            }
+        }
+
         /*Sort numerically by copy/volume number.*/
         usort($items, function($a, $b) { return OLE::cmp($a['sort'], $b['sort']); });
         return $items;
@@ -1195,6 +1243,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $holdingCallNum = trim($row['call_number']);
                 $holdingCallNumDisplay = trim($row['call_number_prefix'] . ' ' . $row['call_number']);
                 $holdingNote = $row['note'];
+                $hasAnalytics = intval($row['analytic_count']) > 0;
                 $hasExtOwnership = intval($row['ext_ownership_count']) > 0;
                 $hasEholdings = intval($row['uri_count']) > 0;
                 $hasItems = intval($row['item_count']) > 0;
@@ -1273,6 +1322,78 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         }
 
         //print_r($items);
+        return $items;
+    }
+
+    public function getAnalytics($id, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay) {
+
+        $sql = 'select * from ole_ds_item_t i
+                    LEFT JOIN ole_dlvr_item_avail_stat_t istat on i.ITEM_STATUS_ID = istat.ITEM_AVAIL_STAT_ID
+                    LEFT JOIN ole_cat_itm_typ_t itype on if(i.TEMP_ITEM_TYPE_ID is not null, i.TEMP_ITEM_TYPE_ID, i.ITEM_TYPE_ID) = itype.ITM_TYP_CD_ID
+                    LEFT JOIN ole_locn_t loc on loc.LOCN_CD = SUBSTRING_INDEX(i.LOCATION, \'/\', -1)
+                    where i.item_id in
+                    (select ih.item_id from ole_ds_item_holdings_t ih
+                    where ih.HOLDINGS_ID in (select h.holdings_id from ole_ds_holdings_t h
+                    where h.BIB_ID = :id))';
+
+        try {
+            /*Query the database*/
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(array(':id' => $id));
+
+            /*Return array*/
+            $items = array();
+            while ($row = $stmt->fetch()) {
+                $item = array();
+        
+                $callnumber = (!empty($row['CALL_NUMBER']) ? $row['CALL_NUMBER'] : $holdingCallNum);
+
+                /*Set convenience variables.*/
+                $status = $row['ITEM_AVAIL_STAT_CD'];
+                $available = (in_array($status, $this->item_available_codes) ? true:false);
+                $copyNum = $row['COPY_NUMBER'];
+                $enumeration = $row['ENUMERATION'];
+                $itemCallNumDisplay = (!empty($row['CALL_NUMBER_PREFIX']) ? trim($row['CALL_NUMBER_PREFIX']) . ' ' . $callnumber : null);
+                $itemCallNum = (isset($row['CALL_NUMBER']) ? trim($row['CALL_NUMBER']) : null);
+                $holdtype = ($available == true) ? "hold":"recall";
+                $itemTypeArray = ($row['ITM_TYP_NM'] ? explode('-', $row['ITM_TYP_NM']) : array());
+                $itemTypeName = trim($itemTypeArray[1]);
+                $itemLocation = $row['LOCN_NAME'];
+                $itemLocCodes = $row['LOCATION'];
+                              
+                /*Build the items*/ 
+                $item['id'] = $id;
+                $item['availability'] = $available;
+                $item['status'] = $status;
+                $item['location'] = (!empty($itemLocation) ? $itemLocation : $holdingLocation);
+                $item['reserve'] = '';
+                $item['callnumber'] = (!empty($itemCallNum) ? $itemCallNum : $holdingCallNum);
+                $item['duedate'] = (isset($row['DUE_DATE_TIME']) ? $row['DUE_DATE_TIME'] : 'Indefinite') ;
+                $item['returnDate'] = '';
+                $item['number'] = $copyNum . ' : ' . $enumeration;
+                $item['requests_placed'] = '';
+                $item['barcode'] = $row['BARCODE'];
+                $item['item_id'] = $row['ITEM_ID'];
+                $item['is_holdable'] = true;
+                //$item['itemNotes'] = $row['note']; COME BACK TO THIS
+                $item['holdtype'] = $holdtype;
+                /*UChicago specific?*/
+                $item['claimsReturned'] = ($row['CLAIMS_RETURNED'] == 'Y' ? true : false);
+                $item['sort'] = preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
+                $item['itemTypeCode'] = $row['ITM_TYP_CD'];
+                $item['itemTypeName'] = $itemTypeName;
+                $item['callnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : $holdingCallNumDisplay);
+                $item['locationCodes'] = (!empty($itemLocCodes) ? $itemLocCodes : $holdingLocCodes);
+    
+                $items[] = $item;
+            }
+        }
+        catch (Exception $e){
+            /*Do nothing*/
+        }
+
+        /*Sort numerically by copy/volume number.*/
+        usort($items, function($a, $b) { return OLE::cmp($a['sort'], $b['sort']); });
         return $items;
     }
 
