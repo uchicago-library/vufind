@@ -112,7 +112,7 @@
       class="ablink">(Browse the Shelves)</a><br/>
  <? endforeach; ?>
 
-<table class="holdings-table" data-display="<?=$this->tab->getDisplayNumber()?>" summary="<?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?>">
+<table class="holdings-table table" data-display="<?=$this->tab->getDisplayNumber()?>" summary="<?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?>">
   <!--<tr>
     <th><?=$hasCallNos ? $this->transEsc("Call Number") . ': ' : ''?></th>
     <td>
