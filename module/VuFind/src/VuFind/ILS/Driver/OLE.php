@@ -428,7 +428,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             }
         }
         catch (Exception $e){
-            /*Do nothing*/
+            throw new ILSException($e->getMessage());
         }
 
         /*Set the default sort order for checked out items.*/
@@ -775,7 +775,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             }
         }
         catch (Exception $e){
-            /*Do nothing*/
+            throw new ILSException($e->getMessage());
         }
         return $items;
     }
@@ -852,7 +852,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             }
         }
         catch (Exception $e){
-            /*Do nothing*/
+            throw new ILSException($e->getMessage());
         }
         return $retval;
     }
@@ -937,7 +937,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             }
         }
         catch (Exception $e){
-            /*Do nothing*/
+            throw new ILSException($e->getMessage());
         }
 
         /*Check for analytics*/
@@ -1043,7 +1043,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             }
         }
         catch (Exception $e){
-            /*Do nothing*/
+            throw new ILSException($e->getMessage());
         }
 
         //var_dump($summaryHoldings);
@@ -1094,7 +1094,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             }
         }
         catch (Exception $e){
-            /*Do nothing*/
+            throw new ILSException($e->getMessage());
         }
         return $eHoldings;
     }
@@ -1171,7 +1171,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             }
         }
         catch (Exception $e){
-            /*Do nothing*/
+            throw new ILSException($e->getMessage());
         }
         return $items;
     }
@@ -1302,7 +1302,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
         }
         catch (Exception $e){
-            /*Do nothing*/
+            throw new ILSException($e->getMessage());
         }
 
         // Get bound-withs
@@ -1389,7 +1389,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             }
         }
         catch (Exception $e){
-            /*Do nothing*/
+            throw new ILSException($e->getMessage());
         }
 
         /*Sort numerically by copy/volume number.*/
