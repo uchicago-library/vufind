@@ -153,6 +153,19 @@ prefix () {
 # Functions for doing the work
 #
 
+delete_bib () {
+    if [ -z "$VUFIND_BIB_DIR" ]
+    then 
+	fatal 2 "VUFIND_BIB_DIR is not set"
+    fi
+
+    for f in $VUFIND_BIB_DIR/*[Dd]eleted*.txt
+    do
+	php $VUFIND_HOME/util/deletes.php "$f" flat &&
+	    mv "$f" $VUFIND_BIB_DIR/processed/$(basename "$f")
+    done
+}
+
 import_bib () {
     if [ -z "$VUFIND_BIB_DIR" ]
     then 
@@ -166,7 +179,7 @@ import_bib () {
 	NEW_BIBS=false
     fi
 
-    $VUFIND_HOME/harvest/batch-import-marc.sh -d -p local/import/import_horizon.properties $VUFIND_BIB_DIR
+    $VUFIND_HOME/harvest/batch-import-marc.sh -d -p local/import/import_ole.properties $VUFIND_BIB_DIR
 }
 
 index_browse () {
@@ -183,7 +196,7 @@ index_browse () {
 	    for index in ${INDEXES[@]};
             do
 	        echo pull $index to $host
-	        ssh $host '$VUFIND_HOME'/uc-pull-browse.sh $(hostname) $index
+	        ssh $host . .env \&\& '$VUFIND_HOME'/uc-pull-browse.sh  $(hostname) $index
             done
 	done
     fi
@@ -226,6 +239,9 @@ for CMD in "$@"
 do
     case $CMD in
 	bib)
+	    # Process deletes first, use the import for the commit
+	    # as of VF 2.3, delete.php does not send a commit
+	    delete_bib
 	    import_bib;;
 	browse)
 	    # TODO: optimize - don't build browse if import_bib did no work
