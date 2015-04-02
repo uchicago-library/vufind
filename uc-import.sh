@@ -196,7 +196,7 @@ index_browse () {
 	    for index in ${INDEXES[@]};
             do
 	        echo pull $index to $host
-	        ssh $host '$VUFIND_HOME'/uc-pull-browse.sh $(hostname) $index
+	        ssh $host . .env \&\& '$VUFIND_HOME'/uc-pull-browse.sh  $(hostname) $index
             done
 	done
     fi
