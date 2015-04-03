@@ -87,11 +87,12 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
             if (isset($item['callnumberDisplay']) && strlen($item['callnumberDisplay']) > 0) {
                 $callNos['display'][] = $item['callnumberDisplay'];
                 $callNos['sort'][] = $item['callnumber'];
+                $callNos['callnumbertypeid'][] = $item['callnumbertypeid'];
             }
         }
 
         sort($callNos['sort']);
-        return array('display' => array_unique($callNos['display']), 'sort' => $callNos['sort']);
+        return array('display' => array_unique($callNos['display']), 'sort' => $callNos['sort'], 'typeid' => $callNos['callnumbertypeid']);
     }
 
     /**

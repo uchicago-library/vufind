@@ -108,7 +108,8 @@
 <? $hasCallNos = implode('', $callNos); ?>
 <?foreach ($callNos['display'] as $numKey => $callNo): ?>
    <h4><span><?=$hasCallNos ? $this->transEsc("Call Number") . ': ' : ''?></span> <?=$this->escapeHtml($callNo)?></h4>
-   <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
+   <? $source = ($callNos['typeid'][$numKey] == '3') ? 'dewey' : 'lcc'; ?>
+   <a href="<?= $this->url('home')?>alphabrowse/Home?source=<?=$source?>&from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
       class="ablink">(Browse the Shelves)</a><br/>
  <? endforeach; ?>
 

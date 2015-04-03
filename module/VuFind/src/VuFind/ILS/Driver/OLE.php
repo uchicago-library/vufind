@@ -862,6 +862,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $available = (in_array($status, $this->item_available_codes) ? true:false);
                 $copyNum = $row['COPY_NUMBER'];
                 $enumeration = $row['ENUMERATION'];
+                $itemCallNumTypeId = (!empty($row['CALL_NUMBER_TYPE_ID']) ? trim($row['CALL_NUMBER_TYPE_ID']) : null);
                 $itemCallNumDisplay = (!empty($row['CALL_NUMBER_PREFIX']) ? trim($row['CALL_NUMBER_PREFIX']) . ' ' . $callnumber : null);
                 $itemCallNum = (isset($row['CALL_NUMBER']) ? trim($row['CALL_NUMBER']) : null);
                 $holdtype = ($available == true) ? "hold":"recall";
@@ -876,6 +877,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['status'] = $status;
                 $item['location'] = (!empty($itemLocation) ? $itemLocation : $holdingLocation);
                 $item['reserve'] = '';
+                $item['callnumbertypeid'] = $itemCallNumTypeId;
                 $item['callnumber'] = (!empty($itemCallNum) ? $itemCallNum : $holdingCallNum);
                 $item['duedate'] = (isset($row['DUE_DATE_TIME']) ? $row['DUE_DATE_TIME'] : 'Indefinite') ;
                 $item['returnDate'] = '';
@@ -1149,6 +1151,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         /*Get holdings by bib id, with holdings notes.*/
         $sql = 'SELECT h.HOLDINGS_ID AS holdings_id, h.BIB_ID AS bib_id, h.location AS
                 location, loc.LOCN_NAME AS locn_name, 
+                       h.CALL_NUMBER_TYPE_ID AS call_number_type_id,
                        h.CALL_NUMBER_PREFIX AS call_number_prefix, h.CALL_NUMBER AS
                 call_number, h.COPY_NUMBER AS copy_number,
                        CONCAT_WS(";", (SELECT note.NOTE
@@ -1192,6 +1195,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
                 /*Convenience variables.*/
                 $shelvingLocation = $row['locn_name'];
+                $holdingCallNumTypeId = trim($row['call_number_type_id']);
                 $holdingCallNum = trim($row['call_number']);
                 $holdingCallNumDisplay = trim($row['call_number_prefix'] . ' ' . $row['call_number']);
                 $holdingNote = $row['note'];
@@ -1215,6 +1219,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 if(((!$hasItems or $hasHoldingNote) and (!empty($shelvingLocation))) and !$hasEholdings) { 
                     $item['id'] = $id; 
                     $item['location'] = $shelvingLocation; 
+                    $item['callnumbertypeid'] = $holdingCallNumTypeId;
                     $item['callnumber'] = $holdingCallNum;
                     $item['holdings notes'] = $holdingNote; 
                     $item['availability'] = true;
@@ -1239,6 +1244,14 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 /*Get individual item data*/           
                 $oleItems = $this->getItems($id, $holdingId, $shelvingLocation, $locationCodes, $holdingCallNum, $holdingCallNumDisplay);
                 foreach($oleItems as $oleItem) {
+                    /* Rather than pass the call number type of the
+                     * holding to getItems(), I add the call number type id here.
+                     * This way we don't have to change the function's signature.
+                     * -jej
+                     */
+                    if ($oleItem['callnumbertypeid'] == NULL) {
+                        $oleItem['callnumbertypeid'] = $holdingCallNumTypeId;
+                    }
                     $items[] = $oleItem;
                 }
 
