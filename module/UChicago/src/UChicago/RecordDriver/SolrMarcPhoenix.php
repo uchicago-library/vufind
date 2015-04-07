@@ -299,9 +299,21 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
      */
     public function getBookPlate()
     {
-        // 097 or 098
-        return array($this->getFieldArray('097', array('d','e'), false), 
-                     $this->getFieldArray('098', array('d','e'), false));
+        $output = array();
+        foreach (array('097', '098') as $field) {
+            $donor_codes = $this->getFieldArray($field, array('e'), false);
+            $donor = $this->getFieldArray($field, array('d'), false);
+
+            $donor_pairs = array();
+            if (count($donor_codes) == count($donor)) {
+                for ($d = 0; $d < count($donor_codes); $d++) {
+                    $donor_pairs[] = $donor_codes[$d];
+                    $donor_pairs[] = $donor[$d];
+                }
+            }
+            $output[] = $donor_pairs;
+        }
+        return $output;
     }
     
     /**

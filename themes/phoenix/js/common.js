@@ -353,6 +353,20 @@ $(document).ready(function() {
     $(this).closest('form').find('.checkbox-select-all').prop('checked', false);
   });
 
+  // Turn bulk action buttons off on page load. 
+  $('.bulkActionButtons input[type=submit]').prop('disabled', true);
+  // Turn bulk action buttons on when something is checked. 
+  $('.template-dir-search.template-name-results .checkbox-select-item, .checkbox-select-all').change(function() {
+    var disabled = true;
+    if ($('.checkbox-select-item:checked').length > 0) {
+        disabled = false;
+    }
+    if ($('.checkbox-select-item:checked').length > 0) {
+        disabled = false;
+    }
+    $('.bulkActionButtons input[type=submit]').prop('disabled', disabled);
+  });
+
   // handle QR code links
   $('a.qrcodeLink').click(function() {
     if ($(this).hasClass("active")) {

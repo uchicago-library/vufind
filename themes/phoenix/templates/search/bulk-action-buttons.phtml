@@ -3,8 +3,10 @@
   <div class="bulkActionButtons hidden-print">
     <div class="checkbox">
       <label>
-        <input type="checkbox" class="checkbox-select-all" name="selectAll" id="<?=$this->idPrefix?>addFormCheckboxSelectAll"/> <span><?=$this->transEsc('select_page')?>
-        &#124; <?=$this->transEsc('with_selected')?>:</span>
+        <input type="checkbox" class="checkbox-select-all"
+name="selectAll" id="<?=$this->idPrefix?>addFormCheckboxSelectAll"/>
+<span>Select records #<?=$this->localizedNumber($this->results->getStartRecord())?>-<?=$this->localizedNumber($this->results->getEndRecord())?>:
+        </span>
       </label>
     </div>
     <div class="btn-group">

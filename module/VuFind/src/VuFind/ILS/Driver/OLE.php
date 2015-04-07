@@ -637,7 +637,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'position' => (string) $itemXml->priority,
             'available' => $available,
             'reqnum' => (string) $itemXml->requestId,
-            'volume' => '',
+            'volume' => (string) $itemXml->volumeNumber,
             'publication_year' => '',
             'title' => strlen((string) $itemXml->title)
                 ? (string) $itemXml->title : "unknown title"
