@@ -253,24 +253,16 @@ $(document).ready(function() {
 	        $('header form:not(.submitEventBound)').each(function() {
 	            $(this).addClass('submitEventBound');
 
-		        $(this).on('submit.googleAnalytics', function(e) {
+		        $(this).on('submit', function(e) {
 					if (window.location.href.toUpperCase().indexOf('/VUFIND/ALPHABROWSE/') == -1) {
 		                return;
 		            }
 		            if ($(this).attr('id') != 'alphaBrowseForm') {
 		                return;
 		            }
-			        $('#alphaBrowseForm').unbind('submit.googleAnalytics');
-			        e.preventDefault();
-		
 					catalogevent('send', 'event', 'searchType', 'beginsWithSearch');
 					catalogevent('send', 'event', 'submitSearchFrom', 'Result Page');
 				    catalogevent('send', 'event', 'searchField', $(this).find('#alphaBrowseForm_source option:selected').text());
-			        /* Short delay for analytics. */
-			        var form = this;
-			        setTimeout(function() {
-			            $(form).submit();
-			        }, 100);
 		        });
 	        });
 	    }, 250);
