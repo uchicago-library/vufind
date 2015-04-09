@@ -276,22 +276,6 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
         return !empty($rawMarcData) ? $rawMarcData : null;
     }
 
-    /**  
-     * Get the call number associated with the record (empty string if
-     * none).
-     *
-     * @return string
-     */
-    public function getCallNumber()
-    {    
-        // Use the callnumber-a field from the Solr index; the plain
-        // callnumber
-        // field is normalized to have no spaces, so it is unsuitable
-        // for display.
-        return isset($this->fields['callnumber_browse']) ?
-            implode(', ', $this->fields['callnumber_browse']) : '';
-    } 
-
     /**
      * Gets bookplate 097 abnd 098 fields from the MARC record.
      *
