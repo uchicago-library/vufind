@@ -402,7 +402,7 @@ class Params extends \VuFind\Search\Base\Params
             'author' => array('field' => 'authorStr', 'order' => 'asc'),
             'title' => array('field' => 'title_sort', 'order' => 'asc'),
             'relevance' => array('field' => 'score', 'order' => 'desc'),
-            'callnumber' => array('field' => 'callnumber', 'order' => 'asc'),
+            'callnumber' => array('field' => 'callnumber-sort', 'order' => 'asc'),
         );
         $normalized = array();
         foreach (explode(',', $sort) as $component) {
