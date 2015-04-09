@@ -86,6 +86,5 @@ build_browse "journal" "journal_browse" 1 "-Dbibleech=StoredFieldLeech -Dsortfie
 build_browse "topic" "topic_browse"
 build_browse "author" "author_browse"
 build_browse "series" "series_browse" 1
-# callnumber_browse is custom: like default callnumber-a, but multiValued="true"
-build_browse "lcc" "callnumber_browse" 1 "-Dbrowse.normalizer=org.vufind.util.LCCallNormalizer"
+build_browse "lcc" "callnumber-raw" 1 "-Dbrowse.normalizer=org.vufind.util.LCCallNormalizer"
 build_browse "dewey" "dewey-raw" 1 "-Dbrowse.normalizer=org.vufind.util.DeweyCallNormalizer"
