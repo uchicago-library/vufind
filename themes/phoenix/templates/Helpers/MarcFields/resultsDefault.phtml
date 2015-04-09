@@ -1,6 +1,5 @@
 <!--resultsDefault.phtml-->
-<div class="<?=strtolower($marcData[0]['label'])?>">
-<? foreach($marcData as $data) : ?>
+<div class="<?=strtolower($data['label'])?>">
     <? if (!empty($data['subfieldData'])) : 
        echo implode(' ', $data['subfieldData']) ?>
     <? endif; ?>   
@@ -10,5 +9,4 @@
         echo '<br />';
     ?>
     <? endif; ?>   
-<? endforeach; ?>
 </div>
