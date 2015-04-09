@@ -541,6 +541,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                  'amount' => (string)((float)$itemXml->amount * 100),
                  'fine' => (string)$itemXml->reason,
                  'balance' => (string)((float)$itemXml->balance * 100),
+                 'billdate' => (string)$itemXml->billDate,
                  'createdate' => (string)$itemXml->dateCharged,
                  'title' => (string)$itemXml->title,
                  'checkout' => '',
