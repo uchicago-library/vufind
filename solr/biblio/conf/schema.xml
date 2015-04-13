@@ -203,7 +203,7 @@
    <field name="callnumber-sort" type="string" indexed="true" stored="true"/>
    <field name="callnumber-raw" type="string" indexed="true" stored="true" multiValued="true" />
    <field name="callnumber-search" type="callnumberSearch" indexed="true" stored="true" multiValued="true" />
-<field name="dewey-hundreds" type="string" indexed="true" stored="true" multiValued="true"/>
+   <field name="dewey-hundreds" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="dewey-tens" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="dewey-ones" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="dewey-full" type="string" indexed="true" stored="true" multiValued="true"/>
