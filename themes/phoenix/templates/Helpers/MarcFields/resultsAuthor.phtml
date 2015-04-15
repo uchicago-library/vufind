@@ -4,7 +4,7 @@
        $displayUrl = implode(' ', $data['subfieldData']);
        $link = $this->getAuthorBrowseLink($data['subfieldData']);?>
 
-       <?=$this->view->transEsc('by')?> <a href="<?='/vufind/alphabrowse'.'/Home?source=author&from='.urlencode(strip_tags(trim($link, ' ')))?>" class="<?=$data['label']?>"><?=$displayUrl ?></a><br/>
+       <?=$this->view->transEsc('by')?> <a href="<?='/vufind/alphabrowse'.'/Home?source=author&amp;from='.urlencode(strip_tags(trim($link, ' ')))?>" class="<?=$data['label']?>"><?=$displayUrl ?></a><br/>
        <? if (!empty($data['vernacularData'])) :
            echo implode(' ', $data['vernacularData']);?><br />
        <? endif; ?>

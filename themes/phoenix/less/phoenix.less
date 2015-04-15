@@ -636,6 +636,13 @@ h1 {
   width: 100%;
   max-width: 100%;
   margin-bottom: @line-height-computed;
+  // Captions
+  > caption {
+        margin-left: -1000px; // These lines are for 
+        margin-bottom: -20px; // hiding the hideous 
+        caption-side: bottom; // table captions 
+        padding: 0;
+  }
   // Cells
   > thead,
   > tbody,

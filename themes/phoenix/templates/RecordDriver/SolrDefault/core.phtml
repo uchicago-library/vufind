@@ -17,7 +17,8 @@
     <? endif; ?>
 
     <?/* Display Main Details */?>
-    <table class="table table-striped" summary="<?=$this->transEsc('Bibliographic Details')?>">
+    <table class="table table-striped">
+      <caption><?=$this->transEsc('Bibliographic Details')?></caption>
       <? $this->MarcFields()->returnMarcData('top', $siteUrl); ?>
 
       <? $journalTitle = $this->driver->getContainerTitle(); if (!empty($journalTitle)): ?>

@@ -121,7 +121,7 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
                 if (($sdKey[0] == 'v') || ($sdKey[0] == 'x') || ($sdKey[0] == 'y') || ($sdKey[0] == 'z')) {
                     /*TEMPORARY FIX: spaces added to each side of hyphen. 
                     REMOVE spaces later - brad 09/05/2013*/
-                    echo ' -- ' . $sd; 
+                    echo urlencode(' -- ' . $sd); 
                 }
                 else{
                     echo $sd;
