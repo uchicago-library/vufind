@@ -97,7 +97,7 @@ class Sfx implements DriverInterface
      */
     public function parseLinks($xmlstr)
     {
-        $records = []; // array to return
+        $records = array(); // array to return
         try {
             $xml = new \SimpleXmlElement($xmlstr);
         } catch (\Exception $e) {
