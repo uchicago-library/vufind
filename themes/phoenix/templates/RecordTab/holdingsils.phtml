@@ -51,7 +51,7 @@
   <? if (!empty($urls)): ?>
       <?/*For now, only display a browse link if the first e-holding has a callnumber - Fix later*/?>
       <? if (isset($urls[0]['callnumber'])):?>
-        <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&from=<?=$this->escapeHtml($urls[0]['callnumber'])?>"
+        <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&amp;from=<?=$this->escapeHtml($urls[0]['callnumber'])?>"
            class="ablink">(Browse the Shelves)</a><br/>
       <?endif;?>
     <? foreach ($urls as $current): ?>
@@ -109,11 +109,12 @@
 <?foreach ($callNos['display'] as $numKey => $callNo): ?>
    <h4><span><?=$hasCallNos ? $this->transEsc("Call Number") . ': ' : ''?></span> <?=$this->escapeHtml($callNo)?></h4>
    <? $source = ($callNos['typeid'][$numKey] == '3') ? 'dewey' : 'lcc'; ?>
-   <a href="<?= $this->url('home')?>alphabrowse/Home?source=<?=$source?>&from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
+   <a href="<?= $this->url('home')?>alphabrowse/Home?source=<?=$source?>&amp;from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
       class="ablink">(Browse the Shelves)</a><br/>
  <? endforeach; ?>
 
-<table class="holdings-table table" data-display="<?=$this->tab->getDisplayNumber()?>" summary="<?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?>">
+<table class="holdings-table table" data-display="<?=$this->tab->getDisplayNumber()?>">
+  <caption><?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?></caption>
   <!--<tr>
     <th><?=$hasCallNos ? $this->transEsc("Call Number") . ': ' : ''?></th>
     <td>

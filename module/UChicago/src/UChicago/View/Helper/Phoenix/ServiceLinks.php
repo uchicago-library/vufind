@@ -408,7 +408,7 @@ class ServiceLinks extends AbstractHelper {
             
             $genre = (in_array($this->getLocation($row['locationCodes'], 'shelving'), $manuscript) ? 'manuscript' : 'monograph');
 
-            $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/aon/aeon-array_OLE.php?genre=' . $genre . '&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
+            $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/aon/aeon-array_OLE.php?genre=' . $genre . '&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
             $serviceLink = $this->getLinkConfig('aeon', $defaultUrl);
             $displayText = 'Request from SCRC';
 
@@ -426,7 +426,7 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function asr($row) {
-        $defaultUrl = '/vufind/MyResearch/Storagerequest?bib=' .  $row['id'] . '&barcode=' . $row['barcode'] . '&action=add';
+        $defaultUrl = '/vufind/MyResearch/Storagerequest?bib=' .  $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;action=add';
         $serviceLink = $this->getLinkConfig('mansueto', $defaultUrl); 
         $displayText = 'Request from Mansueto Library';
         $blacklist = array_map('strtolower', $this->lookupLocation['scrcInMansueto']);
@@ -444,7 +444,7 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function borrowDirect($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/borrowdirect_OLE.php?format=php&database=production&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/borrowdirect_OLE.php?format=php&amp;database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('borrowDirect', $defaultUrl); 
         $displayText = 'BorrowDirect';
         if (($serviceLink) and in_array($row['status'], $this->lookupStatus['borrowDirect'])) {
@@ -460,7 +460,7 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function cantFindIt($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/cant-find-it-OLE.php?barcode=' . $row['barcode'] . '&bib=' . $row['id'];
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/cant-find-it-OLE.php?barcode=' . $row['barcode'] . '&amp;bib=' . $row['id'];
         $serviceLink = $this->getLinkConfig('cantFindIt', $defaultUrl);
         $displayText = 'Can\'t find it?';
         $shelvingLocations = array_map('strtolower', $this->lookupLocation['cantFindIt']); 
@@ -477,7 +477,7 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function debugging($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/itemServlet.php?format=xml&bib=' . $row['id'] . '&barcode=' . $row['barcode'] . '&database=testing';         $serviceLink = $this->getLinkConfig('debugging', $defaultUrl);
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/itemServlet.php?format=xml&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;database=testing';         $serviceLink = $this->getLinkConfig('debugging', $defaultUrl);
         $displayText = '<< Simple API >>';
         if ($serviceLink) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
@@ -492,7 +492,7 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function dllStorage($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/item-mods-lookup_OLE.php?type=law&bib=' . $row['id'] .'&barcode=' . $row['barcode'] . '&database=production';
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/item-mods-lookup_OLE.php?type=law&amp;bib=' . $row['id'] .'&amp;barcode=' . $row['barcode'] . '&amp;database=production';
         $serviceLink = $this->getLinkConfig('dllStorage', $defaultUrl);
         $displayText = 'Request from DLL Storage';
         $shelvingLocations = array_map('strtolower', $this->lookupLocation['dllStorage']); 
@@ -510,7 +510,7 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function getIt($row) {
-        $defaultUrl = '#?format=php&database=production&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
+        $defaultUrl = '#?format=php&amp;database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('getIt', $defaultUrl); 
         $displayText = 'GetIt';
         if (($serviceLink) and in_array($row['status'], $this->lookupStatus['getIt'])) {
@@ -528,7 +528,7 @@ class ServiceLinks extends AbstractHelper {
      * @ return html string
      */
     public function maps($bib, $barcode) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/maplookup/maplookup.php?bib=' .  $bib . '&barcode=' . $barcode;
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/maplookup/maplookup.php?bib=' .  $bib . '&amp;barcode=' . $barcode;
         $serviceLink = $this->getLinkConfig('maps', $defaultUrl); 
         $displayText = '(Map/guide)';
         if ($serviceLink and !empty($barcode)) {
@@ -588,7 +588,7 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function scanAndDeliver($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/sandd_OLE.php?database=production&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/sandd_OLE.php?database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('scanAndDeliver', $defaultUrl); 
         $displayText = 'Scan and Deliver';
         $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
