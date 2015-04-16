@@ -69,9 +69,9 @@ $(document).ready(function() {
     var hideSummaryText = 'Hide holdings <i class="fa fa-arrow-circle-down"></i>'; 
 
     // Links to display for various states
-    var viewItems = '<a href="#" class="itemsToggle text-success hide">' + viewItemsText + '</a>';
+    var viewItems = '<a href="#" class="itemsToggle text-success">' + viewItemsText + '</a>';
     var hideItems = '<a href="#" class="itemsToggle text-success">' + hideItemsText + '</a>';
-    var viewSummary = '<a href="#" class="summaryToggle text-success hide">' + viewSummaryText + '</a>';
+    var viewSummary = '<a href="#" class="summaryToggle text-success">' + viewSummaryText + '</a>';
     var hideSummary = '<a href="#" class="summaryToggle text-success">' + hideSummaryText + '</a>';
 
     $('.holdings-unit table').each(function(){
@@ -99,7 +99,7 @@ $(document).ready(function() {
                 // Show the view link if possible
                 $(this).parent().parent().parent().find('.itemsToggle').removeClass('hide');
 
-                // 
+                // If there isn't already a link 
                 if(!hasLink){
                     $('.itemsToggleTarget td').append(viewItems);
                     hasLink = true;
