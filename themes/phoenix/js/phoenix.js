@@ -97,11 +97,11 @@ $(document).ready(function() {
                 $(this).hide();
                 $(this).addClass('toToggle');
                 // Show the view link if possible
-                $(this).parent().parent().parent().find('.itemsToggle').removeClass('hide');
+                //$(this).parent().parent().parent().find('.itemsToggle').removeClass('hide');
 
                 // If there isn't already a link 
-                if(!hasLink){
-                    $('.itemsToggleTarget td').append(viewItems);
+                if(!hasLink > 0 ){
+                    $(this).parent().find('.itemsToggleTarget td').append(viewItems);
                     hasLink = true;
                 }
             }
@@ -125,9 +125,9 @@ $(document).ready(function() {
                     // Show the view link if possible
                     $(this).parent().find('.summaryToggle').removeClass('hide');
 
-                    // 
+                    // If there isn't already a link
                     if(!hasLink){
-                        $('.summaryToggleTarget').append(viewSummary);
+                        $(this).parent().find('.summaryToggleTarget').append(viewSummary);
                         hasLink = true;
                     }
                 }
