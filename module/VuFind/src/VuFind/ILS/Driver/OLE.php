@@ -1199,20 +1199,20 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     {
         /*Get holdings by bib id, with holdings notes.*/
         $sql = 'SELECT h.HOLDINGS_ID AS holdings_id, h.BIB_ID AS bib_id, h.location AS
-                location, loc.LOCN_NAME AS locn_name, 
+                location, loc.LOCN_NAME AS locn_name,
                        h.CALL_NUMBER_TYPE_ID AS call_number_type_id,
                        h.CALL_NUMBER_PREFIX AS call_number_prefix, h.CALL_NUMBER AS
                 call_number, h.COPY_NUMBER AS copy_number,
-                       CONCAT_WS(";", (SELECT note.NOTE
+                       (SELECT GROUP_CONCAT(note.NOTE SEPARATOR "::|::")
                         FROM ole_ds_holdings_note_t note
                         WHERE note.HOLDINGS_ID = h.HOLDINGS_ID
                         AND note.TYPE="public"
-                       )) AS note,
-                       (SELECT count(*) 
-                        FROM ole_ds_ext_ownership_t own 
+                       ) AS note,
+                       (SELECT count(*)
+                        FROM ole_ds_ext_ownership_t own
                         WHERE own.HOLDINGS_ID = h.HOLDINGS_ID
                         ) AS ext_ownership_count,
-                       (SELECT count(*) 
+                       (SELECT count(*)
                         FROM ole_ser_rcv_rec r
                         WHERE r.INSTANCE_ID = CONCAT("who-", h.HOLDINGS_ID)
                         ) AS ser_rcv_rec_count,
@@ -1228,7 +1228,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     LEFT JOIN ole_locn_t loc on loc.LOCN_CD = SUBSTRING_INDEX(h.LOCATION, \'/\',
                 -1)
                     WHERE h.STAFF_ONLY = "N"
-                    AND h.BIB_ID = :id';
+                    AND h.BIB_ID =  :id';
 
         try {
             /*Query the database*/
@@ -1247,12 +1247,12 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $holdingCallNumTypeId = trim($row['call_number_type_id']);
                 $holdingCallNum = trim($row['call_number']);
                 $holdingCallNumDisplay = trim($row['call_number_prefix'] . ' ' . $row['call_number']);
-                $holdingNote = $row['note'];
+                $holdingNotes = explode('::|::', $row['note']);
                 $hasAnalytics = intval($row['analytic_count']) > 0;
                 $hasExtOwnership = intval($row['ext_ownership_count']) > 0;
                 $hasEholdings = intval($row['uri_count']) > 0;
                 $hasItems = intval($row['item_count']) > 0;
-                $hasHoldingNote = (!empty($holdingNote));
+                $hasHoldingNote = (!empty($holdingNotes));
                 $hasUnboundItems = intval($row['ser_rcv_rec_count']) > 0;
                 $holdingId = $row['holdings_id'];
                 $locationCodes = $row['location'];
@@ -1271,7 +1271,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     $item['location'] = $shelvingLocation; 
                     $item['callnumbertypeid'] = $holdingCallNumTypeId;
                     $item['callnumber'] = $holdingCallNum;
-                    $item['holdings notes'] = $holdingNote; 
+                    $item['holdings notes'] = $holdingNotes; 
                     $item['availability'] = true;
                     $item['status'] = '';
                     $item['is_holdable'] = true;
