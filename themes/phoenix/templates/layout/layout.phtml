@@ -88,13 +88,13 @@
         <?=$this->render('header.phtml')?>
       </div>
       <div class="container">
-        <? //Commented out to fix validation errors - brad 
-           //if ($this->layout()->searchbox != false): ?>
-          <!--<nav class="nav searchbox hidden-lg hidden-print">
-            <?//=$this->render('search/searchbox.phtml')?>
-            <?//=$this->layout()->searchbox ?>
-          </nav>-->
-        <? //endif; ?>
+        <? //This code chunk is responsible for some validation errors - brad 
+           if ($this->layout()->searchbox != false): ?>
+          <nav class="nav searchbox hidden-lg hidden-print">
+            <?=$this->render('search/searchbox.phtml')?>
+            <?=$this->layout()->searchbox ?>
+          </nav>
+        <? endif; ?>
         <? if((!isset($this->layout()->showBreadcrumbs) || $this->layout()->showBreadcrumbs == true)
           && !empty($this->layout()->breadcrumbs)
           && $this->layout()->breadcrumbs !== false
