@@ -581,6 +581,20 @@ class ServiceLinks extends AbstractHelper {
     }
 
     /**
+     * Generates a link to the report a record form and forwards
+     * along information about the record.
+     *
+     * @param id, record bib number
+     *
+     * @returns string
+     */
+    public function reportRecord($id)
+    {
+        $url='http://forms2.lib.uchicago.edu/lib/problemreport/problemreport.php?bib=' . $id;
+        return $url;
+    }
+
+    /**
      * Method creates a link to the Scan&Deliver service
      *
      * @param row, array of holdings and item information 

@@ -316,31 +316,6 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
         return $output;
     }
     
-    /**
-     * Generates a link to the report a record form and forwards
-     * along information about the record.
-     *
-     * @returns string
-     */
-    public function ReportRecord()
-    {
-    	$url='http://forms.lib.uchicago.edu/lib/problemreport/problemreport.php?';
-   	
-		$imprint = implode(" ", array_merge($this->getFieldArray('260', array('a','b','c','d','e','f','g'), false), $this->getFieldArray('264', array('a','b','c'), false)));
-		$title   = implode(" ", array_merge($this->getFieldArray('245', array('a','b','c'), false)));
-		$isbn    = implode(" ", array_merge($this->getFieldArray('020', array('a','b','c'), false)));
-		$issn    = implode(" ", array_merge($this->getFieldArray('022', array('a'), false)));
-	
-	 	$string = "bibno=" . $this->fields['id'] . 
-	 		  "&" . "author=" . (isset($this->fields['author']) ? $this->fields['author'] : null).
-	 		  "&" . "title=" . $title . 
-	 		  "&" . "imprint=" . $imprint .
-	 		  "&" . "isbn=" . $isbn .
-	 		  "&" . "issn=" . $issn;
-		
-        return $url . urlencode($string);
-    }
-        
 
    /******************** BEGIN: Full Record Display *********************/
    /** All of the methods below are support methods for the crosswalk  **/

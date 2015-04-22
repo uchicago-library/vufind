@@ -52,5 +52,5 @@
       </noscript>
     </li>
   <? endif; ?>
-  <li><a href="<?= $this->driver->ReportRecord() ?>" class="report-a-record"><i class="fa fa-external-link"></i> <?=$this->transEsc('Report a Record Problem')?></a></li>
+  <li><a href="<?=$this->ServiceLinks()->reportRecord($id)?>" class="report-a-record"><i class="fa fa-external-link"></i> <?=$this->transEsc('Report a Record Problem')?></a></li>
 </ul>
