@@ -338,7 +338,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
 	 		  "&" . "isbn=" . $isbn .
 	 		  "&" . "issn=" . $issn;
 		
-        return urlencode($url . $string);
+        return $url . urlencode($string);
     }
         
 
