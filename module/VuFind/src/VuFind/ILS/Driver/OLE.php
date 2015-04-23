@@ -1252,7 +1252,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $hasExtOwnership = intval($row['ext_ownership_count']) > 0;
                 $hasEholdings = intval($row['uri_count']) > 0;
                 $hasItems = intval($row['item_count']) > 0;
-                $hasHoldingNote = (!empty($holdingNotes));
+                $hasHoldingNote = (!empty($holdingNotes) && trim(implode('', $holdingNotes)) != '');
                 $hasUnboundItems = intval($row['ser_rcv_rec_count']) > 0;
                 $holdingId = $row['holdings_id'];
                 $locationCodes = $row['location'];
