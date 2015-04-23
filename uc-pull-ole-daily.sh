@@ -229,9 +229,9 @@ OLE_DIR=$1
 OLE_DELETES=/opt/tomcat6/kuali/main/local/olefs-webapp/work/staging/export/
 
 
-ssh ${USER_AT_HOST} find ${OLE_DIR} -type f -iname "*.mrc" -mtime ${MTIME}  | xargs -I{} scp vuadmin@ole01.uchicago.edu:{} ${VUFIND_BIB_DIR}
+ssh ${USER_AT_HOST} find ${OLE_DIR} -type f -iname "*.mrc" -mtime ${MTIME}  | xargs -I{} scp ${USER_AT_HOST}:{} ${VUFIND_BIB_DIR}
 
-ssh ${USER_AT_HOST} find ${OLE_DELETES} -type f -iname "*Deleted_Bibs.txt" -mtime ${MTIME}  | xargs -I{} scp vuadmin@ole01.uchicago.edu:{} ${VUFIND_BIB_DIR}
+ssh ${USER_AT_HOST} find ${OLE_DELETES} -type f -iname "*Deleted_Bibs.txt" -mtime ${MTIME}  | xargs -I{} scp ${USER_AT_HOST}:{} ${VUFIND_BIB_DIR}
 
 exit $?
 
