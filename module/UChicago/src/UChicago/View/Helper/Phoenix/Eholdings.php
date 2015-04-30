@@ -38,7 +38,7 @@ class Eholdings extends AbstractHelper
                 $link[$i]['url'] = $url['subfieldData']['u-1'];
                 $link[$i]['desc'] = $description; //placeholder 
                 $link[$i]['type'] = $url['subfieldData']['c'];
-                $link[$i]['callnumber'] = $url['subfieldData']['a']; 
+                $link[$i]['callnumber'] = isset($url['subfieldData']['a']) ? $url['subfieldData']['a'] : null; 
                 $i++; 
             }
             $links = $link;
