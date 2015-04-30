@@ -56,7 +56,7 @@ class Eholdings extends AbstractHelper
     public function getEholdingsLinkText($type) {
         $lookup = array('FullText' => 'Full text online', 
                         'Related' => 'Related text online');
-        assert(in_array($type, $lookup), 'The e-holding type is not valid.'); 
+        assert(in_array($type, array_keys($lookup)), 'The e-holding type is not valid.'); 
         return $lookup[$type];
     }
 }
