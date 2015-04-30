@@ -105,7 +105,7 @@
 
 <?/*Callnumbers*/?>
 <? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
-<? $hasCallNos = implode('', $callNos); ?>
+<? $hasCallNos = !empty($callNos['display']); ?>
 <?foreach ($callNos['display'] as $numKey => $callNo): ?>
    <h4><span><?=$hasCallNos ? $this->transEsc("Call Number") . ': ' : ''?></span> <?=$this->escapeHtml($callNo)?></h4>
    <? $source = ($callNos['typeid'][$numKey] == '3') ? 'dewey' : 'lcc'; ?>
