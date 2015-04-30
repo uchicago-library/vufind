@@ -1248,7 +1248,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $holdingCallNum = trim($row['call_number']);
                 $holdingCallNumDisplay = trim($row['call_number_prefix'] . ' ' . $row['call_number']);
                 $holdingNotes = explode('::|::', $row['note']);
-                $hasAnalytics = intval($row['analytic_count']) > 0;
+                $hasAnalytics = isset($row['analytic_count']) ? intval($row['analytic_count']) > 0 : null;
                 $hasExtOwnership = intval($row['ext_ownership_count']) > 0;
                 $hasEholdings = intval($row['uri_count']) > 0;
                 $hasItems = intval($row['item_count']) > 0;
