@@ -22,6 +22,9 @@ class Eholdings extends AbstractHelper
     public function getEholdingLinks() {
         $links = array(); 
         $data = $this->view->driver->getEholdingsFromMarc();
+        if ($data === null) {
+            return $links;
+        }
         foreach ($data as $urlData) {
             $link = array();
             $i = 0;
