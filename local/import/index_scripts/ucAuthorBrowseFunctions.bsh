@@ -168,7 +168,8 @@ public static String getPersonalName(DataField field, String sfList)
 		    // assume no multiple parens
 		    int lpInd = sfd.indexOf("(");
 		    if (lpInd != -1) dBuf.deleteCharAt(lpInd);
-		    int rpInd = sfd.indexOf(")");
+		    sfd = dBuf.toString();
+                    int rpInd = sfd.indexOf(")");
 		    if (rpInd != -1) dBuf.deleteCharAt(rpInd);
 		    sfd = dBuf.toString();
 		}
