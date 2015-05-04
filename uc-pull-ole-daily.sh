@@ -28,7 +28,8 @@ TMP_DIR=${TMP_DIR:-/tmp}
 #VUFIND_SFX_DIR=${VUFIND_HARVEST_DIR}/sfx
 
 # list required variables here
-REQVARS="VUFIND_HOME VUFIND_LOCAL_DIR VUFIND_HARVEST_DIR VUFIND_BIB_DIR VUFIND_SFX_DIR"
+#REQVARS="VUFIND_HOME VUFIND_LOCAL_DIR VUFIND_HARVEST_DIR VUFIND_BIB_DIR VUFIND_SFX_DIR"
+REQVARS="VUFIND_BIB_DIR"
 
 #
 # Defaults
@@ -37,11 +38,13 @@ MTIME='-1'    # mtime arg for find, how many days old (note minus sign)
 
 
 
-USAGE="Usage: $ME [-t] -h _host_ remote_dir ; -H for help"
+USAGE="Usage: $ME [-t] [-D days_old] -h _host_ -d delete_file_dir -e remote_dir ; -H for help"
 HELP="Copy export files from remote host to VUFIND_BIB_DIR ($VUFIND_BIB_DIR)
  remote_dir: export directory on remote host
- -d  days old (default = 1)
+ -d  remote directory for delete files
+ -D  days old (default = 1)
  -h  name of remote host (required)
+ -e  remote directory for export files
  -t  test mode (developer only)
  -u  user for remote host
  -v  verbose (NYI)"
@@ -173,12 +176,14 @@ prefix () {
 # Main
 #
 
-while getopts 'd:Hh:tu:v' OPT
+while getopts 'd:D:e:Hh:tu:v' OPT
 do
     case "$OPT" in
 	h)  HOST=$OPTARG;;
 	H)  usage; printf "$HELP\n"; exit 0 ;;
-	d)  MTIME="-$OPTARG";;
+	d)  OLE_DELETES=$OPTARG;;
+	D)  MTIME="-$OPTARG";;
+	e)  OLE_DIR=$OPTARG;;
 	t)  TESTING=true;;
 	u)  SSH_USER=$OPTARG;;
 	-)  break;;
@@ -202,13 +207,16 @@ shift -- $((OPTIND - 1))
 #     esac
 # done
 
+checkenv
+
 # Make sure we have the expected number of arguments
 E_BADARGS=65
-EXPECTED_ARGS=1
+EXPECTED_ARGS=0
 
 if [ $# -ne $EXPECTED_ARGS ]
 then
-    echo "Missing remote directory" >&2
+    #echo "Missing remote directory" >&2
+    echo "Unexpected arguments: ${@}" >&2
     usage $E_BADARGS
 fi
 
@@ -224,14 +232,15 @@ else
     USER_AT_HOST="$SSH_USER@$HOST"
 fi
 
-#OLE_DIR=/opt/tomcat6/kuali/main/local/olefs-webapp/work/staging/export/VFIJan15/
-OLE_DIR=$1
-OLE_DELETES=/opt/tomcat6/kuali/main/local/olefs-webapp/work/staging/export/
+if [[ ! -z ${OLE_DIR} ]]
+then
+    ssh ${USER_AT_HOST} find ${OLE_DIR} -type f -iname "*.mrc" -mtime ${MTIME}  | xargs -I{} scp ${USER_AT_HOST}:{} ${VUFIND_BIB_DIR}
+fi
 
-
-ssh ${USER_AT_HOST} find ${OLE_DIR} -type f -iname "*.mrc" -mtime ${MTIME}  | xargs -I{} scp ${USER_AT_HOST}:{} ${VUFIND_BIB_DIR}
-
-ssh ${USER_AT_HOST} find ${OLE_DELETES} -type f -iname "*Deleted_Bibs.txt" -mtime ${MTIME}  | xargs -I{} scp ${USER_AT_HOST}:{} ${VUFIND_BIB_DIR}
+if [[ ! -z ${OLE_DELETES} ]]
+then
+    ssh ${USER_AT_HOST} find ${OLE_DELETES} -type f -iname "*Deleted_Bibs.txt" -mtime ${MTIME}  | xargs -I{} scp ${USER_AT_HOST}:{} ${VUFIND_BIB_DIR}
+fi
 
 exit $?
 
