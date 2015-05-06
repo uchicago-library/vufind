@@ -579,6 +579,12 @@ $(document).ready(function() {
             $('[name="publishDatefrom"]').remove();
             $('[name="publishDateto"]').remove();
         }
+
+        // Remove the location facet for certain collection queries
+        selected_col = $('#limit_collection option:selected');
+        if (selected_col.text() == 'Crerar Rare Books' || 'Crerar Manuscripts') {
+            $('#limit_building option').remove();
+        }
     });
 
     // Preserve search box terms between begins with and keyword tabs 
