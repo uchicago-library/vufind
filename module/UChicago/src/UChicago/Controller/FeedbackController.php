@@ -62,7 +62,7 @@ class FeedbackController extends \VuFind\Controller\FeedbackController
      * @param string pageUrl, url of the current page
      * @param string refUrl, the referring url
      */
-    public function __construct($config)
+    public function __construct()
     {
         $this->pageUrl = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
         $this->refUrl = isset($_SESSION['Referrer']) ? $_SESSION['Referrer'] : '';
@@ -109,18 +109,29 @@ class FeedbackController extends \VuFind\Controller\FeedbackController
     /**
      * Dispatches a POST request for the javascript lightbox.
      *
-     * @return POST request via zend http client.
+     * @return POST request via php curl.
      */
    public function knowledgeTrackerFormAction()
     {
+        $config = $this->getServiceLocator()->get('VuFind\Config')->get('config');
         $post = $this->getRequest()->getPost();
-        $client = new Client();
-        $client->setMethod('POST');
-        $client->setUri('https://client.knowledgetrackerlib.com/public_form_handler.php');
-        $client->setParameterPost($post);
-        $client->setOptions(array('sslverifypeer' => false));
 
-        return $client->send();
+        /*Don't use the zend framework for http requests. 
+        The zend http client is garbage. Use php curl instead.*/
+        $ch = curl_init();
+        $curlConfig = array(
+            CURLOPT_CUSTOMREQUEST   => 'POST',
+            CURLOPT_POSTFIELDS      => $post,
+            CURLOPT_RETURNTRANSFER  => true,
+            CURLOPT_URL             => $config['KnowledgeTracker']['form_url'],
+            CURLOPT_SSL_VERIFYPEER  => false, # We should fix this!
+            CURLOPT_SSL_VERIFYHOST  => false, # Ditto
+        );
+        curl_setopt_array($ch, $curlConfig);
+        curl_exec($ch);
+        curl_close($ch);
+
+        return null;
     }
 
 }
