@@ -474,9 +474,11 @@ $(document).ready(function() {
     return Lightbox.get('Feedback', 'Home');
   });
   // Knowledge Tracker
+  /* Only commented this out because php libcurl is failing 
+  in the production envirionment. I would like to bring this back - brad 5/18/2015
   $('#knowledgeTrackerLink').click(function() {
     return Lightbox.get('Feedback', 'KnowledgeTracker');
-  });
+  });*/
   // Help links
   $('.help-link').click(function() {
     var split = this.href.split('=');
