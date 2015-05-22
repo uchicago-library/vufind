@@ -1013,11 +1013,11 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $sql = 'SELECT own.EXT_OWNERSHIP_ID, own.HOLDINGS_ID,
                    ot.TYPE_OWNERSHIP_NM,
                    own.ORD, own.TEXT,
-                   CONCAT_WS(\';\', (SELECT note.NOTE
+                   (SELECT GROUP_CONCAT(note.NOTE SEPARATOR \';\')
                     from ole_ds_ext_ownership_note_t note 
                     where note.EXT_OWNERSHIP_ID = own.EXT_OWNERSHIP_ID
                     and note.TYPE = \'public\'
-                    )) AS note
+                    ) AS note
                     FROM ole_ds_ext_ownership_t own
                 JOIN ole_ds_holdings_t h ON own.HOLDINGS_ID = h.HOLDINGS_ID
                 LEFT JOIN ole_cat_type_ownership_t ot ON own.EXT_OWNERSHIP_TYPE_ID = ot.TYPE_OWNERSHIP_ID
