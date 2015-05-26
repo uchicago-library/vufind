@@ -193,7 +193,11 @@
               <? if (isset($row['duedate']) && $row['duedate']): ?>
                 <?/*Only display duedates for loaned items*/?>
                 <? $duedate = ($row['status'] == 'LOANED' ? $this->tab->getDuedate($row) : '');?>
+                <? if ($duedate == 'no due date unless recalled'): ?>
+                <? $dueHtml = '&ndash; <span class="small">no due date unless recalled</span>'; ?>
+                <? else: ?>
                 <? $dueHtml = (!empty($duedate) ? '&ndash; <span class="small">' . $this->transEsc("Due") . ': ' . $this->escapeHtml($duedate) . '</span>' : '');?>
+                <? endif; ?>
                 <?=$dueHtml?>
               <? endif; ?>
               <? if (isset($row['requests_placed']) && $row['requests_placed'] > 0): ?>

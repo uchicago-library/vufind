@@ -127,8 +127,8 @@
             <? if (isset($this->renewResult[$ilsDetails['item_id']])): ?>
               <? $renewDetails = $this->renewResult[$ilsDetails['item_id']]; ?>
                 <?=$this->escapeHtml($renewDetails['new_date'])?> <? if (isset($renewDetails['new_time']) && $ilsDetails['dueTime']): ?><?=date("g:ia", strtotime($renewDetails['new_time']))?><? endif; ?>
-            <? elseif (strpos($ilsDetails['duedate'], '3925') === 0): ?>
-              Indefinite Loan
+            <? elseif ($ilsDetails['duedate'] === null): ?>
+                no due date unless recalled
             <? else: ?>
               <?=$this->escapeHtml($ilsDetails['duedate'])?><? if (isset($ilsDetails['dueTime']) && $ilsDetails['dueTime'] != '00:00:00.0'): ?> <?=date("g:ia", strtotime($ilsDetails['dueTime']))?><? endif; ?>
             <? endif; ?>
