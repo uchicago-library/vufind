@@ -28,6 +28,9 @@ return array(
             'BookPlates' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\BookPlates();
             },
+            'citation' => function ($sm) {
+                return new \UChicago\View\Helper\Phoenix\Citation();
+            },
             'Eholdings' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\Eholdings();
             },

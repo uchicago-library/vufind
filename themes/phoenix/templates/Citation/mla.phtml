@@ -3,3 +3,4 @@
 <? if (!empty($this->edition)): ?><?=$this->escapeHtml($this->edition)?> <? endif; ?>
 <? if (!empty($this->publisher)): ?><?=$this->escapeHtml($this->publisher)?><? endif; ?>
 <? if (!empty($this->year)): ?><? if (!empty($this->publisher)): ?>, <? endif; ?><?=$this->escapeHtml($this->year)?><? endif; ?><? if (!empty($this->year) || !empty($this->publisher)): ?>.<? endif; ?>
+<? if (!empty($this->format)): ?> <?=$this->escapeHtml($this->format)?>.<? endif; ?>
