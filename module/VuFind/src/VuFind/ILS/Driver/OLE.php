@@ -628,11 +628,32 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         // Did the API change to return a string instead of date? (DL)
         $available = ((string) $itemXml->availableStatus == 'ONHOLD') ?  true:false;
 
+        // Get a human-readable description for the pickup location. 
+        $sql = "SELECT OLE_CRCL_DSK_PUB_NAME " .
+               "FROM $this->dbName.ole_crcl_dsk_t " .
+               "WHERE ole_crcl_dsk_id = :deskid";
+
+        $location = '';
+        
+        try {
+            $sqlStmt = $this->db->prepare($sql);
+            $sqlStmt->bindParam(
+                ':deskid', strtolower(utf8_decode($itemXml->pickupLocation)), PDO::PARAM_STR
+            );
+            $sqlStmt->execute();
+            $row = $sqlStmt->fetch(PDO::FETCH_ASSOC);
+            if (isset($row['OLE_CRCL_DSK_PUB_NAME']) && ($row['OLE_CRCL_DSK_PUB_NAME'] != '')) {
+                $location = $row['OLE_CRCL_DSK_PUB_NAME'];
+            }
+        } catch (PDOException $e) {
+            throw new ILSException($e->getMessage());
+        }
+
         return array(
             'id' => substr((string) $itemXml->catalogueId, strpos((string) $itemXml->catalogueId, '-')+1),
             'item_id' => (string) $itemXml->itemId,
             'type' => (string) $itemXml->requestType,
-            'location' => '',
+            'location' => (string) $location,
             'expire' => (string) $itemXml->expiryDate,
             'create' => (string) $itemXml->createDate,
             'position' => (string) $itemXml->priority,
