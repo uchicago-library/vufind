@@ -13,16 +13,16 @@
 
     <? if (!empty($this->transactions)): ?>
       <? if ($this->renewForm): ?>
-        <p style="margin-bottom: 0; margin: -10px 0 15px 0;">Need to renew books?
+        <!--<p style="margin-bottom: 0; margin: -10px 0 15px 0;">Need to renew books?
           <a href="http://www.lib.uchicago.edu/e/using/borrow/#contact">Call us</a> or use our 
           <a href="http://www.lib.uchicago.edu/e/ask/contactcirc.html">online form</a> and Library staff will help you.
-        </p>
+        </p>-->
 
       <form name="renewals" action="" method="post" id="renewals">
-        <!--<div class="toolbar">
-          <input type="submit" class="btn btn-default" name="renewSelected" value="<?//=$this->transEsc("renew_selected")?>" />
-          <input type="submit" class="btn btn-default" name="renewAll" value="<?//=$this->transEsc('renew_all')?>" />
-        </div>-->
+        <div class="toolbar">
+          <input type="submit" class="btn btn-default" name="renewSelected" value="<?=$this->transEsc("renew_selected")?>" />
+          <input type="submit" class="btn btn-default" name="renewAll" value="<?=$this->transEsc('renew_all')?>" />
+        </div>
       <? endif; ?>
 
       <table class="table table-striped">
