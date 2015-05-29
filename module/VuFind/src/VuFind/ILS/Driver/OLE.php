@@ -1696,23 +1696,72 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $patronId = $patron['id'];
         $patronBarcode = $patron['barcode'];
         
-        $service = 'renewItem';
+        $service = 'renewItemList';
         
         $finalResult = array();
-        
-        foreach ($renewDetails['details'] as $key=>$details) {
-          $details_arr = explode(',', $details);
-          $itemBarcode = $details_arr[0];
-          $item_id = $details_arr[1];
 
-            $uri = $this->circService . "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcode}";
+        // Build a list of item barcodes
+        $barcodes = array(); 
+        foreach($renewDetails['details'] as $key=>$details) {
+            $details_arr = explode(',', $details);
+            $itemBarcode = $details_arr[0];
+            array_push($barcodes, $itemBarcode);
+        }
+        $itemBarcodes = implode(',', $barcodes);
+        $uri = $this->circService . "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcodes}";
+      
+
+        // Make the request
+        $request = new Request();
+        $request->setMethod(Request::METHOD_POST);
+        $request->setUri($uri);
+
+        $client = new Client();
+        $client->setOptions(array('timeout' => 4030));
+
+        try {
+            $response = $client->dispatch($request);
+        } catch (Exception $e) { 
+            throw new ILSException($e->getMessage());
+        }
+
+        $content = $response->getBody();
+        error_log($content);
+
+        $xml = simplexml_load_string($content);
+        $msg = $xml->xpath('//message');
+        $code = $xml->xpath('//code');
+        $code = (string)$code[0];
+        
+        $success = false;
+        
+        // TODO: base "success" on the returned codes from OLE
+        if ($code == '003') {
+            $success = true;
+        }
+        $finalResult['details'][$itemBarcode] = array(
+                            "success" => $success,
+                            "new_date" => false,
+                            "item_id" => $itemBarcode,
+                            "sysMessage" => (string)$msg[0]
+                            );
+
+        return $finalResult;
+
+
+        /*foreach ($renewDetails['details'] as $key=>$details) {
+            $details_arr = explode(',', $details);
+            $itemBarcode = $details_arr[0];
+            $item_id = $details_arr[1];
+
+            //$uri = $this->circService . "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcode}";
 
             $request = new Request();
             $request->setMethod(Request::METHOD_POST);
             $request->setUri($uri);
 
             $client = new Client();
-            $client->setOptions(array('timeout' => 30));
+            $client->setOptions(array('timeout' => 130));
 
             try {
                 $response = $client->dispatch($request);
@@ -1725,7 +1774,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             if (!$response->isSuccess()) {
                 throw HttpErrorException::createFromResponse($response);
             }
-            */
+            /
         
             $content = $response->getBody();
             $xml = simplexml_load_string($content);
@@ -1748,7 +1797,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             
         }
         //var_dump($finalResult);
-        return $finalResult;
+        return $finalResult;*/
     }
     
     /**
