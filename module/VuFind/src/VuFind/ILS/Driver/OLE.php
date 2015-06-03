@@ -1691,7 +1691,6 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
      */
     public function renewMyItems($renewDetails)
     {
-
         // Convenience variables
         $patron = $renewDetails['patron'];
         $patronId = $patron['id'];
@@ -1712,7 +1711,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
         // Build the uri
         $uri = $this->circService . "?service={$service}&patronBarcode=" .
-            "{$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcodes}";
+            "{$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcodes}";  
      
         // Make the request
         $request = new Request();
@@ -1724,32 +1723,36 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         // Get the response
         try {
             $response = $client->dispatch($request);
-        } catch (Exception $e) { 
+        } catch (Exception $e) {
             throw new ILSException($e->getMessage());
         }
         $content = $response->getBody();
 
         // Parse the response 
         $xml = simplexml_load_string($content);
-        $msg = $xml->xpath('//message');
-        $code = $xml->xpath('//code');
-        $code = (string)$code[0];
+
+        $i = 0;
+        foreach($xml as $renewal) {
+            $msg = $renewal->xpath('//message');
+            $code = $renewal->xpath('//code');
+            $code = (string)$code[0];
+            $itemBarcode = $barcodes[$i];
         
         
-        // TODO: base "success" on the returned codes from OLE
-        $success = false;
-        if ($code == '003') {
-            $success = true;
+            // TODO: base "success" on the returned codes from OLE
+            $success = false;
+            if ($code == '003') {
+                $success = true;
+            }
+            $finalResult['details'][$itemBarcode] = array(
+                                "success" => $success,
+                                "new_date" => false,
+                                "item_id" => $itemBarcode,
+                                "sysMessage" => (string)$msg[0]
+                                );
+            $i++;
         }
-        $finalResult['details'][$itemBarcode] = array(
-                            "success" => $success,
-                            "new_date" => false,
-                            "item_id" => $itemBarcode,
-                            "sysMessage" => (string)$msg[0]
-                            );
-
         return $finalResult;
-
     }
     
     /**
