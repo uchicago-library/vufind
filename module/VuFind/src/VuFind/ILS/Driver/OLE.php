@@ -1730,12 +1730,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
         // Parse the response 
         $xml = simplexml_load_string($content);
-
         $i = 0;
         foreach($xml as $renewal) {
-            $msg = $renewal->xpath('//message');
-            $code = $renewal->xpath('//code');
-            $code = (string)$code[0];
+            $msg = (string)$renewal->message;
+            $code = (string)$renewal->code;
             $itemBarcode = $barcodes[$i];
         
         
