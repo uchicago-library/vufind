@@ -1,5 +1,5 @@
 <? $account = $this->auth()->getManager(); ?>
 <? $sessionInitiator = $account->getSessionInitiator($this->serverUrl($this->url('myresearch-home'))); ?>
 <div class="col-sm-12">
-<a href="<?=$this->escapeHtmlAttr($sessionInitiator)?>" class="btn btn-primary" >Log in with CNetID</a>
+<a href="<?=$sessionInitiator?>" class="btn btn-primary" >Log in with CNetID</a>
 </div>
