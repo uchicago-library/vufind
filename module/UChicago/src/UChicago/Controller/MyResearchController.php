@@ -172,5 +172,72 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 	        )
 	    );
     }
+
+    /**
+     * Send list of checked out books to view. 
+     * Overriding VuFind core so we can return a flag for detecting
+     * if any of the renewal requests failed. This allows us to display
+     * the appropriate message at the top of the page and saves us an 
+     * extra loop in the template.
+     *
+     * @return mixed
+     */
+    public function checkedoutAction()
+    {
+        // Stop now if the user does not have valid catalog credentials available:
+        if (!is_array($patron = $this->catalogLogin())) {
+            return $patron;
+        }
+
+        // Connect to the ILS:
+        $catalog = $this->getILS();
+
+        // Get the current renewal status and process renewal form, if necessary:
+        $renewStatus = $catalog->checkFunction('Renewals', compact('patron'));
+        $renewResult = $renewStatus
+            ? $this->renewals()->processRenewals(
+                $this->getRequest()->getPost(), $catalog, $patron
+            )
+            : array();
+
+        // Set a flag for passing to the template.
+        // This will tell us which alert message to display.
+        $failure = false;
+        foreach ($renewResult as $entry) {  
+            if ($entry['success'] == false) {
+                $failure = true;
+            }
+        }
+        
+        // By default, assume we will not need to display a renewal form:
+        $renewForm = false;
+
+        // Get checked out item details:
+        $result = $catalog->getMyTransactions($patron);
+        $transactions = array();
+        foreach ($result as $current) {
+            // Add renewal details if appropriate:
+            $current = $this->renewals()->addRenewDetails(
+                $catalog, $current, $renewStatus
+            );
+            if ($renewStatus && !isset($current['renew_link'])
+                && $current['renewable']
+            ) {
+                // Enable renewal form if necessary:
+                $renewForm = true;
+            }
+
+            // Build record driver:
+            $transactions[] = $this->getDriverForILSRecord($current);
+        }
+
+        return $this->createViewModel(
+            array(
+                'transactions' => $transactions, 'renewForm' => $renewForm,
+                'renewResult' => $renewResult,
+                'failure' => $failure,
+            )
+        );
+    }
 }
 
