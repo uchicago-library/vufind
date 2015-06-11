@@ -5,6 +5,8 @@
     $holdings = $this->driver->getRealTimeHoldings();
     $openUrl = $this->driver->openURLActive('holdings') ? $this->driver->getOpenURL() : false;
     $offlineMode = $this->ils()->getOfflineMode();
+    $callNumDisplayText = '(Browse by Call Number)';
+    $callNumLabel = 'Call Number:';
     // Account for replace_other_urls setting
     //$urls = ($openUrl && $this->driver->replaceURLsWithOpenURL()) ? array() : $this->record($this->driver)->getLinkDetails();
     $urls = ($openUrl && $this->driver->replaceURLsWithOpenURL()) ? array() : $this->Eholdings()->getEholdingLinks();//Replace default 856 urls with e-holdings from the 098 fields
@@ -51,8 +53,8 @@
   <? if (!empty($urls)): ?>
       <?/*For now, only display a browse link if the first e-holding has a callnumber - Fix later*/?>
       <? if (isset($urls[0]['callnumber'])):?>
-        <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&amp;from=<?=$this->escapeHtml($urls[0]['callnumber'])?>"
-           class="ablink">(Browse the Shelves)</a><br/>
+        <br/><h4><span><?=$this->transEsc($callNumLabel)?> </span><?=$urls[0]['callnumber']?></h4> <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&amp;from=<?=$this->escapeHtml($urls[0]['callnumber'])?>"
+           class="ablink"><?=$callNumDisplayText?></a><br/>
       <?endif;?>
     <? foreach ($urls as $current): ?>
       <div>
@@ -80,7 +82,7 @@
 <?//Bound-withs?>
 <? if (!empty($holding['items'][0]['boundwiths'])): ?>
   <h3>This item is bound with: </h3>
-  <p><?=!empty($holding['items'][0]['boundwiths']['cn']) ? '<strong>Call Number: </strong>' . $holding['items'][0]['boundwiths']['cn'] : ''; ?></p>
+  <p><?=!empty($holding['items'][0]['boundwiths']['cn']) ? '<strong>' . $this->transEsc($callNumLabel) . ' </strong>' . $holding['items'][0]['boundwiths']['cn'] : ''; ?></p>
   <p>
   <? foreach ($holding['items'][0]['boundwiths'] as $key): ?>
     <? if (array_key_exists('title', $key)):?>
@@ -107,21 +109,21 @@
 <? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
 <? $hasCallNos = !empty($callNos['display']); ?>
 <?foreach ($callNos['display'] as $numKey => $callNo): ?>
-   <h4><span><?=$hasCallNos ? $this->transEsc("Call Number") . ': ' : ''?></span> <?=$this->escapeHtml($callNo)?></h4>
+   <h4><span><?=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></span> <?=$this->escapeHtml($callNo)?></h4>
    <? $source = ($callNos['typeid'][$numKey] == '3') ? 'dewey' : 'lcc'; ?>
    <a href="<?= $this->url('home')?>alphabrowse/Home?source=<?=$source?>&amp;from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
-      class="ablink">(Browse the Shelves)</a><br/>
+      class="ablink"><?=$callNumDisplayText?></a><br/>
  <? endforeach; ?>
 
 <table class="holdings-table table" data-display="<?=$this->tab->getDisplayNumber()?>">
   <caption><?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?></caption>
   <!--<tr>
-    <th><?=$hasCallNos ? $this->transEsc("Call Number") . ': ' : ''?></th>
+    <th><?=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></th>
     <td>
       <?foreach ($callNos['display'] as $numKey => $callNo): ?>
         <?=$this->escapeHtml($callNo)?>
         <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
-           class="ablink">(Browse the Shelves)</a><br/>
+           class="ablink"><?=$callNumDisplayText?></a><br/>
       <? endforeach; ?>
     </td>
   </tr>-->
