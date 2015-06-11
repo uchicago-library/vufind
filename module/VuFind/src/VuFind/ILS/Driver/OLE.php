@@ -963,9 +963,14 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
-
-        /*Check for analytics*/
-        if ($this->hasAnalytics($id)) {
+        
+        /* See if the current holding is an eholding*/ 
+        $eholdings = $this->getEholdings($id, $holdingId, $holdingLocation, $holdingCallNum, $holdingCallNumDisplay);
+        $isEholding =  !empty($eholdings);
+        
+        /*Check for analytics if the current holding 
+        is not an eholding*/
+        if ($this->hasAnalytics($id) && !$isEholding) {
             $analytics = $this->getAnalytics($id, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay);
             foreach($analytics as $anal) {
                 $items[] = $anal;
