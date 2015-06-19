@@ -61,8 +61,20 @@ class Citation extends \VuFind\View\Helper\Root\Citation
         $formats = $this->driver->getFormats();
             if (in_array('Print', $formats)) {
                 $format = 'Print';
+            } else if (in_array('Audio cassette', $formats)) {
+                $format = 'Audiocassette';
+            } else if (in_array('CD', $formats)) {
+                $format = 'CD';
+            } else if (in_array('DVD', $formats)) {
+                $format = 'DVD';
             } else if (in_array('E-Resource', $formats)) {
                 $format = 'Web';
+            } else if (in_array('Laserdisc', $formats)) {
+                $format = 'Laserdisc';
+            } else if (in_array('LP', $formats)) {
+                $format = 'LP';
+            } else if (in_array('Video cassette', $formats)) {
+                $format = 'Videocassette';
             }
         } 
         $mla = array(
