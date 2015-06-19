@@ -73,6 +73,8 @@ class Citation extends \VuFind\View\Helper\Root\Citation
                 $format = 'Laserdisc';
             } else if (in_array('LP', $formats)) {
                 $format = 'LP';
+            } else if (in_array('Microform', $formats)) {
+                $format = 'Microform';
             } else if (in_array('Video cassette', $formats)) {
                 $format = 'Videocassette';
             }
