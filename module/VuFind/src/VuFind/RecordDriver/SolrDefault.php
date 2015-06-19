@@ -65,7 +65,7 @@ class SolrDefault extends AbstractBase
     protected $forbiddenSnippetFields = array(
         'author', 'author-letter', 'title', 'title_short', 'title_full',
         'title_full_unstemmed', 'title_auth', 'title_sub', 'spelling', 'id',
-        'ctrlnum'
+        'ctrlnum', 'fullrecord'
     );
 
     /**
