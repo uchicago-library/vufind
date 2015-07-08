@@ -892,11 +892,11 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     i.LOCATION AS location, loc.LOCN_NAME AS locn_name,
                     i.CALL_NUMBER_TYPE_ID, i.CALL_NUMBER_PREFIX, i.CALL_NUMBER, i.ENUMERATION, i.CHRONOLOGY, i.COPY_NUMBER, 
                     i.DUE_DATE_TIME, i.CHECK_OUT_DATE_TIME, i.CLAIMS_RETURNED,
-                    CONCAT_WS(";", (SELECT inote.NOTE
+                    (SELECT GROUP_CONCAT(inote.NOTE SEPARATOR ";")
                         FROM ole_ds_item_note_t inote
                         WHERE i.ITEM_ID = inote.ITEM_ID
                         AND inote.TYPE="public")
-                    ) AS note 
+                    AS note 
                         FROM ole_ds_item_t i
                     LEFT JOIN ole_dlvr_item_avail_stat_t istat on i.ITEM_STATUS_ID = istat.ITEM_AVAIL_STAT_ID
                     LEFT JOIN ole_cat_itm_typ_t itype on if(i.TEMP_ITEM_TYPE_ID is not null, i.TEMP_ITEM_TYPE_ID, i.ITEM_TYPE_ID) = itype.ITM_TYP_CD_ID
