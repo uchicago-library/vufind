@@ -81,10 +81,10 @@ function build_browse
 #     Must also set as "normalizer" in solr/biblio/config/solrconfig.xml.
 #
 
-build_browse "title" "title_browse" 1 "-Dbibleech=StoredFieldLeech -Dsortfield=title_browse_sort -Dvaluefield=title_browse"
-build_browse "journal" "journal_browse" 1 "-Dbibleech=StoredFieldLeech -Dsortfield=journal_browse_sort -Dvaluefield=journal_browse"
-build_browse "topic" "topic_browse"
-build_browse "author" "author_browse"
-build_browse "series" "series_browse" 1
+build_browse "title" "title_browse" 1 "-Dbibleech=StoredFieldLeech -Dsortfield=title_browse_sort -Dvaluefield=title_browse" "-Dbrowse.normalizer=org.vufind.util.NACONormalizer"
+build_browse "journal" "journal_browse" 1 "-Dbibleech=StoredFieldLeech -Dsortfield=journal_browse_sort -Dvaluefield=journal_browse" "-Dbrowse.normalizer=org.vufind.util.NACONormalizer"
+build_browse "topic" "topic_browse" "-Dbrowse.normalizer=org.vufind.util.NACONormalizer"
+build_browse "author" "author_browse" "-Dbrowse.normalizer=org.vufind.util.NACONormalizer"
+build_browse "series" "series_browse" 1 "-Dbrowse.normalizer=org.vufind.util.NACONormalizer"
 build_browse "lcc" "callnumber-raw" 1 "-Dbrowse.normalizer=org.vufind.util.LCCallNormalizer"
 build_browse "dewey" "dewey-raw" 1 "-Dbrowse.normalizer=org.vufind.util.DeweyCallNormalizer"
