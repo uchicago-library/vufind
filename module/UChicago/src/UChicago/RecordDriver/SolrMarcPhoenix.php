@@ -357,6 +357,8 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                   'values' => array('507|ab')),
             array('label'  => 'Format',
                   'values' => array('LDR|07')),
+            array('label'  => 'Notes',
+                  'values' => array('590|a',)),
             array('label'  => 'URL for this record',
                   'values' => array('URL|http://pi.lib.uchicago.edu/1001/cat/bib/'))
         ),
