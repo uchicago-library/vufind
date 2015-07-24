@@ -581,9 +581,11 @@ $(document).ready(function() {
         }
 
         // Remove the location facet for certain collection queries
-        selected_col = $('#limit_collection option:selected');
-        if (selected_col.text() == 'Crerar Rare Books' || 'Crerar Manuscripts') {
+        selected_col = $('#limit_collection option:selected').text();
+        if (selected_col == 'Crerar Rare Books' || selected_col == 'Crerar Manuscripts') {
             $('#limit_building option').remove();
+        } else if (selected_col == 'No sub-collection') {
+            $('#limit_collection option').remove();
         }
     });
 
