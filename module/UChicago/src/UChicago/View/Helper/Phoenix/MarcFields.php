@@ -160,7 +160,7 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
 
         foreach($rawMarcData as $marcData) {
             
-            if ($pos == 'top' || $pos == 'details') {
+            if ($pos == 'top' || $pos == 'top-hidden' || $pos == 'details') {
  
                 /*Title: get special template*/
                 if (($marcData[0]['currentField'] == 245)) {

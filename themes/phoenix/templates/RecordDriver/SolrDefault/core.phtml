@@ -20,7 +20,6 @@
     <table class="table table-striped">
       <caption><?=$this->transEsc('Bibliographic Details')?></caption>
       <? $this->MarcFields()->returnMarcData('top', $siteUrl); ?>
-
       <? $journalTitle = $this->driver->getContainerTitle(); if (!empty($journalTitle)): ?>
       <tr>
         <th><?=$this->transEsc('Published in')?>:</th>
@@ -91,6 +90,12 @@
       <? endif; ?>
     </table>
     <?/* End Main Details */?>
+
+    <?/* Display Additional Details */?>
+    <table id="top-hidden" class="table table-striped">
+      <? $this->MarcFields()->returnMarcData('top-hidden'); ?>
+    </table>
+    <?/* End Additional Details */?>
   </div><!--/.col-sm-9-->
 
   <div class="col-sm-3">

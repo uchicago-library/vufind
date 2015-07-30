@@ -710,9 +710,12 @@ div[resource="#record"] .table {
       }
     }   
   }  
+}
+div[resource="#record"] #top-hidden.table {
+  width: 100%;
 } 
 
-.table > tbody > tr:first-child > td {
+.table:not(#top-hidden) > tbody > tr:first-child > td {
     border-top:none;
 }
 .pager-phoenix {
@@ -739,7 +742,7 @@ div[resource="#record"] .table {
     outline: 0;
 }
 /*Top of full record*/
-div[resource="#record"] .table > tbody > tr:first-child > td {
+div[resource="#record"] .table > tbody > tr.title > td {
     padding-bottom:0;
     padding-top:0;
 }
