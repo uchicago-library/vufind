@@ -357,7 +357,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                   'values' => array('507|ab')),
             array('label'  => 'Format',
                   'values' => array('LDR|07')),
-            array('label'  => 'Notes',
+            array('label'  => 'Local Note',
                   'values' => array('590|a',)),
             array('label'  => 'URL for this record',
                   'values' => array('URL|http://pi.lib.uchicago.edu/1001/cat/bib/'))
@@ -390,7 +390,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             array('label'  => 'Digital file characteristics',
                   'values' => array('347|abcdef3')),
             array('label'  => 'Notes',
-                  'values' => array('500|a', '501|a', '502|a', '504|a', '506|abcdefu', '508|a', '510|abcux', '511|a', '513|ab', '514|abcdefghijkmuz', '515|a', '516|a', '518|adop3', '525|a', '530|abcdu', '533|abcdefmn', '534|abcefklmnptxz', '535|abcdg', '536|abcdefgh', '538|aiu', '540|abcdu', '541|abcdefhno', '544|abcden', '545|abu', '546|ab', '547|a', '550|a', '552|abcdefghijklmnopu', '561|a', '562|abcde', '580|a', '583|abcdefhijklnouxz', '588|a', '590|a', '598|a')),
+                  'values' => array('500|a', '501|a', '502|a', '504|a', '506|abcdefu', '508|a', '510|abcux', '511|a', '513|ab', '514|abcdefghijkmuz', '515|a', '516|a', '518|adop3', '525|a', '530|abcdu', '533|abcdefmn', '534|abcefklmnptxz', '535|abcdg', '536|abcdefgh', '538|aiu', '540|abcdu', '541|abcdefhno', '544|abcden', '545|abu', '546|ab', '547|a', '550|a', '552|abcdefghijklmnopu', '561|a', '562|abcde', '580|a', '583|abcdefhijklnouxz', '588|a', '598|a')),
             array('label'  => 'Summary',
                   'values' => array('520|abu')),
             array('label'  => 'Target Audience',
