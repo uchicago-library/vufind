@@ -57,6 +57,73 @@ $(document).ready(function() {
         $('.view-toggle a').attr('href', location.href.replace(upd, '') + upd);
     });
 
+    /**
+     * Collapse and expand bibliographic data 
+     */
+
+    // Re-stripe tables on the full record page so that successive tables display as if
+    // they are one, continuous table
+    $('#record').each(function(){
+        $(this).find('tr:odd').css('background-color','#f9f9f9');
+        $(this).find('tr:even').css('background-color','#ffffff');
+    });
+
+    $('table tr').each(function(){
+        var trcolor = $(this).css('backgroundColor');
+        console.log(trcolor);
+    });
+
+    // Text for various states
+    var viewMoreBibText = 'More details <i class="fa fa-arrow-circle-right"></i>';
+    var viewLessBibText = 'Fewer details <i class="fa fa-arrow-circle-down"></i>';
+
+    // Links to display for various states
+    var viewMoreBib = '<a href="#" class="bibToggle">' + viewMoreBibText + '</a>';
+    var viewLessBib = '<a href="#" class="bibToggle">' + viewLessBibText + '</a>';
+
+    // Number of rows in the additional bibliographic data table
+    var bibRowCount = 0;
+
+    // Number of rows to show by default
+    var configNum = 1;
+
+    // Table containing additonal bibliographic data
+    var addtionalBibData = '#top-hidden';
+
+    $(addtionalBibData).each(function(){
+        // Number of things to display by default
+        var bibDisplayNum = 2;
+
+        // Boolean, is there a toggle link appended
+        var hasBibToggleLink = false;
+
+        // Hidden additional biblographic data count
+        $(this).find('tr').each(function(){ 
+            bibRowCount++;
+        });
+
+        if (bibRowCount > 0 && bibRowCount > configNum) {
+            $(addtionalBibData).before(viewMoreBib);
+            $(addtionalBibData).hide();
+        }
+    });
+
+    // Toggle additional bibliographic data
+    $('.bibToggle').click(function(){
+        // Toggle the inner html of the link
+        var text = $(this).html();
+        if (text == viewMoreBibText) {
+            text = viewLessBibText;
+        }
+        else {
+            text = viewMoreBibText;
+        }
+        $(this).html(text);
+
+        // Show/hide items
+        $(this).parent().find(addtionalBibData).toggle();
+    });
+
 
     /**
      * Collapse and Expand Items and Summary Holdings 
@@ -141,7 +208,7 @@ $(document).ready(function() {
     //prevent links from making the page jump
     $('a[href^="#"]').bind('click focus', function(e) {
         e.preventDefault();    var viewItems = '<a href="#" class="itemsToggle text-success hide">' + viewItemsText + '</a>';
-    var hideItems = '<a href="#" class="itemsToggle text-success">' + hideItemsText + '</a>';
+        var hideItems = '<a href="#" class="itemsToggle text-success">' + hideItemsText + '</a>';
     });
 
 

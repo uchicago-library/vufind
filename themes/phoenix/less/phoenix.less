@@ -727,8 +727,31 @@ div[resource="#record"] #top-hidden.table {
     display: inline;
     list-style: none;
 }
+.bibToggle {
+    margin: 20px 0 20px 5px;
+    //background: #f9f9f9;
+    background: lighten(@gray-base, 94%);
+    border: 1px solid lighten(@gray-base, 89%);    
+    //color: lighten(@gray-base, 60%);
+    color: @link-color;
+    padding: 8px;
+    text-align: center;
+}
+.bibToggle:hover {
+    background: lighten(@gray-base, 90%);
+}
+a.bibToggle:focus,
+a.bibToggle:hover {
+    color: darken(@link-color, 12%);
+    border: 1px solid lighten(@gray-base, 85%);    
+    text-decoration: none;
+}
+.template-dir-record table:not(#top-hidden){
+    margin-bottom: 0;
+}
 .itemsToggle,
-.summaryToggle {
+.summaryToggle,
+.bibToggle {
     font-weight: bold;
     font-size: @font-size-base + 1;
     display: block;
