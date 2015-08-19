@@ -513,9 +513,11 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             array('label'  => 'edition',
                   'values' => array('250|ab','254|a')),
             array('label'  => 'imprint',
-                  'values' => array('260|abcdefg','264|abc')),
+                  'values' => array('260|abcdefg','264|abc')), 
             array('label'  => 'Description',
                   'values' => array('300|abcefg3')),
+            array('label'  => 'Series',
+                  'values' => array('440|anpvx', '490|avx', '830|anpvsx', '800|acdtklfv', '810|abtv')),
         ),
     ); // end $displayConfig
 

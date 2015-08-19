@@ -151,6 +151,7 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
      */
     public function returnMarcData($pos)
     {
+        $hasSeries = false;
         $rawMarcData = $this->view->driver->crosswalk($pos);
        
         /*Display a message if nothing is found*/ 
@@ -158,8 +159,8 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
             echo '<tr><td>' . $this->view->transEsc('no_description') . '</td></tr>';
         }
 
-        foreach($rawMarcData as $marcData) {
-            
+        foreach($rawMarcData as $mkey => $marcData) {
+
             if ($pos == 'top' || $pos == 'top-hidden') {
  
                 /*Title: get special template*/
@@ -260,6 +261,13 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
                         if (($data['currentField'] == 100) || ($data['currentField'] == 110) || ($data['currentField'] == 111) || ($data['currentField'] == 700) || 
                                 ($data['currentField'] == 710) || ($data['currentField'] == 711) || ($data['currentField'] == 790) || ($data['currentField'] == 791)) {
                             include('themes/phoenix/templates/Helpers/MarcFields/resultsAuthor.phtml');
+                        }
+                        elseif (($data['currentField'] == 440) || ($data['currentField'] == 490) || ($data['currentField'] == 830) 
+                            || ($data['currentField'] == 800) || ($data['currentField'] == 810)) {
+                            if ($hasSeries == false) {
+                                include('themes/phoenix/templates/Helpers/MarcFields/resultsDefault.phtml');
+                            }
+                            $hasSeries = true;
                         }
                         else {
                             include('themes/phoenix/templates/Helpers/MarcFields/resultsDefault.phtml');
