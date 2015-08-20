@@ -198,7 +198,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
     }
 
     /**
-     * A junk method for combining subfield data between multiple eholdings incorrectly
+     * A heinous junk method for combining subfield data between multiple eholdings incorrectly
      * returned from OLE. This is necessary because of a bug in the way OLE is 
      * returning 098 fields. This method should be deleted and the getAllRecordLinks
      * method updated when this is finally fixed. The order of subfields matters!
@@ -217,21 +217,39 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                     $retval['urls'][$i]['label'] = $urls['label'];
                     $retval['urls'][$i]['currentField'] = $urls['currentField'];
                     $retval['urls'][$i]['subfieldData'] = $urls['subfieldData'];
-                    foreach($marcData['displayText'] as $displayText) {
+                    foreach($marcData['displayText'] as $num => $displayText) {
                         if(!empty($displayText['subfieldData'])) {
                             foreach($displayText['subfieldData'] as $key => $value) {
                                 $retval['urls'][$i]['subfieldData'][$key[0]] = $value; 
                             }
-                            array_shift($marcData['displayText']);
+                            unset($marcData['displayText'][$num]);
                             break;
                         }
                     }
-                    foreach($marcData['callnumber'] as $callnumber) {
+                    foreach($marcData['callnumber'] as $num => $callnumber) {
                         if(!empty($callnumber['subfieldData'])) {
                             foreach($callnumber['subfieldData'] as $key => $value) {
                                 $retval['urls'][$i]['subfieldData'][$key[0]] = $value; 
                             }
-                            array_shift($marcData['callnumber']);
+                            unset($marcData['callnumber'][$num]);
+                            break;
+                        }
+                    }
+                    foreach($marcData['linkText'] as $num => $linkText) {
+                        if(!empty($linkText['subfieldData'])) {
+                            foreach($linkText['subfieldData'] as $key => $value) {
+                                $retval['urls'][$i]['subfieldData'][$key[0]] = $value; 
+                            }
+                            unset($marcData['linkText'][$num]);
+                            break;
+                        }
+                    }
+                    foreach($marcData['note'] as $num => $note) {
+                        if(!empty($note['subfieldData'])) {
+                            foreach($note['subfieldData'] as $key => $value) {
+                                $retval['urls'][$i]['subfieldData'][$key[0]] = $value; 
+                            }
+                            unset($marcData['note'][$num]);
                             break;
                         }
                     }
@@ -239,6 +257,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                 $i++;
             }
         }
+
         return $retval;
     }
 
@@ -489,7 +508,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
         ),
         /**
          * Array of marc fields to display for 
-         * eHoldings on results pages.
+         * eHoldings on full record and results pages.
          */
         'eHoldings' => array(
             array('label'  => 'urls',
@@ -498,6 +517,10 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                   'values' => array('098|cl')),
             array('label'  => 'callnumber',
                   'values' => array('098|a')),
+            array('label'  => 'note',
+                  'values' => array('098|p')),
+            array('label'  => 'linkText',
+                  'values' => array('098|z')),
         ),
         /**
          * Array of marc fields to display for 

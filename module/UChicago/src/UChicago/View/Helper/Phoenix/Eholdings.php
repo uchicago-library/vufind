@@ -29,16 +29,11 @@ class Eholdings extends AbstractHelper
             $link = array();
             $i = 0;
             foreach ($urlData as $url) {
-                $filter = 'www.';
-                $descriptionArray = parse_url($url['subfieldData']['u-1']);
-                $host = $descriptionArray['host'];
-                $hasFilter = (substr($host, 0, 4) == $filter);
-                $description = $hasFilter ? substr($host, strlen($filter)) : $host;
-                 
                 $link[$i]['url'] = $url['subfieldData']['u-1'];
-                $link[$i]['desc'] = $description; //placeholder 
+                $link[$i]['desc'] = $url['subfieldData']['p'];
                 $link[$i]['type'] = isset($url['subfieldData']['c']) ? $url['subfieldData']['c'] : null;
-                $link[$i]['callnumber'] = isset($url['subfieldData']['a']) ? $url['subfieldData']['a'] : null; 
+                $link[$i]['callnumber'] = isset($url['subfieldData']['a']) ? $url['subfieldData']['a'] : null;
+                $link[$i]['text'] = $url['subfieldData']['z'];
                 $i++; 
             }
             $links = $link;

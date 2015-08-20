@@ -57,8 +57,9 @@
            class="ablink"><?=$callNumDisplayText?></a><br/>
       <?endif;?>
     <? foreach ($urls as $current): ?>
+      <? $linkText = (!empty($current['text']) ? ': '.$current['text'] : ''); ?>
       <div>
-        <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="eLink text-success"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']))?></a> <?=$current['desc']?><br/>
+        <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="eLink text-success"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']) . $linkText)?></a> <?=$current['desc']?><br/>
       </div>
     <? endforeach; ?>
   <? endif; ?>
