@@ -25,7 +25,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
  */
-namespace VuFind\Content;
+namespace VuFind\Content\TOC;
 use Zend\ServiceManager\ServiceManager;
 
 /**
@@ -41,70 +41,44 @@ use Zend\ServiceManager\ServiceManager;
 class Factory
 {
     /**
-     * Create Author Notes loader
+     * Create either a Syndetics or SyndeticsPlus loader
      *
-     * @param ServiceManager $sm Service manager
+     * @param ServiceManager $sm   Service manager
+     * @param bool           $plus Instantiate in Syndetics Plus mode?
      *
      * @return mixed
      */
-    public static function getAuthorNotes(ServiceManager $sm)
+    public static function getAbstractSyndetics(ServiceManager $sm, $plus)
     {
-        $loader = $sm->getServiceLocator()
-            ->get('VuFind\ContentAuthorNotesPluginManager');
         $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
-        $providers = isset($config->Content->authorNotes)
-            ? $config->Content->authorNotes : '';
-        return new Loader($loader, $providers);
+        return new Syndetics(
+            isset($config->Syndetics->use_ssl) && $config->Syndetics->use_ssl,
+            $plus,
+            isset($config->Syndetics->timeout) ? $config->Syndetics->timeout : 10
+        );
     }
 
     /**
-     * Create Excerpts loader
+     * Create Syndetics loader
      *
      * @param ServiceManager $sm Service manager
      *
      * @return mixed
      */
-    public static function getExcerpts(ServiceManager $sm)
+    public static function getSyndetics(ServiceManager $sm)
     {
-        $loader = $sm->getServiceLocator()
-            ->get('VuFind\ContentExcerptsPluginManager');
-        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
-        $providers = isset($config->Content->excerpts)
-            ? $config->Content->excerpts : '';
-        return new Loader($loader, $providers);
+        return static::getAbstractSyndetics($sm, false);
     }
 
     /**
-     * Create Reviews loader
+     * Create SyndeticsPlus loader
      *
      * @param ServiceManager $sm Service manager
      *
      * @return mixed
      */
-    public static function getReviews(ServiceManager $sm)
+    public static function getSyndeticsPlus(ServiceManager $sm)
     {
-        $loader = $sm->getServiceLocator()
-            ->get('VuFind\ContentReviewsPluginManager');
-        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
-        $providers = isset($config->Content->reviews)
-            ? $config->Content->reviews : '';
-        return new Loader($loader, $providers);
-    }
-
-    /**
-     * Create TOC loader
-     *
-     * @param ServiceManager $sm Service manager
-     *
-     * @return mixed
-     */
-    public static function getTOC(ServiceManager $sm)
-    {
-        $loader = $sm->getServiceLocator()
-            ->get('VuFind\ContentTOCPluginManager');
-        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
-        $providers = isset($config->Content->toc)
-            ? $config->Content->toc : '';
-        return new Loader($loader, $providers);
+        return static::getAbstractSyndetics($sm, true);
     }
 }

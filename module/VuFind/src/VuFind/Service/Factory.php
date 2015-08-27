@@ -176,6 +176,18 @@ class Factory
     }
 
     /**
+     * Construct the Content\TOC Plugin Manager.
+     *
+     * @param ServiceManager $sm Service manager.
+     *
+     * @return \VuFind\Content\TOC\PluginManager
+     */
+    public static function getContentTOCPluginManager(ServiceManager $sm)
+    {
+        return static::getGenericPluginManager($sm, 'Content\TOC');
+    }
+
+    /**
      * Construct the date converter.
      *
      * @param ServiceManager $sm Service manager.

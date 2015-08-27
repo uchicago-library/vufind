@@ -136,6 +136,7 @@ $config = array(
             'VuFind\ContentCoversPluginManager' => 'VuFind\Service\Factory::getContentCoversPluginManager',
             'VuFind\ContentExcerptsPluginManager' => 'VuFind\Service\Factory::getContentExcerptsPluginManager',
             'VuFind\ContentReviewsPluginManager' => 'VuFind\Service\Factory::getContentReviewsPluginManager',
+            'VuFind\ContentTOCPluginManager' => 'VuFind\Service\Factory::getContentTOCPluginManager',
             'VuFind\DateConverter' => 'VuFind\Service\Factory::getDateConverter',
             'VuFind\DbAdapter' => 'VuFind\Service\Factory::getDbAdapter',
             'VuFind\DbAdapterFactory' => 'VuFind\Service\Factory::getDbAdapterFactory',
@@ -278,6 +279,7 @@ $config = array(
                     'authornotes' => 'VuFind\Content\Factory::getAuthorNotes',
                     'excerpts' => 'VuFind\Content\Factory::getExcerpts',
                     'reviews' => 'VuFind\Content\Factory::getReviews',
+                    'toc' => 'VuFind\Content\Factory::getTOC',
                 ),
             ),
             'content_authornotes' => array(
@@ -290,6 +292,11 @@ $config = array(
                 'factories' => array(
                     'syndetics' => 'VuFind\Content\Excerpts\Factory::getSyndetics',
                     'syndeticsplus' => 'VuFind\Content\Excerpts\Factory::getSyndeticsPlus',
+                ),
+            ),
+            'content_toc' => array(
+                'factories' => array(
+                    'syndetics' => 'VuFind\Content\TOC\Factory::getSyndetics',
                 ),
             ),
             'content_covers' => array(
@@ -460,13 +467,13 @@ $config = array(
                     'preview' => 'VuFind\RecordTab\Factory::getPreview',
                     'reviews' => 'VuFind\RecordTab\Factory::getReviews',
                     'similaritemscarousel' => 'VuFind\RecordTab\Factory::getSimilarItemsCarousel',
+                    'toc' => 'VuFind\RecordTab\Factory::getTOC',
                     'usercomments' => 'VuFind\RecordTab\Factory::getUserComments',
                 ),
                 'invokables' => array(
                     'description' => 'VuFind\RecordTab\Description',
                     'staffviewarray' => 'VuFind\RecordTab\StaffViewArray',
                     'staffviewmarc' => 'VuFind\RecordTab\StaffViewMARC',
-                    'toc' => 'VuFind\RecordTab\TOC',
                 ),
             ),
             'related' => array(

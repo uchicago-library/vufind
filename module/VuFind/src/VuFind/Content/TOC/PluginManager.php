@@ -1,6 +1,6 @@
 <?php
 /**
- * Table of Contents tab
+ * TOC content loader plugin manager
  *
  * PHP version 5
  *
@@ -20,31 +20,32 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * @category VuFind2
- * @package  RecordTabs
+ * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_tabs Wiki
+ * @link     http://vufind.org/wiki/vufind2:hierarchy_components Wiki
  */
-namespace VuFind\RecordTab;
+namespace VuFind\Content\TOC;
 
 /**
- * Table of Contents tab
+ * TOC content loader plugin manager
  *
  * @category VuFind2
- * @package  RecordTabs
+ * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_tabs Wiki
+ * @link     http://vufind.org/wiki/vufind2:hierarchy_components Wiki
  */
-class TOC extends AbstractContent
+class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
 {
     /**
-     * Get the on-screen description for this tab.
+     * Return the name of the base class or interface that plug-ins must conform
+     * to.
      *
      * @return string
      */
-    public function getDescription()
+    protected function getExpectedInterface()
     {
-        return 'Table of Contents';
+        return 'VuFind\Content\AbstractBase';
     }
 }

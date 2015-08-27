@@ -235,6 +235,7 @@ class Factory
      */
     public static function getReviews(ServiceManager $sm)
     {
+        echo "JEJ VuFind\RecordTab\Factory->getReviews()<br/>";
         $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
         // Only instantiate the loader if the feature is enabled:
         if (isset($config->Content->reviews)) {
@@ -244,6 +245,27 @@ class Factory
             $loader = null;
         }
         return new Reviews($loader, static::getHideSetting($config, 'reviews'));
+    }
+
+    /**
+     * Factory for TOC tab plugin.
+     *
+     * @param ServiceManager $sm Service manager.
+     *
+     * @return Reviews
+     */
+    public static function getTOC(ServiceManager $sm)
+    {
+        echo "JEJ VuFind\RecordTab\Factory->getTOC()<br/>";
+        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+        // Only instantiate the loader if the feature is enabled:
+        if (isset($config->Content->toc)) {
+            $loader = $sm->getServiceLocator()->get('VuFind\ContentPluginManager')
+                ->get('toc');
+        } else {
+            $loader = null;
+        }
+        return new TOC($loader, static::getHideSetting($config, 'toc'));
     }
 
     /**
