@@ -182,6 +182,19 @@ class Factory
      *
      * @return \VuFind\Content\TOC\PluginManager
      */
+    public static function getContentSummariesPluginManager(ServiceManager $sm)
+    {
+        return static::getGenericPluginManager($sm, 'Content\Summaries');
+    }
+
+
+    /**
+     * Construct the Content\TOC Plugin Manager.
+     *
+     * @param ServiceManager $sm Service manager.
+     *
+     * @return \VuFind\Content\TOC\PluginManager
+     */
     public static function getContentTOCPluginManager(ServiceManager $sm)
     {
         return static::getGenericPluginManager($sm, 'Content\TOC');

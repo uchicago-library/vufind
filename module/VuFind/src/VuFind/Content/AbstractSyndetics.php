@@ -101,6 +101,7 @@ abstract class AbstractSyndetics extends AbstractBase
      */
     protected function getIsbnUrl($isbn, $id, $file = 'index.xml', $type = 'rw12,h7')
     {
+        
         $baseUrl = $this->useSSL
             ? 'https://secure.syndetics.com' : 'http://syndetics.com';
         $url = $baseUrl . '/index.aspx?isbn=' . $isbn

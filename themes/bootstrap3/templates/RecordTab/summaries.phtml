@@ -1,0 +1,18 @@
+<?
+    // Set page title.
+    $this->headTitle($this->translate('Summaries') . ': ' . $this->driver->getBreadcrumb());
+
+    $summaries = $this->tab->getContent();
+?>
+<? if (!empty($summaries)): ?>
+  <strong><?=$this->transEsc('Summaries')?>: </strong>
+  <ul class="summaries">
+    <? foreach ($summaries['Syndetics'] as $summary): ?>
+      <? foreach ($summary['Content'] as $content): ?>
+        <li><?=$this->escapeHtml($content)?></li>
+      <? endforeach; ?>
+    <? endforeach; ?>
+  </ul>
+<? else: ?>
+  <?=$this->transEsc("Summaries unavailable")?>.
+<? endif; ?>

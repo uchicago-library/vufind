@@ -136,6 +136,7 @@ $config = array(
             'VuFind\ContentCoversPluginManager' => 'VuFind\Service\Factory::getContentCoversPluginManager',
             'VuFind\ContentExcerptsPluginManager' => 'VuFind\Service\Factory::getContentExcerptsPluginManager',
             'VuFind\ContentReviewsPluginManager' => 'VuFind\Service\Factory::getContentReviewsPluginManager',
+            'VuFind\ContentSummariesPluginManager' => 'VuFind\Service\Factory::getContentSummariesPluginManager',
             'VuFind\ContentTOCPluginManager' => 'VuFind\Service\Factory::getContentTOCPluginManager',
             'VuFind\DateConverter' => 'VuFind\Service\Factory::getDateConverter',
             'VuFind\DbAdapter' => 'VuFind\Service\Factory::getDbAdapter',
@@ -279,6 +280,7 @@ $config = array(
                     'authornotes' => 'VuFind\Content\Factory::getAuthorNotes',
                     'excerpts' => 'VuFind\Content\Factory::getExcerpts',
                     'reviews' => 'VuFind\Content\Factory::getReviews',
+                    'summaries' => 'VuFind\Content\Factory::getSummaries',
                     'toc' => 'VuFind\Content\Factory::getTOC',
                 ),
             ),
@@ -292,6 +294,11 @@ $config = array(
                 'factories' => array(
                     'syndetics' => 'VuFind\Content\Excerpts\Factory::getSyndetics',
                     'syndeticsplus' => 'VuFind\Content\Excerpts\Factory::getSyndeticsPlus',
+                ),
+            ),
+            'content_summaries' => array(
+                'factories' => array(
+                    'syndetics' => 'VuFind\Content\Summaries\Factory::getSyndetics',
                 ),
             ),
             'content_toc' => array(
@@ -467,6 +474,7 @@ $config = array(
                     'preview' => 'VuFind\RecordTab\Factory::getPreview',
                     'reviews' => 'VuFind\RecordTab\Factory::getReviews',
                     'similaritemscarousel' => 'VuFind\RecordTab\Factory::getSimilarItemsCarousel',
+                    'summaries' => 'VuFind\RecordTab\Factory::getSummaries',
                     'toc' => 'VuFind\RecordTab\Factory::getTOC',
                     'usercomments' => 'VuFind\RecordTab\Factory::getUserComments',
                 ),
@@ -586,6 +594,7 @@ $config = array(
                 'tabs' => array(
                     'Description' => 'Description',
                     'TOC' => 'TOC', 'UserComments' => 'UserComments',
+                    'Summaries' => 'Summaries',
                     'Reviews' => 'Reviews', 'Excerpt' => 'Excerpt',
                     'Preview' => 'preview',
                     'Details' => 'StaffViewArray',
@@ -602,6 +611,7 @@ $config = array(
                 'tabs' => array(
                     'Description' => 'Description',
                     'TOC' => 'TOC', 'UserComments' => 'UserComments',
+                    'Summaries' => 'Summaries',
                     'Reviews' => 'Reviews', 'Excerpt' => 'Excerpt',
                     'Preview' => 'preview',
                     'Details' => 'StaffViewArray',
@@ -618,6 +628,7 @@ $config = array(
                 'tabs' => array (
                     'Holdings' => 'HoldingsILS', 'Description' => 'Description',
                     'TOC' => 'TOC', 'UserComments' => 'UserComments',
+                    'Summaries' => 'Summaries',
                     'Reviews' => 'Reviews', 'Excerpt' => 'Excerpt',
                     'Preview' => 'preview',
                     'HierarchyTree' => 'HierarchyTree', 'Map' => 'Map',
@@ -630,6 +641,7 @@ $config = array(
                 'tabs' => array(
                     'Holdings' => 'HoldingsILS', 'Description' => 'Description',
                     'TOC' => 'TOC', 'UserComments' => 'UserComments',
+                    'Summaries' => 'Summaries',
                     'Reviews' => 'Reviews', 'Excerpt' => 'Excerpt',
                     'Preview' => 'preview',
                     'HierarchyTree' => 'HierarchyTree', 'Map' => 'Map',
@@ -642,6 +654,7 @@ $config = array(
                 'tabs' => array(
                     'Description' => 'Description',
                     'TOC' => 'TOC', 'UserComments' => 'UserComments',
+                    'Summaries' => 'Summaries',
                     'Reviews' => 'Reviews', 'Excerpt' => 'Excerpt',
                     'Preview' => 'preview',
                     'Details' => 'StaffViewArray',
@@ -652,6 +665,7 @@ $config = array(
                 'tabs' => array (
                     'Holdings' => 'HoldingsWorldCat', 'Description' => 'Description',
                     'TOC' => 'TOC', 'UserComments' => 'UserComments',
+                    'Summaries' => 'Summaries',
                     'Reviews' => 'Reviews', 'Excerpt' => 'Excerpt',
                     'Details' => 'StaffViewMARC',
                 ),
