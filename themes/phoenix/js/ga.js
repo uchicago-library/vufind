@@ -836,7 +836,7 @@ $(document).ready(function() {
 	     * new ones on the page every so often. If there is a new one, add a
 	     * class to it to "tag" it so we don't bound multiple events to it,
 	     * and bind one change event. */
-	
+
 	    setInterval(function() {
 	        $('.openurls a[href]:not(.clickEventBound)').each(function() {
 	            $(this).addClass('clickEventBound');
@@ -846,17 +846,14 @@ $(document).ready(function() {
 	                var t = $(e.target).text();
 		            catalogevent('send', 'event', 'SFXLink', t);
 	
-	                /* Short delay for analytics. */
 	                var link = this;
-	                setTimeout(function() {
-                        var target = $(link).attr('target');
-                        var href = $(link).attr('href');
-                        if ($.trim(target).length > 0) {
-                            window.open(href, target);
-                        } else {
-                            window.location = href;
-                        }
-	                }, 100);
+                    var target = $(link).attr('target');
+                    var href = $(link).attr('href');
+                    if ($.trim(target).length > 0) {
+                        window.open(href, target);
+                    } else {
+                        window.location = href;
+                    }
 	            });
 	        });
 	    }, 250);
