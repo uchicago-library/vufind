@@ -1706,25 +1706,38 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $finalResult = array();
 
         // Build a list of item barcodes
-        $barcodes = array(); 
+        $barcodes = array();
         foreach($renewDetails['details'] as $key=>$details) {
             $details_arr = explode(',', $details);
             $itemBarcode = $details_arr[0];
-            array_push($barcodes, $itemBarcode);
+            $barcodes[] = $itemBarcode;
         }
-        $itemBarcodes = implode(',', $barcodes);
+
+        $json = array(
+            'patronBarcode' => $patronBarcode,
+            'operatorId' => $this->operatorId,
+            'requestFormatType' => 'JSON',
+            'responseFormatType' => 'JSON',
+            'itemBarcodes' => $barcodes,
+        );
 
         // Build the uri
-        $uri = $this->circService . "?service={$service}&patronBarcode=" .
-            "{$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcodes}";  
-     
+        $u = parse_url($this->circService);
+        $uri = sprintf("%s://%s:%s/olefs/rest/circ/renewItem", $u['scheme'], $u['host'], $u['port']);
+
         // Make the request
         $request = new Request();
         $request->setMethod(Request::METHOD_POST);
+        $request->getHeaders()->addHeaders(array(
+            'Accept' => 'application/json',
+        ));
+
         $request->setUri($uri);
+        $request->setContent(json_encode($json));
         $client = new Client();
         $client->setOptions(array('timeout' => 4030));
-
+        // invalid parameter headers passed...
+        
         // Get the response
         try {
             $response = $client->dispatch($request);
@@ -1734,11 +1747,12 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $content = $response->getBody();
 
         // Parse the response 
-        $xml = simplexml_load_string($content);
+        $response = json_decode($content, true);
+
         $i = 0;
-        foreach($xml as $renewal) {
-            $msg = (string)$renewal->message;
-            $code = (string)$renewal->code;
+        foreach($response['renewItemList'] as $renewal) {
+            $msg = (string)$renewal['message'];
+            $code = (string)$renewal['code'];
             $itemBarcode = $barcodes[$i];
         
         
@@ -1751,10 +1765,11 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                                 "success" => $success,
                                 "new_date" => false,
                                 "item_id" => $itemBarcode,
-                                "sysMessage" => (string)$msg[0]
+                                "sysMessage" => (string)$msg,
                                 );
             $i++;
         }
+
         return $finalResult;
     }
     
