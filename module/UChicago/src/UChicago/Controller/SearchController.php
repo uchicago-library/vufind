@@ -28,8 +28,22 @@
 namespace UChicago\Controller;
 use Zend\Stdlib\Parameters;
 
+/**
+ * Override some default behavior in the SearchController.
+ *
+ * @category VuFind2
+ * @package  Controller
+ * @author   John Jung <jej@uchicago.edu>
+ * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
+ * @link     http://catalog.lib.uchicago.edu
+ */
 class SearchController extends \VuFind\Controller\SearchController
 {
+    /**
+     * Advanced search is the default. 
+     *
+     * @return \Zend\View\Model\ViewModel
+     */
     public function homeAction()
     {
         return $this->forwardTo('Search', 'Advanced');
@@ -42,6 +56,8 @@ class SearchController extends \VuFind\Controller\SearchController
      */
     public function resultsAction()
     {
+        $config = $this->getServiceLocator()->get('VuFind\Config')->get('config');
+
         $view = $this->createViewModel();
 
         // Handle saved search requests:
@@ -72,7 +88,10 @@ class SearchController extends \VuFind\Controller\SearchController
             // catch exceptions more reliably:
             $results->performAndProcessSearch();
 
-            if ($results->getResultTotal() == 1) {
+            if (isset($config->Record->jump_to_single_search_result)  
+                && $config->Record->jump_to_single_search_result  
+                && $results->getResultTotal() == 1
+            ) {
                 $jumpto = 1;
             } else {
                 $jumpto = null;
@@ -140,7 +159,6 @@ class SearchController extends \VuFind\Controller\SearchController
         }
 
         // Search toolbar
-        $config = $this->getServiceLocator()->get('VuFind\Config')->get('config');
         $view->showBulkOptions = isset($config->Site->showBulkOptions)
           && $config->Site->showBulkOptions;
 
@@ -152,6 +170,7 @@ class SearchController extends \VuFind\Controller\SearchController
      * return view model, or ignore the parameter and return false.
      *
      * @param \VuFind\Search\Base\Results $results Search results object.
+     * @param null|int                    $jumpto  Jump to this search result number. 
      *
      * @return bool|\Zend\View\Model\ViewModel
      */
