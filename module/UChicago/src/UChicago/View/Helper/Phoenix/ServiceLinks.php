@@ -477,7 +477,8 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function debugging($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/itemServlet.php?format=xml&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;database=testing';         $serviceLink = $this->getLinkConfig('debugging', $defaultUrl);
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/itemServlet.php?format=xml&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;database=testing';
+        $serviceLink = $this->getLinkConfig('debugging', $defaultUrl);
         $displayText = '<< Simple API >>';
         if ($serviceLink) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
@@ -627,5 +628,51 @@ class ServiceLinks extends AbstractHelper {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
+
+    /**
+     * Gets all the grouper groups for the logged-in user.
+     *
+     * @return array of grouper groups
+     */
+    protected function getGrouperGroups() {
+        if (array_key_exists('ucisMemberOf', $_SERVER)) {
+            return  explode(';', $_SERVER['ucisMemberOf']);
+        }
+        else {
+            return array();
+        }
+    }
+
+    /**
+     * Checks to see if the logged in user is a member 
+     * of the specified group.
+     *
+     * @param $groupName, string name of the group for which
+     * to see if the logged in user is a member.
+     * 
+     * @return boolean
+     */
+    public function isMemberOf($groupName) {
+        $groups = $this->getGrouperGroups();
+        return in_array($groupName, $groups);
+    }
+
+    /**
+     * Method creates a link to the alternative text request service
+     * uc:applications:library:alttext:authorized
+     *
+     * @param row, array of holdings and item information
+     *
+     * @return html string
+     */
+    public function altText($row) {
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/alt-text-request.php?barcode=' . $row['barcode'] . '&amp;bib=' . $row['id'];
+        $serviceLink = $this->getLinkConfig('altText', $defaultUrl);
+        $displayText = 'Alternative Text Request';
+        if (($serviceLink) and ($this->isMemberOf('uc:applications:library:alttext:authorized'))) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+    }
+    
 
 }

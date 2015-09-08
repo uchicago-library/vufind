@@ -218,7 +218,8 @@
               <? endif; ?>
             <? endif; ?>
               <? /* Begin Items that are either Available or Unavailable */ ?>
-                <?=$this->ServiceLinks()->aeon($row)?> 
+                <?=$this->ServiceLinks()->aeon($row)?>
+                <?=$this->ServiceLinks()->altText($row)?>
           <? endif; ?>
           <? /* Embed item structured data: library, barcode, call number */ ?>
           <? if ($row['location']): ?>
