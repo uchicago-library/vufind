@@ -662,17 +662,60 @@ class ServiceLinks extends AbstractHelper {
      * uc:applications:library:alttext:authorized
      *
      * @param row, array of holdings and item information
+     * @param formats, array of formats
      *
      * @return html string
      */
-    public function altText($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/alt-text-request.php?barcode=' . $row['barcode'] . '&amp;bib=' . $row['id'];
+    public function altText($row, $formats) {
+        $formats = $this->urlEncodeArray($formats);
+        $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
+        $status = urlencode($row['status']);
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/alt-text-request.php?barcode=' . $row['barcode'] . '&amp;bib=' . $row['id'] . '&amp;status=' . $status  . '&amp;' . $patron . $formats;
         $serviceLink = $this->getLinkConfig('altText', $defaultUrl);
         $displayText = 'Alternative Text Request';
         if (($serviceLink) and ($this->isMemberOf('uc:applications:library:alttext:authorized'))) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
-    
 
+    /**
+     * Method gets specified values from the $_SERVER variable.
+     *
+     * @param $config, array of key names to pull from the $_SERVER variable.
+     *
+     * @return associative array of key => values.
+     */
+    protected function getServerVars($config) {
+        $retval = array();
+        foreach ($config as $key => $value) {
+            $retval[$config[$key]] = $_SERVER[$value];
+        }
+        return $retval;
+    }
+
+    /**
+     * Method returns associative array as a url encoded string 
+     *
+     * @param associative array 
+     *
+     * @return string
+     */
+    protected function urlEncodeArrayAsString($array) {
+        return http_build_query($array, '', '&amp;');
+    }
+
+    /**
+     * Method returns an array representation for a GET request
+     *
+     * @param array
+     *
+     * @return string
+     */
+    protected function urlEncodeArray($array) {
+        $string = '';
+        foreach ($array as $item) {
+            $string .= '&amp;formats[]=' . urlencode($item);
+        }
+        return $string;
+    }  
 }

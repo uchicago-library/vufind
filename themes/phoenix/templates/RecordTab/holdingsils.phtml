@@ -219,7 +219,7 @@
             <? endif; ?>
               <? /* Begin Items that are either Available or Unavailable */ ?>
                 <?=$this->ServiceLinks()->aeon($row)?>
-                <?=$this->ServiceLinks()->altText($row)?>
+                <?=$this->ServiceLinks()->altText($row, $this->driver->getFormats())?>
           <? endif; ?>
           <? /* Embed item structured data: library, barcode, call number */ ?>
           <? if ($row['location']): ?>
