@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<project basedir="." default="package" name="SolrMarcMixin">
+
+    <property file="build.properties" />
+
+    <property environment="env" />
+    <property name="debuglevel" value="source,lines,vars" />
+    <property name="target" value="1.7" />
+    <property name="source" value="1.7" />
+    <property name="build" value="bin" />
+    <property name="src" value="src" />
+    <property name="lib" value="lib" />
+    <property name="dist" value="dist" />
+    <property name="custom.jar" value="=umich_solr_isbn_filters.jar" />
+
+
+    <property name="solrmarc.directory" value=""/>
+
+    <property name="SolrMarcMixin.srcdir" value="src/main/java" />
+
+    <path id="SolrMarcMixin.srcpath">
+        <fileset dir="${SolrMarcMixin.srcdir}" includes="**/*.java" />
+    </path>
+
+    <target name="init">
+        <mkdir dir="${build}" />
+        <mkdir dir="test/${build}" />
+        <mkdir dir="${lib}" />
+        <mkdir dir="${dist}" />
+        <mkdir dir="${src}" />
+    </target>
+
+    <target name="clean">
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
+    </target>
+
+    <target name="cleanall" depends="clean" />
+
+    <target name="build" depends="build-subprojects,build-project" />
+
+    <target name="build-subprojects" />
+
+    <target name="build-project" depends="init">
+        <echo message="${ant.project.name}: ${ant.file}" />
+        <fail message="No source files found in src directory" >
+            <condition>
+                <resourcecount refid="SolrMarcMixin.srcpath" count="0" when="eq"/>
+            </condition>
+        </fail>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${build}" srcdir="${SolrMarcMixin.srcdir}" encoding="UTF-8" source="${source}" target="${target}" includeAntRuntime="false">
+            <classpath>
+                <fileset dir="lib">
+                    <patternset includes="*.jar" /> 
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="package" depends="build-project">
+        <echo message="${ant.project.name}: ${ant.file}" />
+        <fail message="More than one source file found in src directory and property custom.jar not defined" >
+            <condition>
+                    <not>
+                        <isset property="custom.jar" />
+                    </not>
+            </condition>
+        </fail>
+        <echo message="custom.jar=${custom.jar}" />
+        <jar destfile="${dist}/${custom.jar}" basedir="${build}" includes="**/*.class">
+        </jar>
+    </target>
+
+
+    <target name="install" depends="package">
+        <fail message="Deploy dir not defined" >
+            <condition>
+                <not>
+                    <isset property="deploydir" />
+                </not>
+            </condition>
+        </fail>
+        <copy file="${dist}/${custom.jar}" todir="${deploydir}" />
+    </target>
+
+    <target name="build-refprojects" description="Build all projects which reference this project. Useful to propagate changes." />
+</project>

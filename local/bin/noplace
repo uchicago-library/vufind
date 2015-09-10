@@ -1,0 +1,6 @@
+#!/bin/bash
+# a simple filter to strip out XML tags like <st1:something>  and </st1:something> from the Syndetics TOC data
+# the namespace declarations on these tags cause problems for the XSL transform to MARCXML
+# Usage:     cat syndetics_toc_data.xml | noplace | syn2marc - | indexfile 
+
+sed -e 's#</*st1:[^>/]*>##g' | sed -e 's@&#60;/*st1:[^&]*&#62;@@g'

@@ -271,7 +271,12 @@
    <field name="title_author_exact" type="text_lr" indexed="true" stored="true"/>
    <!-- title_auth_exact is obsolete, remove sometime with a clean import -->
    <field name="title_auth_exact" type="text_lr" indexed="true" stored="true"/>
-
+   <!-- UChicago fields extracted from syndetics data -->
+   <field name="syn_toc_headings" type="text" indexed="true" stored="true" multiValued="true"/>
+   <field name="syn_toc_author" type="text" indexed="true" stored="true" multiValued="true"/>
+   <field name="syn_toc_title_str" type="string" indexed="false" stored="true" multiValued="true"/>
+   <field name="syn_summary_title_str" type="string" indexed="false" stored="true" multiValued="true"/>
+   <field name="syn_summary_text" type="text" indexed="true" stored="true" multiValued="true"/>
    <!-- Hierarchy Fields -->
    <field name="hierarchytype" type="string" indexed="true" stored="true" multiValued="false"/>
    <field name="hierarchy_top_id" type="string" indexed="true" stored="true" multiValued="true"/>
@@ -338,6 +343,7 @@
  <copyField source="dewey-raw" dest="dewey-search"/>
  <!-- UChicago: populate callnumber-search separately -->
  <!-- <copyField source="callnumber-raw" dest="callnumber-search"/> -->
+ <copyField source="callnumber-raw" dest="callnumber-search"/>
 <!-- CopyFields for exactish boosting -->
  <copyField source="title_short"    dest="title_short_exact"/>
  <copyField source="title_alt"    dest="title_alt_exact"/>

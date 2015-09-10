@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+ contributor license agreements.  See the NOTICE file distributed with
+ this work for additional information regarding copyright ownership.
+ The ASF licenses this file to You under the Apache License, Version 2.0
+ (the "License"); you may not use this file except in compliance with
+ the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!--
+ This is a stripped down config file used for a simple example...  
+ It is *not* a good example to work from. 
+-->
+<config>
+  <luceneMatchVersion>LUCENE_40</luceneMatchVersion>
+  <!--  The DirectoryFactory to use for indexes.
+        solr.StandardDirectoryFactory, the default, is filesystem based.
+        solr.RAMDirectoryFactory is memory based, not persistent, and doesn't work with replication. -->
+  <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.StandardDirectoryFactory}"/>
+
+  <dataDir>${solr.core.instanceDir}</dataDir>
+  <!--<dataDir>${solr.core.instanceDir:.}</dataDir>-->
+  <!--<dataDir>${solr.core0.data.dir:}</dataDir>-->
+
+  <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+       Index Config - These settings control low-level behavior of indexing
+       Most example settings here show the default value, but are commented
+       out, to more easily see where customizations have been made.
+       
+       Note: This replaces <indexDefaults> and <mainIndex> from older versions
+       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+  <indexConfig>
+    <!-- maxFieldLength was removed in 4.0. To get similar behavior, include a 
+         LimitTokenCountFilterFactory in your fieldType definition. E.g. 
+     <filter class="solr.LimitTokenCountFilterFactory" maxTokenCount="10000"/>
+    -->
+    <!-- Maximum time to wait for a write lock (ms) for an IndexWriter. Default: 1000 -->
+    <!-- <writeLockTimeout>1000</writeLockTimeout>  -->
+
+    <!-- Expert: Enabling compound file will use less files for the index, 
+         using fewer file descriptors on the expense of performance decrease. 
+         Default in Lucene is "true". Default in Solr is "false" (since 3.6) -->
+    <!-- <useCompoundFile>false</useCompoundFile> -->
+
+    <!-- ramBufferSizeMB sets the amount of RAM that may be used by Lucene
+         indexing for buffering added documents and deletions before they are
+         flushed to the Directory.
+         maxBufferedDocs sets a limit on the number of documents buffered
+         before flushing.
+         If both ramBufferSizeMB and maxBufferedDocs is set, then
+         Lucene will flush based on whichever limit is hit first.  -->
+    <!-- <ramBufferSizeMB>32</ramBufferSizeMB> -->
+    <!-- <maxBufferedDocs>1000</maxBufferedDocs> -->
+
+    <!-- Expert: Merge Policy 
+         The Merge Policy in Lucene controls how merging of segments is done.
+         The default since Solr/Lucene 3.3 is TieredMergePolicy.
+         The default since Lucene 2.3 was the LogByteSizeMergePolicy,
+         Even older versions of Lucene used LogDocMergePolicy.
+      -->
+    <!--
+        <mergePolicy class="org.apache.lucene.index.TieredMergePolicy">
+          <int name="maxMergeAtOnce">10</int>
+          <int name="segmentsPerTier">10</int>
+        </mergePolicy>
+      -->
+       
+    <!-- Merge Factor
+         The merge factor controls how many segments will get merged at a time.
+         For TieredMergePolicy, mergeFactor is a convenience parameter which
+         will set both MaxMergeAtOnce and SegmentsPerTier at once.
+         For LogByteSizeMergePolicy, mergeFactor decides how many new segments
+         will be allowed before they are merged into one.
+         Default is 10 for both merge policies.
+      -->
+    <!-- 
+    <mergeFactor>10</mergeFactor>
+      -->
+
+    <!-- Expert: Merge Scheduler
+         The Merge Scheduler in Lucene controls how merges are
+         performed.  The ConcurrentMergeScheduler (Lucene 2.3 default)
+         can perform merges in the background using separate threads.
+         The SerialMergeScheduler (Lucene 2.2 default) does not.
+     -->
+    <!-- 
+       <mergeScheduler class="org.apache.lucene.index.ConcurrentMergeScheduler"/>
+       -->
+
+    <!-- LockFactory 
+
+         This option specifies which Lucene LockFactory implementation
+         to use.
+      
+         single = SingleInstanceLockFactory - suggested for a
+                  read-only index or when there is no possibility of
+                  another process trying to modify the index.
+         native = NativeFSLockFactory - uses OS native file locking.
+                  Do not use when multiple solr webapps in the same
+                  JVM are attempting to share a single index.
+         simple = SimpleFSLockFactory  - uses a plain file for locking
+
+         Defaults: 'native' is default for Solr3.6 and later, otherwise
+                   'simple' is the default
+
+         More details on the nuances of each LockFactory...
+         http://wiki.apache.org/lucene-java/AvailableLockFactories
+    -->
+    <lockType>simple</lockType>
+
+    <!-- Unlock On Startup
+
+         If true, unlock any held write or commit locks on startup.
+         This defeats the locking mechanism that allows multiple
+         processes to safely access a lucene index, and should be used
+         with care. Default is "false".
+
+         This is not needed if lock type is 'none' or 'single'
+     -->
+    
+    <unlockOnStartup>true</unlockOnStartup>
+   
+    
+    <!-- Expert: Controls how often Lucene loads terms into memory
+         Default is 128 and is likely good for most everyone.
+      -->
+    <!-- <termIndexInterval>128</termIndexInterval> -->
+
+    <!-- If true, IndexReaders will be reopened (often more efficient)
+         instead of closed and then opened. Default: true
+      -->
+    <reopenReaders>false</reopenReaders>
+
+    <!-- Commit Deletion Policy
+
+         Custom deletion policies can be specified here. The class must
+         implement org.apache.lucene.index.IndexDeletionPolicy.
+
+         http://lucene.apache.org/java/3_5_0/api/core/org/apache/lucene/index/IndexDeletionPolicy.html
+
+         The default Solr IndexDeletionPolicy implementation supports
+         deleting index commit points on number of commits, age of
+         commit point and optimized status.
+         
+         The latest commit point should always be preserved regardless
+         of the criteria.
+    -->
+    <!-- 
+    <deletionPolicy class="solr.SolrDeletionPolicy">
+    -->
+      <!-- The number of commit points to be kept -->
+      <!-- <str name="maxCommitsToKeep">1</str> -->
+      <!-- The number of optimized commit points to be kept -->
+      <!-- <str name="maxOptimizedCommitsToKeep">0</str> -->
+      <!--
+          Delete all commit points once they have reached the given age.
+          Supports DateMathParser syntax e.g.
+        -->
+      <!--
+         <str name="maxCommitAge">30MINUTES</str>
+         <str name="maxCommitAge">1DAY</str>
+      -->
+    <!-- 
+    </deletionPolicy>
+    -->
+
+    <!-- Lucene Infostream
+       
+         To aid in advanced debugging, Lucene provides an "InfoStream"
+         of detailed information when indexing.
+
+         Setting The value to true will instruct the underlying Lucene
+         IndexWriter to write its debugging info the specified file
+      -->
+     <!-- <infoStream file="INFOSTREAM.txt">false</infoStream> --> 
+  </indexConfig>
+
+
+  <updateHandler class="solr.DirectUpdateHandler2">
+ <!--   <updateLog>
+      <str name="dir">${solr.core0.data.dir:}</str>
+    </updateLog> -->
+  </updateHandler>
+
+  <!-- realtime get handler, guaranteed to return the latest stored fields 
+    of any document, without the need to commit or open a new searcher. The current 
+    implementation relies on the updateLog feature being enabled. -->
+  <requestHandler name="/get" class="solr.RealTimeGetHandler">
+    <lst name="defaults">
+      <str name="omitHeader">true</str>
+    </lst>
+  </requestHandler>  
+  
+  <requestHandler name="/replication" class="solr.ReplicationHandler" startup="lazy" /> 
+
+  <requestDispatcher handleSelect="true" >
+    <requestParsers enableRemoteStreaming="false" multipartUploadLimitInKB="2048" />
+  </requestDispatcher>
+  
+  <requestHandler name="standard" class="solr.StandardRequestHandler" default="true" />
+  <requestHandler name="/analysis/field" startup="lazy" class="solr.FieldAnalysisRequestHandler" />
+  <requestHandler name="/update" class="solr.UpdateRequestHandler"  />
+  <requestHandler name="/admin/" class="org.apache.solr.handler.admin.AdminHandlers" />
+     
+  <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
+    <lst name="invariants">
+      <str name="q">solrpingquery</str>
+    </lst>
+    <lst name="defaults">
+      <str name="echoParams">all</str>
+    </lst>
+  </requestHandler>
+   
+  <!-- config for the admin interface --> 
+  <admin>
+    <defaultQuery>solr</defaultQuery>
+  </admin>
+
+  <requestHandler name="search" class="solr.SearchHandler" >
+    <lst name="defaults">
+     <str name="defType">edismax</str>
+     <str name="echoParams">explicit</str>
+     <float name="tie">0.01</float>
+     <str name="qf">
+       title_text^20.0 author_text^10.0 subtitle_text^15.0 alternate_form_title_text^10.0 title_added_entry_text^10.0 part_text^5.0 call_number_text^5 text
+     </str>
+     <str name="pf">
+       title_facet^100 title_unstem_text^50 title_text^20 author_unstem_text^20 subject_unstem_text^20 text^15.0
+     </str>
+     <str name="mm">
+       3&lt; 100% 8&lt; 80%
+     </str>
+     <str name="qf_author"> 
+       author_text^20.0 author_added_entry_text 
+     </str>
+     <str name="pf_author"> 
+       title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0 
+     </str>
+     <str name="qf_title"> 
+       title_text^20.0 subtitle_text^15 title_added_entry_text series_title_text notes_text uniform_title_text alternate_form_title_text 
+     </str>
+     <str name="pf_title"> 
+       full_title_text^100 title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0 
+     </str>
+     <str name="qf_journal_title"> 
+       journal_title_text^20.0 journal_addnl_title_text 
+     </str>
+     <str name="pf_journal_title"> 
+       journal_title_text^100 title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0 
+     </str>
+     <str name="qf_series">
+       series_title_text^20.0
+     </str>
+     <str name="pf_series"> 
+       series_title_text^100 title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0 
+     </str>
+     <str name="qf_subject">
+       subject_text^20.0
+     </str>
+     <str name="pf_subject"> 
+       title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0 
+     </str>
+     <str name="qf_call_number">
+       call_number_text^20.0
+       call_number_facet
+     </str>
+     <str name="pf_call_number"> 
+       title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0 
+     </str>
+     <str name="qf_published"> 
+       published_text^20 year_multisort_i^10 
+     </str>
+     <str name="pf_published"> 
+       published_text^20 year_multisort_i^10 
+     </str>
+     <str name="qf_music"> 
+       author_text^20 author_added_entry_text^10 title_text^1.0 text 
+     </str>
+     <str name="pf_music"> 
+       title_facet^50 title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0 
+     </str>
+     <str name="qf_issn"> issn_text </str>
+     <str name="pf_issn"> issn_text </str>
+     <str name="qf_isbn"> isbn_text </str>
+     <str name="pf_isbn"> isbn_text </str>
+     <str name="fl">id, score, media_resource_id_display, media_description_display, title_display,
+       subtitle_display, main_title_display, series_title_display, part_display, date_display,
+       date_received_facet, author_display, creator_display, digital_collection_facet,
+       datafile_name_display, format_facet, location_facet, call_number_display, isbn_display,
+       published_display, source_facet, content_model_facet, mint_display, accession_display,
+       thumb_obv_display, thumb_rev_display, year_facet, year_display, published_date_display,
+       linked_author_display, linked_title_display, linked_responsibility_statement_display,
+       url_display, repository_address_display, medium_display, date_coverage_display,
+       date_bulk_coverage_display, form_display, library_facet, description_note_display,
+       date_first_indexed_facet, video_run_time_display, video_target_audience_display,
+       video_director_facet, location2_facet, release_date_facet, barcode_facet, marc_display_facet,
+       series_title_facet, breadcrumbs_display, author_facet, digitized_item_pid_display, policy_facet,
+       oclc_display, upc_display,  description_note_display, resource_display, thumbnail_display,
+       doc_type_facet, url_item_display, url_supp_display
+     </str>
+     <str name="facet">on</str>
+     <str name="facet.mincount">1</str>
+     <str name="facet.limit">10</str>
+     <str name="facet">on</str>
+     <str name="facet.mincount">1</str>
+     <str name="facet.limit">10</str>
+     <str name="facet.field">library_facet</str>
+     <str name="facet.field">location_facet</str>
+     <str name="facet.field">location2_facet</str>
+     <str name="facet.field">published_date_facet</str>
+     <str name="facet.field">format_facet</str>
+     <str name="facet.field">call_number_facet</str>
+     <str name="facet.field">digital_collection_facet</str>
+     <str name="facet.field">subject_facet</str>
+     <str name="facet.field">language_facet</str>
+     <str name="facet.field">source_facet</str>
+     <str name="facet.field">series_title_facet</str>
+     <str name="facet.field">recordings_and_scores_facet</str>
+     <str name="facet.field">recording_format_facet</str>
+     <str name="facet.field">instrument_facet</str>
+     <str name="facet.field">music_composition_era_facet</str>
+     <str name="facet.field">author_facet</str>
+     <str name="facet.field">region_facet</str>
+     <str name="facet.field">video_genre_facet</str>
+     <int name="ps">100</int>
+     <str name="q.alt">*:*</str>
+     <!--  <str name="spellcheck">true</str>
+     <str name="spellcheck.dictionary">default</str>
+     <str name="spellcheck.onlyMorePopular">true</str>
+     <str name="spellcheck.extendedResults">true</str>
+     <str name="spellcheck.collate">true</str>
+     <str name="spellcheck.count">5</str> -->
+    </lst>
+    <!-- <arr name="last-components">
+      <str>spellcheck</str>
+    </arr> -->
+  </requestHandler>
+
+  <requestHandler name="author_search" class="solr.SearchHandler" >
+    <lst name="defaults">
+     <str name="defType">dismax</str>
+     <str name="echoParams">explicit</str>
+     <float name="tie">0.01</float>
+     <str name="qf">
+       author_text^20.0 author_added_entry_text author_facet
+     </str>
+     <str name="pf">
+       title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0
+     </str>
+     <str name="mm">
+       3&lt; 100% 5&lt; 70%
+     </str>
+     <str name="fl">
+       id, score, media_resource_id_display, media_description_display, title_display, subtitle_display, main_title_display, series_title_display, part_display, date_display, 
+       date_received_facet, author_display, creator_display, digital_collection_facet, 
+       datafile_name_display, format_facet, location_facet, call_number_display, isbn_display, 
+       published_display, source_facet, content_model_facet, mint_display, accession_display, 
+       thumb_obv_display, thumb_rev_display, year_facet, year_display, published_date_display, 
+       linked_author_display, linked_title_display, linked_responsibility_statement_display, url_display
+     </str>
+     <str name="facet">on</str>
+     <str name="facet.mincount">1</str>
+     <str name="facet.limit">10</str>
+     <int name="ps">100</int>
+     <str name="q.alt">*:*</str>
+<!--     <str name="spellcheck">true</str>
+     <str name="spellcheck.dictionary">default</str>
+     <str name="spellcheck.onlyMorePopular">true</str>
+     <str name="spellcheck.extendedResults">true</str>
+     <str name="spellcheck.collate">true</str>
+     <str name="spellcheck.count">5</str>   -->
+    </lst>
+<!--    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr> -->
+  </requestHandler>
+
+  <requestHandler name="title_search" class="solr.SearchHandler" >
+    <lst name="defaults">
+     <str name="defType">dismax</str>
+     <str name="echoParams">explicit</str>
+     <float name="tie">0.01</float>
+     <str name="qf">
+       title_text^20.0 subtitle_text^15 title_added_entry_text series_title_text notes_text uniform_title_text
+     </str>
+     <str name="pf">
+       title_facet^100 title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0
+     </str>
+     <str name="mm">
+       3&lt; 100% 5&lt; 70%
+     </str>
+     <str name="fl">
+       id, score, media_resource_id_display, media_description_display, title_display, subtitle_display, main_title_display, series_title_display, part_display, date_display, 
+       date_received_facet, author_display, creator_display, digital_collection_facet, 
+       datafile_name_display, format_facet, location_facet, call_number_display, isbn_display, 
+       published_display, source_facet, content_model_facet, mint_display, accession_display, 
+       thumb_obv_display, thumb_rev_display, year_facet, year_display, published_date_display, 
+       linked_author_display, linked_title_display, linked_responsibility_statement_display, url_display
+     </str>
+     <str name="facet">on</str>
+     <str name="facet.mincount">1</str>
+     <str name="facet.limit">10</str>
+     <int name="ps">100</int>
+     <str name="q.alt">*:*</str>
+ <!--    <str name="spellcheck">true</str>
+     <str name="spellcheck.dictionary">default</str>
+     <str name="spellcheck.onlyMorePopular">true</str>
+     <str name="spellcheck.extendedResults">true</str>
+     <str name="spellcheck.collate">true</str>
+     <str name="spellcheck.count">5</str>   -->
+    </lst>
+<!--    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr> -->
+  </requestHandler>
+
+  <requestHandler name="subject_search" class="solr.SearchHandler" >
+    <lst name="defaults">
+     <str name="defType">dismax</str>
+     <str name="echoParams">explicit</str>
+     <float name="tie">0.01</float>
+     <str name="qf">
+       subject_text^20.0 text^15 subject_facet subject_era_facet
+     </str>
+     <str name="pf">
+       title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0
+     </str>
+     <str name="mm">
+       3&lt; 100% 5&lt; 70%
+     </str>
+     <str name="fl">
+       id, score, media_resource_id_display, media_description_display, title_display, subtitle_display, main_title_display, series_title_display, part_display, date_display, 
+       date_received_facet, author_display, creator_display, digital_collection_facet, 
+       datafile_name_display, format_facet, location_facet, call_number_display, isbn_display, 
+       published_display, source_facet, content_model_facet, mint_display, accession_display, 
+       thumb_obv_display, thumb_rev_display, year_facet, year_display, published_date_display, 
+       linked_author_display, linked_title_display, linked_responsibility_statement_display, url_display
+     </str>
+     <str name="facet">on</str>
+     <str name="facet.mincount">1</str>
+     <str name="facet.limit">10</str>
+     <int name="ps">100</int>
+     <str name="q.alt">*:*</str>
+<!--     <str name="spellcheck">true</str>
+     <str name="spellcheck.dictionary">default</str>
+     <str name="spellcheck.onlyMorePopular">true</str>
+     <str name="spellcheck.extendedResults">true</str>
+     <str name="spellcheck.collate">true</str>
+     <str name="spellcheck.count">5</str>   -->
+    </lst>
+<!--    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr>  -->
+  </requestHandler>
+
+  <requestHandler name="call_number_search" class="solr.SearchHandler" >
+    <lst name="defaults">
+     <str name="defType">dismax</str>
+     <str name="echoParams">explicit</str>
+     <float name="tie">0.01</float>
+     <str name="qf">
+       call_number_text^20.0 call_number_facet
+     </str>
+     <str name="pf">
+       title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0
+     </str>
+     <str name="mm">
+       3&lt; 100% 5&lt; 70%
+     </str>
+     <str name="fl">
+       id, score, media_resource_id_display, media_description_display, title_display, subtitle_display, main_title_display, series_title_display, part_display, date_display, 
+       date_received_facet, author_display, creator_display, digital_collection_facet, 
+       datafile_name_display, format_facet, location_facet, call_number_display, isbn_display, 
+       published_display, source_facet, content_model_facet, mint_display, accession_display, 
+       thumb_obv_display, thumb_rev_display, year_facet, year_display, published_date_display, 
+       linked_author_display, linked_title_display, linked_responsibility_statement_display, url_display
+     </str>
+     <str name="facet">on</str>
+     <str name="facet.mincount">1</str>
+     <str name="facet.limit">10</str>
+     <int name="ps">100</int>
+     <str name="q.alt">*:*</str>
+ <!--    <str name="spellcheck">true</str>
+     <str name="spellcheck.dictionary">default</str>
+     <str name="spellcheck.onlyMorePopular">true</str>
+     <str name="spellcheck.extendedResults">true</str>
+     <str name="spellcheck.collate">true</str>
+     <str name="spellcheck.count">5</str>   -->
+    </lst>
+<!--    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr>  -->
+  </requestHandler>
+
+  <requestHandler name="music_search" class="solr.SearchHandler" >
+    <lst name="defaults">
+     <str name="defType">dismax</str>
+     <str name="echoParams">explicit</str>
+     <float name="tie">0.01</float>
+     <str name="qf">
+       author_text^20 author_added_entry_text^10 title_text^1.0 text
+     </str>
+     <str name="pf">
+       title_facet^50 title_unstem_text^20.0 author_unstem_text^20 subject_unstem_text^20 text^15.0
+     </str>
+     <str name="mm">
+       3&lt; 100% 5&lt; 70%
+     </str>
+     <str name="fl">
+       id, score, media_resource_id_display, media_description_display, title_display, subtitle_display, main_title_display, series_title_display, part_display, date_display, 
+       date_received_facet, author_display, creator_display, digital_collection_facet, 
+       datafile_name_display, format_facet, location_facet, call_number_display, isbn_display, 
+       published_display, source_facet, content_model_facet, mint_display, accession_display, 
+       thumb_obv_display, thumb_rev_display, year_facet, year_display, published_date_display, 
+       linked_author_display, linked_title_display, linked_responsibility_statement_display, url_display
+     </str>
+     <str name="facet">on</str>
+     <str name="facet.mincount">1</str>
+     <str name="facet.limit">10</str>
+     <int name="ps">100</int>
+     <str name="q.alt">*:*</str>
+ <!--     <str name="spellcheck">true</str>
+     <str name="spellcheck.dictionary">default</str>
+     <str name="spellcheck.onlyMorePopular">true</str>
+     <str name="spellcheck.extendedResults">true</str>
+     <str name="spellcheck.collate">true</str>
+     <str name="spellcheck.count">5</str>  -->
+    </lst>
+<!--    <arr name="last-components">
+      <str>spellcheck</str>
+    </arr> -->
+  </requestHandler>
+  
+  <!-- very simple param defaults for for a single documents -->
+  <requestHandler name="document" class="solr.SearchHandler" >
+    <lst name="defaults">
+     <str name="echoParams">explicit</str>
+     <str name="fl">
+       accession_display, material_display, media_resource_id_display, media_description_display, media_retrieval_id_display,
+       marc_display, marc_display_facet, format_facet, location_facet, location_display, call_number_display, isbn_display,
+       edition_display, call_number_facet, score, datafile_name_display,
+       digital_collection_facet, collection_facet, timestamp, subject_facet, subject_genre_facet, genre_facet,
+       content_model_facet, id, composition_era_facet, content_type_facet, author_facet, author_display,
+       linked_author_display, source_facet, language_facet, title_display, subtitle_display, main_title_display,
+       series_title_display, alternate_title_display, published_display, creator_display,
+       linked_title_display, linked_responsibility_statement_display, year_facet, year_display, note_display,
+       accession_display, thumb_obv_display, thumb_rev_display, material_display, published_date_display,
+       denomination_display, url_display, region_facet, series_title_facet, subject_facet, mint_display,
+       shadowed_location_facet, desc_meta_file_display, admin_meta_file_display, repository_address_display,
+       summary_holdings_display, part_display, medium_display, subtitle_display, form_display,
+       date_coverage_display, date_bulk_coverage_display, video_run_time_display, video_target_audience_display,
+       video_director_facet, location2_facet, release_date_facet, library_facet, uniform_title_facet, date_indexed_facet,
+       editorlocation_display, editorgroups_facet, iseditable_facet,
+       hierarchy_display, full_hierarchy_display, breadcrumbs_display, scope_content_display, container_display,
+       digitized_item_pid_display, anchor_script_pdf_url_display, anchor_script_thumbnail_url_display,
+       abstract_display, anchor_script_display, pbcore_display, policy_facet, oclc_display, upc_display,
+       book_plate_facet, book_plate_url_display, book_plate_thumb_url_display, book_plate_name_display, fund_code_facet,
+       resource_display, description_display, thumbnail_display, doc_type_facet, url_item_display, url_supp_display
+     </str>
+     <str name="rows">1</str>
+     <str name="q">{!raw f=id v=$id}</str>
+     <str name="q.alt">*:*</str>
+    </lst>
+  </requestHandler>
+
+  <!-- very simple param defaults for for a single documents -->
+  <requestHandler name="document_lean" class="solr.SearchHandler" >
+    <lst name="defaults">
+     <str name="echoParams">explicit</str>
+     <str name="fl">
+       id, title_display, format_facet, source_facet, content_model_facet, isbn_display, author_display, thumb_obv_display, media_resource_id_display
+     </str>
+     <str name="rows">1</str>
+     <str name="q">{!raw f=id v=$id}</str>
+     <str name="q.alt">*:*</str>
+    </lst>
+  </requestHandler>
+
+
+  
+
+
+</config>
+

@@ -1,0 +1,7 @@
+2015-08-19 14:34:44,577 [main] ERROR main org.solrmarc.marc.MarcHandler - Fatal error: Unable to open specified MARC data file: ~/record_288342_bad.mrc
+2015-08-19 14:34:44,580 [main] ERROR main org.solrmarc.marc.MarcPrinter - Fatal error: Unable to open specified MARC data file: ~/record_288342_bad.mrc
+2015-08-19 14:35:38,070 [main] ERROR main org.solrmarc.marc.MarcImporter - Error while indexing summary_text for record 288342 -- org.solrmarc.tools.SolrMarcIndexerException: Error executing query
+2015-08-19 14:35:38,083 [main] ERROR main org.solrmarc.marc.MarcImporter - Error while indexing toc_text for record 288342 -- org.solrmarc.tools.SolrMarcIndexerException: Error executing query
+2015-08-19 14:35:38,088 [main] ERROR main org.solrmarc.marc.MarcImporter - Error while indexing toc_author_text for record 288342 -- org.solrmarc.tools.SolrMarcIndexerException: Error executing query
+2015-08-19 14:35:38,093 [main] ERROR main org.solrmarc.marc.MarcImporter - Error while indexing summary_title_display for record 288342 -- org.solrmarc.tools.SolrMarcIndexerException: Error executing query
+2015-08-19 14:35:38,097 [main] ERROR main org.solrmarc.marc.MarcImporter - Error while indexing toc_title_display for record 288342 -- org.solrmarc.tools.SolrMarcIndexerException: Error executing query

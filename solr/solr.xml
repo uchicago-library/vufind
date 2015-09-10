@@ -5,5 +5,7 @@
     <!-- uncomment to enable stats core: <core name="stats" instanceDir="stats"/> -->
     <core name="website" instanceDir="website"/>
     <!-- uncomment to enable reserves core: <core name="reserves" instanceDir="reserves"/> -->
+    <core name="summ" instanceDir="summ" />
+    <core name="toc" instanceDir="toc" />
   </cores>
 </solr>
