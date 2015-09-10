@@ -238,6 +238,10 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
                                     ($data['currentField'] == 650) || ($data['currentField'] == 651) || ($data['currentField'] == 654) || ($data['currentField'] == 655)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/topics.phtml');
                             }
+                            /*382 (Instrumentation): get special template*/
+                            elseif (($data['currentField'] == 382)) {
+                                include('themes/phoenix/templates/Helpers/MarcFields/382.phtml');
+                            }
                             /*Default: get the default template*/
                             else {
                                 include('themes/phoenix/templates/Helpers/MarcFields/default.phtml');

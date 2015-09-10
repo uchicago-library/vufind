@@ -1,0 +1,38 @@
+<!--382.phtml-->
+<? //print_r($data)?>
+<? 
+if (!empty($data['subfieldData'])) {
+    foreach($data['subfieldData'] as $key => $value) {
+        if (substr($key, 0, 1) == 'a') {
+            echo ' |    ' . $value; 
+        }
+        elseif (substr($key, 0, 1) == 'b') {
+            echo ' | soloist:' . $value;
+        }
+        elseif (substr($key, 0, 1) == 'd') {
+            echo '/' . $value;
+        }
+        elseif (substr($key, 0, 1) == 'e') {
+            echo '(' . $value . ')';
+        }
+        elseif (substr($key, 0, 1) == 'n') {
+            echo '(' . $value . ')';
+        }
+        elseif (substr($key, 0, 1) == 'p') {
+            echo ' or ' . $value;
+        }
+        elseif (substr($key, 0, 1) == 'v') {
+            echo ' [' . $value . ']';
+        }
+    }
+    echo '<br/>'; 
+}
+?>   
+
+
+
+
+
+<? if (!empty($data['vernacularData'])) :
+       echo implode(' ', $data['vernacularData']);?><br />
+<? endif; ?>   
