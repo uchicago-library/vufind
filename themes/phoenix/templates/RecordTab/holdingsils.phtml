@@ -10,6 +10,7 @@
     // Account for replace_other_urls setting
     //$urls = ($openUrl && $this->driver->replaceURLsWithOpenURL()) ? array() : $this->record($this->driver)->getLinkDetails();
     $urls = ($openUrl && $this->driver->replaceURLsWithOpenURL()) ? array() : $this->Eholdings()->getEholdingLinks();//Replace default 856 urls with e-holdings from the 098 fields
+    $bib = $this->driver->getUniqueID(); 
 
     // E-resource links
     $hathiLink = $this->HathiLink()->getHathiLink();
@@ -48,7 +49,7 @@
     <a class="placehold modal-link" title="<?=$this->transEsc('request_place_text')?>" href="<?=$this->recordLink()->getRequestUrl($holdingTitleHold)?>"><i class="fa fa-flag"></i>&nbsp;<?=$this->transEsc('title_hold_place')?></a>
 <? endif; ?>
 <? if (!empty($urls) || $openUrl || $hathiLink): ?>
-  <div class="holdings-unit">
+  <div id="e-links" class="holdings-unit">
   <h3><?=$this->transEsc("Internet")?></h3>
   <? if (!empty($urls)): ?>
       <?/*For now, only display a browse link if the first e-holding has a callnumber - Fix later*/?>
@@ -69,6 +70,7 @@
     <?=$hathiLink?>    
   <? endif; ?>
   <?=$this->record($this->driver)->getPreviewLink()?>
+  <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib)?>
   </div>
 <? endif; ?>
 
@@ -219,7 +221,7 @@
             <? endif; ?>
               <? /* Begin Items that are either Available or Unavailable */ ?>
                 <?=$this->ServiceLinks()->aeon($row)?>
-                <?=$this->ServiceLinks()->altText($row, $this->driver->getFormats())?>
+                <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib, $row)?>
           <? endif; ?>
           <? /* Embed item structured data: library, barcode, call number */ ?>
           <? if ($row['location']): ?>

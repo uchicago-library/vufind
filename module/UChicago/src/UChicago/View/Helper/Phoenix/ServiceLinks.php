@@ -661,16 +661,18 @@ class ServiceLinks extends AbstractHelper {
      * Method creates a link to the alternative text request service
      * uc:applications:library:alttext:authorized
      *
-     * @param row, array of holdings and item information
-     * @param formats, array of formats
+     * @param $formats, array of formats.
+     * @param $bib, string, unique ID
+     * @param $row, array of holdings and item information, defaults to false.
      *
      * @return html string
      */
-    public function altText($row, $formats) {
+    public function altText($formats, $bib, $row=false) {
         $formats = $this->urlEncodeArray($formats);
         $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
-        $status = urlencode($row['status']);
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/alt-text-request.php?barcode=' . $row['barcode'] . '&amp;bib=' . $row['id'] . '&amp;status=' . $status  . '&amp;' . $patron . $formats;
+        $status = $row ? urlencode($row['status']) : '';
+        $barcode = $row ? urlencode($row['barcode']) : '';
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/alt-text-request.php?barcode=' . $barcode . '&amp;bib=' . $bib . '&amp;status=' . $status  . '&amp;' . $patron . $formats;
         $serviceLink = $this->getLinkConfig('altText', $defaultUrl);
         $displayText = 'Alternative Text Request';
         if (($serviceLink) and ($this->isMemberOf('uc:applications:library:alttext:authorized'))) {
