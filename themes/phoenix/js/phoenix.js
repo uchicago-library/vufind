@@ -70,7 +70,6 @@ $(document).ready(function() {
 
     $('table tr').each(function(){
         var trcolor = $(this).css('backgroundColor');
-        console.log(trcolor);
     });
 
     // Text for various states
@@ -123,6 +122,46 @@ $(document).ready(function() {
         // Show/hide items
         $(this).parent().find(addtionalBibData).toggle();
     });
+
+    /**
+     * Collapse and Expand Subject headings in 
+     * the top part of the MARC record 
+     */
+
+    // Text for various states
+    var viewSubjectsText = 'More subjects <i class="fa fa-arrow-circle-right"></i>';
+    var hideSubjectsText = 'Hide subjects <i class="fa fa-arrow-circle-down"></i>';
+
+    // Links to display for various states
+    var viewSubjects = '<a href="#" class="subjectsToggle">' + viewSubjectsText + '</a>';
+    var hideSubjects = '<a href="#" class="subjectsToggle">' + hideSubjectsText + '</a>';
+
+    $('.topic').parent().each(function(){
+        // Number of things to display by default
+        var displayNum = 3;
+
+        // Boolean, is there a toggle link appended
+        var hasLink = false;
+
+        // Loop over items
+        var i = 1;
+        $(this).find('.topic').each(function(){
+            console.log(i);
+            if (i == displayNum) {
+                $(this).addClass('subjectToggleTarget');
+            }
+            if (i > displayNum) {
+                $(this).hide();
+                $(this).addClass('subjectToToggle');
+                if(!hasLink > 0 ){
+                    $(this).before(viewSubjects);
+                    hasLink = true;
+                }
+            }
+            i++;
+        });
+    });
+   
 
 
     /**
@@ -211,6 +250,21 @@ $(document).ready(function() {
         var hideItems = '<a href="#" class="itemsToggle text-success">' + hideItemsText + '</a>';
     });
 
+    // Toggle hidden subject headings in the top portion of the MARC record
+    $('.subjectsToggle').click(function(){
+        // Toggle the inner html of the link
+        var text = $(this).html();
+        if (text == viewSubjectsText) {
+            text = hideSubjectsText;
+        }
+        else {
+            text = viewSubjectsText;
+        }
+        $(this).html(text);
+
+        // Show/hide items
+        $(this).parent().find('.subjectToToggle').toggle();
+    });
 
     // Toggle hidden items
     $('.itemsToggle').click(function(){

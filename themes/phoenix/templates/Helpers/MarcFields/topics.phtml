@@ -1,5 +1,7 @@
 <!--topics.phtml-->
-<a href="/vufind/alphabrowse/home?source=topic&amp;from=<?=trim($this->topicFormatter($data, $link=1))?>"><?=$this->topicFormatter($data, $link=0)?></a><br/>
+<a href="/vufind/alphabrowse/home?source=topic&amp;from=<?=trim($this->topicFormatter($data, $link=1))?>" class="topic">
+    <?=$this->topicFormatter($data, $link=0)?>
+<br/></a>
 <? if (!empty($data['vernacularData'])) :
        echo implode(' ', $data['vernacularData']);?><br />
 <? endif; ?>

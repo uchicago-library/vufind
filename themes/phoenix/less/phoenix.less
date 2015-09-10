@@ -751,7 +751,8 @@ a.bibToggle:hover {
 }
 .itemsToggle,
 .summaryToggle,
-.bibToggle {
+.bibToggle,
+.subjectsToggle {
     font-weight: bold;
     font-size: @font-size-base + 1;
     display: block;
@@ -761,9 +762,20 @@ a.bibToggle:hover {
 .itemsToggle:focus, 
 .summaryToggle,
 .summaryToggle:active, 
-.summaryToggle:focus {
+.summaryToggle:focus,
+.subjectsToggle:active, 
+.subjectsToggle:focus {
     outline: 0;
+    text-decoration: none;
 }
+.subjectsToggle {
+    color: #666;
+}
+.subjectsToggle:active, 
+.subjectsToggle:focus {
+    color: #444;
+}
+
 /*Top of full record*/
 div[resource="#record"] .table > tbody > tr.title > td {
     padding-bottom:0;
