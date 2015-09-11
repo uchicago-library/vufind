@@ -36,11 +36,22 @@ $config = array(
     'service_manager' => array(
         'allow_override' => true,
         'factories' => array(
+            'VuFind\ContentTOCPluginManager' => 'UChicago\Service\Factory::getContentTOCPluginManager',
             'VuFind\Mailer' => 'UChicago\Mailer\Factory',
         ),
     ),//service_manager
     'vufind' => array(
         'plugin_managers' => array(
+            'content' => array(
+                'factories' => array(
+                    'toc' => 'UChicago\Content\Factory::getTOC',
+                ),
+            ),//content
+            'content_toc' => array(
+                'factories' => array(
+                    'syndetics' => 'UChicago\Content\TOC\Factory::getSyndetics',
+                ),
+            ),//content_toc
             'recorddriver' => array(
                 'factories' => array(
                     'solrmarc' => 'UChicago\RecordDriver\Factory::getSolrMarc',
@@ -51,6 +62,7 @@ $config = array(
             'recordtab' => array(
                 'factories' => array(
                     'holdingsils' => 'UChicago\RecordTab\Factory::getHoldingsILS', 
+                    'toc' => 'UChicago\RecordTab\Factory::getTOC',
                 ),  
             ),//recordtab
         ),//plugin_managers

@@ -21,7 +21,7 @@
  *
  * @category VuFind2
  * @package  RecordDrivers
- * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Brad Busenius <bbusenius@uchicago.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/vufind2:hierarchy_components Wiki
  */
@@ -38,7 +38,7 @@ use Zend\ServiceManager\ServiceManager;
  * @link     http://vufind.org/wiki/vufind2:hierarchy_components Wiki
  * @codeCoverageIgnore
  */
-class Factory
+class Factory extends \VuFind\RecordTab\Factory
 {
 
     /**
@@ -68,4 +68,23 @@ class Factory
         return new \UChicago\RecordTab\HoldingsILS($catalog, $displayNum);
     }
 
+    /**
+     * Factory for TOC tab plugin.
+     *
+     * @param ServiceManager $sm Service manager.
+     *
+     * @return TOC
+     */
+    public static function getTOC(ServiceManager $sm)
+    {
+        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+        // Only instantiate the loader if the feature is enabled:
+        if (isset($config->Content->toc)) {
+            $loader = $sm->getServiceLocator()->get('VuFind\ContentPluginManager')
+                ->get('toc');
+        } else {
+            $loader = null;
+        }
+        return new \UChicago\RecordTab\TOC($loader, static::getHideSetting($config, 'toc'));
+    }
 }
