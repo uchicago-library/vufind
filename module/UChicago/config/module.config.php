@@ -62,7 +62,7 @@ $config = array(
             'recordtab' => array(
                 'factories' => array(
                     'holdingsils' => 'UChicago\RecordTab\Factory::getHoldingsILS', 
-                    'toc' => 'UChicago\RecordTab\Factory::getTOC',
+                    'chicagotoc' => 'UChicago\RecordTab\Factory::getTOC',
                 ),  
             ),//recordtab
         ),//plugin_managers
@@ -77,7 +77,7 @@ $config = array(
                 'tabs' => array(
                     'Holdings' => 'HoldingsILS', 
                     'Description' => null,
-                    'TOC' => 'TOC', 
+                    'TOC' => 'ChicagoTOC', 
                     'UserComments' => 'UserComments',
                     'Reviews' => 'Reviews', 
                     'Excerpt' => 'Excerpt',
