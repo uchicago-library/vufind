@@ -1,5 +1,4 @@
 <!--382.phtml-->
-<? //print_r($data)?>
 <? 
 if (!empty($data['subfieldData'])) {
     foreach($data['subfieldData'] as $key => $value) {
@@ -13,10 +12,14 @@ if (!empty($data['subfieldData'])) {
             echo '/' . $value;
         }
         elseif (substr($key, 0, 1) == 'e') {
-            echo '(' . $value . ')';
+            if ($value != '1') {
+                echo '(' . $value . ')';
+            }
         }
         elseif (substr($key, 0, 1) == 'n') {
-            echo '(' . $value . ')';
+            if ($value != '1') {
+                echo '(' . $value . ')';
+            }
         }
         elseif (substr($key, 0, 1) == 'p') {
             echo ' or ' . $value;
@@ -28,10 +31,6 @@ if (!empty($data['subfieldData'])) {
     echo '<br/>'; 
 }
 ?>   
-
-
-
-
 
 <? if (!empty($data['vernacularData'])) :
        echo implode(' ', $data['vernacularData']);?><br />
