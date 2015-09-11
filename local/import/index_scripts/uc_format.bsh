@@ -639,10 +639,17 @@ public Set getFormat(Record record)
             formatCode23 = formatString.length() > 23 ? formatString.charAt(23) : ' ';    //@ 23
             formatCode29 = formatString.length() > 29 ? formatString.charAt(29) : ' ';    //@ 29
             formatCode33 = formatString.length() > 33 ? formatString.charAt(33) : ' ';    //@ 33
+            formatCode17 = formatString.length() > 17 ? formatString.charAt(17) : ' ';    //@ 17
+            formatCode28 = formatString.length() > 28 ? formatString.charAt(28) : ' ';    //@ 28
+
+            if(formatCode17 == 'U' && formatCode28 == 'F')
+	     {    
+                               result.add("USfedGovDoc");  
+			}
 
             switch(formatCode23)
                {
-		 
+	 
                 case 'D': 
                 case 'F':
                 case 'R':
