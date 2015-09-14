@@ -35,10 +35,10 @@
         </p>
 
       <form name="renewals" action="<?=$this->url('myresearch-home')?>" method="post" id="renewals">
-        <!--<div class="toolbar">
+        <div class="toolbar">
           <input type="submit" class="btn btn-default" name="renewSelected" value="<?=$this->transEsc("renew_selected")?>" />
           <input type="submit" class="btn btn-default" name="renewAll" value="<?=$this->transEsc('renew_all')?>" />
-        </div>-->
+        </div>
       <? endif; ?>
 
       <table class="table table-striped">
@@ -74,8 +74,11 @@
           <td>
             <? if (isset($this->renewResult[$ilsDetails['item_id']])): ?>
                 <? $renewalStatus = $this->renewResult[$ilsDetails['item_id']]['success']?>
-                <?=$renewalStatus == true ? '<strong class="text-success">Successfully renewed!</strong>' : 
-                    '<strong class="text-danger">Failed to renew!</strong>'?><br/>
+                <? if ($renewalStatus): ?>
+                    <strong class="text-success">Successfully renewed!</strong>
+                <? else: ?>
+                    <strong class="text-danger"><?=$this->renewResult[$ilsDetails["item_id"]]["sysMessage"]?></strong><br/>
+                <? endif; ?>
             <? endif; ?>
             <?
               // If this is a non-missing Solr record, we should display a link:

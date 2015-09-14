@@ -1753,14 +1753,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         foreach($response['renewItemList'] as $renewal) {
             $msg = (string)$renewal['message'];
             $code = (string)$renewal['code'];
+            $success = (bool)$renewal['success'];
             $itemBarcode = $barcodes[$i];
-        
-        
-            // TODO: base "success" on the returned codes from OLE
-            $success = false;
-            if ($code == '003') {
-                $success = true;
-            }
             $finalResult['details'][$itemBarcode] = array(
                                 "success" => $success,
                                 "new_date" => false,
