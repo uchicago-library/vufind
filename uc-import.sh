@@ -179,7 +179,7 @@ import_bib () {
 	NEW_BIBS=false
     fi
 
-    $VUFIND_HOME/harvest/batch-import-marc.sh -d -p local/import/import_ole.properties $VUFIND_BIB_DIR
+    $VUFIND_HOME/harvest/batch-import-marc.sh -d -p local/import/import_ole_syn.properties $VUFIND_BIB_DIR
 }
 
 index_browse () {
