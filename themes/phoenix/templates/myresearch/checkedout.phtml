@@ -29,10 +29,7 @@
 
     <? if (!empty($this->transactions)): ?>
       <? if ($this->renewForm): ?>
-        <p style="margin-bottom: 0; margin: -10px 0 15px 0;">Need to renew books?
-          <a href="http://www.lib.uchicago.edu/e/using/borrow/#contact">Call us</a> or use our 
-          <a href="http://www.lib.uchicago.edu/e/ask/contactcirc.html">online form</a> and Library staff will help you.
-        </p>
+        <? echo $this->BootstrapAlert()->makeAlert('warning', 'Please do not click renew twice—renewals can take up to a minute.<br/>For help, <a href="http://www.lib.uchicago.edu/e/using/borrow/#contact">Call us</a> or use our <a href="http://www.lib.uchicago.edu/e/ask/contactcirc.html">online form</a> and Library staff will help you.', $style); ?>
 
       <form name="renewals" action="<?=$this->url('myresearch-home')?>" method="post" id="renewals">
         <div class="toolbar">
