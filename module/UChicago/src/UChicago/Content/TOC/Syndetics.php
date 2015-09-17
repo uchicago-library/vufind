@@ -114,8 +114,7 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
                     $nodes = $xmldoc2->GetElementsbyTagName("Fld970");
 
                     foreach ($nodes as $node) {
-                        $indent = (int)$node->getAttribute('I2') - 1;
-                        $li = str_repeat('&nbsp;', $indent);
+                        $li = '';
 
                         // Chapter labels.
                         $nodeList = $node->getElementsByTagName('l');
