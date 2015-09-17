@@ -246,9 +246,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
                     }
                     foreach($marcData['note'] as $num => $note) {
                         if(!empty($note['subfieldData'])) {
-                            foreach($note['subfieldData'] as $key => $value) {
-                                $retval['urls'][$i]['subfieldData'][$key[0]] = $value; 
-                            }
+                            $retval['urls'][$i]['subfieldData']['p'] = implode(' ', $note['subfieldData']);
                             unset($marcData['note'][$num]);
                             break;
                         }
