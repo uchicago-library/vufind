@@ -147,7 +147,7 @@
           <td>
             <? if (isset($this->renewResult[$ilsDetails['item_id']])): ?>
               <? $renewDetails = $this->renewResult[$ilsDetails['item_id']]; ?>
-                <?=$this->escapeHtml($renewDetails['new_date'])?> <? if (isset($renewDetails['new_time']) && $ilsDetails['dueTime']): ?><?=date("g:ia", strtotime($renewDetails['new_time']))?><? endif; ?>
+                <?=date("n/j/Y g:ia", strtotime($renewDetails['new_date']))?> <? if (isset($renewDetails['new_time']) && $ilsDetails['dueTime']): ?><?=date("g:ia", strtotime($renewDetails['new_time']))?><? endif; ?>
             <? elseif ($ilsDetails['duedate'] === null): ?>
                 no due date unless recalled
             <? else: ?>
