@@ -835,7 +835,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     {
         $status = array();
         foreach ($idList as $id) {
-            $status[] = $this->getStatus($id);
+            $isNumericBib = is_numeric($id[0]);
+            if ($isNumericBib) {
+                $status[] = $this->getStatus($id);
+            } 
         }
         return $status;
     }
@@ -1038,8 +1041,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             $summaryHoldings = array();
 
             /*Get indicies and suppliments for unbound items in the serials receiving tables*/
-            $unboundIndices = $this->getSerialReceiving($id, $holdingId, $location, $type='Index');
-            $unboundSupplements = $this->getSerialReceiving($id, $holdingId, $location, $type='Supplementary');
+            $unboundIndices = $this->getSerialReceiving($id, $holdingId, $location, $holdingCallNum, $holdingCallNumDisplay, $type='Index');
+            $unboundSupplements = $this->getSerialReceiving($id, $holdingId, $location, $holdingCallNum, $holdingCallNumDisplay, $type='Supplementary');
 
             if (!empty($unboundIndices)) {
                 $summaryHoldings += $unboundIndices; 
@@ -1138,13 +1141,13 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
      *
      * @returns an array of item information for things without a barcode.
      */
-    protected function getSerialReceiving($id, $holdingId, $holdingLocation, $type='Main') {
+    protected function getSerialReceiving($id, $holdingId, $holdingLocation, $holdingCallNum, $holdingCallNumDisplay, $type='Main') {
 
         /*Summary holdings types*/
         $summaryTypes = array('Index', 'Supplementary');
 
         /*Get serial receiving data (unbound periodicals) by holdingId*/
-        $sql = 'SELECT r.INSTANCE_ID, SUBSTRING(r.UNBOUND_LOC,  SUBSTRING_INDEX(r.UNBOUND_LOC, \'/\', -1) + LOCATE(\'/\', REVERSE(r.UNBOUND_LOC)) + 1 )  AS unbound_shelving_loc, 
+        $sql = 'SELECT r.INSTANCE_ID, SUBSTRING_INDEX(r.UNBOUND_LOC, \'/\', -1)  AS unbound_shelving_loc, SER_RCPT_LOC, 
                 s.SER_RCPT_HIS_REC_ID, s.SER_RCV_REC_ID, s.RCV_REC_TYP,
                    CONCAT_WS(" ", s.ENUM_LVL_1, s.ENUM_LVL_2, s.ENUM_LVL_3, s.ENUM_LVL_4, s.ENUM_LVL_5, s.ENUM_LVL_6) AS enum,
                    if(LEFT(s.CHRON_LVL_1,1)=\'(\' || LENGTH(s.CHRON_LVL_1) = 0,
@@ -1182,6 +1185,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['locationCodes'] = $unboundLocCodes;
                 $item['availability'] = true;
                 $item['status'] = 'AVAILABLE';
+
+                $item['callnumber'] = $holdingCallNum;
+                $item['callnumberDisplay'] = $holdingCallNumDisplay;
                 
                 /*Filter out summary holdings. These will be returned
                 along with the getSummaryHoldings method.*/
@@ -1333,7 +1339,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
                 /*Get serials receiving data*/
                 if ($hasUnboundItems) {
-                    $unboundSerials = $this->getSerialReceiving($id, $holdingId, $shelvingLocation);
+                    $unboundSerials = $this->getSerialReceiving($id, $holdingId, $shelvingLocation, $holdingCallNum, $holdingCallNumDisplay);
                     foreach($unboundSerials as $unboundItem) {
                         $items[] = $unboundItem;
                     }
