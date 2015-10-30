@@ -139,10 +139,10 @@
               <? endforeach; ?>
             <? endif; ?>
 
-            <? if (isset($ilsDetails['available']) && $ilsDetails['available'] == true): ?>
+            <? if (isset($ilsDetails['position']) && $ilsDetails['position'] > 1): ?>
+              <div><?=$this->transEsc("hold_queue_position") ?>: <?=$this->escapeHtml($ilsDetails['position']) ?></div>
+            <? elseif (isset($ilsDetails['available']) && $ilsDetails['available'] == true): ?>
               <div class="text-success"><?=$this->transEsc("hold_available") ?></div>
-            <? elseif (isset($ilsDetails['position'])): ?>
-              <p><?=$this->transEsc("hold_queue_position") ?>: <?=$this->escapeHtml($ilsDetails['position']) ?></p>
             <? endif; ?>
             <? if (isset($ilsDetails['cancel_link'])): ?>
               <p><a href="<?=$this->escapeHtmlAttr($ilsDetails['cancel_link']) ?>"><?=$this->transEsc("hold_cancel") ?></a></p>
