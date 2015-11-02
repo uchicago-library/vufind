@@ -575,8 +575,10 @@ class ServiceLinks extends AbstractHelper {
         /*Combined statuses and locations to make a blacklist*/
         $blacklist = array_map('strtolower', array_merge($this->lookupStatus['recall'], $this->lookupLocation['recall']));
 
-        if (($serviceLink) && (!empty($row['status'])) && (!in_array(strtolower($row['status']), $blacklist)) && (!in_array($this->getLocation($row['locationCodes'], 'shelving'), $blacklist)) 
-            && !empty($row['barcode'])) {
+        if (($serviceLink) 
+            && (!empty($row['status'])) 
+            && (!in_array(strtolower($row['status']), $blacklist)) 
+            && (!in_array($this->getLocation($row['locationCodes'], 'shelving'), $blacklist))) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
