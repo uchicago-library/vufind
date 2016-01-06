@@ -68,7 +68,7 @@ public Set getCollection(Record record)
              	  result.add("Eckhart Reserves");
              	 }
              if(str.equals("GameASR") || str.equals("HarpASR") || str.equals("JRLASR") || str.equals("LawASR") || 
-             	str.equals("LawSupr") || str.equals("RRADiss") || str.equals("SciASR"))
+             	str.equals("LawSupr") || str.equals("RRADiss") || str.equals("SciASR") || str.equals("RecASR"))
              	 {
              	  result.add("Mansueto");
              	 }	 
@@ -81,7 +81,7 @@ public Set getCollection(Record record)
                  str.equals("Res") || str.equals("Stor") || str.equals("Acq") || str.equals("Art420") || str.equals("ArtResA") || 
                  str.equals("Cat") || str.equals("CircPer") || str.equals("CJK") || str.equals("CJKRar") || str.equals("CJKRef") || 
                  str.equals("CJKRfHY") || str.equals("CJKSem") || str.equals("CJKSPer") || str.equals("CJKSpHY") || str.equals("CJKSpl") || 
-                 str.equals("CMC") || str.equals("Film") || str.equals("Gen") || str.equals("GenHY") || str.equals("JRLASR"))
+                 str.equals("CMC") || str.equals("Film") || str.equals("Gen") || str.equals("GenHY") || str.equals("JRLASR") || str.equals("RecASR"))
              	 {
              	  result.add("Regenstein Library");
              	 }	 
