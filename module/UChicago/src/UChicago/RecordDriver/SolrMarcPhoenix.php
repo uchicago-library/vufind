@@ -377,7 +377,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             array('label'  => 'Title varies',
                   'values' => array('247|abdefghnpx')),
             array('label'  => 'Other title',
-                  'values' => array('740|a')),
+                  'values' => array('740|apn')),
             array('label'  => 'Other uniform titles', //if this label changes, we'll need to change it in author.phtml and in the otherAuthorsTitles function below, I can add an ID parameter to avoid this but I'm not going to worry about it now
                   'values' => array('700|abcdfgiklmnopqrstux','710|abcdfgiklmnoprstux','711|acdefgiklnpqstux','730|adfiklmnoprs', '793|adfgiklmnoprs')), //700, 710, and 711 fields must come first 
             array('label'  => 'Other authors / contributors', //If this label changes, we'll need to change it in author.phtml too. 
