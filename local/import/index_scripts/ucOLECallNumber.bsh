@@ -215,6 +215,7 @@ public String getLCSortable(Record record, String fieldSpec) {
     Set input = indexer.getFieldList(record, fieldSpec);
     for (String current : input) {
         LCCallNumber callNum = new LCCallNumber(current);
+System.out.println("callNUM: " + callNum);
 	if (bestCall == null) {
 	    // Save first in case none are valid
 	    bestCall = callNum;
