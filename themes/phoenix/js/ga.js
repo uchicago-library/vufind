@@ -791,21 +791,10 @@ $(document).ready(function() {
 	
 		/* User clicks the Hathi Trust preview link. */
 		$('a.eLink.hathi').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
+            // removed timeout because it was buggy on Safari-
+            // the link would appear broken. Clicking it wouldn't
+            // do anything.
 			catalogevent('send', 'event', 'preview', 'Hathi Trust');
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
 		});
 	
 		/* User clicks the Google Book preview link. */
