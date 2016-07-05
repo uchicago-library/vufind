@@ -353,6 +353,12 @@ $(document).ready(function() {
 
         // If we made it this far, clear the timer and proceed. 
         clearInterval(setup_homepage_cookies_interval_id);
+
+        // Allow advanced searches from a URL. 
+        if (window.location.href.indexOf('/vufind/Search/Advanced') > -1) {
+            $.cookie('keyword_or_begins_with', 'keyword', cookie_settings);
+            $.cookie('basic_or_advanced', 'advanced', cookie_settings);
+        }
     
         // If the homepage cookie is set...
         if ($.cookie('keyword_or_begins_with') == 'keyword') {
