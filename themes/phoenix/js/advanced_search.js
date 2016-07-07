@@ -450,7 +450,7 @@ function switchToBasicSearch()
 
     //add 'power searching instructions', if necessary.
     if ($('#advSearchP').length == 0) {
-        $('.group:first').append('<p id="advSearchP"><a class="external" href="http://www.lib.uchicago.edu/e/using/catalog/help.html#powersearch">Power searching instructions (Boolean, etc.)</a></p>');
+        $('.group:first').append('<p id="advSearchP"><a class="external" href="https://www.lib.uchicago.edu/research/help/catalog-help/power-searching/">Power searching instructions (Boolean, etc.)</a></p>');
     }
     
     //make a basic search button, if necessary. 
@@ -476,14 +476,14 @@ $(document).ready(function() {
     $('#advancedSearchSwitch a').click(switchToAdvancedSearch);
 
     // Create "Add search group" and "what is a group?" links.
-    var groupPlaceHolder = $('<div id="groupPlaceHolder"><i class="fa fa-plus-circle"></i> <a href="#">Add Search Group</a> <a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchgroup" id="what_is_a_group" target="_blank" class="external"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Group?</a></div>');
+    var groupPlaceHolder = $('<div id="groupPlaceHolder"><i class="fa fa-plus-circle"></i> <a href="#">Add Search Group</a> <a href="https://www.lib.uchicago.edu/research/help/catalog-help/advanced/" id="what_is_a_group" target="_blank" class="external"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Group?</a></div>');
     $('.group:first').after(groupPlaceHolder);
 
     // Add click event to 'add search group'
     $('#groupPlaceHolder a:first').click(addGroup);
 
     // Create "Add search field" and "what is a field?" links.
-    var searchPlaceHolder = $('<span class="searchPlaceHolder"><i class="fa fa-plus-circle"></i> <a href="#">Add Search Field</a> <a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchfield" class="external what_is_a_field"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Field?</a></span>');
+    var searchPlaceHolder = $('<span class="searchPlaceHolder"><i class="fa fa-plus-circle"></i> <a href="#">Add Search Field</a> <a href="https://www.lib.uchicago.edu/research/help/catalog-help/advanced/" class="external what_is_a_field"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Field?</a></span>');
 
     // Append those at the end of the first search group. 
     $('.group:first').append(searchPlaceHolder);
