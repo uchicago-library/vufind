@@ -11,7 +11,7 @@
     $style = 'margin-bottom:-6px; font-size:15px;'; 
     if ($this->failure) { 
         $msg = 'Some of your items failed to renew!<br/>Please talk with a librarian or '  
-             . '<a href="http://www.lib.uchicago.edu/e/using/borrow/">consult our '
+             . '<a href="https://www.lib.uchicago.edu/borrow/borrowing/">consult our '
              . 'borrowing policies page</a> if you have any questions.';
         echo $this->BootstrapAlert()->makeAlert('danger', $msg, $style);
     }
@@ -29,7 +29,7 @@
 
     <? if (!empty($this->transactions)): ?>
       <? if ($this->renewForm): ?>
-        <? echo $this->BootstrapAlert()->makeAlert('warning', 'Please do not click renew twice—renewals can take up to a minute.<br/>For help, <a href="http://www.lib.uchicago.edu/e/using/borrow/#contact">Call us</a> or use our <a href="http://www.lib.uchicago.edu/e/ask/contactcirc.html">online form</a> and Library staff will help you.', $style); ?>
+        <? echo $this->BootstrapAlert()->makeAlert('warning', 'Please do not click renew twice—renewals can take up to a minute.<br/>For help, <a href="https://www.lib.uchicago.edu/about/directory/?view=department&query=circulation">Call us</a> or use our <a href="https://www.lib.uchicago.edu/borrow/borrowing/contact-circulation/">online form</a> and Library staff will help you.', $style); ?>
 
       <form name="renewals" action="<?=$this->url('myresearch-home')?>" method="post" id="renewals">
         <div class="toolbar">
