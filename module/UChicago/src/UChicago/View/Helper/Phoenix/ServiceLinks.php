@@ -198,6 +198,7 @@ class ServiceLinks extends AbstractHelper {
                                   'LawRR',
                                   'LawStor',
                                   'LawSupr',
+                                  'Mansueto',
                                   'PerBio',
                                   'PerPhy',
                                   'RR',
@@ -267,7 +268,6 @@ class ServiceLinks extends AbstractHelper {
                                   'INPROCESS',
                                   'INPROCESS-CRERAR',
                                   'INPROCESS-LAW',
-                                  'INPROCESS-MANSUETO',
                                   'INPROCESS-REGENSTEIN',
                                   'INTRANSIT',
                                   'INTRANSIT-FOR-HOLD',
@@ -286,7 +286,6 @@ class ServiceLinks extends AbstractHelper {
                                   'INPROCESS',
                                   'INPROCESS-CRERAR',
                                   'INPROCESS-LAW',
-                                  'INPROCESS-MANSUETO',
                                   'INPROCESS-REGENSTEIN',
                                   'INTRANSIT',
                                   'INTRANSIT-FOR-HOLD',
@@ -304,7 +303,6 @@ class ServiceLinks extends AbstractHelper {
                                   'INPROCESS',
                                   'INPROCESS-CRERAR',
                                   'INPROCESS-LAW',
-                                  'INPROCESS-MANSUETO',
                                   'INPROCESS-REGENSTEIN',
                                   'INTRANSIT',
                                   'INTRANSIT-FOR-HOLD',
@@ -322,6 +320,7 @@ class ServiceLinks extends AbstractHelper {
                         'scanAndDeliver' =>
                             array('AVAILABLE',
                                   'AVAILABLE-AT-MANSUETO',
+                                  'INPROCESS-MANSUETO',
                                   'RECENTLY-RETURNED'),
                         'dllStorage' =>
                             array('AVAILABLE',
@@ -334,6 +333,7 @@ class ServiceLinks extends AbstractHelper {
                                   'AVAILABLE',
                                   'DECLARED-LOST',
                                   'FLAGGED-FOR-RESERVE',
+                                  'INPROCESS-MANSUETO',
                                   'INTRANSITFORHOLD', //temp
                                   'LOST',
                                   'MISSING',
