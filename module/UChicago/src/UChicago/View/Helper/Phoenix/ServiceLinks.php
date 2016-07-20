@@ -163,6 +163,8 @@ class ServiceLinks extends AbstractHelper {
                                   'SSAdX',
                                   'W',
                                   'WCJK'),
+                        'inProcessAtMansueto' =>
+                            array('SciASR'),
                         'scanAndDeliver' => 
                             array('ArtResA',
                                   'CJK',
@@ -317,6 +319,8 @@ class ServiceLinks extends AbstractHelper {
                         'cantFindIt' =>
                             array('AVAILABLE',
                                   'RECENTLY-RETURNED'),
+                        'inProcessAtMansueto' =>
+                            array('INPROCESS-MANSUETO'),
                         'scanAndDeliver' =>
                             array('AVAILABLE',
                                   'AVAILABLE-AT-MANSUETO',
@@ -516,6 +520,25 @@ class ServiceLinks extends AbstractHelper {
         $displayText = 'GetIt';
         if (($serviceLink) and in_array($row['status'], $this->lookupStatus['getIt'])) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+    }
+
+    /**
+     * Method creates a link to the special Crerar form 
+     * for items INPROCESS-MANSUETO.
+     *
+     * @param row, array of holdings and item information 
+     *        	
+     * @return html string
+     */
+    public function inProcessAtMansueto($row) {
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/cant-find-it-crerar.php?barcode=' . $row['barcode'] . '&amp;bib=' . $row['id'];
+        $serviceLink = $this->getLinkConfig('inProcessAtMansueto', $defaultUrl);
+        $displayText = 'Can\'t find it?';
+        $shelvingLocations = array_map('strtolower', $this->lookupLocation['inProcessAtMansueto']);
+        if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['inProcessAtMansueto'])) and 
+            (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
 

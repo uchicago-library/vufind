@@ -171,11 +171,12 @@
                   <span>Loan period: <?=$row['itemTypeName']?>&nbsp;</span>
                <?endif;?>
 
-               <span class="text-success"><?=$this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'AVAILABLE' : $row['status'])?><link property="availability" href="http://schema.org/InStock" /></span>
+               <span class="text-success"><?=$this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'Available' : $row['status_name'])?><link property="availability" href="http://schema.org/InStock" /></span>
                <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                <?=$this->ServiceLinks()->asr($row)?>
                <?=$this->ServiceLinks()->dllStorage($row)?>
                <?=$this->ServiceLinks()->cantFindIt($row)?>
+               <?=$this->ServiceLinks()->inProcessAtMansueto($row)?>
                <?=$this->ServiceLinks()->debugging($row)?>
               <? if (isset($row['link']) && $row['link']): ?>
                 <!--<a style="display:inline-block" class="<?//=$check ? 'checkRequest ' : ''?>inlineblock modal-link placehold" href="<?//=$this->recordLink()->getRequestUrl($row['link'])?>" title="<?//=$this->transEsc($check ? "Check Hold" : "Place a Hold")?>"><i class="fa fa-flag"></i>&nbsp;<?//=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>-->
@@ -193,7 +194,7 @@
                  <? $c = array_shift(explode(' ', $this->driver->getCallNumber())); ?>
                  <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc">consult the series record</a>.
               <? else: ?>
-              <span class="text-danger"><?=$this->transEsc($row['status'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
+              <span class="text-danger"><?=$this->transEsc($row['status_name'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
               <? if (isset($row['returnDate']) && $row['returnDate']): ?>&ndash; <span class="small"><?=$this->escapeHtml($row['returnDate'])?></span><? endif; ?>
               <? if (isset($row['duedate']) && $row['duedate']): ?>
                 <?/*Only display duedates for loaned items*/?>
