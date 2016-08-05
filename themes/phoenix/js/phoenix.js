@@ -1,4 +1,24 @@
+function getAlert(){
+    var api = 'https://www.lib.uchicago.edu/api/v1/pages/?type=alerts.AlertPage&fields=title,banner_message,more_info,alert_level,url&format=json';
+    json = $.getJSON(api, function(data) {
+        var pages = data.pages;
+        $.each(pages, function(key){
+            var page = pages[key];
+            var level = page.alert_level;
+            var msg = page.banner_message;
+            var url = page.url;
+            var html = '';
+            if (level == 'alert-high') {
+                html += '<div id="alert" class="container">' + msg +' | <a href="' + url + '">More info...</a></div>';
+                $('.container.navbar').before(html);
+                return false;
+            }
+        }); 
+    });
+}
 $(document).ready(function() {
+    getAlert();
+
     /*** Brief View / Detailed View Toggle***/
     var upd = '&upd=123456';
     //set a cookie for brief/detailed view toggle, uses jquery.cookie.js
