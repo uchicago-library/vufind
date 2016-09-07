@@ -49,7 +49,12 @@ class FeedbackController extends \VuFind\Controller\FeedbackController
     /**
      * A special ID for the Knowledge Tracker form.
      */
-    public $abineguid; 
+    public $abineguid;
+
+     /**
+     * Thank you page for sending users upon success.
+     */
+    public $successPage; 
    
 
     /**
@@ -100,9 +105,11 @@ class FeedbackController extends \VuFind\Controller\FeedbackController
         $libId = $config['KnowledgeTracker']['library_id'];
         $formUrl = $config['KnowledgeTracker']['form_url'];
         $abineguid = $config['KnowledgeTracker']['abineguid'];
+        $successPage = $config['KnowledgeTracker']['success_page'];
 
         // Create the view
-        return $this->createViewModel(array('pageUrl' => $this->getPageUrl(), 'refUrl' => $this->getRefUrl(), 'libId' => $libId, 'formUrl' => $formUrl, 'abineguid' => $abineguid ));
+        return $this->createViewModel(array('pageUrl' => $this->getPageUrl(), 'refUrl' => $this->getRefUrl(), 'libId' => $libId, 
+            'formUrl' => $formUrl, 'abineguid' => $abineguid, 'successPage' => $successPage ));
     }
 
 

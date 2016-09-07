@@ -11,6 +11,7 @@
   <input type="hidden" id="feedbackFailure" value="<?=$this->transEsc("An error has occurred")?>"/>
   <input type="hidden" id="pageUrl" name="page_url" value="<?=$this->pageUrl?>" readonly >
   <input type="hidden" id="refUrl" name="referring_page" value="<?=$this->refUrl?>" readonly >
+  <input type="hidden" value="<?=$this->successPage?>" name="form_custom_webform_redirect">
   <div class="form-group">
     <label for="tasks"><?=$this->transEsc("Please briefly describe the types of tasks you attempted to complete with the Library Catalog")?></label>
       <textarea id="tasks" class="form-control" name="tasks" placeholder="Examples: search for a book by title; look for works by an author."></textarea>
