@@ -38,13 +38,32 @@ $(document).ready(function() {
 	};
 	
 	/* Uncomment the lines below to test event logging. */
-	function catalogevent(a, b, c, d) {
+	function catalogevent(a, b, c, d, hitcallback) {
 	    //var s = '/vufind/themes/phoenix/js/empty.js?analyticstest=on&event=' + c + '&label=' + d;
 	    //var s = 'https://www.lib.uchicago.edu/e/jej/empty.js?analyticstest=on&event=' + c + '&label=' + d;
 	    //$('head').append("<script src='" + s + "' type='text/javascript'></script>");
-	    ga(a, b, c, d);
+        if (hitcallback) {
+	        ga(a, b, c, d, {
+                "hitCallback": hitcallback
+            })
+        } else {
+	        ga(a, b, c, d);
+        }
 	}
-	
+
+    function cataloglinkclick(a, b, c, d, link, e) {
+        var target = $(link).attr('target');
+        if (target == '_blank') { /* Opening a new window? Just send the event. */
+    	    catalogevent(a, b, c, d);
+        } else { /* Otherwise register a hit callback. */
+            e.preventDefault();
+            var href = $(link).attr('href');
+            catalogevent(a, b, c, d, function() {
+                window.location = href;
+            });
+        }
+    }
+
     var q = 'https://www.lib.uchicago.edu/cgi-bin/subnetclass?jsoncallback=?';
     $.getJSON(q, function(data) {
 
@@ -297,8 +316,6 @@ $(document).ready(function() {
                 return;
             }
 
-	        e.preventDefault();
-
             /* Make sure we're dealing with an <a> element. */
             var link = e.target;
             if (!$(link).is('a')) {
@@ -313,21 +330,10 @@ $(document).ready(function() {
             }
 
 	        if ($(link).text().indexOf('more') == 0) {
-	    	    catalogevent('send', 'event', 'moreFacets', f);
+	    	    cataloglinkclick('send', 'event', 'moreFacets', f, $(this), e);
 	        } else {
-	    	    catalogevent('send', 'event', 'selectFacet', f);
+	    	    cataloglinkclick('send', 'event', 'selectFacet', f, $(this), e);
 	        }
-	
-	        /* Short delay for analytics. */
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
 	    });
 
 		/* User submits the year of publication form. */
@@ -347,22 +353,8 @@ $(document).ready(function() {
 	
 	    /* User removes a facet. */
 	    $('ul.filters a.list-group-item').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
 	        var facetType = $(this).text().split(':')[0].trim();
-	        catalogevent('send', 'event', 'deleteFacet', facetType);
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+	        cataloglinkclick('send', 'event', 'deleteFacet', facetType, $(this), e);
 	    });
 	
 		/* Will send 'Relevance', 'Date Descending', 'Date Ascending', etc. */
@@ -404,65 +396,23 @@ $(document).ready(function() {
 	
 		/* User switches to brief view. */
 		$('a.bv').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
-			catalogevent('send', 'event', 'changeResultsView', 'toBriefView');
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+			cataloglinkclick('send', 'event', 'changeResultsView', 'toBriefView', $(this), e);
 		});
 	
 		/* User switches to detailed view. */
 		$('a.dv').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
-			catalogevent('send', 'event', 'changeResultsView', 'toDetailedView');
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+			cataloglinkclick('send', 'event', 'changeResultsView', 'toDetailedView', $(this), e);
 		});
 		
 		/* User clicks a link to go to a different result page. */
 		$('ul.pagination a[href]').on('click touchstart', function(e) {
-	        e.preventDefault();
-
 			// extract the page number from the href. 
+            var page = 1;
 			var m = /page=([0-9]+)/.exec($(this).attr('href'));
 			if (m !== null && m.length > 0) {
-				catalogevent('send', 'event', 'goToResultPage', m[1]); 
-            } else {
-				catalogevent('send', 'event', 'goToResultPage', 1);
+                page = m[1];
             }
-
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+	    	cataloglinkclick('send', 'event', 'goToResultPage', page, $(this), e);
 		});
 	
 		/* User clicked a result on the search result page- either the
@@ -474,22 +424,8 @@ $(document).ready(function() {
             if (result.attr('id') == undefined) {
                 return;
             } else {
-	            e.preventDefault();
-	
 			    var n = parseInt(result.attr('id').replace('result', '')) + 1;
-			    catalogevent('send', 'event', 'resultNumber', n);
-	
-	            /* Short delay for analytics. */
-	            var link = this;
-	            setTimeout(function() {
-                    var target = $(link).attr('target');
-                    var href = $(link).attr('href');
-                    if ($.trim(target).length > 0) {
-                        window.open(href, target);
-                    } else {
-                        window.location = href;
-                    }
-	            }, 100);
+			    cataloglinkclick('send', 'event', 'resultNumber', n, $(this), e);
             }
 		});
 	
@@ -500,38 +436,23 @@ $(document).ready(function() {
 		/* User clicks next or previous links in full record view. */
 		$('ul.pager-phoenix a[href]').on('click touchstart', function(e) {
             /* There are three links in the pager- prev, next, and
-             * number of results. Only log an event for the prev and next links. 
+             * number of results. 
              */
-            if ($(this).attr('href').indexOf('/vufind/Record') == -1) {
-                return;
-            }
-
             var text = '';
-            if ($(this).text().indexOf('Prev') > -1) {
-                text = 'Prev';
-            } else if ($(this).text().indexOf('Next') > -1) {
-                text = 'Next';
+            if ($(this).attr('href').indexOf('/vufind/Search/Results') > -1) {
+                text = 'backToResults';
+            } else {
+                if ($(this).text().indexOf('Prev') > -1) {
+                    text = 'Prev';
+                } else if ($(this).text().indexOf('Next') > -1) {
+                    text = 'Next';
+                }
             }
-    
             if (text == '') {
                 return;
             }
 
-	        e.preventDefault();
-
-			catalogevent('send', 'event', 'nextOrPrevious', text);
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+            cataloglinkclick('send', 'event', 'nextOrPrevious', text, $(this), e);
 		});
 	
 		/* User clicks toolbar link. */
@@ -589,110 +510,58 @@ $(document).ready(function() {
 
 			/* check to be sure this link is going to a browse. */
 			if ($(this).attr('href').indexOf('source=') !== -1 && $(this).attr('href').indexOf('from=') !== -1) {
-	            e.preventDefault();
-	
 				/* will send something like 'author' or 'topic'. */
 				var m = /source=([a-z]+)/.exec($(this).attr('href'));
 				if (m.length > 0) {
-					catalogevent('send', 'event', 'linkedField', m[1]);
+					cataloglinkclick('send', 'event', 'linkedField', m[1], $(this), e);
 				}
-	
-	            /* Short delay for analytics. */
-	            var link = this;
-	            setTimeout(function() {
-                    var target = $(link).attr('target');
-                    var href = $(link).attr('href');
-                    if ($.trim(target).length > 0) {
-                        window.open(href, target);
-                    } else {
-                        window.location = href;
-                    }
-	            }, 100);
 			}
 		});
 	
 		/* User switches tabs. */
 		$('ul.recordTabs a[href]').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
-			catalogevent('send', 'event', 'changeFullRecordTab', $(this).text());
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+			cataloglinkclick('send', 'event', 'changeFullRecordTab', $(this).text(), $(this), e);
 		});
 	
 	    /* User clicks a borrowing service, like borrow direct, uborrow, or
 	     * recall. */
 	    $('a.service').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
 	        var t = $(this).text();
-			catalogevent('send', 'event', 'borrowingService', t);
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+			cataloglinkclick('send', 'event', 'borrowingService', t, $(this), e);
 	    });
 	
 	    /* User clicks to browse the shelves. */
 	    $('a.ablink').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
-			catalogevent('send', 'event', 'browseShelves', 'browseShelves');
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+			cataloglinkclick('send', 'event', 'browseShelves', 'browseShelves', $(this), e);
 	    });
 	
 		/* User clicks a "similar item" */
 		$('ul.similar a[href]').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
-			catalogevent('send', 'event', 'similarItems', 'click');
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+			cataloglinkclick('send', 'event', 'similarItems', 'click', $(this), e);
 		});
+
+	    /* User clicks "more subjects" link. */
+	    $('a.subjectsToggle').on('click touchstart', function() {
+	        /* link opens via javascript, no need for a delay. */
+			catalogevent('send', 'event', 'moreSubjects', 'moreSubjects');
+	    });
+
+	    /* User clicks "more details" link. */
+	    $('a.bibToggle').on('click touchstart', function() {
+	        /* link opens via javascript, no need for a delay. */
+			catalogevent('send', 'event', 'moreDetails', 'moreDetails');
+	    });
 	
 	    /* User clicks "view availability" for serial holdings. */
 	    $('a.summaryToggle').on('click touchstart', function() {
-			catalogevent('send', 'event', 'viewSerialHoldings', 'viewSerialHoldings');
 	        /* link opens via javascript, no need for a delay. */
+			catalogevent('send', 'event', 'viewSerialHoldings', 'viewSerialHoldings');
+	    });
+
+	    /* User clicks "view more items" for serial holdings. */
+	    $('a.itemsToggle').on('click touchstart', function() {
+	        /* link opens via javascript, no need for a delay. */
+			catalogevent('send', 'event', 'viewMoreItems', 'viewMoreItems');
 	    });
 	
 		/**************************************** 
@@ -700,22 +569,8 @@ $(document).ready(function() {
 		 ****************************************/
 	
 	    $('ul.top-tabs a[href]').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
 	        var t = $(e.target).text();
-	        catalogevent('send', 'event', 'headerLink', t);
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+	        cataloglinkclick('send', 'event', 'headerLink', t, $(this), e);
 	    });
 	
         /*Only affects logout link currently, but this would affect general links inside #header-collapse*/
@@ -725,22 +580,8 @@ $(document).ready(function() {
 	            return;
 	        }
             	
-	        e.preventDefault();
-	
 	        var t = $(e.target).text();
-	        catalogevent('send', 'event', 'headerLink', t);
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+	        cataloglinkclick('send', 'event', 'headerLink', t, $(this), e);
 	    });
 
 		$('#header-collapse .modal-link').on('click touchstart', function(e) {
@@ -754,8 +595,6 @@ $(document).ready(function() {
 		
 		/* User clicks contextual help. */
 		$('a[title="Help"]').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
 			var c = '';
             if ($('ul#homepageNavTabs li:first').hasClass('active')) {
                 if ($('#advSearchForm').hasClass('basicSearch')) {
@@ -774,46 +613,17 @@ $(document).ready(function() {
 			} else if (window.location.href.toUpperCase().indexOf('/VUFIND/MYRESEARCH/') > -1) {
 				c = 'My Account';
 			}
-			catalogevent('send', 'event', 'contextualHelp', c);
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+			cataloglinkclick('send', 'event', 'contextualHelp', c, $(this), e);
 		});
-	
+
 		/* User clicks the Hathi Trust preview link. */
 		$('a.eLink.hathi').on('click touchstart', function(e) {
-            // removed timeout because it was buggy on Safari-
-            // the link would appear broken. Clicking it wouldn't
-            // do anything.
-			catalogevent('send', 'event', 'preview', 'Hathi Trust');
+		    cataloglinkclick('send', 'event', 'preview', 'Hathi Trust', $(this), e);
 		});
 	
 		/* User clicks the Google Book preview link. */
 		$('a.previewGBS').on('click touchstart', function(e) {
-	        e.preventDefault();
-	
-			catalogevent('send', 'event', 'preview', 'Google');
-	
-	        /* Short delay for analytics. */
-	        var link = this;
-	        setTimeout(function() {
-                var target = $(link).attr('target');
-                var href = $(link).attr('href');
-                if ($.trim(target).length > 0) {
-                    window.open(href, target);
-                } else {
-                    window.location = href;
-                }
-	        }, 100);
+            cataloglinkclick('send', 'event', 'preview', 'Google', $(this), e);
 		});
 	
 		/**************************************** 
@@ -830,19 +640,15 @@ $(document).ready(function() {
 	        $('.openurls a[href]:not(.clickEventBound)').each(function() {
 	            $(this).addClass('clickEventBound');
 	            $(this).on('click touchstart', function(e) {
-	                e.preventDefault();
-	
+                    /* Get the text of the link. "Find It!" button links
+                     * have no text. If the user clicked one of those
+                     * buttons set the "text" of the link here.
+                     */
 	                var t = $(e.target).text();
-		            catalogevent('send', 'event', 'SFXLink', t);
-	
-	                var link = this;
-                    var target = $(link).attr('target');
-                    var href = $(link).attr('href');
-                    if ($.trim(target).length > 0) {
-                        window.open(href, target);
-                    } else {
-                        window.location = href;
+                    if (t == '' && $(this).find('img.findit')) {	
+                        t = 'Find It!';
                     }
+                    cataloglinkclick('send', 'event', 'SFXLink', t, $(this), e);
 	            });
 	        });
 	    }, 250);

@@ -480,12 +480,6 @@ $(document).ready(function() {
             '?r=' +
             encodeURIComponent(window.location)
         );
-
-    /*Required for opening new tabs in Safari*/
-    $('a.service, a.external').click(function() {
-        window.open(url,'_blank');
-    });
-
 });
 
 /**
