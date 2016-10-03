@@ -57,7 +57,7 @@ $(document).ready(function() {
     	    catalogevent(a, b, c, d);
         } else { /* Otherwise register a hit callback. */
             e.preventDefault();
-            var href = $(link).attr('href');
+            var href = $(link).find('a').addBack('a').attr('href');
             catalogevent(a, b, c, d, function() {
                 window.location = href;
             });
