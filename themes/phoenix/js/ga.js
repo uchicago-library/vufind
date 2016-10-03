@@ -56,11 +56,13 @@ $(document).ready(function() {
         if (target == '_blank') { /* Opening a new window? Just send the event. */
     	    catalogevent(a, b, c, d);
         } else { /* Otherwise register a hit callback. */
-            e.preventDefault();
-            var href = $(link).find('a').addBack('a').attr('href');
-            catalogevent(a, b, c, d, function() {
-                window.location = href;
-            });
+            var href = $(link).attr('href');
+            if (href) {
+                e.preventDefault();
+                catalogevent(a, b, c, d, function() {
+                    window.location = href;
+                });
+            }
         }
     }
 
@@ -310,15 +312,17 @@ $(document).ready(function() {
 	    }
 	
 		/* User clicked a facet. */
-        $('ul.facet li:not(.title), ul.facet a.list-group-item:not(.active)').on('click touchstart', function(e) {
+        $('ul.facet a').on('click touchstart', function(e) {
             /* Skip the facet containing the year of publication slider. */
             if ($(this).find('form#publishDateFilter').length > 0) {
                 return;
             }
 
-            /* Make sure we're dealing with an <a> element. */
-            var link = e.target;
-            if (!$(link).is('a')) {
+            /* If the user clicked the "x" to exclude a facet, the
+             * target would have been an <i> element. In that case, go up in the
+             * element hierarchy to get to the actual anchor. */
+            var link = $(this);
+            if ($(link).is('i')) {
                 link = $(link).parents('a').eq(0);
             }
 	
@@ -330,9 +334,9 @@ $(document).ready(function() {
             }
 
 	        if ($(link).text().indexOf('more') == 0) {
-	    	    cataloglinkclick('send', 'event', 'moreFacets', f, $(this), e);
+	    	    cataloglinkclick('send', 'event', 'moreFacets', f, $(link), e);
 	        } else {
-	    	    cataloglinkclick('send', 'event', 'selectFacet', f, $(this), e);
+	    	    cataloglinkclick('send', 'event', 'selectFacet', f, $(link), e);
 	        }
 	    });
 
