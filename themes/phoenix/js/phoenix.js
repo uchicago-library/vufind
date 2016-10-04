@@ -166,7 +166,6 @@ $(document).ready(function() {
         // Loop over items
         var i = 1;
         $(this).find('.topic').each(function(){
-            console.log(i);
             if (i == displayNum) {
                 $(this).addClass('subjectToggleTarget');
             }

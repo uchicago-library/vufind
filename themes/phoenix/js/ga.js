@@ -42,26 +42,32 @@ $(document).ready(function() {
 	    //var s = '/vufind/themes/phoenix/js/empty.js?analyticstest=on&event=' + c + '&label=' + d;
 	    //var s = 'https://www.lib.uchicago.edu/e/jej/empty.js?analyticstest=on&event=' + c + '&label=' + d;
 	    //$('head').append("<script src='" + s + "' type='text/javascript'></script>");
-        if (hitcallback) {
-	        ga(a, b, c, d, {
-                "hitCallback": hitcallback
-            })
-        } else {
-	        ga(a, b, c, d);
+        /* Be sure Google Analytics is present before continuing. */
+        if (window.ga && ga.create) {
+            if (hitcallback) {
+	            ga(a, b, c, d, {
+                    "hitCallback": hitcallback
+                })
+            } else {
+	            ga(a, b, c, d);
+            }
         }
 	}
 
     function cataloglinkclick(a, b, c, d, link, e) {
-        var target = $(link).attr('target');
-        if (target == '_blank') { /* Opening a new window? Just send the event. */
-    	    catalogevent(a, b, c, d);
-        } else { /* Otherwise register a hit callback. */
-            var href = $(link).attr('href');
-            if (href) {
-                e.preventDefault();
-                catalogevent(a, b, c, d, function() {
-                    window.location = href;
-                });
+        /* Be sure Google Analytics is present before continuing. */
+        if (window.ga && ga.create) {
+            var target = $(link).attr('target');
+            if (target == '_blank') { /* Opening a new window? Just send the event. */
+    	        catalogevent(a, b, c, d);
+            } else { /* Otherwise register a hit callback. */
+                var href = $(link).attr('href');
+                if (href) {
+                    e.preventDefault();
+                    catalogevent(a, b, c, d, function() {
+                        window.location = href;
+                    });
+                }
             }
         }
     }
