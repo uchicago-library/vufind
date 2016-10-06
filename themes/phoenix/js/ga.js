@@ -318,7 +318,7 @@ $(document).ready(function() {
 	    }
 	
 		/* User clicked a facet. */
-        $('ul.facet a').on('click touchstart', function(e) {
+        $('ul.facet a').on('click', function(e) {
             /* Skip the facet containing the year of publication slider. */
             if ($(this).find('form#publishDateFilter').length > 0) {
                 return;
@@ -362,7 +362,7 @@ $(document).ready(function() {
         });
 	
 	    /* User removes a facet. */
-	    $('ul.filters a.list-group-item').on('click touchstart', function(e) {
+	    $('ul.filters a.list-group-item').on('click', function(e) {
 	        var facetType = $(this).text().split(':')[0].trim();
 	        cataloglinkclick('send', 'event', 'deleteFacet', facetType, $(this), e);
 	    });
@@ -405,17 +405,17 @@ $(document).ready(function() {
 	    }
 	
 		/* User switches to brief view. */
-		$('a.bv').on('click touchstart', function(e) {
+		$('a.bv').on('click', function(e) {
 			cataloglinkclick('send', 'event', 'changeResultsView', 'toBriefView', $(this), e);
 		});
 	
 		/* User switches to detailed view. */
-		$('a.dv').on('click touchstart', function(e) {
+		$('a.dv').on('click', function(e) {
 			cataloglinkclick('send', 'event', 'changeResultsView', 'toDetailedView', $(this), e);
 		});
 		
 		/* User clicks a link to go to a different result page. */
-		$('ul.pagination a[href]').on('click touchstart', function(e) {
+		$('ul.pagination a[href]').on('click', function(e) {
 			// extract the page number from the href. 
             var page = 1;
 			var m = /page=([0-9]+)/.exec($(this).attr('href'));
@@ -427,7 +427,7 @@ $(document).ready(function() {
 	
 		/* User clicked a result on the search result page- either the
          * thumbnail or the title itself. Which result did they click? */
-		$('div.template-dir-search.template-name-results .ajaxItem a:has("img.recordcover"), div.template-dir-search.template-name-results .ajaxItem a.title').on('click touchstart', function(e) {
+		$('div.template-dir-search.template-name-results .ajaxItem a:has("img.recordcover"), div.template-dir-search.template-name-results .ajaxItem a.title').on('click', function(e) {
             var result = $(this).parents('div.result').eq(0);
 
             /* In a saved list, the id will be undefined. Skip those. */
@@ -444,7 +444,7 @@ $(document).ready(function() {
 		 ****************************************/
 	
 		/* User clicks next or previous links in full record view. */
-		$('ul.pager-phoenix a[href]').on('click touchstart', function(e) {
+		$('ul.pager-phoenix a[href]').on('click', function(e) {
             /* There are three links in the pager- prev, next, and
              * number of results. 
              */
@@ -466,7 +466,7 @@ $(document).ready(function() {
 		});
 	
 		/* User clicks toolbar link. */
-		$('div.main ul.nav:not(.recordTabs) a[href]').on('click touchstart', function(e) {
+		$('div.main ul.nav:not(.recordTabs) a[href]').on('click', function(e) {
             /* Skip homepage tabs. */
             if ($(this).parents('.template-dir-search.template-name-advanced').length > 0) {
                 return;
@@ -512,7 +512,7 @@ $(document).ready(function() {
 	    }, 250);
 	
 		/* User clicks linked fields in full record view. */
-		$('.record table a[href]').on('click touchstart', function(e) {
+		$('.record table a[href]').on('click', function(e) {
             /* Skip the "Add Tag" link. */
             if ($(this).attr('id') == 'tagRecord') {
                 return;
@@ -529,47 +529,47 @@ $(document).ready(function() {
 		});
 	
 		/* User switches tabs. */
-		$('ul.recordTabs a[href]').on('click touchstart', function(e) {
+		$('ul.recordTabs a[href]').on('click', function(e) {
 			cataloglinkclick('send', 'event', 'changeFullRecordTab', $(this).text(), $(this), e);
 		});
 	
 	    /* User clicks a borrowing service, like borrow direct, uborrow, or
 	     * recall. */
-	    $('a.service').on('click touchstart', function(e) {
+	    $('a.service').on('click', function(e) {
 	        var t = $(this).text();
 			cataloglinkclick('send', 'event', 'borrowingService', t, $(this), e);
 	    });
 	
 	    /* User clicks to browse the shelves. */
-	    $('a.ablink').on('click touchstart', function(e) {
+	    $('a.ablink').on('click', function(e) {
 			cataloglinkclick('send', 'event', 'browseShelves', 'browseShelves', $(this), e);
 	    });
 	
 		/* User clicks a "similar item" */
-		$('ul.similar a[href]').on('click touchstart', function(e) {
+		$('ul.similar a[href]').on('click', function(e) {
 			cataloglinkclick('send', 'event', 'similarItems', 'click', $(this), e);
 		});
 
 	    /* User clicks "more subjects" link. */
-	    $('a.subjectsToggle').on('click touchstart', function() {
+	    $('a.subjectsToggle').on('click', function() {
 	        /* link opens via javascript, no need for a delay. */
 			catalogevent('send', 'event', 'moreSubjects', 'moreSubjects');
 	    });
 
 	    /* User clicks "more details" link. */
-	    $('a.bibToggle').on('click touchstart', function() {
+	    $('a.bibToggle').on('click', function() {
 	        /* link opens via javascript, no need for a delay. */
 			catalogevent('send', 'event', 'moreDetails', 'moreDetails');
 	    });
 	
 	    /* User clicks "view availability" for serial holdings. */
-	    $('a.summaryToggle').on('click touchstart', function() {
+	    $('a.summaryToggle').on('click', function() {
 	        /* link opens via javascript, no need for a delay. */
 			catalogevent('send', 'event', 'viewSerialHoldings', 'viewSerialHoldings');
 	    });
 
 	    /* User clicks "view more items" for serial holdings. */
-	    $('a.itemsToggle').on('click touchstart', function() {
+	    $('a.itemsToggle').on('click', function() {
 	        /* link opens via javascript, no need for a delay. */
 			catalogevent('send', 'event', 'viewMoreItems', 'viewMoreItems');
 	    });
@@ -578,13 +578,13 @@ $(document).ready(function() {
 		 ************ HEADER LINKS **************
 		 ****************************************/
 	
-	    $('ul.top-tabs a[href]').on('click touchstart', function(e) {
+	    $('ul.top-tabs a[href]').on('click', function(e) {
 	        var t = $(e.target).text();
 	        cataloglinkclick('send', 'event', 'headerLink', t, $(this), e);
 	    });
 	
         /*Only affects logout link currently, but this would affect general links inside #header-collapse*/
-	    $('#header-collapse a[href]').on('click touchstart', function(e) {
+	    $('#header-collapse a[href]').on('click', function(e) {
 	        /* deal with the help and leave feedback (knowledge tracker) links separately. */
 	        if ($(e.target).attr('title') == 'Help' || $(e.target).attr('class') == 'modal-link') {
 	            return;
@@ -594,7 +594,7 @@ $(document).ready(function() {
 	        cataloglinkclick('send', 'event', 'headerLink', t, $(this), e);
 	    });
 
-		$('#header-collapse .modal-link').on('click touchstart', function(e) {
+		$('#header-collapse .modal-link').on('click', function(e) {
 	        var t = $(e.target).text().trim();
 	        catalogevent('send', 'event', 'headerLink', t);
         });
@@ -604,7 +604,7 @@ $(document).ready(function() {
 		 ****************************************/
 		
 		/* User clicks contextual help. */
-		$('a[title="Help"]').on('click touchstart', function(e) {
+		$('a[title="Help"]').on('click', function(e) {
 			var c = '';
             if ($('ul#homepageNavTabs li:first').hasClass('active')) {
                 if ($('#advSearchForm').hasClass('basicSearch')) {
@@ -627,12 +627,12 @@ $(document).ready(function() {
 		});
 
 		/* User clicks the Hathi Trust preview link. */
-		$('a.eLink.hathi').on('click touchstart', function(e) {
+		$('a.eLink.hathi').on('click', function(e) {
 		    cataloglinkclick('send', 'event', 'preview', 'Hathi Trust', $(this), e);
 		});
 	
 		/* User clicks the Google Book preview link. */
-		$('a.previewGBS').on('click touchstart', function(e) {
+		$('a.previewGBS').on('click', function(e) {
             cataloglinkclick('send', 'event', 'preview', 'Google', $(this), e);
 		});
 	
@@ -649,7 +649,7 @@ $(document).ready(function() {
 	    setInterval(function() {
 	        $('.openurls a[href]:not(.clickEventBound)').each(function() {
 	            $(this).addClass('clickEventBound');
-	            $(this).on('click touchstart', function(e) {
+	            $(this).on('click', function(e) {
                     /* Get the text of the link. "Find It!" button links
                      * have no text. If the user clicked one of those
                      * buttons set the "text" of the link here.
