@@ -1,14 +1,14 @@
 <?
     // Set up page title:
-    $this->headTitle($this->translate('My Holds'));
+    $this->headTitle($this->translate('Requested Items'));
 
     // Set up breadcrumbs:
-    $this->layout()->breadcrumbs = '<li><a href="' . $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') . '</a></li> <li class="active">' . $this->transEsc('My Holds') . '</li>';
+    $this->layout()->breadcrumbs = '<li><a href="' .  $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') .  '</a></li> <li class="active">' . $this->transEsc('Requested Items') . '</li>';
 ?>
 
 <div class="row">
   <div class="<?=$this->layoutClass('mainbody')?>">
-    <h2><?=$this->transEsc('Holds and Recalls') ?></h2>
+    <h2><?=$this->transEsc('Requested Items') ?></h2>
 
     <?=$this->flashmessages()?>
 
@@ -155,7 +155,7 @@
       </table>
       <? if ($this->cancelForm): ?></form><? endif; ?>
     <? else: ?>
-      <?=$this->transEsc('You do not have any holds or recalls placed') ?>.
+      <?=$this->transEsc('You have no outstanding requests') ?>.
     <? endif; ?>
   </div>
 
