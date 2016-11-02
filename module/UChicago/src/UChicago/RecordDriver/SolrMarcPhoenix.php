@@ -411,7 +411,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             array('label'  => 'Language/Script',
                   'values' => array('540|abcdu')),
             array('label'  => 'Provenance',
-                  'values' => array('541|abcdefhno', '561|a',)),
+                  'values' => array('541|abcdefhno', '561|a')),
             array('label'  => 'Notes',
                   'values' => array('500|a', '501|a', '502|a', '504|a', '506|abcdefu', '508|a', '510|abcux', '511|a', '513|ab', '514|abcdefghijkmuz', '515|a', '516|a', '518|adop3', '525|a', '530|abcdu', '533|abcdefmn', '534|abcefklmnptxz', '535|abcdg', '536|abcdefgh', '538|aiu', '544|abcden', '545|abu', '546|ab', '547|a', '550|a', '552|abcdefghijklmnopu', '562|abcde', '580|a', '583|abcdefhijklnouxz', '588|a', '598|a')),
             array('label'  => 'Summary',
