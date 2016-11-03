@@ -139,6 +139,31 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
         } 
     }
 
+
+    /**
+     * Analyzes MARC data for each selected grouping and decides weather 
+     * the information is displayable. This is only being used for 561 fields
+     * however it could be expanded to include other fields.
+     *
+     * @param array $data MARC info
+     *
+     * @return boolean 
+     */
+    private function displayable($data) {
+        $flag = true;
+        foreach($data as $d) {
+            if ($d['currentField'] == 561) {
+                if ($d['indicator1'] == "0") {
+                    $flag = false;
+                }
+                else {
+                    return true;
+                }
+            }
+        }
+        return $flag;
+    }
+
     /**
      * Main public function for returning marc data based on the part of the templates where executed
      * Uses all of the above support methods  
@@ -169,18 +194,20 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
                 }
                 /*Get everything else*/
                 else {
-                    echo '<tr>';
-                    echo '<th>';
-                        /*Print the html label*/
-                        foreach($marcData as $l){
-                            $label = $l['label'];
-                            if (!empty($label)) {
-                                echo $label;
-                                break;
+                    if ($this->displayable($marcData) == true) {
+                        echo '<tr>';
+                        echo '<th>';
+                            /*Print the html label*/
+                            foreach($marcData as $l){
+                                $label = $l['label'];
+                                if (!empty($label)) {
+                                    echo $label;
+                                    break;
+                                }
                             }
-                        }
-                    echo '</th>';
-                    echo '<td>';
+                        echo '</th>';
+                        echo '<td>';
+                    }
                         foreach($marcData as $data){
                             /*246: get special template*/
                             if (($data['currentField'] == 246)) {
