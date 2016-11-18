@@ -68,7 +68,7 @@ $config = array(
             'search_results' => array(// Fix file open instead of method call bug. Addresses out of memory error???
                 'abstract_factories' => array('VuFind\Search\Results\PluginFactory'),
                 'factories' => array(
-                    'solr' => ['VuFind\Search\Results\Factory', 'getSolr'],
+                    'solr' => array('VuFind\Search\Results\Factory', 'getSolr'),
                 ),
             ),//search_results 
         ),//plugin_managers
