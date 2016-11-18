@@ -65,6 +65,12 @@ $config = array(
                     'chicagotoc' => 'UChicago\RecordTab\Factory::getTOC',
                 ),  
             ),//recordtab
+            'search_results' => array(// Fix file open instead of method call bug. Addresses out of memory error???
+                'abstract_factories' => array('VuFind\Search\Results\PluginFactory'),
+                'factories' => array(
+                    'solr' => ['VuFind\Search\Results\Factory', 'getSolr'],
+                ),
+            ),//search_results 
         ),//plugin_managers
         // This section controls which tabs are used for which record driver classes.
         // Each sub-array is a map from a tab name (as used in a record URL) to a tab
