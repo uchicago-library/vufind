@@ -114,10 +114,7 @@ class SearchController extends \VuFind\Controller\SearchController
                     ->getId();
                 $history = $this->getTable('Search');
                 $history->saveSearch(
-                    $this->getResultsManager(), $results, $sessId,
-                    $history->getSearches(
-                        $sessId, isset($user->id) ? $user->id : null
-                    )
+                    $this->getResultsManager(), $results, $sessId, isset($user->id) ? $user->id : null
                 );
             }
 
