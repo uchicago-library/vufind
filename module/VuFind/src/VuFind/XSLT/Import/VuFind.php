@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Import_Tools
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/importing_records Wiki
+ * @link     https://vufind.org/wiki/indexing Wiki
  */
 namespace VuFind\XSLT\Import;
 use DOMDocument, VuFind\Config\Locator as ConfigLocator;
@@ -33,11 +33,11 @@ use DOMDocument, VuFind\Config\Locator as ConfigLocator;
  * they will be automatically made available to your XSL stylesheet for use
  * with the php:function() function.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Import_Tools
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/importing_records Wiki
+ * @link     https://vufind.org/wiki/indexing Wiki
  */
 class VuFind
 {
@@ -287,14 +287,14 @@ class VuFind
         $tika = $settings->Tika->path;
 
         // We need to use this method to get the output from STDOUT into the file
-        $descriptorspec = array(
-            0 => array('pipe', 'r'),
-            1 => array('file', $output, 'w'),
-            2 => array('pipe', 'w')
-        );
-        return array(
-            "java -jar $tika $arg -eUTF8 $input", $descriptorspec, array()
-        );
+        $descriptorspec = [
+            0 => ['pipe', 'r'],
+            1 => ['file', $output, 'w'],
+            2 => ['pipe', 'w']
+        ];
+        return [
+            "java -jar $tika $arg -eUTF8 $input", $descriptorspec, []
+        ];
     }
 
     /**
@@ -342,7 +342,7 @@ class VuFind
         // Load the translation map and send back the appropriate value.  Note
         // that PHP's parse_ini_file() function is not compatible with SolrMarc's
         // style of properties map, so we are parsing this manually.
-        $map = array();
+        $map = [];
         $mapFile
             = ConfigLocator::getConfigPath($filename, 'import/translation_maps');
         foreach (file($mapFile) as $line) {
@@ -364,9 +364,11 @@ class VuFind
      */
     public static function stripArticles($in)
     {
-        static $articles = array('a', 'an', 'the');
+        static $articles = ['a', 'an', 'the'];
 
-        $text = strtolower(trim($in));
+        $text = is_callable('mb_strtolower')
+            ? mb_strtolower(trim($in), 'UTF-8')
+            : strtolower(trim($in));
 
         foreach ($articles as $a) {
             if (substr($text, 0, strlen($a) + 1) == ($a . ' ')) {
@@ -390,7 +392,7 @@ class VuFind
     {
         // Ensure that $in is an array:
         if (!is_array($in)) {
-            $in = array($in);
+            $in = [$in];
         }
 
         // Start building return value:
@@ -424,7 +426,7 @@ class VuFind
     {
         // Ensure that $in is an array:
         if (!is_array($in)) {
-            $in = array($in);
+            $in = [$in];
         }
 
         foreach ($in as $current) {

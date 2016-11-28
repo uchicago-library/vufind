@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\Integration\View\Helper\Root;
 use VuFind\View\Helper\Root\ResultFeed;
@@ -31,11 +31,11 @@ use VuFind\View\Helper\Root\ResultFeed;
 /**
  * ResultFeed Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class ResultFeedTest extends \VuFindTest\Unit\ViewHelperTestCase
 {
@@ -64,11 +64,12 @@ class ResultFeedTest extends \VuFindTest\Unit\ViewHelperTestCase
             ->will($this->returnValue('/test/path'));
 
         $recordLink = $this->getMock(
-            'VuFind\View\Helper\Root\RecordLink', array(),
-            array(new \VuFind\Record\Router(
+            'VuFind\View\Helper\Root\RecordLink', [],
+            [new \VuFind\Record\Router(
                 $this->getServiceManager()->get('VuFind\RecordLoader'),
-                new \Zend\Config\Config(array()))
+                new \Zend\Config\Config([])
             )
+            ]
         );
         $recordLink->expects($this->any())->method('getUrl')
             ->will($this->returnValue('test/url'));
@@ -77,11 +78,11 @@ class ResultFeedTest extends \VuFindTest\Unit\ViewHelperTestCase
         $serverUrl->expects($this->any())->method('__invoke')
             ->will($this->returnValue('http://server/url'));
 
-        return array(
+        return [
             'currentpath' => $currentPath,
             'recordlink' => $recordLink,
             'serverurl' => $serverUrl
-        );
+        ];
     }
 
     /**
@@ -106,10 +107,6 @@ class ResultFeedTest extends \VuFindTest\Unit\ViewHelperTestCase
 
         $helper = new ResultFeed();
         $helper->setView($this->getPhpRenderer($this->getPlugins()));
-        $mockTranslator = function ($str) {
-            return $str;
-        };
-        $helper->setTranslatorHelper($mockTranslator);
         $feed = $helper->__invoke($results, '/test/path');
         $this->assertTrue(is_object($feed));
         $rss = $feed->export('rss');
@@ -123,17 +120,17 @@ class ResultFeedTest extends \VuFindTest\Unit\ViewHelperTestCase
         // Now re-parse it and check for some expected values:
         $parsedFeed = \Zend\Feed\Reader\Reader::importString($rss);
         $this->assertEquals(
-            $parsedFeed->getDescription(),
-            'Displaying the top 2 search results of 2 found'
+            'Showing 1-2 of 2', $parsedFeed->getDescription()
         );
-        $items = array();
+        $items = [];
         $i = 0;
         foreach ($parsedFeed as $item) {
             $items[$i++] = $item;
         }
         $this->assertEquals(
-            $items[1]->getTitle(), 'Journal of rational emotive therapy : '
-            . 'the journal of the Institute for Rational-Emotive Therapy.'
+            'Journal of rational emotive therapy : '
+            . 'the journal of the Institute for Rational-Emotive Therapy.',
+            $items[1]->getTitle()
         );
     }
 }

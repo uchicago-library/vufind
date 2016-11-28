@@ -18,15 +18,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindSearch\Backend\Solr;
 
@@ -36,13 +36,13 @@ namespace VuFindSearch\Backend\Solr;
  * The SearchHandler implements the rule-based translation of a user search
  * query to a SOLR query string.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class SearchHandler
 {
@@ -51,17 +51,17 @@ class SearchHandler
      *
      * @var array
      */
-    protected static $configKeys = array(
+    protected static $configKeys = [
         'CustomMunge', 'DismaxFields', 'DismaxHandler', 'QueryFields',
         'DismaxParams', 'FilterQuery'
-    );
+    ];
 
     /**
      * Known boolean operators.
      *
      * @var array
      */
-    protected static $booleanOperators = array('AND', 'OR', 'NOT');
+    protected static $booleanOperators = ['AND', 'OR', 'NOT'];
 
     /**
      * Search handler specification.
@@ -82,12 +82,14 @@ class SearchHandler
     public function __construct(array $spec, $defaultDismaxHandler = 'dismax')
     {
         foreach (self::$configKeys as $key) {
-            $this->specs[$key] = isset($spec[$key]) ? $spec[$key] : array();
+            $this->specs[$key] = isset($spec[$key]) ? $spec[$key] : [];
         }
         // Set dismax handler to default if not specified:
         if (empty($this->specs['DismaxHandler'])) {
             $this->specs['DismaxHandler'] = $defaultDismaxHandler;
         }
+        // Set default mm handler if necessary:
+        $this->setDefaultMustMatch();
     }
 
     /// Public API
@@ -132,7 +134,7 @@ class SearchHandler
      */
     public function createBoostQueryString($search)
     {
-        $boostQuery = array();
+        $boostQuery = [];
         if ($this->hasDismax()) {
             foreach ($this->getDismaxParams() as $param) {
                 list($name, $value) = $param;
@@ -219,7 +221,6 @@ class SearchHandler
      * Return the filter query.
      *
      * @return string
-     *
      */
     public function getFilterQuery()
     {
@@ -250,6 +251,44 @@ class SearchHandler
     /// Internal API
 
     /**
+     * Support method for constructor: if no mm is provided, set a reasonable
+     * default based on the selected Dismax handler.
+     *
+     * @return void
+     */
+    protected function setDefaultMustMatch()
+    {
+        // Initialize parameter array if absent:
+        if (!isset($this->specs['DismaxParams'])) {
+            $this->specs['DismaxParams'] = [];
+        }
+        // Add mm if applicable:
+        if ($this->hasDismax()) {
+            // Our default mm depends on whether we're using dismax or edismax;
+            // for dismax, we want 100% matches, because we always want to
+            // simulate "AND" behavior by default (any "OR" searches will get
+            // rerouted to Lucene queries). For edismax, boolean operators are
+            // accounted for, and with an mm of 100%, OR searches will always
+            // fail. We can use 0% here, because the default q.op of AND will
+            // make AND searches work correctly even without a high mm value.
+            $default = $this->hasExtendedDismax() ? '0%' : '100%';
+
+            // Now if the configuration has no explicit mm value, let's push in
+            // our default:
+            $foundSetting = false;
+            foreach ($this->specs['DismaxParams'] as $current) {
+                if ($current[0] == 'mm') {
+                    $foundSetting = true;
+                    break;
+                }
+            }
+            if (!$foundSetting) {
+                $this->specs['DismaxParams'][] = ['mm', $default];
+            }
+        }
+    }
+
+    /**
      * Return a Dismax subquery for specified search string.
      *
      * @param string $search Search string
@@ -258,7 +297,7 @@ class SearchHandler
      */
     protected function dismaxSubquery($search)
     {
-        $dismaxParams = array();
+        $dismaxParams = [];
         foreach ($this->specs['DismaxParams'] as $param) {
             $dismaxParams[] = sprintf(
                 "%s='%s'", $param[0], addcslashes($param[1], "'")
@@ -288,19 +327,19 @@ class SearchHandler
     {
         if ($tokenize) {
             $tokens = $this->tokenize($search);
-            $mungeValues = array(
+            $mungeValues = [
                 'onephrase' => sprintf(
                     '"%s"', str_replace('"', '', implode(' ', $tokens))
                 ),
                 'and' => implode(' AND ', $tokens),
                 'or'  => implode(' OR ', $tokens),
                 'identity' => $search,
-            );
+            ];
         } else {
-            $mungeValues = array(
+            $mungeValues = [
                 'and' => $search,
                 'or'  => $search,
-            );
+            ];
             // If we're skipping tokenization, we just want to pass $lookfor through
             // unmodified (it's probably an advanced search that won't benefit from
             // tokenization).  We'll just set all possible values to the same thing,
@@ -358,7 +397,6 @@ class SearchHandler
      * @param bool   $advanced Is the search an advanced search string?
      *
      * @return string
-     *
      */
     protected function createQueryString($search, $advanced = false)
     {
@@ -406,7 +444,7 @@ class SearchHandler
      */
     protected function munge(array $mungeRules, array $mungeValues, $joiner = 'OR')
     {
-        $clauses = array();
+        $clauses = [];
         foreach ($mungeRules as $field => $clausearray) {
             if (is_numeric($field)) {
                 // shift off the join string and weight
@@ -454,13 +492,19 @@ class SearchHandler
      */
     protected function tokenize($string)
     {
-        // Tokenize on spaces and quotes
-        $phrases = array();
-        preg_match_all('/"[^"]*"[~[0-9]+]*|"[^"]*"|[^ ]+/', $string, $phrases);
-        $phrases = $phrases[0];
+        // First replace escaped quotes with a non-printable character that will
+        // never be found in user input (ASCII 26, "substitute"). Next use a regex
+        // to split on whitespace and quoted phrases. Finally, swap the "substitute"
+        // characters back to escaped quotes. This allows for a simpler regex.
+        $string = str_replace('\\"', chr(26), $string);
+        preg_match_all('/[^\s"]+|"([^"]*)"/', $string, $phrases);
+        $callback = function ($str) {
+            return str_replace(chr(26), '\\"', $str);
+        };
+        $phrases = array_map($callback, $phrases[0]);
 
-        $tokens  = array();
-        $token   = array();
+        $tokens  = [];
+        $token   = [];
 
         reset($phrases);
         while (current($phrases) !== false) {
@@ -473,7 +517,7 @@ class SearchHandler
                 }
             } else {
                 $tokens[] = implode(' ', $token);
-                $token = array();
+                $token = [];
             }
         }
 

@@ -17,27 +17,40 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordTabs
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_tabs Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
 namespace VuFind\RecordTab;
+use ZfcRbac\Service\AuthorizationServiceAwareInterface,
+    ZfcRbac\Service\AuthorizationServiceAwareTrait;
 
 /**
  * Record tab abstract base class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordTabs
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_tabs Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
-abstract class AbstractBase implements TabInterface
+abstract class AbstractBase implements TabInterface,
+    AuthorizationServiceAwareInterface
 {
+    use AuthorizationServiceAwareTrait;
+
+    /**
+     * Permission that must be granted to access this module (null for no
+     * restriction)
+     *
+     * @var string
+     */
+    protected $accessPermission = null;
+
     /**
      * Record driver associated with the tab
      *
@@ -59,7 +72,15 @@ abstract class AbstractBase implements TabInterface
      */
     public function isActive()
     {
-        // Assume active by default; subclasses may add rules.
+        // If accessPermission is set, check for authorization to enable tab
+        if (!empty($this->accessPermission)) {
+            $auth = $this->getAuthorizationService();
+            if (!$auth) {
+                throw new \Exception('Authorization service missing');
+            }
+            return $auth->isGranted($this->accessPermission);
+        }
+
         return true;
     }
 
@@ -71,6 +92,17 @@ abstract class AbstractBase implements TabInterface
     public function isVisible()
     {
         // Assume visible by default; subclasses may add rules.
+        return true;
+    }
+
+    /**
+     * Can this tab be loaded via AJAX?
+     *
+     * @return bool
+     */
+    public function supportsAjax()
+    {
+        // Assume we can load by AJAX; subclasses may add rules.
         return true;
     }
 

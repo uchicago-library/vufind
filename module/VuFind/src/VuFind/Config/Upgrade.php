@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Config
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Config;
 use VuFind\Config\Writer as ConfigWriter,
@@ -32,11 +32,11 @@ use VuFind\Config\Writer as ConfigWriter,
 /**
  * Class to upgrade previous VuFind configurations to the current version
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Config
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class Upgrade
 {
@@ -80,28 +80,28 @@ class Upgrade
      *
      * @var array
      */
-    protected $oldConfigs = array();
+    protected $oldConfigs = [];
 
     /**
      * Processed new configurations
      *
      * @var array
      */
-    protected $newConfigs = array();
+    protected $newConfigs = [];
 
     /**
      * Comments parsed from configuration files
      *
      * @var array
      */
-    protected $comments = array();
+    protected $comments = [];
 
     /**
      * Warnings generated during upgrade process
      *
      * @var array
      */
-    protected $warnings = array();
+    protected $warnings = [];
 
     /**
      * Are we upgrading files in place rather than creating them?
@@ -109,6 +109,13 @@ class Upgrade
      * @var bool
      */
     protected $inPlaceUpgrade;
+
+    /**
+     * Have we modified permissions.ini?
+     *
+     * @var bool
+     */
+    protected $permissionsModified = false;
 
     /**
      * Constructor
@@ -145,14 +152,19 @@ class Upgrade
         // and into other files.
         $this->upgradeConfig();
         $this->upgradeAuthority();
-        $this->upgradeFacets();
+        $this->upgradeFacetsAndCollection();
         $this->upgradeFulltext();
         $this->upgradeReserves();
         $this->upgradeSearches();
         $this->upgradeSitemap();
         $this->upgradeSms();
         $this->upgradeSummon();
+        $this->upgradePrimo();
         $this->upgradeWorldCat();
+
+        // The previous upgrade routines may have added values to permissions.ini,
+        // so we should save it last. It doesn't have its own upgrade routine.
+        $this->saveModifiedConfig('permissions.ini');
 
         // The following routines load special configurations that were not
         // explicitly loaded by loadConfigs:
@@ -225,7 +237,8 @@ class Upgrade
     protected function loadOldBaseConfig()
     {
         // Load the base settings:
-        $mainArray = parse_ini_file($this->oldDir . '/config.ini', true);
+        $oldIni = $this->oldDir . '/config.ini';
+        $mainArray = file_exists($oldIni) ? parse_ini_file($oldIni, true) : [];
 
         // Merge in local overrides as needed.  VuFind 2 structures configurations
         // differently, so people who used this mechanism will need to refactor
@@ -278,10 +291,11 @@ class Upgrade
     {
         // Configuration files to load.  Note that config.ini must always be loaded
         // first so that getOldConfigPath can work properly!
-        $configs = array(
+        $configs = [
             'config.ini', 'authority.ini', 'facets.ini', 'reserves.ini',
-            'searches.ini', 'Summon.ini', 'WorldCat.ini', 'sms.ini'
-        );
+            'searches.ini', 'Summon.ini', 'WorldCat.ini', 'sms.ini',
+            'permissions.ini', 'Collection.ini', 'Primo.ini'
+        ];
         foreach ($configs as $config) {
             // Special case for config.ini, since we may need to overlay extra
             // settings:
@@ -290,7 +304,7 @@ class Upgrade
             } else {
                 $path = $this->getOldConfigPath($config);
                 $this->oldConfigs[$config] = file_exists($path)
-                    ? parse_ini_file($path, true) : array();
+                    ? parse_ini_file($path, true) : [];
             }
             $this->newConfigs[$config]
                 = parse_ini_file($this->rawDir . '/' . $config, true);
@@ -308,7 +322,7 @@ class Upgrade
      *
      * @return void
      */
-    protected function applyOldSettings($filename, $fullSections = array())
+    protected function applyOldSettings($filename, $fullSections = [])
     {
         // First override all individual settings:
         foreach ($this->oldConfigs[$filename] as $section => $subsection) {
@@ -321,7 +335,7 @@ class Upgrade
         foreach ($fullSections as $section) {
             $this->newConfigs[$filename][$section]
                 = isset($this->oldConfigs[$filename][$section])
-                ? $this->oldConfigs[$filename][$section] : array();
+                ? $this->oldConfigs[$filename][$section] : [];
         }
     }
 
@@ -343,13 +357,17 @@ class Upgrade
         // If we're doing an in-place upgrade, and the source file is empty,
         // there is no point in upgrading anything (the file doesn't exist).
         if (empty($this->oldConfigs[$filename]) && $this->inPlaceUpgrade) {
-            return;
+            // Special case: if we set up custom permissions, we need to
+            // write the file even if it didn't previously exist.
+            if (!$this->permissionsModified || $filename !== 'permissions.ini') {
+                return;
+            }
         }
 
         // If target file already exists, back it up:
         $outfile = $this->newDir . '/' . $filename;
         $bakfile = $outfile . '.bak.' . time();
-        if (!copy($outfile, $bakfile)) {
+        if (file_exists($outfile) && !copy($outfile, $bakfile)) {
             throw new FileAccessException(
                 "Error: Could not copy {$outfile} to {$bakfile}."
             );
@@ -391,12 +409,14 @@ class Upgrade
 
         // Compare the source file against the raw file; if they happen to be the
         // same, we don't need to copy anything!
-        if (md5(file_get_contents($src)) == md5(file_get_contents($raw))) {
+        if (file_exists($src) && file_exists($raw)
+            && md5(file_get_contents($src)) == md5(file_get_contents($raw))
+        ) {
             return;
         }
 
         // If we got this far, we need to copy the user's file into place:
-        if (!copy($src, $dest)) {
+        if (file_exists($src) && !copy($src, $dest)) {
             throw new FileAccessException(
                 "Error: Could not copy {$src} to {$dest}."
             );
@@ -411,7 +431,7 @@ class Upgrade
      *
      * @return void
      */
-    protected function checkTheme($setting, $default)
+    protected function checkTheme($setting, $default = null)
     {
         // If a setting is not set, there is nothing to check:
         $theme = isset($this->newConfigs['config.ini']['Site'][$setting])
@@ -426,13 +446,21 @@ class Upgrade
         if (!file_exists(APPLICATION_PATH . '/themes/' . $theme)
             || !is_dir(APPLICATION_PATH . '/themes/' . $theme)
         ) {
-            $this->addWarning(
-                "WARNING: This version of VuFind does not support "
-                . "the {$theme} theme.  Your config.ini [Site] {$setting} setting "
-                . "has been reset to the default: {$default}.  You may need to "
-                . "reimplement your custom theme."
-            );
-            $this->newConfigs['config.ini']['Site'][$setting] = $default;
+            if ($default === null) {
+                $this->addWarning(
+                    "WARNING: This version of VuFind does not support the {$theme} "
+                    . "theme. As such, we have disabled your {$setting} setting."
+                );
+                unset($this->newConfigs['config.ini']['Site'][$setting]);
+            } else {
+                $this->addWarning(
+                    "WARNING: This version of VuFind does not support "
+                    . "the {$theme} theme. Your config.ini [Site] {$setting} setting"
+                    . " has been reset to the default: {$default}. You may need to "
+                    . "reimplement your custom theme."
+                );
+                $this->newConfigs['config.ini']['Site'][$setting] = $default;
+            }
         }
     }
 
@@ -509,11 +537,19 @@ class Upgrade
         // Set up reference for convenience (and shorter lines):
         $newConfig = & $this->newConfigs['config.ini'];
 
-        // If the [BulkExport] options setting is an old default, update it to
-        // reflect the fact that we now support more options.
-        if ($this->isDefaultBulkExportOptions($newConfig['BulkExport']['options'])) {
-            $newConfig['BulkExport']['options']
-                = 'MARC:MARCXML:EndNote:EndNoteWeb:RefWorks:BibTeX:RIS';
+        // If the [BulkExport] options setting is present and non-default, warn
+        // the user about its deprecation.
+        if (isset($newConfig['BulkExport']['options'])) {
+            $default = $this->isDefaultBulkExportOptions(
+                $newConfig['BulkExport']['options']
+            );
+            if (!$default) {
+                $this->addWarning(
+                    'The [BulkExport] options setting is deprecated; please '
+                    . 'customize the [Export] section instead.'
+                );
+            }
+            unset($newConfig['BulkExport']['options']);
         }
 
         // Warn the user about Amazon configuration issues:
@@ -538,12 +574,35 @@ class Upgrade
             }
         }
 
-        // Warn the user about deprecated WorldCat setting:
+        // Warn the user about deprecated WorldCat settings:
         if (isset($newConfig['WorldCat']['LimitCodes'])) {
             unset($newConfig['WorldCat']['LimitCodes']);
             $this->addWarning(
                 'The [WorldCat] LimitCodes setting never had any effect and has been'
                 . ' removed.'
+            );
+        }
+        $badKeys
+            = ['id', 'xISBN_token', 'xISBN_secret', 'xISSN_token', 'xISSN_secret'];
+        foreach ($badKeys as $key) {
+            if (isset($newConfig['WorldCat'][$key])) {
+                unset($newConfig['WorldCat'][$key]);
+                $this->addWarning(
+                    'The [WorldCat] ' . $key . ' setting is no longer used and'
+                    . ' has been removed.'
+                );
+            }
+        }
+        if (isset($newConfig['Record']['related'])
+            && in_array('Editions', $newConfig['Record']['related'])
+        ) {
+            $newConfig['Record']['related'] = array_diff(
+                $newConfig['Record']['related'], ['Editions']
+            );
+            $this->addWarning(
+                'The Editions related record module is no longer '
+                . 'supported due to OCLC\'s xID API shutdown.'
+                . ' It has been removed from your settings.'
             );
         }
 
@@ -552,15 +611,15 @@ class Upgrade
             && !is_array($newConfig['Content']['GoogleOptions'])
         ) {
             $newConfig['Content']['GoogleOptions']
-                = array('link' => $newConfig['Content']['GoogleOptions']);
+                = ['link' => $newConfig['Content']['GoogleOptions']];
         }
 
         // Disable unused, obsolete setting:
         unset($newConfig['Index']['local']);
 
         // Warn the user if they are using an unsupported theme:
-        $this->checkTheme('theme', 'blueprint');
-        $this->checkTheme('mobile_theme', 'jquerymobile');
+        $this->checkTheme('theme', 'bootprint3');
+        $this->checkTheme('mobile_theme', null);
 
         // Translate legacy auth settings:
         if (strtolower($newConfig['Authentication']['method']) == 'db') {
@@ -580,7 +639,7 @@ class Upgrade
 
         // Eliminate obsolete database settings:
         $newConfig['Database']
-            = array('database' => $newConfig['Database']['database']);
+            = ['database' => $newConfig['Database']['database']];
 
         // Eliminate obsolete config override settings:
         unset($newConfig['Extra_Config']);
@@ -589,7 +648,7 @@ class Upgrade
         if (isset($newConfig['Statistics']['enabled'])) {
             // If "enabled" is on, this equates to the new system being in Solr mode:
             if ($newConfig['Statistics']['enabled']) {
-                $newConfig['Statistics']['mode'] = array('Solr');
+                $newConfig['Statistics']['mode'] = ['Solr'];
             }
 
             // Whether or not "enabled" is on, remove the deprecated setting:
@@ -611,6 +670,9 @@ class Upgrade
             unset($newConfig['Syndetics']['url']);
         }
 
+        // Translate obsolete permission settings:
+        $this->upgradeAdminPermissions();
+
         // Deal with shard settings (which may have to be moved to another file):
         $this->upgradeShardSettings();
 
@@ -619,20 +681,104 @@ class Upgrade
     }
 
     /**
-     * Upgrade facets.ini.
+     * Translate obsolete permission settings.
+     *
+     * @return void
+     */
+    protected function upgradeAdminPermissions()
+    {
+        $config = & $this->newConfigs['config.ini'];
+        $permissions = & $this->newConfigs['permissions.ini'];
+
+        if (isset($config['AdminAuth'])) {
+            $permissions['access.AdminModule'] = [];
+            if (isset($config['AdminAuth']['ipRegEx'])) {
+                $permissions['access.AdminModule']['ipRegEx']
+                    = $config['AdminAuth']['ipRegEx'];
+            }
+            if (isset($config['AdminAuth']['userWhitelist'])) {
+                $permissions['access.AdminModule']['username']
+                    = $config['AdminAuth']['userWhitelist'];
+            }
+            // If no settings exist in config.ini, we grant access to everyone
+            // by allowing both logged-in and logged-out roles.
+            if (empty($permissions['access.AdminModule'])) {
+                $permissions['access.AdminModule']['role'] = ['guest', 'loggedin'];
+            }
+            $permissions['access.AdminModule']['permission'] = 'access.AdminModule';
+            $this->permissionsModified = true;
+
+            // Remove any old settings remaining in config.ini:
+            unset($config['AdminAuth']);
+        }
+    }
+
+    /**
+     * Change an array key.
+     *
+     * @param array  $array Array to rewrite
+     * @param string $old   Old key name
+     * @param string $new   New key name
+     *
+     * @return array
+     */
+    protected function changeArrayKey($array, $old, $new)
+    {
+        $newArr = [];
+        foreach ($array as $k => $v) {
+            if ($k === $old) {
+                $k = $new;
+            }
+            $newArr[$k] = $v;
+        }
+        return $newArr;
+    }
+
+    /**
+     * Support method for upgradeFacetsAndCollection() - change the name of
+     * a facet field.
+     *
+     * @param string $old Old field name
+     * @param string $new New field name
+     *
+     * @return void
+     */
+    protected function renameFacet($old, $new)
+    {
+        $didWork = false;
+        if (isset($this->newConfigs['facets.ini']['Results'][$old])) {
+            $this->newConfigs['facets.ini']['Results'] = $this->changeArrayKey(
+                $this->newConfigs['facets.ini']['Results'], $old, $new
+            );
+            $didWork = true;
+        }
+        if (isset($this->newConfigs['Collection.ini']['Facets'][$old])) {
+            $this->newConfigs['Collection.ini']['Facets'] = $this->changeArrayKey(
+                $this->newConfigs['Collection.ini']['Facets'], $old, $new
+            );
+            $didWork = true;
+        }
+        if ($didWork) {
+            $this->newConfigs['facets.ini']['LegacyFields'][$old] = $new;
+        }
+    }
+
+    /**
+     * Upgrade facets.ini and Collection.ini (since these are tied together).
      *
      * @throws FileAccessException
      * @return void
      */
-    protected function upgradeFacets()
+    protected function upgradeFacetsAndCollection()
     {
         // we want to retain the old installation's various facet groups
         // exactly as-is
-        $facetGroups = array(
+        $facetGroups = [
             'Results', 'ResultsTop', 'Advanced', 'Author', 'CheckboxFacets',
             'HomePage'
-        );
+        ];
         $this->applyOldSettings('facets.ini', $facetGroups);
+        $this->applyOldSettings('Collection.ini', ['Facets', 'Sort']);
 
         // fill in home page facets with advanced facets if missing:
         if (!isset($this->oldConfigs['facets.ini']['HomePage'])) {
@@ -640,8 +786,12 @@ class Upgrade
                 = $this->newConfigs['facets.ini']['Advanced'];
         }
 
+        // rename changed facets
+        $this->renameFacet('authorStr', 'author_facet');
+
         // save the file
         $this->saveModifiedConfig('facets.ini');
+        $this->saveModifiedConfig('Collection.ini');
     }
 
     /**
@@ -669,9 +819,9 @@ class Upgrade
     {
         // we want to retain the old installation's Basic/Advanced search settings
         // and sort settings exactly as-is
-        $groups = array(
+        $groups = [
             'Basic_Searches', 'Advanced_Searches', 'Sorting', 'DefaultSortingByType'
-        );
+        ];
         $this->applyOldSettings('searches.ini', $groups);
 
         // Fix autocomplete settings in case they use the old style:
@@ -690,7 +840,20 @@ class Upgrade
             }
         }
 
-        $this->upgradeSpellingSettings('searches.ini', array('CallNumber'));
+        // fix call number sort settings:
+        if (isset($newConfig['Sorting']['callnumber'])) {
+            $newConfig['Sorting']['callnumber-sort']
+                = $newConfig['Sorting']['callnumber'];
+            unset($newConfig['Sorting']['callnumber']);
+        }
+        if (isset($newConfig['DefaultSortingByType'])) {
+            foreach ($newConfig['DefaultSortingByType'] as & $v) {
+                if ($v === 'callnumber') {
+                    $v = 'callnumber-sort';
+                }
+            }
+        }
+        $this->upgradeSpellingSettings('searches.ini', ['CallNumber']);
 
         // save the file
         $this->saveModifiedConfig('searches.ini');
@@ -705,17 +868,17 @@ class Upgrade
      *
      * @return void
      */
-    protected function upgradeSpellingSettings($ini, $skip = array())
+    protected function upgradeSpellingSettings($ini, $skip = [])
     {
         // Turn on the spelling recommendations if we're upgrading from a version
         // prior to 2.4.
         if ((float)$this->from < 2.4) {
             // Fix defaults in general section:
             $cfg = & $this->newConfigs[$ini]['General'];
-            $keys = array('default_top_recommend', 'default_noresults_recommend');
+            $keys = ['default_top_recommend', 'default_noresults_recommend'];
             foreach ($keys as $key) {
                 if (!isset($cfg[$key])) {
-                    $cfg[$key] = array();
+                    $cfg[$key] = [];
                 }
                 if (!in_array('SpellingSuggestions', $cfg[$key])) {
                     $cfg[$key][] = 'SpellingSuggestions';
@@ -738,7 +901,7 @@ class Upgrade
                 if (!isset($cfg[$key])) {
                     $cfg[$key] = array_diff(
                         $this->newConfigs[$ini]['General']['default_top_recommend'],
-                        array('SpellingSuggestions')
+                        ['SpellingSuggestions']
                     );
                 }
             }
@@ -775,7 +938,7 @@ class Upgrade
      */
     protected function upgradeSms()
     {
-        $this->applyOldSettings('sms.ini', array('Carriers'));
+        $this->applyOldSettings('sms.ini', ['Carriers']);
         $this->saveModifiedConfig('sms.ini');
     }
 
@@ -789,9 +952,9 @@ class Upgrade
     {
         // we want to retain the old installation's search and facet settings
         // exactly as-is
-        $groups = array(
+        $groups = [
             'Facets', 'Basic_Searches', 'Advanced_Searches', 'Sorting'
-        );
+        ];
         $this->applyOldSettings('authority.ini', $groups);
 
         // save the file
@@ -815,9 +978,9 @@ class Upgrade
 
         // we want to retain the old installation's search and facet settings
         // exactly as-is
-        $groups = array(
+        $groups = [
             'Facets', 'Basic_Searches', 'Advanced_Searches', 'Sorting'
-        );
+        ];
         $this->applyOldSettings('reserves.ini', $groups);
 
         // save the file
@@ -840,9 +1003,9 @@ class Upgrade
 
         // we want to retain the old installation's search and facet settings
         // exactly as-is
-        $groups = array(
+        $groups = [
             'Facets', 'FacetsTop', 'Basic_Searches', 'Advanced_Searches', 'Sorting'
-        );
+        ];
         $this->applyOldSettings('Summon.ini', $groups);
 
         // Turn on advanced checkbox facets if we're upgrading from a version
@@ -856,10 +1019,150 @@ class Upgrade
             }
         }
 
+        // update permission settings
+        $this->upgradeSummonPermissions();
+
         $this->upgradeSpellingSettings('Summon.ini');
 
         // save the file
         $this->saveModifiedConfig('Summon.ini');
+    }
+
+    /**
+     * Translate obsolete permission settings.
+     *
+     * @return void
+     */
+    protected function upgradeSummonPermissions()
+    {
+        $config = & $this->newConfigs['Summon.ini'];
+        $permissions = & $this->newConfigs['permissions.ini'];
+        if (isset($config['Auth'])) {
+            $permissions['access.SummonExtendedResults'] = [];
+            if (isset($config['Auth']['check_login'])
+                && $config['Auth']['check_login']
+            ) {
+                $permissions['access.SummonExtendedResults']['role'] = ['loggedin'];
+            }
+            if (isset($config['Auth']['ip_range'])) {
+                $permissions['access.SummonExtendedResults']['ipRegEx']
+                    = $config['Auth']['ip_range'];
+            }
+            if (!empty($permissions['access.SummonExtendedResults'])) {
+                $permissions['access.SummonExtendedResults']['boolean'] = 'OR';
+                $permissions['access.SummonExtendedResults']['permission']
+                    = 'access.SummonExtendedResults';
+                $this->permissionsModified = true;
+            } else {
+                unset($permissions['access.SummonExtendedResults']);
+            }
+
+            // Remove any old settings remaining in Summon.ini:
+            unset($config['Auth']);
+        }
+    }
+
+    /**
+     * Upgrade Primo.ini.
+     *
+     * @throws FileAccessException
+     * @return void
+     */
+    protected function upgradePrimo()
+    {
+        // we want to retain the old installation's search and facet settings
+        // exactly as-is
+        $groups = [
+            'Facets', 'FacetsTop', 'Basic_Searches', 'Advanced_Searches', 'Sorting'
+        ];
+        $this->applyOldSettings('Primo.ini', $groups);
+
+        // update permission settings
+        $this->upgradePrimoPermissions();
+
+        // update server settings
+        $this->upgradePrimoServerSettings();
+
+        // save the file
+        $this->saveModifiedConfig('Primo.ini');
+    }
+
+    /**
+     * Translate obsolete permission settings.
+     *
+     * @return void
+     */
+    protected function upgradePrimoPermissions()
+    {
+        $config = & $this->newConfigs['Primo.ini'];
+        $permissions = & $this->newConfigs['permissions.ini'];
+        if (isset($config['Institutions']['code'])
+            && isset($config['Institutions']['regex'])
+        ) {
+            $codes = $config['Institutions']['code'];
+            $regex = $config['Institutions']['regex'];
+            if (count($regex) != count($codes)) {
+                $this->addWarning(
+                    'Mismatched code/regex counts in Primo.ini [Institutions].'
+                );
+            }
+
+            // Map parallel arrays into code => array of regexes and detect
+            // wildcard regex to treat as default code.
+            $map = [];
+            $default = null;
+            foreach ($codes as $i => $code) {
+                if ($regex[$i] == '/.*/') {
+                    $default = $code;
+                } else {
+                    $map[$code] = !isset($map[$code])
+                        ? [$regex[$i]]
+                        : array_merge($map[$code], [$regex[$i]]);
+                }
+            }
+            foreach ($map as $code => $regexes) {
+                $perm = "access.PrimoInstitution.$code";
+                $config['Institutions']["onCampusRule['$code']"] = $perm;
+                $permissions[$perm] = [
+                    'ipRegEx' => count($regexes) == 1 ? $regexes[0] : $regexes,
+                    'permission' => $perm,
+                ];
+                $this->permissionsModified = true;
+            }
+            if (null !== $default) {
+                $config['Institutions']['defaultCode'] = $default;
+            }
+
+            // Remove any old settings remaining in Primo.ini:
+            unset($config['Institutions']['code']);
+            unset($config['Institutions']['regex']);
+        }
+    }
+
+    /**
+     * Translate obsolete server settings.
+     *
+     * @return void
+     */
+    protected function upgradePrimoServerSettings()
+    {
+        $config = & $this->newConfigs['Primo.ini'];
+        // Convert apiId to url
+        if (isset($config['General']['apiId'])) {
+            $url = 'http://' . $config['General']['apiId']
+                . '.hosted.exlibrisgroup.com';
+            if (isset($config['General']['port'])) {
+                $url .= ':' . $config['General']['port'];
+            } else {
+                $url .= ':1701';
+            }
+
+            $config['General']['url'] = $url;
+
+            // Remove any old settings remaining in Primo.ini:
+            unset($config['General']['apiId']);
+            unset($config['General']['port']);
+        }
     }
 
     /**
@@ -877,14 +1180,14 @@ class Upgrade
         }
 
         // we want to retain the old installation's search settings exactly as-is
-        $groups = array(
+        $groups = [
             'Basic_Searches', 'Advanced_Searches', 'Sorting'
-        );
+        ];
         $this->applyOldSettings('WorldCat.ini', $groups);
 
         // we need to fix an obsolete search setting for authors
-        foreach (array('Basic_Searches', 'Advanced_Searches') as $section) {
-            $new = array();
+        foreach (['Basic_Searches', 'Advanced_Searches'] as $section) {
+            $new = [];
             foreach ($this->newConfigs['WorldCat.ini'][$section] as $k => $v) {
                 if ($k == 'srw.au:srw.pn:srw.cn') {
                     $k = 'srw.au';
@@ -892,6 +1195,21 @@ class Upgrade
                 $new[$k] = $v;
             }
             $this->newConfigs['WorldCat.ini'][$section] = $new;
+        }
+
+        // Deal with deprecated related record module.
+        $newConfig = & $this->newConfigs['WorldCat.ini'];
+        if (isset($newConfig['Record']['related'])
+            && in_array('WorldCatEditions', $newConfig['Record']['related'])
+        ) {
+            $newConfig['Record']['related'] = array_diff(
+                $newConfig['Record']['related'], ['WorldCatEditions']
+            );
+            $this->addWarning(
+                'The WorldCatEditions related record module is no longer '
+                . 'supported due to OCLC\'s xID API shutdown.'
+                . ' It has been removed from your settings.'
+            );
         }
 
         // save the file
@@ -963,7 +1281,7 @@ class Upgrade
         // VuFind 1.x uses *_local.yaml files as overrides; VuFind 2.x uses files
         // with the same filename in the local directory.  Copy any old override
         // files into the new expected location:
-        $files = array('searchspecs', 'authsearchspecs', 'reservessearchspecs');
+        $files = ['searchspecs', 'authsearchspecs', 'reservessearchspecs'];
         foreach ($files as $file) {
             $old = $this->oldDir . '/' . $file . '_local.yaml';
             $new = $this->newDir . '/' . $file . '.yaml';
@@ -1043,7 +1361,7 @@ class Upgrade
         // setting with StripFields setting):
         if (isset($this->oldConfigs['facets.ini']['StripFacets'])) {
             if (!isset($this->oldConfigs['searches.ini']['StripFields'])) {
-                $this->oldConfigs['searches.ini']['StripFields'] = array();
+                $this->oldConfigs['searches.ini']['StripFields'] = [];
             }
             foreach ($this->oldConfigs['facets.ini']['StripFacets'] as $k => $v) {
                 // If we already have values for the current key, merge and dedupe:
@@ -1065,7 +1383,7 @@ class Upgrade
      * Read the specified file and return an associative array of this format
      * containing all comments extracted from the file:
      *
-     * array =>
+     * [
      *   'sections' => array
      *     'section_name_1' => array
      *       'before' => string ("Comments found at the beginning of this section")
@@ -1079,6 +1397,7 @@ class Upgrade
      *        ...
      *      'section_name_n' => array (same keys as section_name_1)
      *   'after' => string ("Comments found at the very end of the file")
+     * ]
      *
      * @param string $filename Name of ini file to read.
      *
@@ -1089,7 +1408,7 @@ class Upgrade
         $lines = file($filename);
 
         // Initialize our return value:
-        $retVal = array('sections' => array(), 'after' => '');
+        $retVal = ['sections' => [], 'after' => ''];
 
         // Initialize variables for tracking status during parsing:
         $section = $comments = '';
@@ -1116,10 +1435,10 @@ class Upgrade
                     } else {
                         $inline = '';
                     }
-                    $retVal['sections'][$section] = array(
+                    $retVal['sections'][$section] = [
                         'before' => $comments,
                         'inline' => $inline,
-                        'settings' => array());
+                        'settings' => []];
                     $comments = '';
                 }
             } else if (($equals = strpos($trimmed, '=')) !== false) {
@@ -1141,7 +1460,7 @@ class Upgrade
                     // concern, but we should improve it if we ever need to.
                     if (!isset($retVal['sections'][$section]['settings'][$set])) {
                         $retVal['sections'][$section]['settings'][$set]
-                            = array('before' => $comments, 'inline' => $inline);
+                            = ['before' => $comments, 'inline' => $inline];
                     } else {
                         $retVal['sections'][$section]['settings'][$set]['before']
                             .= $comments;

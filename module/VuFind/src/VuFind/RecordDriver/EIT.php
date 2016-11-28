@@ -17,26 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Julia Bauder <bauderj@grinnell.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 namespace VuFind\RecordDriver;
-
-use Zend\Log\LoggerInterface;
 
 /**
  * Model for records retrieved via EBSCO's EIT API.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Julia Bauder <bauderj@grinnell.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 class EIT extends SolrDefault
 {
@@ -48,44 +46,11 @@ class EIT extends SolrDefault
     protected $sourceIdentifier = 'EIT';
 
     /**
-     * Logger, if any.
-     *
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * Reference to controlInfo section of fields, for readability
      *
      * @var array
      */
     protected $controlInfo;
-
-    /**
-     * Set the Logger.
-     *
-     * @param LoggerInterface $logger Logger
-     *
-     * @return void
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Log a debug message.
-     *
-     * @param string $msg Message to log.
-     *
-     * @return void
-     */
-    protected function debug($msg)
-    {
-        if ($this->logger) {
-            $this->logger->debug($msg);
-        }
-    }
 
     /**
      * Set raw data to initialize the object.
@@ -123,13 +88,13 @@ class EIT extends SolrDefault
     public function getAllSubjectHeadings()
     {
         $su = isset($this->controlInfo['artinfo']['su'])
-            ? $this->controlInfo['artinfo']['su'] : array();
+            ? $this->controlInfo['artinfo']['su'] : [];
 
         // The EIT index doesn't currently subject headings in a broken-down
         // format, so we'll just send each value as a single chunk.
-        $retval = array();
+        $retval = [];
         foreach ($su as $s) {
-            $retval[] = array($s);
+            $retval[] = [$s];
         }
         return $retval;
     }
@@ -151,7 +116,7 @@ class EIT extends SolrDefault
      *
      * @return array
      */
-    public function getCallNumber()
+    public function getCallNumbers()
     {
         return [];
     }
@@ -186,32 +151,7 @@ class EIT extends SolrDefault
      */
     public function getDateSpan()
     {
-        return array();
-    }
-
-    /**
-     * Deduplicate author information into associative array with main/corporate/
-     * secondary keys.
-     *
-     * @return array
-     */
-    public function getDeduplicatedAuthors()
-    {
-        $authors = array(
-            'main' => $this->getPrimaryAuthor(),
-            'secondary' => $this->getSecondaryAuthors()
-        );
-
-        // The secondary author array may contain a corporate or primary author;
-        // let's be sure we filter out duplicate values.
-        $duplicates = array();
-        if (!empty($authors['main'])) {
-            $duplicates[] = $authors['main'];
-        }
-        if (!empty($duplicates)) {
-            $authors['secondary'] = array_diff($authors['secondary'], $duplicates);
-        }
-        return $authors;
+        return [];
     }
 
     /**
@@ -237,7 +177,7 @@ class EIT extends SolrDefault
             return $this->controlInfo['artinfo']['doctype'];
         }
         return isset($this->controlInfo['artinfo']['doctype'])
-            ? array($this->controlInfo['artinfo']['doctype']) : array();
+            ? [$this->controlInfo['artinfo']['doctype']] : [];
     }
 
     /**
@@ -245,15 +185,15 @@ class EIT extends SolrDefault
      *
      * @return string
      */
-    public function getPrimaryAuthor()
+    public function getPrimaryAuthors()
     {
         if (isset($this->controlInfo['artinfo']['aug']['au'])
             && is_array($this->controlInfo['artinfo']['aug']['au'])
         ) {
-            return $this->controlInfo['artinfo']['aug']['au']['0'];
+            return $this->controlInfo['artinfo']['aug']['au'];
         } else {
             return isset($this->controlInfo['artinfo']['aug']['au'])
-                ? $this->controlInfo['artinfo']['aug']['au'] : '';
+                ? [$this->controlInfo['artinfo']['aug']['au']] : [];
         }
 
     }
@@ -266,13 +206,13 @@ class EIT extends SolrDefault
     public function getPublicationDates()
     {
         if (isset($this->controlInfo['pubinfo']['dt']['@attributes']['year'])) {
-            return array(
+            return [
                 $this->controlInfo['pubinfo']['dt']['@attributes']['year']
-            );
+            ];
         } else if (isset($this->controlInfo['pubinfo']['dt'])) {
-            return array($this->controlInfo['pubinfo']['dt']);
+            return [$this->controlInfo['pubinfo']['dt']];
         } else {
-            return array();
+            return [];
         }
     }
 
@@ -284,18 +224,7 @@ class EIT extends SolrDefault
     public function getPublishers()
     {
         return isset($this->controlInfo['pubinfo']['pub'])
-            ? array($this->controlInfo['pubinfo']['pub']) : array();
-    }
-
-    /**
-     * Get an array of all secondary authors (complementing getPrimaryAuthor()).
-     *
-     * @return array
-     */
-    public function getSecondaryAuthors()
-    {
-        return is_array($this->controlInfo['artinfo']['aug']['au'])
-            ? $this->controlInfo['artinfo']['aug']['au'] : array();
+            ? [$this->controlInfo['pubinfo']['pub']] : [];
     }
 
     /**
@@ -308,7 +237,6 @@ class EIT extends SolrDefault
         return isset($this->controlInfo['artinfo']['tig']['atl'])
             ? $this->controlInfo['artinfo']['tig']['atl'] : '';
     }
-
 
         /**
      * Get an array of summary strings for the record.
@@ -326,11 +254,11 @@ class EIT extends SolrDefault
         ) {
             return is_array($this->controlInfo['artinfo']['ab'])
                 ? $this->controlInfo['artinfo']['ab']
-                : array($this->controlInfo['artinfo']['ab']);
+                : [$this->controlInfo['artinfo']['ab']];
         }
 
         // If we got this far, no description was found:
-        return array();
+        return [];
     }
 
         /**
@@ -363,14 +291,14 @@ class EIT extends SolrDefault
         // If non-empty, map internal URL array to expected return format;
         // otherwise, return empty array:
         if (isset($this->fields['fields']['plink'])) {
-            $links = array($this->fields['fields']['plink']);
+            $links = [$this->fields['fields']['plink']];
             $desc = $this->translate('View this record in EBSCOhost');
             $filter = function ($url) use ($desc) {
                 return compact('url', 'desc');
             };
             return array_map($filter, $links);
         } else {
-            return array();
+            return [];
         }
     }
 
@@ -478,25 +406,12 @@ class EIT extends SolrDefault
             ? $this->controlInfo['artinfo']['tig']['atl'] : '';
     }
 
-        /**
-     * Does the OpenURL configuration indicate that we should display OpenURLs in
-     * the specified context?
-     *
-     * @param string $area 'results', 'record' or 'holdings'
-     *
-     * @return bool
-     */
-    public function openURLActive($area)
-    {
-        return true;
-    }
-
     /**
-     * Support method for getOpenURL() -- pick the OpenURL format.
+     * Support method for getOpenUrl() -- pick the OpenURL format.
      *
      * @return string
      */
-    protected function getOpenURLFormat()
+    protected function getOpenUrlFormat()
     {
         // If we have multiple formats, Book, Journal and Article are most
         // important...

@@ -19,12 +19,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA    02111-1307    USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Mark Triggs <vufind-tech@lists.sourceforge.net>
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/alphabetical_heading_browse Wiki
+ * @link     https://vufind.org/wiki/indexing:alphabetical_heading_browse Wiki
  */
 namespace VuFind\Controller;
 
@@ -34,12 +34,12 @@ use VuFindSearch\ParamBag;
  *
  * Controls the alphabetical browsing feature
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Mark Triggs <vufind-tech@lists.sourceforge.net>
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/alphabetical_heading_browse Wiki
+ * @link     https://vufind.org/wiki/indexing:alphabetical_heading_browse Wiki
  */
 class AlphabrowseController extends AbstractBase
 {
@@ -56,31 +56,31 @@ class AlphabrowseController extends AbstractBase
         if (isset($config->AlphaBrowse_Types)
             && !empty($config->AlphaBrowse_Types)
         ) {
-            $types = array();
+            $types = [];
             foreach ($config->AlphaBrowse_Types as $key => $value) {
                 $types[$key] = $value;
             }
         } else {
-            $types = array(
+            $types = [
                 'topic'  => 'By Topic',
                 'author' => 'By Author',
                 'title'  => 'By Title',
                 'lcc'    => 'By Call Number'
-            );
+            ];
         }
 
         // Load any extras from config file
-        $extras = array();
+        $extras = [];
         if (isset($config->AlphaBrowse_Extras)) {
             foreach ($config->AlphaBrowse_Extras as $key => $value) {
                 $extras[$key] = $value;
             }
         } else {
-            $extras = array(
+            $extras = [
                 'title' => 'author:format:publishDate',
                 'lcc' => 'title',
                 'dewey' => 'title'
-            );
+            ];
         }
 
         // Load remaining config parameters
@@ -102,8 +102,13 @@ class AlphabrowseController extends AbstractBase
         $from   = $this->params()->fromQuery('from', false);
         $page   = intval($this->params()->fromQuery('page', 0));
 
+        // Special case: highlighting is pointless if there's no user input:
+        if (empty($from)) {
+            $highlighting = false;
+        }
+
         // Set up any extra parameters to pass
-        $extraParams = new ParamBag(); 
+        $extraParams = new ParamBag();
         if (isset($extras[$source])) {
             $extraParams->add('extras', $extras[$source]);
         }
@@ -171,7 +176,7 @@ class AlphabrowseController extends AbstractBase
 
         // Pass information about extra columns on to theme
         $view->extras = isset($extras[$source])
-            ? explode(':', $extras[$source]) : array();
+            ? explode(':', $extras[$source]) : [];
 
         return $view;
     }

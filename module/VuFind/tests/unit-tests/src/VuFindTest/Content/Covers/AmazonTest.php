@@ -18,13 +18,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindTest\Content\Covers;
 use VuFindCode\ISBN;
@@ -32,11 +32,11 @@ use VuFindCode\ISBN;
 /**
  * Unit tests for Amazon cover loader.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class AmazonTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,7 +45,7 @@ class AmazonTest extends \PHPUnit_Framework_TestCase
      *
      * @var array
      */
-    protected $params = array('ResponseGroup' => 'Images', 'AssociateTag' => 'fake');
+    protected $params = ['ResponseGroup' => 'Images', 'AssociateTag' => 'fake'];
 
     /**
      * Test cover loading
@@ -54,13 +54,13 @@ class AmazonTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidCoverLoading()
     {
-        $expected = array(
+        $expected = [
             'small' =>
                 'http://ecx.images-amazon.com/images/I/518597FY50L._SL75_.jpg',
             'medium' =>
                 'http://ecx.images-amazon.com/images/I/518597FY50L._SL160_.jpg',
             'large' => 'http://ecx.images-amazon.com/images/I/518597FY50L.jpg',
-        );
+        ];
         foreach ($expected as $size => $expectedUrl) {
             $this->assertEquals($expectedUrl, $this->getUrl($size));
         }
@@ -108,10 +108,10 @@ class AmazonTest extends \PHPUnit_Framework_TestCase
     protected function getUrl($size, $isbn = '0739313126', $throw = false)
     {
         $amazon = $this->getMock(
-            'VuFind\Content\Covers\Amazon', array('getAmazonService'),
-            array('fake', 'fakesecret')
+            'VuFind\Content\Covers\Amazon', ['getAmazonService'],
+            ['fake', 'fakesecret']
         );
-        $params = array();
+        $params = [];
         if (!empty($isbn)) {
             $behavior = $throw
                 ? $this->throwException(new \Exception('kaboom'))
@@ -135,8 +135,8 @@ class AmazonTest extends \PHPUnit_Framework_TestCase
     protected function getFakeService($isbn, $expectedBehavior)
     {
         $service = $this->getMock(
-            'ZendService\Amazon\Amazon', array('itemLookup'),
-            array('fakekey', 'US', 'fakesecret')
+            'ZendService\Amazon\Amazon', ['itemLookup'],
+            ['fakekey', 'US', 'fakesecret']
         );
         if (!empty($isbn)) {
             $service->expects($this->once())

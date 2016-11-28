@@ -17,36 +17,37 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Authentication
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Auth;
-use VuFind\Db\Row\User as UserRow, VuFind\Db\Table\User as UserTable,
+use VuFind\Cookie\CookieManager,
+    VuFind\Db\Row\User as UserRow, VuFind\Db\Table\User as UserTable,
     VuFind\Exception\Auth as AuthException,
-    Zend\Config\Config, Zend\Session\SessionManager;
+    Zend\Config\Config, Zend\Session\SessionManager, Zend\Validator\Csrf;
 
 /**
  * Wrapper class for handling logged-in user in session.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Authentication
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
-class Manager
+class Manager implements \ZfcRbac\Identity\IdentityProviderInterface
 {
     /**
      * Authentication modules
      *
      * @var \VuFind\Auth\AbstractBase[]
      */
-    protected $auth = array();
+    protected $auth = [];
 
     /**
      * Currently selected authentication module
@@ -98,6 +99,13 @@ class Manager
     protected $pluginManager;
 
     /**
+     * Cookie Manager
+     *
+     * @var CookieManager
+     */
+    protected $cookieManager;
+
+    /**
      * Cache for current logged in user object
      *
      * @var UserRow
@@ -111,24 +119,36 @@ class Manager
      * @param UserTable      $userTable      User table gateway
      * @param SessionManager $sessionManager Session manager
      * @param PluginManager  $pm             Authentication plugin manager
+     * @param CookieManager  $cookieManager  Cookie manager
      */
     public function __construct(Config $config, UserTable $userTable,
-        SessionManager $sessionManager, PluginManager $pm
+        SessionManager $sessionManager, PluginManager $pm,
+        CookieManager $cookieManager
     ) {
         // Store dependencies:
         $this->config = $config;
         $this->userTable = $userTable;
         $this->sessionManager = $sessionManager;
         $this->pluginManager = $pm;
+        $this->cookieManager = $cookieManager;
 
         // Set up session:
-        $this->session = new \Zend\Session\Container('Account');
+        $this->session = new \Zend\Session\Container('Account', $sessionManager);
+
+        // Set up CSRF:
+        $this->csrf = new Csrf(
+            [
+                'session' => new \Zend\Session\Container('csrf', $sessionManager),
+                'salt' => isset($this->config->Security->HMACkey)
+                    ? $this->config->Security->HMACkey : 'VuFindCsrfSalt',
+            ]
+        );
 
         // Initialize active authentication setting (defaulting to Database
         // if no setting passed in):
         $method = isset($config->Authentication->method)
             ? $config->Authentication->method : 'Database';
-        $this->legalAuthOptions = array($method);   // mark it as legal
+        $this->legalAuthOptions = [$method];   // mark it as legal
         $this->setAuthMethod($method);              // load it
     }
 
@@ -174,7 +194,7 @@ class Manager
      *
      * @return bool
      */
-    public function supportsCreation($authMethod=null)
+    public function supportsCreation($authMethod = null)
     {
         return $this->getAuth($authMethod)->supportsCreation();
     }
@@ -187,7 +207,7 @@ class Manager
      *
      * @return bool
      */
-    public function supportsRecovery($authMethod=null)
+    public function supportsRecovery($authMethod = null)
     {
         if ($this->getAuth($authMethod)->supportsPasswordRecovery()) {
             return isset($this->config->Authentication->recover_password)
@@ -204,11 +224,12 @@ class Manager
      *
      * @return bool
      */
-    public function supportsPasswordChange($authMethod=null)
+    public function supportsPasswordChange($authMethod = null)
     {
-        if ($this->getAuth($authMethod)->supportsPasswordChange()) {
-            return isset($this->config->Authentication->change_password)
-                && $this->config->Authentication->change_password;
+        if (isset($this->config->Authentication->change_password)
+            && $this->config->Authentication->change_password
+        ) {
+            return $this->getAuth($authMethod)->supportsPasswordChange();
         }
         return false;
     }
@@ -221,7 +242,7 @@ class Manager
      *
      * @return array
      */
-    public function getPasswordPolicy($authMethod=null)
+    public function getPasswordPolicy($authMethod = null)
     {
         return $this->getAuth($authMethod)->getPasswordPolicy();
     }
@@ -237,7 +258,22 @@ class Manager
      */
     public function getSessionInitiator($target)
     {
-        return $this->getAuth()->getSessionInitiator($target);
+        try {
+            return $this->getAuth()->getSessionInitiator($target);
+        } catch (InvalidArgumentException $e) {
+            // If the authentication is in an illegal state but there is an
+            // active user session, we should clear everything out so the user
+            // can try again. This is useful, for example, if a user is logged
+            // in at the same time that an administrator changes the [ChoiceAuth]
+            // settings in config.ini. However, if the user is not logged in,
+            // they are probably attempting something nasty and should be given
+            // an error message.
+            if (!$this->isLoggedIn()) {
+                throw $e;
+            }
+            $this->logout('');
+            return $this->getAuth()->getSessionInitiator($target);
+        }
     }
 
     /**
@@ -251,7 +287,7 @@ class Manager
     public function getAuthClassForTemplateRendering()
     {
         $auth = $this->getAuth();
-        if (is_callable(array($auth, 'getSelectedAuthOption'))) {
+        if (is_callable([$auth, 'getSelectedAuthOption'])) {
             $selected = $auth->getSelectedAuthOption();
             if ($selected) {
                 $auth = $this->getAuth($selected);
@@ -270,12 +306,12 @@ class Manager
     public function getSelectableAuthOptions()
     {
         $auth = $this->getAuth();
-        if (is_callable(array($auth, 'getSelectableAuthOptions'))) {
+        if (is_callable([$auth, 'getSelectableAuthOptions'])) {
             if ($methods = $auth->getSelectableAuthOptions()) {
                 return $methods;
             }
         }
-        return array($this->getAuthMethod());
+        return [$this->getAuthMethod()];
     }
 
     /**
@@ -288,8 +324,8 @@ class Manager
     public function getLoginTargets()
     {
         $auth = $this->getAuth();
-        return is_callable(array($auth, 'getLoginTargets'))
-            ? $auth->getLoginTargets() : array();
+        return is_callable([$auth, 'getLoginTargets'])
+            ? $auth->getLoginTargets() : [];
     }
 
     /**
@@ -302,7 +338,7 @@ class Manager
     public function getDefaultLoginTarget()
     {
         $auth = $this->getAuth();
-        return is_callable(array($auth, 'getDefaultLoginTarget'))
+        return is_callable([$auth, 'getDefaultLoginTarget'])
             ? $auth->getDefaultLoginTarget() : null;
     }
 
@@ -348,7 +384,8 @@ class Manager
         // Clear out the cached user object and session entry.
         $this->currentUser = false;
         unset($this->session->userId);
-        setcookie('loggedOut', 1, null, '/');
+        unset($this->session->userDetails);
+        $this->cookieManager->set('loggedOut', 1);
 
         // Destroy the session for good measure, if requested.
         if ($destroy) {
@@ -357,7 +394,7 @@ class Manager
             // If we don't want to destroy the session, we still need to empty it.
             // There should be a way to do this through Zend\Session, but there
             // apparently isn't (TODO -- do this better):
-            $_SESSION = array();
+            $_SESSION = [];
         }
 
         return $url;
@@ -370,7 +407,7 @@ class Manager
      */
     public function userHasLoggedOut()
     {
-        return isset($_COOKIE['loggedOut']) && $_COOKIE['loggedOut'];
+        return (bool)$this->cookieManager->get('loggedOut');
     }
 
     /**
@@ -382,13 +419,48 @@ class Manager
     {
         // If user object is not in cache, but user ID is in session,
         // load the object from the database:
-        if (!$this->currentUser && isset($this->session->userId)) {
-            $results = $this->userTable
-                ->select(array('id' => $this->session->userId));
-            $this->currentUser = count($results) < 1
-                ? false : $results->current();
+        if (!$this->currentUser) {
+            if (isset($this->session->userId)) {
+                // normal mode
+                $results = $this->userTable
+                    ->select(['id' => $this->session->userId]);
+                $this->currentUser = count($results) < 1
+                    ? false : $results->current();
+            } else if (isset($this->session->userDetails)) {
+                // privacy mode
+                $results = $this->userTable->createRow();
+                $results->exchangeArray($this->session->userDetails);
+                $this->currentUser = $results;
+            } else {
+                // unexpected state
+                $this->currentUser = false;
+            }
         }
         return $this->currentUser;
+    }
+
+    /**
+     * Retrieve CSRF token
+     *
+     * If no CSRF token currently exists, or should be regenerated, generates one.
+     *
+     * @param bool $regenerate Should we regenerate token? (default false)
+     *
+     * @return string
+     */
+    public function getCsrfHash($regenerate = false)
+    {
+        return $this->csrf->getHash($regenerate);
+    }
+
+    /**
+     * Get the identity
+     *
+     * @return \ZfcRbac\Identity\IdentityInterface|null
+     */
+    public function getIdentity()
+    {
+        return $this->isLoggedIn() ?: null;
     }
 
     /**
@@ -406,6 +478,17 @@ class Manager
     }
 
     /**
+     * Are we in privacy mode?
+     *
+     * @return bool
+     */
+    public function inPrivacyMode()
+    {
+        return isset($this->config->Authentication->privacy)
+            && $this->config->Authentication->privacy;
+    }
+
+    /**
      * Updates the user information in the session.
      *
      * @param UserRow $user User object to store in the session
@@ -415,8 +498,12 @@ class Manager
     public function updateSession($user)
     {
         $this->currentUser = $user;
-        $this->session->userId = $user->id;
-        setcookie('loggedOut', '', time() - 3600, '/'); // clear logged out cookie
+        if ($this->inPrivacyMode()) {
+            $this->session->userDetails = $user->toArray();
+        } else {
+            $this->session->userId = $user->id;
+        }
+        $this->cookieManager->clear('loggedOut');
     }
 
     /**
@@ -463,6 +550,18 @@ class Manager
      */
     public function login($request)
     {
+        // Allow the auth module to inspect the request (used by ChoiceAuth,
+        // for example):
+        $this->getAuth()->preLoginCheck($request);
+
+        // Validate CSRF for form-based authentication methods:
+        if (!$this->getAuth()->getSessionInitiator(null)
+            && !$this->csrf->isValid($request->getPost()->get('csrf'))
+        ) {
+            $this->getAuth()->resetState();
+            throw new AuthException('authentication_error_technical');
+        }
+
         // Perform authentication:
         try {
             $user = $this->getAuth()->authenticate($request);

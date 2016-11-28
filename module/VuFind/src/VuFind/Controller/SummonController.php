@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Controller;
 use Zend\Mvc\MvcEvent;
@@ -31,13 +31,12 @@ use Zend\Mvc\MvcEvent;
 /**
  * Summon Controller
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
-
 class SummonController extends AbstractSearch
 {
     /**
@@ -62,11 +61,15 @@ class SummonController extends AbstractSearch
     }
 
     /**
-     * preDispatch -- add Summon message.
+     * Use preDispatch event to add Summon message.
+     *
+     * @param MvcEvent $e Event object
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function preDispatch()
+    public function injectSummonMessage(MvcEvent $e)
     {
         $this->layout()->poweredBy
             = 'Powered by Summon™ from Serials Solutions, a division of ProQuest.';
@@ -81,7 +84,9 @@ class SummonController extends AbstractSearch
     {
         parent::attachDefaultListeners();
         $events = $this->getEventManager();
-        $events->attach(MvcEvent::EVENT_DISPATCH, array($this, 'preDispatch'), 1000);
+        $events->attach(
+            MvcEvent::EVENT_DISPATCH, [$this, 'injectSummonMessage'], 1000
+        );
     }
 
     /**
@@ -120,7 +125,7 @@ class SummonController extends AbstractSearch
     public function homeAction()
     {
         return $this->createViewModel(
-            array('results' => $this->getHomePageFacets())
+            ['results' => $this->getHomePageFacets()]
         );
     }
 
@@ -154,13 +159,13 @@ class SummonController extends AbstractSearch
             $params = $results->getParams();
             $facetsToShow = isset($config->Advanced_Facets)
                  ? $config->Advanced_Facets
-                 : array('Language' => 'Language', 'ContentType' => 'Format');
+                 : ['Language' => 'Language', 'ContentType' => 'Format'];
             if (isset($config->Advanced_Facet_Settings->orFacets)) {
                 $orFields = array_map(
                     'trim', explode(',', $config->Advanced_Facet_Settings->orFacets)
                 );
             } else {
-                $orFields = array();
+                $orFields = [];
             }
             foreach ($facetsToShow as $facet => $label) {
                 $useOr = (isset($orFields[0]) && $orFields[0] == '*')
@@ -212,7 +217,7 @@ class SummonController extends AbstractSearch
             foreach ($list['list'] as $key => $value) {
                 // Build the filter string for the URL:
                 $fullFilter = ($value['operator'] == 'OR' ? '~' : '')
-                    . $facet.':"'.$value['value'].'"';
+                    . $facet . ':"' . $value['value'] . '"';
 
                 // If we haven't already found a selected facet and the current
                 // facet has been applied to the search, we should store it as
@@ -232,4 +237,3 @@ class SummonController extends AbstractSearch
         return $facetList;
     }
 }
-

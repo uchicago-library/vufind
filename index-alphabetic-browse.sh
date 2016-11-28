@@ -10,11 +10,21 @@ else
   JAVA="java"
 fi
 
+if [ -z "$VUFIND_HOME" ]
+then
+  VUFIND_HOME=`dirname $0`
+fi
+
+if [ -z "$SOLR_HOME" ]
+then
+  SOLR_HOME="$VUFIND_HOME/solr/vufind"
+fi
+
 set -e
 set -x
 
 cd "`dirname $0`/import"
-CLASSPATH="browse-indexing.jar:../solr/lib/*"
+CLASSPATH="browse-indexing.jar:${SOLR_HOME}/jars/*:${SOLR_HOME}/../vendor/contrib/analysis-extras/lib/*:${SOLR_HOME}/../vendor/server/solr-webapp/webapp/WEB-INF/lib/*"
 
 # make index work with replicated index
 # current index is stored in the last line of index.properties
@@ -38,9 +48,9 @@ function locate_index
     eval $targetVar="$indexDir/$subDir"
 }
 
-locate_index "bib_index" "../solr/biblio"
-locate_index "auth_index" "../solr/authority"
-index_dir="../solr/alphabetical_browse"
+locate_index "bib_index" "${SOLR_HOME}/biblio"
+locate_index "auth_index" "${SOLR_HOME}/authority"
+index_dir="${SOLR_HOME}/alphabetical_browse"
 
 mkdir -p "$index_dir"
 
@@ -70,5 +80,5 @@ build_browse "hierarchy" "hierarchy_browse"
 build_browse "title" "title_fullStr" 1 "-Dbibleech=StoredFieldLeech -Dsortfield=title_sort -Dvaluefield=title_fullStr"
 build_browse "topic" "topic_browse"
 build_browse "author" "author_browse"
-build_browse "lcc" "callnumber-a" 1
-build_browse "dewey" "dewey-raw" 1 "-Dbibleech=StoredFieldLeech -Dsortfield=dewey-sort-browse -Dvaluefield=dewey-raw"
+build_browse "lcc" "callnumber-raw" 1 "-Dbrowse.normalizer=org.vufind.util.LCCallNormalizer"
+build_browse "dewey" "dewey-raw" 1 "-Dbrowse.normalizer=org.vufind.util.DeweyCallNormalizer"

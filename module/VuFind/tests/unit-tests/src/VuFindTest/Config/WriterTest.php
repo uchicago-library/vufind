@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\Config;
 use VuFind\Config\Writer;
@@ -31,12 +31,12 @@ use VuFind\Config\Writer;
 /**
  * Config Writer Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class WriterTest extends \VuFindTest\Unit\TestCase
 {
@@ -59,22 +59,22 @@ class WriterTest extends \VuFindTest\Unit\TestCase
      */
     public function testReadArray()
     {
-        $cfg = array('Test' => array('key1' => 'val1', 'key2' => 'val2'));
-        $comments = array(
-            'sections' => array(
-                'Test' => array(
+        $cfg = ['Test' => ['key1' => 'val1', 'key2' => 'val2']];
+        $comments = [
+            'sections' => [
+                'Test' => [
                     'before' => "; section head\n",
                     'inline' => '; inline',
-                    'settings' => array(
-                        'key1' => array(
+                    'settings' => [
+                        'key1' => [
                             'before' => "; key head\n",
                             'inline' => '; key inline'
-                        )
-                    )
-                )
-            ),
+                        ]
+                    ]
+                ]
+            ],
             'after' => "; the end\n"
-        );
+        ];
         $target = "; section head\n[Test]\t; inline\n; key head\n"
             . "key1             = \"val1\"\t; key inline\n"
             . "key2             = \"val2\"\n; the end\n";
@@ -101,7 +101,7 @@ class WriterTest extends \VuFindTest\Unit\TestCase
      */
     public function testStandardArray()
     {
-        $cfg = array('Test' => array('test' => array('val1', 'val2')));
+        $cfg = ['Test' => ['test' => ['val1', 'val2']]];
         $test = new Writer('fake.ini', $cfg);
         $expected = "[Test]\ntest[]           = \"val1\"\n"
             . "test[]           = \"val2\"\n\n";
@@ -116,7 +116,7 @@ class WriterTest extends \VuFindTest\Unit\TestCase
      */
     public function testOutOfOrderArray()
     {
-        $cfg = array('Test' => array('test' => array(6 => 'val1', 8 => 'val2')));
+        $cfg = ['Test' => ['test' => [6 => 'val1', 8 => 'val2']]];
         $test = new Writer('fake.ini', $cfg);
         $expected = "[Test]\ntest[6]          = \"val1\"\n"
             . "test[8]          = \"val2\"\n\n";
@@ -130,9 +130,9 @@ class WriterTest extends \VuFindTest\Unit\TestCase
      */
     public function testAssocArray()
     {
-        $cfg = array(
-            'Test' => array('test' => array('key1' => 'val1', 'key2' => 'val2'))
-        );
+        $cfg = [
+            'Test' => ['test' => ['key1' => 'val1', 'key2' => 'val2']]
+        ];
         $test = new Writer('fake.ini', $cfg);
         $expected = "[Test]\ntest['key1']     = \"val1\"\n"
             . "test['key2']     = \"val2\"\n\n";
@@ -150,10 +150,12 @@ class WriterTest extends \VuFindTest\Unit\TestCase
         $test = new Writer('fake.ini', $cfg);
         $test->set('test', 'key2', 'val2');
         $test->set('test', 'key1', 'val1b');
+        $test->set('test', 'keyQuote', 'I "quoted" it');
         $ini = parse_ini_string($test->getContent(), true);
         $this->assertEquals('val1b', $ini['test']['key1']);
         $this->assertEquals('val2', $ini['test']['key2']);
         $this->assertEquals('val3', $ini['test']['key3']);
+        $this->assertEquals('I "quoted" it', $ini['test']['keyQuote']);
     }
 
     /**
@@ -211,5 +213,32 @@ class WriterTest extends \VuFindTest\Unit\TestCase
         $test->set('a', 'two', '');
         $ini = parse_ini_string($test->getContent(), true);
         $this->assertEquals('', $ini['a']['two']);
+    }
+
+    /**
+     * Test alignment of values.
+     *
+     * @return void
+     */
+    public function testTabAlignment()
+    {
+        $test = new Writer('fake.ini', ['general' => ['foo' => 'bar', 'foofoofoofoofoofo' => 'baz']]);
+        $expected = "[general]\nfoo              = \"bar\"\nfoofoofoofoofoofo = \"baz\"\n";
+        $this->assertEquals($expected, $test->getContent());
+    }
+
+    /**
+     * Test clearing values.
+     *
+     * @return void
+     */
+    public function testClear()
+    {
+        $cfg = "[a]\nb[]=1\nb[]=2\n[b]\nc=3\n";
+        $test = new Writer('fake.ini', $cfg);
+        $test->clear('a', 'b[]');   // clear array
+        $test->clear('b', 'c');     // clear single value
+        $test->clear('z', 'z');     // clear value that does not exist
+        $this->assertEquals("[a]\n[b]", trim($test->getContent()));
     }
 }

@@ -18,13 +18,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Cache
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Cache\Storage\Adapter;
 
@@ -33,11 +33,12 @@ use Zend\Cache\Storage\Adapter\AbstractAdapter;
 /**
  * VuFind NoCacheAdapter.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Cache
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
+ *
  * @SuppressWarnings(PHPMD.UnusedFormalParameter)
  */
 class NoCacheAdapter extends AbstractAdapter
@@ -45,9 +46,9 @@ class NoCacheAdapter extends AbstractAdapter
     /**
      * Internal method to get an item.
      *
-     * @param string &$normalizedKey Normalized key
-     * @param bool   &$success       Success indicator
-     * @param mixed  &$casToken      CAS token
+     * @param string $normalizedKey Normalized key
+     * @param bool   $success       Success indicator
+     * @param mixed  $casToken      CAS token
      *
      * @return mixed Data on success, null on failure
      */
@@ -60,8 +61,8 @@ class NoCacheAdapter extends AbstractAdapter
     /**
      * Internal method to store an item.
      *
-     * @param string &$normalizedKey Normalized key
-     * @param mixed  &$value         Cache item
+     * @param string $normalizedKey Normalized key
+     * @param mixed  $value         Cache item
      *
      * @return bool
      */
@@ -73,7 +74,7 @@ class NoCacheAdapter extends AbstractAdapter
     /**
      * Internal method to remove an item.
      *
-     * @param string &$normalizedKey Normalized key
+     * @param string $normalizedKey Normalized key
      *
      * @return bool
      */

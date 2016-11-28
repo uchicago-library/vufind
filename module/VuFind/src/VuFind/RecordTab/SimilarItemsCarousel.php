@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordTabs
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_tabs Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
 namespace VuFind\RecordTab;
 
 /**
  * Staff view (array dump) tab
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordTabs
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_tabs Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
 class SimilarItemsCarousel extends AbstractBase
 {
@@ -73,8 +73,6 @@ class SimilarItemsCarousel extends AbstractBase
     }
 
     /**
-     * getResults
-     *
      * Get an array of Record Driver objects representing items similar to the one
      * passed to the constructor.
      *
@@ -83,7 +81,7 @@ class SimilarItemsCarousel extends AbstractBase
     public function getResults()
     {
         $record = $this->getRecordDriver();
-        $params = new \VuFindSearch\ParamBag(array('rows' => 40));
+        $params = new \VuFindSearch\ParamBag(['rows' => 40]);
         return $this->searchService->similar(
             $record->getSourceIdentifier(), $record->getUniqueId(), $params
         );

@@ -17,14 +17,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  ILS_Drivers
  * @author   Altaf Mahmud, System Programmer <altaf.mahmud@gmail.com>
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:building_an_ils_driver Wiki
+ * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
 namespace VuFind\ILS\Driver;
 use PDO, PDOException, VuFind\Exception\ILS as ILSException;
@@ -32,14 +32,12 @@ use PDO, PDOException, VuFind\Exception\ILS as ILSException;
 /**
  * VuFind Driver for Koha (version: 3.02)
  *
- * last updated: 12/21/2010
- *
- * @category VuFind2
+ * @category VuFind
  * @package  ILS_Drivers
  * @author   Altaf Mahmud, System Programmer <altaf.mahmud@gmail.com>
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:building_an_ils_driver Wiki
+ * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
 class Koha extends AbstractBase
 {
@@ -85,7 +83,8 @@ class Koha extends AbstractBase
             ';port=' . $this->config['Catalog']['port'] .
             ';dbname=' . $this->config['Catalog']['database'],
             $this->config['Catalog']['username'],
-            $this->config['Catalog']['password']
+            $this->config['Catalog']['password'],
+            [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
         );
         // Throw PDOExceptions if something goes wrong
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -117,7 +116,7 @@ class Koha extends AbstractBase
      */
     public function getHolding($id, array $patron = null)
     {
-        $holding = array();
+        $holding = [];
         $available = true;
         $duedate = $status = '';
         $inum = 0;
@@ -129,7 +128,7 @@ class Koha extends AbstractBase
             " order by itemnumber";
         try {
             $itemSqlStmt = $this->db->prepare($sql);
-            $itemSqlStmt->execute(array(':id' => $id));
+            $itemSqlStmt->execute([':id' => $id]);
             foreach ($itemSqlStmt->fetchAll() as $rowItem) {
                 $inum = $rowItem['ITEMNO'];
                 $sql = "select date_due as DUEDATE from issues " .
@@ -140,7 +139,7 @@ class Koha extends AbstractBase
                     // If the item is available for loan, then check its current
                     // status
                     $issueSqlStmt = $this->db->prepare($sql);
-                    $issueSqlStmt->execute(array(':inum' => $inum));
+                    $issueSqlStmt->execute([':inum' => $inum]);
                     $rowIssue = $issueSqlStmt->fetch();
                     if ($rowIssue) {
                         $available = false;
@@ -165,7 +164,7 @@ class Koha extends AbstractBase
                     $sql = "select branchname as BNAME from branches where " .
                         "branchcode = :loc";
                     $locSqlStmt = $this->db->prepare($sql);
-                    $locSqlStmt->execute(array(':loc' => $loc));
+                    $locSqlStmt->execute([':loc' => $loc]);
                     $row = $locSqlStmt->fetch();
                     if ($row) {
                         $loc = $row['BNAME'];
@@ -181,7 +180,7 @@ class Koha extends AbstractBase
                     : $loc . ": " . 'Unknown';
 
                 //A default value is stored for null
-                $holding[] = array(
+                $holding[] = [
                     'id' => $id,
                     'availability' => $available,
                     'item_num' => $rowItem['ITEMNO'],
@@ -196,7 +195,7 @@ class Koha extends AbstractBase
                         ? 'Unknown' : $rowItem['BARCODE'],
                     'number' => (null == $rowItem['COPYNO'])
                         ? 'Unknown' : $rowItem['COPYNO']
-                );
+                ];
             }
             return $holding;
         }
@@ -216,6 +215,7 @@ class Koha extends AbstractBase
      * @param array  $details Item details from getHoldings return array
      *
      * @return string         URL to ILS's OPAC's place hold screen.
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getHoldLink($id, $details)
@@ -239,7 +239,7 @@ class Koha extends AbstractBase
     {
         $sql = $sqlStmt = $row = '';
         $id = 0;
-        $fineLst = array();
+        $fineLst = [];
         try {
             $id = $patron['id'];
             $sql = "select round(accountlines.amount*100) as AMOUNT, " .
@@ -253,16 +253,16 @@ class Koha extends AbstractBase
                 "join items on accountlines.itemnumber = items.itemnumber " .
                 "where accountlines.borrowernumber = :id";
             $sqlStmt = $this->db->prepare($sql);
-            $sqlStmt->execute(array(':id' => $id));
+            $sqlStmt->execute([':id' => $id]);
             foreach ($sqlStmt->fetchAll() as $row) {
-                $fineLst[] = array(
-                    'amount' => (null == $row['AMOUNT'])? 0 : $row['AMOUNT'],
+                $fineLst[] = [
+                    'amount' => (null == $row['AMOUNT']) ? 0 : $row['AMOUNT'],
                     'checkout' => $row['CHECKOUT'],
-                    'fine' => (null == $row['FINE'])? 'Unknown' : $row['FINE'],
-                    'balance' => (null == $row['BALANCE'])? 0 : $row['BALANCE'],
+                    'fine' => (null == $row['FINE']) ? 'Unknown' : $row['FINE'],
+                    'balance' => (null == $row['BALANCE']) ? 0 : $row['BALANCE'],
                     'duedate' => $row['DUEDATE'],
                     'id' => $row['BIBNO']
-                );
+                ];
             }
             return $fineLst;
         }
@@ -286,7 +286,7 @@ class Koha extends AbstractBase
     {
         $sql = $sqlStmt = $row = '';
         $id = 0;
-        $holdLst = array();
+        $holdLst = [];
         try {
             $id = $patron['id'];
             $sql = "select reserves.biblionumber as BIBNO, " .
@@ -296,14 +296,14 @@ class Koha extends AbstractBase
                 "join branches on reserves.branchcode = branches.branchcode " .
                 "where reserves.borrowernumber = :id";
             $sqlStmt = $this->db->prepare($sql);
-            $sqlStmt->execute(array(':id' => $id));
+            $sqlStmt->execute([':id' => $id]);
             foreach ($sqlStmt->fetchAll() as $row) {
-                $holdLst[] = array(
+                $holdLst[] = [
                     'id' => $row['BIBNO'],
                     'location' => $row['BRNAME'],
                     'expire' => $row['EXDATE'],
                     'create' => $row['RSVDATE']
-                );
+                ];
             }
             return $holdLst;
         }
@@ -326,17 +326,17 @@ class Koha extends AbstractBase
     {
         $id = 0;
         $sql = $sqlStmt = $row = '';
-        $profile = array();
+        $profile = [];
         try {
             $id = $patron['id'];
             $sql = "select address as ADDR1, address2 as ADDR2, zipcode as ZIP, " .
                 "phone as PHONE, categorycode as GRP from borrowers " .
                 "where borrowernumber = :id";
             $sqlStmt = $this->db->prepare($sql);
-            $sqlStmt->execute(array(':id' => $id));
+            $sqlStmt->execute([':id' => $id]);
             $row = $sqlStmt->fetch();
             if ($row) {
-                $profile = array(
+                $profile = [
                     'firstname' => $patron['firstname'],
                     'lastname' => $patron['lastname'],
                     'address1' => $row['ADDR1'],
@@ -344,7 +344,7 @@ class Koha extends AbstractBase
                     'zip' => $row['ZIP'],
                     'phone' => $row['PHONE'],
                     'group' => $row['GRP']
-                );
+                ];
                 return $profile;
             }
             return null;
@@ -369,7 +369,7 @@ class Koha extends AbstractBase
     public function getMyTransactions($patron)
     {
         $id = 0;
-        $transactionLst = array();
+        $transactionLst = [];
         $row = $sql = $sqlStmt = '';
         try {
             $id = $patron['id'];
@@ -378,14 +378,14 @@ class Koha extends AbstractBase
                 "from issues join items on issues.itemnumber = items.itemnumber " .
                 "where issues.borrowernumber = :id";
             $sqlStmt = $this->db->prepare($sql);
-            $sqlStmt->execute(array(':id' => $id));
+            $sqlStmt->execute([':id' => $id]);
             foreach ($sqlStmt->fetchAll() as $row) {
-                $transactionLst[] = array(
+                $transactionLst[] = [
                     'duedate' => $row['DUEDATE'],
                     'id' => $row['BIBNO'],
                     'barcode' => $row['BARCODE'],
                     'renew' => $row['RENEWALS']
-                );
+                ];
             }
             return $transactionLst;
         }
@@ -404,12 +404,13 @@ class Koha extends AbstractBase
      *
      * @throws ILSException
      * @return array     An array with the acquisitions data on success.
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getPurchaseHistory($id)
     {
         // TODO
-        return array();
+        return [];
     }
 
     /**
@@ -442,7 +443,7 @@ class Koha extends AbstractBase
      */
     public function getStatuses($idLst)
     {
-        $statusLst = array();
+        $statusLst = [];
         foreach ($idLst as $id) {
             $statusLst[] = $this->getStatus($id);
         }
@@ -461,7 +462,7 @@ class Koha extends AbstractBase
     public function getSuppressedRecords()
     {
         // TODO
-        return array();
+        return [];
     }
 
     /**
@@ -478,13 +479,34 @@ class Koha extends AbstractBase
      */
     public function patronLogin($username, $password)
     {
-        $patron = array();
+        $patron = [];
         $row = '';
 
-        // Koha uses MD5_BASE64 encoding to save borrowers' passwords, function
-        // 'rtrim' is used to discard trailing '=' signs, suitable for pushing
-        // into MySQL database
-        $db_pwd = rtrim(base64_encode(pack('H*', md5($password))), '=');
+        $stored_hash = '';
+        try {
+            $sql = "select password from borrowers where userid = :username";
+            $sqlStmt = $this->db->prepare($sql);
+            $sqlStmt->execute([':username' => $username]);
+            $row = $sqlStmt->fetch();
+            if ($row) {
+                $stored_hash = $row['password'];
+            } else {
+                return null;
+            }
+        }
+        catch (PDOException $e) {
+            throw new ILSException($e->getMessage());
+        }
+
+        if ("$2a$" == substr($stored_hash, 0, 4)) {
+            // Newer Koha version that uses bcrypt
+            $db_pwd = crypt($password, $stored_hash);
+        } else {
+            // Koha used to use MD5_BASE64 encoding to save borrowers' passwords,
+            // function 'rtrim' is used to discard trailing '=' signs, suitable for
+            // pushing into MySQL database
+            $db_pwd = rtrim(base64_encode(pack('H*', md5($password))), '=');
+        }
 
         $sql = "select borrowernumber as ID, firstname as FNAME, " .
             "surname as LNAME, email as EMAIL from borrowers " .
@@ -492,14 +514,14 @@ class Koha extends AbstractBase
         
         try {
             $sqlStmt = $this->db->prepare($sql);
-            $sqlStmt->execute(array(':username' => $username, ':db_pwd' => $db_pwd));
+            $sqlStmt->execute([':username' => $username, ':db_pwd' => $db_pwd]);
             $row = $sqlStmt->fetch();
             if ($row) {
                 // NOTE: Here, 'cat_password' => $password is used, password is
                 // saved in a clear text as user provided.  If 'cat_password' =>
                 // $db_pwd was used, then password will be saved encrypted as in
                 // 'borrowers' table of 'koha' database
-                $patron = array(
+                $patron = [
                     'id' => $row['ID'],
                     'firstname' => $row['FNAME'],
                     'lastname' => $row['LNAME'],
@@ -508,7 +530,7 @@ class Koha extends AbstractBase
                     'email' => $row['EMAIL'],
                     'major' => null,
                     'college' => null
-                );
+                ];
 
                 return $patron;
             }

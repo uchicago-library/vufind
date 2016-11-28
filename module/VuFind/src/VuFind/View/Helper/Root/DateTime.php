@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  View_Helpers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\View\Helper\Root;
 
 /**
  * View helper for formatting dates and times
  *
- * @category VuFind2
+ * @category VuFind
  * @package  View_Helpers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class DateTime extends \Zend\View\Helper\AbstractHelper
 {
@@ -82,12 +82,12 @@ class DateTime extends \Zend\View\Helper\AbstractHelper
     {
         $dueDateHelpString
             = $this->converter->convertToDisplayDate("m-d-y", "11-22-3333");
-        $search = array("1", "2", "3");
-        $replace = array(
+        $search = ["1", "2", "3"];
+        $replace = [
             $this->view->translate("date_month_placeholder"),
             $this->view->translate("date_day_placeholder"),
             $this->view->translate("date_year_placeholder")
-        );
+        ];
 
         return str_replace($search, $replace, $dueDateHelpString);
     }
@@ -102,6 +102,6 @@ class DateTime extends \Zend\View\Helper\AbstractHelper
      */
     public function __call($methodName, $params)
     {
-        return call_user_func_array(array($this->converter, $methodName), $params);
+        return call_user_func_array([$this->converter, $methodName], $params);
     }
 }

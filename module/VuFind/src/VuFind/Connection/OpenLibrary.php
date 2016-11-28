@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  OpenLibrary
  * @author   Eoghan Ó Carragáin <eoghan.ocarragain@gmail.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\Connection;
 
@@ -32,11 +32,11 @@ namespace VuFind\Connection;
  *
  * Class for accessing helpful Open Library APIs.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  OpenLibrary
  * @author   Eoghan Ó Carragáin <eoghan.ocarragain@gmail.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class OpenLibrary
 {
@@ -79,7 +79,7 @@ class OpenLibrary
         $limit = 5, $offset = null, $publicFullText = true
     ) {
         // empty array to hold the result
-        $result = array();
+        $result = [];
 
         // normalise subject term
         $subject = $this->normaliseSubjectString($subject);
@@ -100,7 +100,7 @@ class OpenLibrary
                 // ebooks parameter does not work at present, so limit has been set
                 // to 50 to increase likelihood of full-text, public scans being
                 // returned. see https://bugs.launchpad.net/openlibrary/+bug/709772
-                $url= "http://openlibrary.org/subjects/" . $subjectType . $subject .
+                $url = "http://openlibrary.org/subjects/" . $subjectType . $subject .
                     ".json?ebooks=" . $ebooks . "&details=" . $details .
                     "&offset=" . $offset . "&limit=50&published_in=" . $publishedIn;
 
@@ -125,7 +125,7 @@ class OpenLibrary
     protected function processSubjectsApi($url, $limit, $publicFullText)
     {
         // empty array to hold the result
-        $result = array();
+        $result = [];
 
         // find out if there are any reviews
         $response = $this->client->setUri($url)->setMethod('GET')->send();
@@ -174,7 +174,7 @@ class OpenLibrary
     protected function normaliseSubjectString($subject)
     {
         // Normalise search term
-        $subject = str_replace(array('"', ',', '/'), '', $subject);
+        $subject = str_replace(['"', ',', '/'], '', $subject);
         $subject = trim(strtolower($subject));
         $subject = preg_replace("/\s+/", "_", $subject);
         return $subject;

@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 namespace VuFind\Recommend;
 use Zend\Config\Config;
@@ -33,11 +33,11 @@ use Zend\Config\Config;
  *
  * This class provides recommendations displaying facets beside search results
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 abstract class AbstractFacets implements RecommendInterface
 {
@@ -46,14 +46,14 @@ abstract class AbstractFacets implements RecommendInterface
      *
      * @var array
      */
-    protected $excludableFacets = array();
+    protected $excludableFacets = [];
 
     /**
      * Facets that are "ORed" instead of "ANDed."
      *
      * @var array
      */
-    protected $orFacets = array();
+    protected $orFacets = [];
 
     /**
      * Search results
@@ -80,8 +80,6 @@ abstract class AbstractFacets implements RecommendInterface
     }
 
     /**
-     * process
-     *
      * Called after the Search Results object has performed its main search.  This
      * may be used to extract necessary information from the Search Results object
      * or to perform completely unrelated processing.

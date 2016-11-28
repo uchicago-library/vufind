@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search_Solr
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
-
 namespace VuFind\Search;
 
 use VuFindSearch\Query\AbstractQuery;
@@ -40,11 +39,11 @@ use Zend\StdLib\Parameters;
  * The class is a intermediate solution to translate the (possibly modified)
  * search query parameters in an object required by the new search system.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search_Solr
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 abstract class QueryAdapter
 {
@@ -57,7 +56,8 @@ abstract class QueryAdapter
      */
     public static function deminify(array $search)
     {
-        if (isset($search['l'])) {
+        // Use array_key_exists since null is also valid
+        if (array_key_exists('l', $search)) {
             $handler = isset($search['i']) ? $search['i'] : $search['f'];
             return new Query(
                 $search['l'], $handler, isset($search['o']) ? $search['o'] : null
@@ -65,14 +65,14 @@ abstract class QueryAdapter
         } elseif (isset($search['g'])) {
             $operator = $search['g'][0]['b'];
             return new QueryGroup(
-                $operator, array_map(array('self', 'deminify'), $search['g'])
+                $operator, array_map(['self', 'deminify'], $search['g'])
             );
         } else {
             // Special case: The outer-most group-of-groups.
             if (isset($search[0]['j'])) {
                 $operator = $search[0]['j'];
                 return new QueryGroup(
-                    $operator, array_map(array('self', 'deminify'), $search)
+                    $operator, array_map(['self', 'deminify'], $search)
                 );
             } else {
                 // Simple query
@@ -114,11 +114,11 @@ abstract class QueryAdapter
         $showName
     ) {
         // Groups and exclusions.
-        $groups = $excludes = array();
+        $groups = $excludes = [];
 
         foreach ($query->getQueries() as $search) {
             if ($search instanceof QueryGroup) {
-                $thisGroup = array();
+                $thisGroup = [];
                 // Process each search group
                 foreach ($search->getQueries() as $group) {
                     if ($group instanceof Query) {
@@ -171,11 +171,11 @@ abstract class QueryAdapter
     public static function fromRequest(Parameters $request, $defaultHandler)
     {
         $groupCount = 0;
-        $groups = array();
+        $groups = [];
 
         // Loop through each search group
         while (!is_null($lookfor = $request->get("lookfor{$groupCount}"))) {
-            $group = array();
+            $group = [];
             $lastBool = null;
 
             // Loop through each term inside the group
@@ -184,16 +184,14 @@ abstract class QueryAdapter
                 if ($lookfor[$i] != '') {
                     // Use default fields if not set
                     $typeArr = $request->get('type' . $groupCount);
-                    $handler = (isset($typeArr[$i]) && !empty($typeArr[$i]))
-                        ? $typeArr[$i] : $defaultHandler;
+                    $handler = !empty($typeArr[$i]) ? $typeArr[$i] : $defaultHandler;
 
                     $opArr = $request->get('op' . $groupCount);
-                    $operator = (isset($opArr[$i]) && !empty($opArr[$i]))
-                        ? $opArr[$i] : null;
+                    $operator = !empty($opArr[$i]) ? $opArr[$i] : null;
 
                     // Add term to this group
                     $boolArr = $request->get('bool' . $groupCount);
-                    $lastBool = isset($boolArr[0]) ? $boolArr[0] : null;
+                    $lastBool = isset($boolArr[0]) ? $boolArr[0] : 'AND';
                     $group[] = new Query($lookfor[$i], $handler, $operator);
                 }
             }
@@ -209,7 +207,7 @@ abstract class QueryAdapter
         }
 
         return (count($groups) > 0)
-            ? new QueryGroup($request->get('join'), $groups)
+            ? new QueryGroup($request->get('join', 'AND'), $groups)
             : new Query();
     }
 
@@ -225,31 +223,31 @@ abstract class QueryAdapter
     {
         // Simple query:
         if ($query instanceof Query) {
-            return array(
-                array(
+            return [
+                [
                     'l' => $query->getString(),
                     'i' => $query->getHandler()
-                )
-            );
+                ]
+            ];
         }
 
         // Advanced query:
-        $retVal = array();
+        $retVal = [];
         $operator = $query->isNegated() ? 'NOT' : $query->getOperator();
         foreach ($query->getQueries() as $current) {
             if ($topLevel) {
-                $retVal[] = array(
+                $retVal[] = [
                     'g' => self::minify($current, false),
                     'j' => $operator
-                );
+                ];
             } elseif ($current instanceof QueryGroup) {
                 throw new \Exception('Not sure how to minify this query!');
             } else {
-                $currentArr = array(
+                $currentArr = [
                     'f' => $current->getHandler(),
                     'l' => $current->getString(),
                     'b' => $operator
-                );
+                ];
                 if (null !== ($op = $current->getOperator())) {
                     $currentArr['o'] = $op;
                 }

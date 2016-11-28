@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest;
 
 /**
  * Tags Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class TagsTest extends \PHPUnit_Framework_TestCase
 {
@@ -61,7 +61,7 @@ class TagsTest extends \PHPUnit_Framework_TestCase
     public function testTagParsing()
     {
         $this->assertEquals(
-            array('this', 'that', 'the other'),
+            ['this', 'that', 'the other'],
             $this->parser->parse('this that "the other"')
         );
     }
@@ -73,7 +73,7 @@ class TagsTest extends \PHPUnit_Framework_TestCase
      */
     public function testEmptyTagParsing()
     {
-        $this->assertEquals(array(), $this->parser->parse(''));
+        $this->assertEquals([], $this->parser->parse(''));
     }
 
     /**
@@ -83,7 +83,7 @@ class TagsTest extends \PHPUnit_Framework_TestCase
      */
     public function testDeduplication()
     {
-        $this->assertEquals(array('test'), $this->parser->parse('test test test'));
+        $this->assertEquals(['test'], $this->parser->parse('test test test'));
     }
 
     /**
@@ -95,6 +95,6 @@ class TagsTest extends \PHPUnit_Framework_TestCase
     {
         // Create custom object w/ small size limit:
         $parser = new \VuFind\Tags(10);
-        $this->assertEquals(array('0123456789'), $parser->parse('01234567890'));
+        $this->assertEquals(['0123456789'], $parser->parse('01234567890'));
     }
 }

@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\Recommend;
 use VuFind\Recommend\ExpandFacets;
@@ -31,11 +31,11 @@ use VuFind\Recommend\ExpandFacets;
 /**
  * ExpandFacets recommendation module Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class ExpandFacetsTest extends \VuFindTest\Unit\TestCase
 {
@@ -59,18 +59,18 @@ class ExpandFacetsTest extends \VuFindTest\Unit\TestCase
     public function testFacetInit()
     {
         $configLoader = $this->getMockConfigLoader(
-            array(
-                'Results' => array(
+            [
+                'Results' => [
                     'format' => 'Format',
-                ),
-            )
+                ],
+            ]
         );
         $results = $this->getMockResults();
         $params = $results->getParams();
         $params->expects($this->once())->method('addFacet')->with($this->equalTo('format'), $this->equalTo('Format'));
-        $results->expects($this->once())->method('getFacetList')->with($this->equalTo(array('format' => 'Format')))->will($this->returnValue(array('foo')));
+        $results->expects($this->once())->method('getFacetList')->with($this->equalTo(['format' => 'Format']))->will($this->returnValue(['foo']));
         $ef = $this->getExpandFacets($configLoader, $results);
-        $this->assertEquals(array('foo'), $ef->getExpandedSet());
+        $this->assertEquals(['foo'], $ef->getExpandedSet());
     }
 
     /**
@@ -96,7 +96,7 @@ class ExpandFacetsTest extends \VuFindTest\Unit\TestCase
             $emptyResults = $this->getMockResults();
         }
         if (null === $request) {
-            $request = new \Zend\StdLib\Parameters(array());
+            $request = new \Zend\StdLib\Parameters([]);
         }
         $sf = new ExpandFacets($configLoader, $emptyResults);
         $sf->setConfig($settings);
@@ -113,7 +113,7 @@ class ExpandFacetsTest extends \VuFindTest\Unit\TestCase
      *
      * @return \VuFind\Config\PluginManager
      */
-    protected function getMockConfigLoader($config = array(), $key = 'facets')
+    protected function getMockConfigLoader($config = [], $key = 'facets')
     {
         $loader = $this->getMockBuilder('VuFind\Config\PluginManager')
             ->disableOriginalConstructor()->getMock();

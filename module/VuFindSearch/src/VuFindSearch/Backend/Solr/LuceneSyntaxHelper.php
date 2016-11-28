@@ -6,6 +6,7 @@
  * PHP version 5
  *
  * Copyright (C) Villanova University 2010.
+ * Copyright (C) The National Library of Finland 2016.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -18,28 +19,30 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindSearch\Backend\Solr;
 
 /**
  * Lucene query syntax helper class.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class LuceneSyntaxHelper
 {
@@ -78,7 +81,7 @@ class LuceneSyntaxHelper
      *
      * @var array
      */
-    protected $allBools = array('AND', 'OR', 'NOT');
+    protected $allBools = ['AND', 'OR', 'NOT'];
 
     /**
      * Constructor.
@@ -153,7 +156,7 @@ class LuceneSyntaxHelper
         }
 
         // Check for unescaped parentheses:
-        $stripped = str_replace(array('\(', '\)'), '', $searchString);
+        $stripped = str_replace(['\(', '\)'], '', $searchString);
         if (strstr($stripped, '(') && strstr($stripped, ')')) {
             return true;
         }
@@ -218,7 +221,7 @@ class LuceneSyntaxHelper
      *
      * @return string
      */
-    public function capitalizeBooleans($string, $bools = array('AND', 'OR', 'NOT'))
+    public function capitalizeBooleans($string, $bools = ['AND', 'OR', 'NOT'])
     {
         // Short-circuit if no Booleans were selected:
         if (empty($bools)) {
@@ -232,7 +235,7 @@ class LuceneSyntaxHelper
         $lookahead = self::$insideQuotes;
 
         // Create standard conversions:
-        $regs = $replace = array();
+        $regs = $replace = [];
         foreach ($bools as $bool) {
             $regs[] = "/\s+{$bool}\s+{$lookahead}/i";
             $replace[] = ' ' . $bool . ' ';
@@ -261,10 +264,75 @@ class LuceneSyntaxHelper
         // problems in case-sensitive fields when the reserved words are
         // actually used as search terms.
         $lookahead = self::$insideQuotes;
-        $regs = array("/(\[)([^\]]+)\s+TO\s+([^\]]+)(\]){$lookahead}/i",
-            "/(\{)([^}]+)\s+TO\s+([^}]+)(\}){$lookahead}/i");
-        $callback = array($this, 'capitalizeRangesCallback');
+        $regs = ["/(\[)([^\]]+)\s+TO\s+([^\]]+)(\]){$lookahead}/i",
+            "/(\{)([^}]+)\s+TO\s+([^}]+)(\}){$lookahead}/i"];
+        $callback = [$this, 'capitalizeRangesCallback'];
         return trim(preg_replace_callback($regs, $callback, $string));
+    }
+
+    /**
+     * Extract search terms from a query string for spell checking.
+     *
+     * This will only handle the most often used simple cases.
+     *
+     * @param string $query Query string
+     *
+     * @return string
+     */
+    public function extractSearchTerms($query)
+    {
+        $result = [];
+        $inQuotes = false;
+        $collected = '';
+        $discardParens = 0;
+        // Discard local parameters
+        $query = preg_replace('/\{!.+?\}/', '', $query);
+        // Discard fuzziness and proximity indicators
+        $query = preg_replace('/\~[^\s]*/', '', $query);
+        $query = preg_replace('/\^[^\s]*/', '', $query);
+        $lastCh = '';
+        foreach (str_split($query) as $ch) {
+            // Handle quotes (everything in quotes is considered part of search
+            // terms)
+            if ($ch == '"' && $lastCh != '\\') {
+                $inQuotes = !$inQuotes;
+            }
+            if (!$inQuotes) {
+                // Discard closing parenthesis for previously discarded opening ones
+                // to keep balance
+                if ($ch == ')' && $discardParens > 0) {
+                    --$discardParens;
+                    continue;
+                }
+                // Flush to result array on word break
+                if ($ch == ' ' && $collected !== '') {
+                    $result[] = $collected;
+                    $collected = '';
+                    continue;
+                }
+                // If we encounter ':', discard preceding string as it's a field name
+                if ($ch == ':') {
+                    // Take into account any opening parenthesis we discard here
+                    $discardParens += substr_count($collected, '(');
+                    $collected = '';
+                    continue;
+                }
+            }
+            $collected .= $ch;
+            $lastCh = $ch;
+        }
+        // Flush final collected string
+        if ($collected !== '') {
+            $result[] = $collected;
+        }
+        // Discard any preceding pluses or minuses
+        $result = array_map(
+            function ($s) {
+                return ltrim($s, '+-');
+            },
+            $result
+        );
+        return implode(' ', $result);
     }
 
     /**
@@ -302,7 +370,7 @@ class LuceneSyntaxHelper
     protected function normalizeFancyQuotes($input)
     {
         // Normalize fancy quotes:
-        $quotes = array(
+        $quotes = [
             "\xC2\xAB"     => '"', // « (U+00AB) in UTF-8
             "\xC2\xBB"     => '"', // » (U+00BB) in UTF-8
             "\xE2\x80\x98" => "'", // ‘ (U+2018) in UTF-8
@@ -315,7 +383,7 @@ class LuceneSyntaxHelper
             "\xE2\x80\x9F" => '"', // ? (U+201F) in UTF-8
             "\xE2\x80\xB9" => "'", // ‹ (U+2039) in UTF-8
             "\xE2\x80\xBA" => "'", // › (U+203A) in UTF-8
-        );
+        ];
         return strtr($input, $quotes);
     }
 
@@ -347,7 +415,7 @@ class LuceneSyntaxHelper
         //     -- dmaus, 2012-11-11
         $start = preg_match_all('/\(/', $input, $tmp);
         $end = preg_match_all('/\)/', $input, $tmp);
-        return ($start != $end) ? str_replace(array('(', ')'), '', $input) : $input;
+        return ($start != $end) ? str_replace(['(', ')'], '', $input) : $input;
     }
 
     /**
@@ -387,7 +455,7 @@ class LuceneSyntaxHelper
         // invalid brackets/braces, and transform our tokens back into valid ones.
         // Obviously, the order of the patterns/merges array is critically
         // important to get this right!!
-        $patterns = array(
+        $patterns = [
             // STEP 1 -- escape valid brackets/braces
             '/\[([^\[\]\s]+\s+TO\s+[^\[\]\s]+)\]/' .
             ($this->caseSensitiveRanges ? '' : 'i'),
@@ -397,14 +465,14 @@ class LuceneSyntaxHelper
             '/[\[\]\{\}]/',
             // STEP 3 -- unescape valid brackets/braces
             '/\^\^lbrack\^\^/', '/\^\^rbrack\^\^/',
-            '/\^\^lbrace\^\^/', '/\^\^rbrace\^\^/');
-        $matches = array(
+            '/\^\^lbrace\^\^/', '/\^\^rbrace\^\^/'];
+        $matches = [
             // STEP 1 -- escape valid brackets/braces
             '^^lbrack^^$1^^rbrack^^', '^^lbrace^^$1^^rbrace^^',
             // STEP 2 -- destroy remaining brackets/braces
             '',
             // STEP 3 -- unescape valid brackets/braces
-            '[', ']', '{', '}');
+            '[', ']', '{', '}'];
         return preg_replace($patterns, $matches, $input);
     }
 
@@ -450,7 +518,7 @@ class LuceneSyntaxHelper
         $lookahead = self::$insideQuotes;
         $input = preg_replace('/:+/', ':', $input);
         $input = preg_replace('/(\:[:\s]+|[:\s]+:)' . $lookahead . '/', ' ', $input);
-        return $input == ':' ? '' : $input;
+        return trim($input, ':');
     }
     /**
      * Prepare input to be used in a SOLR query.
@@ -481,7 +549,7 @@ class LuceneSyntaxHelper
 
         // If the string consists only of control characters and/or BOOLEANs with no
         // other input, wipe it out entirely to prevent weird errors:
-        $operators = array('AND', 'OR', 'NOT', '+', '-', '"', '&', '|');
+        $operators = ['AND', 'OR', 'NOT', '+', '-', '"', '&', '|'];
         if (trim(str_replace($operators, '', $input)) == '') {
             return '';
         }
@@ -523,7 +591,7 @@ class LuceneSyntaxHelper
             || $this->caseSensitiveBooleans === 1
             || $this->caseSensitiveBooleans === "1"
         ) {
-            return array();
+            return [];
         }
 
         // Callback function to clean up configuration settings:

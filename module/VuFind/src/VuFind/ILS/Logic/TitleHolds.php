@@ -17,27 +17,28 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  ILS_Logic
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Luke O'Sullivan <l.osullivan@swansea.ac.uk>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\ILS\Logic;
-use VuFind\ILS\Connection as ILSConnection;
+use VuFind\ILS\Connection as ILSConnection,
+    VuFind\Exception\ILS as ILSException;
 
 /**
  * Title Hold Logic Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  ILS_Logic
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Luke O'Sullivan <l.osullivan@swansea.ac.uk>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class TitleHolds
 {
@@ -74,7 +75,7 @@ class TitleHolds
      *
      * @var array
      */
-    protected $hideHoldings = array();
+    protected $hideHoldings = [];
 
     /**
      * Constructor
@@ -106,6 +107,8 @@ class TitleHolds
      * @param string $id A Bib ID
      *
      * @return string|bool URL to place hold, or false if hold option unavailable
+     *
+     * @todo Indicate login failure or ILS connection failure somehow?
      */
     public function getHold($id)
     {
@@ -115,13 +118,21 @@ class TitleHolds
             if ($mode == 'disabled') {
                  return false;
             } else if ($mode == 'driver') {
-                $patron = $this->ilsAuth->storedCatalogLogin();
+                try {
+                    $patron = $this->ilsAuth->storedCatalogLogin();
+                } catch (ILSException $e) {
+                    return false;
+                }
                 if (!$patron) {
                     return false;
                 }
                 return $this->driverHold($id, $patron);
             } else {
-                $patron = $this->ilsAuth->storedCatalogLogin();
+                try {
+                    $patron = $this->ilsAuth->storedCatalogLogin();
+                } catch (ILSException $e) {
+                    $patron = false;
+                }
                 $mode = $this->checkOverrideMode($id, $mode);
                 return $this->generateHold($id, $mode, $patron);
             }
@@ -140,7 +151,7 @@ class TitleHolds
     {
         // Cache results in a static array since the same holdings may be requested
         // multiple times during a run through the class:
-        static $holdings = array();
+        static $holdings = [];
 
         if (!isset($holdings[$id])) {
             $holdings[$id] = $this->catalog->getHolding($id);
@@ -194,10 +205,10 @@ class TitleHolds
         $checkHolds = $this->catalog->checkFunction(
             'Holds', compact('id', 'patron')
         );
-        $data = array(
+        $data = [
             'id' => $id,
             'level' => 'title'
-        );
+        ];
 
         if ($checkHolds != false) {
             $valid = $this->catalog->checkRequestIsValid($id, $data, $patron);
@@ -223,10 +234,10 @@ class TitleHolds
         $any_available = false;
         $addlink = false;
 
-        $data = array(
+        $data = [
             'id' => $id,
             'level' => 'title'
-        );
+        ];
 
         // Are holds allows?
         $checkHolds = $this->catalog->checkFunction(
@@ -281,7 +292,7 @@ class TitleHolds
         foreach ($data as $key => $param) {
             $needle = in_array($key, $HMACKeys);
             if ($needle) {
-                $queryString[] = $key. '=' .urlencode($param);
+                $queryString[] = $key . '=' . urlencode($param);
             }
         }
 
@@ -290,9 +301,9 @@ class TitleHolds
         $queryString = implode('&', $queryString);
 
         // Build Params
-        return array(
+        return [
             'action' => 'Hold', 'record' => $data['id'], 'query' => $queryString,
             'anchor' => '#tabnav'
-        );
+        ];
     }
 }

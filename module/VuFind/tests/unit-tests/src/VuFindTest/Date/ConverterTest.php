@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFindTest\Date;
 use VuFind\Date\Converter, VuFind\Exception\Date as DateException,
@@ -32,11 +32,11 @@ use VuFind\Date\Converter, VuFind\Exception\Date as DateException,
 /**
  * VuFindDate Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class ConverterTest extends \VuFindTest\Unit\TestCase
 {
@@ -54,7 +54,7 @@ class ConverterTest extends \VuFindTest\Unit\TestCase
         $real_zone = date_default_timezone_get();
 
         // Try all the tests in different time zones to ensure consistency:
-        foreach (array('America/New_York', 'Europe/Helsinki') as $zone) {
+        foreach (['America/New_York', 'Europe/Helsinki'] as $zone) {
             date_default_timezone_set($zone);
             $this->runTests();
         }
@@ -72,7 +72,7 @@ class ConverterTest extends \VuFindTest\Unit\TestCase
     {
         // Build an object to test with (using empty configuration to ensure default
         // settings):
-        $date = new Converter(new Config(array()));
+        $date = new Converter(new Config([]));
 
         // Try some conversions:
         $this->assertEquals(

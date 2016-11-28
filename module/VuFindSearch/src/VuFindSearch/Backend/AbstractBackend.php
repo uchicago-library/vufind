@@ -17,47 +17,40 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindSearch\Backend;
 
 use VuFindSearch\Response\RecordCollectionInterface;
 use VuFindSearch\Response\RecordCollectionFactoryInterface;
 
-use VuFindSearch\Backend\BackendInterface;
-
-use Zend\Log\LoggerInterface, Zend\Log\LoggerAwareInterface;
+use Zend\Log\LoggerAwareInterface;
 
 /**
  * Abstract backend.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 abstract class AbstractBackend implements BackendInterface, LoggerAwareInterface
 {
+    use \VuFind\Log\LoggerAwareTrait;
+
     /**
      * Record collection factory.
      *
      * @var RecordCollectionFactoryInterface
      */
     protected $collectionFactory = null;
-
-    /**
-     * Logger, if any.
-     *
-     * @var LoggerInterface
-     */
-    protected $logger = null;
 
     /**
      * Backend identifier.
@@ -76,18 +69,6 @@ abstract class AbstractBackend implements BackendInterface, LoggerAwareInterface
     public function setIdentifier($identifier)
     {
         $this->identifier = $identifier;
-    }
-
-    /**
-     * Set the Logger.
-     *
-     * @param LoggerInterface $logger Logger
-     *
-     * @return void
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
@@ -138,21 +119,5 @@ abstract class AbstractBackend implements BackendInterface, LoggerAwareInterface
             $record->setSourceIdentifier($this->identifier);
         }
         return $response;
-    }
-
-    /**
-     * Send a message to the logger.
-     *
-     * @param string $level   Log level
-     * @param string $message Log message
-     * @param array  $context Log context
-     *
-     * @return void
-     */
-    protected function log($level, $message, array $context = array())
-    {
-        if ($this->logger) {
-            $this->logger->$level($message, $context);
-        }
     }
 }

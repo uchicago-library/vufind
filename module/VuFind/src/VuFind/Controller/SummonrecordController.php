@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Controller;
 use Zend\Mvc\MvcEvent;
@@ -31,13 +31,12 @@ use Zend\Mvc\MvcEvent;
 /**
  * Summon Record Controller
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
-
 class SummonrecordController extends AbstractRecord
 {
     /**
@@ -66,11 +65,15 @@ class SummonrecordController extends AbstractRecord
     }
 
     /**
-     * preDispatch -- add Summon message.
+     * Use preDispatch event to add Summon message.
+     *
+     * @param MvcEvent $e Event object
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function preDispatch()
+    public function injectSummonMessage(MvcEvent $e)
     {
         $this->layout()->poweredBy
             = 'Powered by Summon™ from Serials Solutions, a division of ProQuest.';
@@ -85,6 +88,8 @@ class SummonrecordController extends AbstractRecord
     {
         parent::attachDefaultListeners();
         $events = $this->getEventManager();
-        $events->attach(MvcEvent::EVENT_DISPATCH, array($this, 'preDispatch'), 1000);
+        $events->attach(
+            MvcEvent::EVENT_DISPATCH, [$this, 'injectSummonMessage'], 1000
+        );
     }
 }

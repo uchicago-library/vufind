@@ -18,13 +18,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindTest\Content\Covers;
 use VuFindCode\ISBN, VuFind\Content\Covers\OpenLibrary;
@@ -32,11 +32,11 @@ use VuFindCode\ISBN, VuFind\Content\Covers\OpenLibrary;
 /**
  * Unit tests for OpenLibrary cover loader.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class OpenLibraryTest extends \PHPUnit_Framework_TestCase
 {
@@ -51,7 +51,7 @@ class OpenLibraryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'http://covers.openlibrary.org/b/isbn/9780739313121-S.jpg?default=false',
             $ol->getUrl(
-                'mykey', 'small', array('isbn' => new ISBN('0739313126'))
+                'mykey', 'small', ['isbn' => new ISBN('0739313126')]
             )
         );
     }
@@ -64,6 +64,6 @@ class OpenLibraryTest extends \PHPUnit_Framework_TestCase
     public function testMissingIsbn()
     {
         $ol = new OpenLibrary();
-        $this->assertEquals(false, $ol->getUrl('mykey', 'small', array()));
+        $this->assertEquals(false, $ol->getUrl('mykey', 'small', []));
     }
 }

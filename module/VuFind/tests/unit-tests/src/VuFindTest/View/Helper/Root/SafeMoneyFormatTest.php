@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\View\Helper\Root;
 use VuFind\View\Helper\Root\SafeMoneyFormat;
@@ -31,11 +31,11 @@ use VuFind\View\Helper\Root\SafeMoneyFormat;
 /**
  * SafeMoneyFormat view helper Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class SafeMoneyFormatTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,7 +55,10 @@ class SafeMoneyFormatTest extends \PHPUnit_Framework_TestCase
     {
         // store current default and set a value for consistency in testing
         $this->locale = setlocale(LC_MONETARY, 0);
-        setlocale(LC_MONETARY, 'en_US.UTF8');
+        $locales = ['en_US.UTF8', 'en_US.UTF-8', 'en_US'];
+        if (false === setlocale(LC_MONETARY, $locales)) {
+            $this->markTestSkipped('Problem setting up locale');
+        }
     }
 
     /**

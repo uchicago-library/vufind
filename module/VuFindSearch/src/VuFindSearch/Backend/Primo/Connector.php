@@ -18,41 +18,39 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Spencer Lamm <slamm1@swarthmore.edu>
  * @author   Anna Headley <aheadle1@swarthmore.edu>
  * @author   Chelsea Lobdell <clobdel1@swarthmore.edu>
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Ere Maijala <ere.maijala@helsinki.fi>
+ * @author   Oliver Goldschmidt <o.goldschmidt@tuhh.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindSearch\Backend\Primo;
 use Zend\Http\Client as HttpClient;
-use Zend\Log\LoggerInterface;
 
 /**
  * Primo Central connector.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Spencer Lamm <slamm1@swarthmore.edu>
  * @author   Anna Headley <aheadle1@swarthmore.edu>
  * @author   Chelsea Lobdell <clobdel1@swarthmore.edu>
  * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   Ere Maijala <ere.maijala@helsinki.fi>
+ * @author   Oliver Goldschmidt <o.goldschmidt@tuhh.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-class Connector
+class Connector implements \Zend\Log\LoggerAwareInterface
 {
-    /**
-     * Logger instance.
-     *
-     * @var LoggerInterface
-     */
-    protected $logger;
+    use \VuFind\Log\LoggerAwareTrait;
 
     /**
      * The HTTP_Request object used for API transactions
@@ -76,6 +74,18 @@ class Connector
     protected $host;
 
     /**
+     * Response for an empty search
+     *
+     * @var array
+     */
+    protected static $emptyQueryResponse = [
+        'recordCount' => 0,
+        'documents' => [],
+        'facets' => [],
+        'error' => 'Primo does not accept an empty query'
+    ];
+
+    /**
      * Debug status
      *
      * @var bool
@@ -87,33 +97,27 @@ class Connector
      *
      * Sets up the Primo API Client
      *
-     * @param string     $apiId  Primo API ID
+     * @param string     $url    Primo API URL (either a host name and port or a full
+     * path to the brief search including a trailing question mark)
      * @param string     $inst   Institution code
      * @param HttpClient $client HTTP client
-     * @param int        $port   API connection port
      */
-    public function __construct($apiId, $inst, $client, $port = 1701)
+    public function __construct($url, $inst, $client)
     {
-        $this->host = "http://$apiId.hosted.exlibrisgroup.com:{$port}/"
-            . "PrimoWebServices/xservice/search/brief?";
+        $parts = parse_url($url);
+        if (empty($parts['path']) || $parts['path'] == '/') {
+            $parts['path'] = '/PrimoWebServices/xservice/search/brief';
+        }
+        $this->host = $parts['scheme'] . '://' . $parts['host']
+            . (!empty($parts['port']) ? ':' . $parts['port'] : '')
+            . $parts['path'] . '?';
+
         $this->inst = $inst;
         $this->client = $client;
     }
 
     /**
-     * Set logger instance.
-     *
-     * @param LoggerInterface $logger Logger
-     *
-     * @return void
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Execute a search.  adds all the querystring parameters into
+     * Execute a search. Adds all the querystring parameters into
      * $this->client and returns the parsed response
      *
      * @param string $institution Institution
@@ -128,8 +132,6 @@ class Connector
      *     pageNumber  string: index of first record (default 1)
      *     limit       string: number of records to return (default 20)
      *     sort        string: value to be used by for sorting (default null)
-     *     returnErr   bool:   false to fail on error; true to return empty
-     *                         empty result set with an error field (def true)
      *     Anything in $params not listed here will be ignored.
      *
      * Note: some input parameters accepted by Primo are not implemented here:
@@ -141,46 +143,29 @@ class Connector
      *
      * @throws \Exception
      * @return array             An array of query results
+     *
      * @link http://www.exlibrisgroup.org/display/PrimoOI/Brief+Search
      */
-    public function query($institution, $terms, $params=null)
+    public function query($institution, $terms, $params = null)
     {
         // defaults for params
-        $args = array(
+        $args = [
             "phrase" => false,
             "onCampus" => true,
             "didYouMean" => false,
             "filterList" => null,
+            "pcAvailability" => false,
             "pageNumber" => 1,
             "limit" => 20,
-            "sort" => null,
-            "returnErr" => true,
-        );
+            "sort" => null
+        ];
         if (isset($params)) {
             $args = array_merge($args, $params);
         }
 
-        // run search, deal with exceptions
-        try {
-            $result = $this->performSearch($institution, $terms, $args);
-        } catch (\Exception $e) {
-            if ($args["returnErr"]) {
-                if ($this->logger) {
-                    $this->logger->debug($e->getMessage());
-                }
-                return array(
-                    'recordCount' => 0,
-                    'documents' => array(),
-                    'facets' => array(),
-                    'error' => $e->getMessage()
-                );
-            } else {
-                throw $e;
-            }
-        }
+        $result = $this->performSearch($institution, $terms, $args);
         return $result;
     }
-
 
     /**
      * Support method for query() -- perform inner search logic
@@ -216,7 +201,7 @@ class Connector
         // we have to build a querystring because I think adding them
         //   incrementally is implemented as a dictionary, but we are allowed
         //   multiple querystring parameters with the same key.
-        $qs = array();
+        $qs = [];
 
         // QUERYSTRING: query (search terms)
         // re: phrase searches, turns out we can just pass whatever we got
@@ -275,7 +260,7 @@ class Connector
             // have a query to send to primo or it hates us
 
             // QUERYSTRING: institution
-            $qs[] ="institution=$institution";
+            $qs[] = "institution=$institution";
 
             // QUERYSTRING: onCampus
             if ($args["onCampus"]) {
@@ -288,7 +273,7 @@ class Connector
             if ($args["didYouMean"]) {
                 $qs[] = "dym=true";
             } else {
-                $qs[] ="dym=false";
+                $qs[] = "dym=false";
             }
 
             // QUERYSTRING: query (filter list)
@@ -306,11 +291,19 @@ class Connector
                 }
             }
 
-            // QUERYSTRING: indx (start record)
-            $recordStart = $args["pageNumber"];
-            if ($recordStart != 1) {
-                $recordStart = ($recordStart * 10) + 1;
+            // QUERYSTRING: pcAvailability
+            // by default, PrimoCentral only returns matches,
+            // which are available via Holdingsfile
+            // pcAvailability = false
+            // By setting this value to true, also matches, which
+            // are NOT available via Holdingsfile are returned
+            // (yes, right, set this to true - thats ExLibris Logic)
+            if ($args["pcAvailability"]) {
+                $qs[] = "pcAvailability=true";
             }
+
+            // QUERYSTRING: indx (start record)
+            $recordStart = ($args["pageNumber"] - 1) * $args['limit'] + 1;
             $qs[] = "indx=$recordStart";
 
             // TODO: put bulksize in conf file?  set a reasonable cap...
@@ -338,13 +331,14 @@ class Connector
             // Send Request
             $result = $this->call(implode('&', $qs));
         } else {
-            throw new \Exception('Primo API does not accept a null query');
+            return self::$emptyQueryResponse;
         }
+
         return $result;
     }
 
     /**
-     * small wrapper for sendRequest, process to simplify error handling.
+     * Small wrapper for sendRequest, process to simplify error handling.
      *
      * @param string $qs     Query string
      * @param string $method HTTP method
@@ -354,9 +348,7 @@ class Connector
      */
     protected function call($qs, $method = 'GET')
     {
-        if ($this->logger) {
-            $this->logger->debug("{$method}: {$this->host}{$qs}");
-        }
+        $this->debug("{$method}: {$this->host}{$qs}");
         $this->client->resetParameters();
         if ($method == 'GET') {
             $baseUrl = $this->host . $qs;
@@ -374,7 +366,7 @@ class Connector
     }
 
     /**
-     * translate Primo's XML into array of arrays.
+     * Translate Primo's XML into array of arrays.
      *
      * @param array $data The raw xml from Primo
      *
@@ -423,7 +415,7 @@ class Connector
         // Get results set data and add to $items array
         // This foreach grabs all the child elements of sear:DOC,
         //   except those with namespaces
-        $items = array();
+        $items = [];
 
         $docset = $sxe->xpath('//sear:DOC');
         if (empty($docset) && isset($sxe->JAGROOT->RESULT->DOCSET->DOC)) {
@@ -431,7 +423,7 @@ class Connector
         }
 
         foreach ($docset as $doc) {
-            $item = array();
+            $item = [];
             // Due to a bug in the primo API, the first result has
             //   a namespace (prim:) while the rest of the results do not.
             //   Those child elements do not get added to $doc.
@@ -460,7 +452,7 @@ class Connector
             $creator
                 = trim((string)$prefix->PrimoNMBib->record->display->creator);
             if (strlen($creator) > 0) {
-                $item['creator'] = explode(';', $creator);
+                $item['creator'] = array_map('trim', explode(';', $creator));
             }
             // subjects
             $subject
@@ -493,12 +485,13 @@ class Connector
             $item['language']
                 = (string)$prefix->PrimoNMBib->record->display->language;
             $item['source']
-                = (string)$prefix->PrimoNMBib->record->display->source;
+                = implode('; ', (array)$prefix->PrimoNMBib->record->display->source);
             $item['identifier']
                 = (string)$prefix->PrimoNMBib->record->display->identifier;
             $item['fulltext']
                 = (string)$prefix->PrimoNMBib->record->delivery->fulltext;
 
+            $item['issn'] = [];
             foreach ($prefix->PrimoNMBib->record->search->issn as $issn) {
                 $item['issn'][] = (string)$issn;
             }
@@ -515,6 +508,36 @@ class Connector
                 ? (string)$sear->LINKS->openurl
                 : (string)$sear->GETIT->attributes()->GetIt2;
 
+            // Container data
+            $addata = $prefix->PrimoNMBib->record->addata;
+            $item['container_title'] = (string)$addata->jtitle;
+            $item['container_volume'] = (string)$addata->volume;
+            $item['container_issue'] = (string)$addata->issue;
+            $item['container_start_page'] = (string)$addata->spage;
+            $item['container_end_page'] = (string)$addata->epage;
+            foreach ($addata->eissn as $eissn) {
+                if (!in_array((string)$eissn, $item['issn'])) {
+                    $item['issn'][] = (string)$eissn;
+                }
+            }
+            foreach ($addata->issn as $issn) {
+                if (!in_array((string)$issn, $item['issn'])) {
+                    $item['issn'][] = (string)$issn;
+                }
+            }
+
+            // Remove dash-less ISSNs if there are corresponding dashed ones
+            // (We could convert dash-less ISSNs to dashed ones, but try to stay
+            // true to the metadata)
+            $callback = function ($issn) use ($item) {
+                return strlen($issn) != 8
+                    || !in_array(
+                        substr($issn, 0, 4) . '-' . substr($issn, 4),
+                        $item['issn']
+                    );
+            };
+            $item['issn'] = array_values(array_filter($item['issn'], $callback));
+
             $item['fullrecord'] = $prefix->PrimoNMBib->record->asXml();
             $items[] = $item;
         }
@@ -530,7 +553,7 @@ class Connector
         //  which has the name of the facet as an attribute.
         // We only get the first level of elements
         //   because child elements have a namespace prefix
-        $facets = array();
+        $facets = [];
 
         $facetSet = $sxe->xpath('//sear:FACET');
         if (empty($facetSet)) {
@@ -555,18 +578,18 @@ class Connector
             }
         }
 
-        $didYouMean = array();
+        $didYouMean = [];
         $suggestions = $sxe->xpath('//sear:QUERYTRANSFORMS');
         foreach ($suggestions as $suggestion) {
             $didYouMean[] = (string)$suggestion->attributes()->QUERY;
         }
 
-        return array(
+        return [
             'recordCount' => $totalhits,
             'documents' => $items,
             'facets' => $facets,
             'didYouMean' => $didYouMean
-        );
+        ];
     }
 
     /**
@@ -574,26 +597,84 @@ class Connector
      *
      * @param string $recordId  The document to retrieve from the Primo API
      * @param string $inst_code Institution code (optional)
+     * @param bool   $onCampus  Whether the user is on campus
      *
      * @throws \Exception
      * @return string    The requested resource
      */
-    public function getRecord($recordId, $inst_code = null)
+    public function getRecord($recordId, $inst_code = null, $onCampus = false)
     {
         // Query String Parameters
         if (isset($recordId)) {
-            $qs   = array();
-            $qs[] = "query=any,contains,\"$recordId\"";
+            $qs   = [];
+            // There is currently (at 2015-12-17) a problem with Primo fetching
+            // records that have colons in the id (e.g.
+            // doaj_xmloai:doaj.org/article:94935655971c4917aab4fcaeafeb67b9).
+            // According to Ex Libris support we must use contains search without
+            // quotes for the time being.
+            // Escaping the - character causes problems getting records like
+            // wj10.1111/j.1475-679X.2011.00421.x
+            $qs[] = 'query=rid,contains,'
+                . urlencode(addcslashes($recordId, '":()'));
             $qs[] = "institution=$inst_code";
-            $qs[] = "onCampus=true";
+            $qs[] = 'onCampus=' . ($onCampus ? 'true' : 'false');
             $qs[] = "indx=1";
             $qs[] = "bulkSize=1";
             $qs[] = "loc=adaptor,primo_central_multiple_fe";
+            // pcAvailability=true is needed for records, which
+            // are NOT in the PrimoCentral Holdingsfile.
+            // It won't hurt to have this parameter always set to true.
+            // But it'd hurt to have it not set in case you want to get
+            // a record, which is not in the Holdingsfile.
+            $qs[] = "pcAvailability=true";
 
             // Send Request
             $result = $this->call(implode('&', $qs));
         } else {
-            throw new \Exception('Primo API does not accept a null query');
+            return self::$emptyQueryResponse;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Retrieves multiple documents specified by the ID.
+     *
+     * @param array  $recordIds The documents to retrieve from the Primo API
+     * @param string $inst_code Institution code (optional)
+     * @param bool   $onCampus  Whether the user is on campus
+     *
+     * @throws \Exception
+     * @return string    The requested resource
+     */
+    public function getRecords($recordIds, $inst_code = null, $onCampus = false)
+    {
+        // Callback function for formatting IDs:
+        $formatIds = function ($id) {
+            return addcslashes($id, '":()');
+        };
+
+        // Query String Parameters
+        if ($recordIds) {
+            $qs   = [];
+            $recordIds = array_map($formatIds, $recordIds);
+            $qs[] = 'query=rid,contains,' . urlencode(implode(' OR ', $recordIds));
+            $qs[] = "institution=$inst_code";
+            $qs[] = 'onCampus=' . ($onCampus ? 'true' : 'false');
+            $qs[] = "indx=1";
+            $qs[] = "bulkSize=" . count($recordIds);
+            $qs[] = "loc=adaptor,primo_central_multiple_fe";
+            // pcAvailability=true is needed for records, which
+            // are NOT in the PrimoCentral Holdingsfile.
+            // It won't hurt to have this parameter always set to true.
+            // But it'd hurt to have it not set in case you want to get
+            // a record, which is not in the Holdingsfile.
+            $qs[] = "pcAvailability=true";
+
+            // Send Request
+            $result = $this->call(implode('&', $qs));
+        } else {
+            return self::$emptyQueryResponse;
         }
 
         return $result;

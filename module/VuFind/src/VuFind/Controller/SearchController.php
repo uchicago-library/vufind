@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Controller;
 
@@ -32,11 +32,11 @@ use VuFind\Exception\Mail as MailException;
 /**
  * Redirects the user to the appropriate default VuFind action.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class SearchController extends AbstractSearch
 {
@@ -81,10 +81,15 @@ class SearchController extends AbstractSearch
     {
         // If a URL was explicitly passed in, use that; otherwise, try to
         // find the HTTP referrer.
-        $view = $this->createEmailViewModel();
+        $mailer = $this->getServiceLocator()->get('VuFind\Mailer');
+        $view = $this->createEmailViewModel(null, $mailer->getDefaultLinkSubject());
+        $mailer->setMaxRecipients($view->maxRecipients);
+        // Set up reCaptcha
+        $view->useRecaptcha = $this->recaptcha()->active('email');
         $view->url = $this->params()->fromPost(
             'url', $this->params()->fromQuery(
-                'url', $this->getRequest()->getServer()->get('HTTP_REFERER')
+                'url',
+                $this->getRequest()->getServer()->get('HTTP_REFERER')
             )
         );
 
@@ -93,7 +98,7 @@ class SearchController extends AbstractSearch
         if ((!isset($config->Mail->require_login) || $config->Mail->require_login)
             && !$this->getUser()
         ) {
-            return $this->forceLogin(null, array('emailurl' => $view->url));
+            return $this->forceLogin(null, ['emailurl' => $view->url]);
         }
 
         // Check if we have a URL in login followup data -- this should override
@@ -109,20 +114,20 @@ class SearchController extends AbstractSearch
         }
 
         // Process form submission:
-        if ($this->formWasSubmitted('submit')) {
+        if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
             // Attempt to send the email and show an appropriate flash message:
             try {
                 // If we got this far, we're ready to send the email:
-                $this->getServiceLocator()->get('VuFind\Mailer')->sendLink(
+                $cc = $this->params()->fromPost('ccself') && $view->from != $view->to
+                    ? $view->from : null;
+                $mailer->sendLink(
                     $view->to, $view->from, $view->message,
-                    $view->url, $this->getViewRenderer()
+                    $view->url, $this->getViewRenderer(), $view->subject, $cc
                 );
-                $this->flashMessenger()->setNamespace('info')
-                    ->addMessage('email_success');
+                $this->flashMessenger()->addMessage('email_success', 'success');
                 return $this->redirect()->toUrl($view->url);
             } catch (MailException $e) {
-                $this->flashMessenger()->setNamespace('error')
-                    ->addMessage($e->getMessage());
+                $this->flashMessenger()->addMessage($e->getMessage(), 'error');
             }
         }
         return $view;
@@ -137,15 +142,15 @@ class SearchController extends AbstractSearch
      */
     protected function getIllustrationSettings($savedSearch = false)
     {
-        $illYes= array(
+        $illYes = [
             'text' => 'Has Illustrations', 'value' => 1, 'selected' => false
-        );
-        $illNo = array(
+        ];
+        $illNo = [
             'text' => 'Not Illustrated', 'value' => 0, 'selected' => false
-        );
-        $illAny = array(
+        ];
+        $illAny = [
             'text' => 'No Preference', 'value' => -1, 'selected' => false
-        );
+        ];
 
         // Find the selected value by analyzing facets -- if we find match, remove
         // the offending facet to avoid inappropriate items appearing in the
@@ -163,7 +168,7 @@ class SearchController extends AbstractSearch
         } else {
             $illAny['selected'] = true;
         }
-        return array($illYes, $illNo, $illAny);
+        return [$illYes, $illNo, $illAny];
     }
 
     /**
@@ -199,7 +204,7 @@ class SearchController extends AbstractSearch
             foreach ($list['list'] as $key => $value) {
                 // Build the filter string for the URL:
                 $fullFilter = ($value['operator'] == 'OR' ? '~' : '')
-                    . $facet.':"'.$value['value'].'"';
+                    . $facet . ':"' . $value['value'] . '"';
 
                 // If we haven't already found a selected facet and the current
                 // facet has been applied to the search, we should store it as
@@ -240,7 +245,7 @@ class SearchController extends AbstractSearch
         );
 
         // Build arrays of history entries
-        $saved = $unsaved = array();
+        $saved = $unsaved = [];
 
         // Loop through the history
         foreach ($searchHistory as $current) {
@@ -266,7 +271,7 @@ class SearchController extends AbstractSearch
         }
 
         return $this->createViewModel(
-            array('saved' => $saved, 'unsaved' => $unsaved)
+            ['saved' => $saved, 'unsaved' => $unsaved]
         );
     }
 
@@ -278,12 +283,12 @@ class SearchController extends AbstractSearch
     public function homeAction()
     {
         return $this->createViewModel(
-            array(
+            [
                 'results' => $this->getHomePageFacets(),
                 'hierarchicalFacets' => $this->getHierarchicalFacets(),
                 'hierarchicalFacetSortOptions'
                     => $this->getHierarchicalFacetSortSettings()
-            )
+            ]
         );
     }
 
@@ -300,10 +305,10 @@ class SearchController extends AbstractSearch
         }
 
         return $this->createViewModel(
-            array(
+            [
                 'fundList' => $this->newItems()->getFundList(),
                 'ranges' => $this->newItems()->getRanges()
-            )
+            ]
         );
     }
 
@@ -360,11 +365,15 @@ class SearchController extends AbstractSearch
         // (check it's set first -- RSS feed will return a response model rather
         // than a view model):
         if (isset($view->results)) {
-            $url = $view->results->getUrlQuery();
-            $url->setDefaultParameter('range', $range);
-            $url->setDefaultParameter('department', $dept);
-            $url->setSuppressQuery(true);
+            $view->results->getUrlQuery()
+                ->setDefaultParameter('range', $range)
+                ->setDefaultParameter('department', $dept)
+                ->setSuppressQuery(true);
         }
+
+        // We don't want new items hidden filters to propagate to other searches:
+        $view->ignoreHiddenFilterMemory = true;
+        $view->ignoreHiddenFiltersInRequest = true;
 
         return $view;
     }
@@ -394,11 +403,11 @@ class SearchController extends AbstractSearch
         // send options to the view:
         $catalog = $this->getILS();
         return $this->createViewModel(
-            array(
+            [
                 'deptList' => $catalog->getDepartments(),
                 'instList' => $catalog->getInstructors(),
                 'courseList' =>  $catalog->getCourses()
-            )
+            ]
         );
     }
 
@@ -409,17 +418,17 @@ class SearchController extends AbstractSearch
      */
     public function reservessearchAction()
     {
-        $results = $this->getResultsManager()->get('SolrReserves');
-        $params = $results->getParams();
-        $params->initFromRequest(
-            new \Zend\Stdlib\Parameters(
-                $this->getRequest()->getQuery()->toArray()
-                + $this->getRequest()->getPost()->toArray()
-            )
+        $request = new \Zend\Stdlib\Parameters(
+            $this->getRequest()->getQuery()->toArray()
+            + $this->getRequest()->getPost()->toArray()
         );
-        return $this->createViewModel(
-            array('params' => $params, 'results' => $results)
+        $view = $this->createViewModel();
+        $runner = $this->getServiceLocator()->get('VuFind\SearchRunner');
+        $view->results = $runner->run(
+            $request, 'SolrReserves', $this->getSearchSetupCallback()
         );
+        $view->params = $view->results->getParams();
+        return $view;
     }
 
     /**
@@ -446,8 +455,7 @@ class SearchController extends AbstractSearch
             ->getQueryIDLimit();
         if (count($bibIDs) > $limit) {
             $bibIDs = array_slice($bibIDs, 0, $limit);
-            $this->flashMessenger()->setNamespace('info')
-                ->addMessage('too_many_reserves');
+            $this->flashMessenger()->addMessage('too_many_reserves', 'info');
         }
 
         // Use standard search action with override parameter to show results:
@@ -455,6 +463,10 @@ class SearchController extends AbstractSearch
 
         // Don't save to history -- history page doesn't handle correctly:
         $this->saveToHistory = false;
+
+        // Set up RSS feed title just in case:
+        $this->getViewRenderer()->plugin('resultfeed')
+            ->setOverrideTitle('Reserves Search Results');
 
         // Call rather than forward, so we can use custom template
         $view = $this->resultsAction();
@@ -467,12 +479,16 @@ class SearchController extends AbstractSearch
             $view->course = $result[0]['course'];
         }
 
-        // Customize the URL helper to make sure it builds proper reserves URLs:
-        $url = $view->results->getUrlQuery();
-        $url->setDefaultParameter('course', $course);
-        $url->setDefaultParameter('inst', $inst);
-        $url->setDefaultParameter('dept', $dept);
-        $url->setSuppressQuery(true);
+        // Customize the URL helper to make sure it builds proper reserves URLs
+        // (but only do this if we have access to a results object, which we
+        // won't in RSS mode):
+        if (isset($view->results)) {
+            $view->results->getUrlQuery()
+                ->setDefaultParameter('course', $course)
+                ->setDefaultParameter('inst', $inst)
+                ->setDefaultParameter('dept', $dept)
+                ->setSuppressQuery(true);
+        }
         return $view;
     }
 
@@ -491,6 +507,10 @@ class SearchController extends AbstractSearch
             $query->set('type', 'tag');
         }
         if ($this->params()->fromQuery('type') == 'tag') {
+            // Because we're coming in from a search, we want to do a fuzzy
+            // tag search, not an exact search like we would when linking to a
+            // specific tag name.
+            $query = $this->getRequest()->getQuery()->set('fuzzy', 'true');
             return $this->forwardTo('Tag', 'Home');
         }
 
@@ -512,6 +532,11 @@ class SearchController extends AbstractSearch
         // Check if we have facet results cached, and build them if we don't.
         $cache = $this->getServiceLocator()->get('VuFind\CacheManager')
             ->getCache('object');
+        $searchTabsHelper = $this->getServiceLocator()
+            ->get('VuFind\SearchTabsHelper');
+        $hiddenFilters = $searchTabsHelper->getHiddenFilters($this->searchClassId);
+        $hiddenFiltersHash = md5(json_encode($hiddenFilters));
+        $cacheName .= "-$hiddenFiltersHash";
         if (!($results = $cache->getItem($cacheName))) {
             // Use advanced facet settings to get summary facets on the front page;
             // we may want to make this more flexible later.  Also keep in mind that
@@ -520,6 +545,11 @@ class SearchController extends AbstractSearch
             $results = $this->getResultsManager()->get('Solr');
             $params = $results->getParams();
             $params->$initMethod();
+            foreach ($hiddenFilters as $key => $filters) {
+                foreach ($filters as $filter) {
+                    $params->addHiddenFilter("$key:$filter");
+                }
+            }
 
             // We only care about facet lists, so don't get any results (this helps
             // prevent problems with serialized File_MARC objects in the cache):
@@ -571,7 +601,7 @@ class SearchController extends AbstractSearch
         case 'describe':
             $config = $this->getConfig();
             $xml = $this->getViewRenderer()->render(
-                'search/opensearch-describe.phtml', array('site' => $config->Site)
+                'search/opensearch-describe.phtml', ['site' => $config->Site]
             );
             break;
         default:
@@ -587,8 +617,7 @@ class SearchController extends AbstractSearch
     }
 
     /**
-     * Provide OpenSearch suggestions as specified here:
-     *
+     * Provide OpenSearch suggestions as specified at
      * http://www.opensearch.org/Specifications/OpenSearch/Extensions/Suggestions/1.0
      *
      * @return \Zend\Http\Response
@@ -612,7 +641,7 @@ class SearchController extends AbstractSearch
         $headers = $response->getHeaders();
         $headers->addHeaderLine('Content-type', 'application/javascript');
         $response->setContent(
-            json_encode(array($query->get('lookfor', ''), $suggestions))
+            json_encode([$query->get('lookfor', ''), $suggestions])
         );
         return $response;
     }
@@ -639,7 +668,7 @@ class SearchController extends AbstractSearch
         $facetConfig = $this->getConfig('facets');
         return isset($facetConfig->SpecialFacets->hierarchical)
             ? $facetConfig->SpecialFacets->hierarchical->toArray()
-            : array();
+            : [];
     }
 
     /**
@@ -652,8 +681,7 @@ class SearchController extends AbstractSearch
         $facetConfig = $this->getConfig('facets');
         return isset($facetConfig->SpecialFacets->hierarchicalFacetSortOptions)
             ? $facetConfig->SpecialFacets->hierarchicalFacetSortOptions->toArray()
-            : array();
+            : [];
     }
-
 
 }

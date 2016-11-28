@@ -17,30 +17,32 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Controller;
 
 use VuFind\Exception\Auth as AuthException,
+    VuFind\Exception\Forbidden as ForbiddenException,
     VuFind\Exception\Mail as MailException,
     VuFind\Exception\ListPermission as ListPermissionException,
     VuFind\Exception\RecordMissing as RecordMissingException,
-    Zend\Stdlib\Parameters;
+    VuFind\Search\RecommendListener, Zend\Stdlib\Parameters,
+    Zend\View\Model\ViewModel;
 
 /**
  * Controller for the user account area.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class MyResearchController extends AbstractBase
 {
@@ -63,7 +65,7 @@ class MyResearchController extends AbstractBase
         ) {
             $msg = 'authentication_error_loggedout';
         }
-        $this->flashMessenger()->setNamespace('error')->addMessage($msg);
+        $this->flashMessenger()->addMessage($msg, 'error');
     }
 
     /**
@@ -146,10 +148,7 @@ class MyResearchController extends AbstractBase
             return $this->forwardTo('MyResearch', 'Home');
         }
 
-        // We may have come in from a lightbox.  In this case, a prior module
-        // will not have set the followup information.  We should grab the referer
-        // so the user doesn't get lost.
-        // i.e. if there's already a followup url, keep it; otherwise set one.
+        // If there's already a followup url, keep it; otherwise set one.
         if (!$this->getFollowupUrl()) {
             $this->setFollowupUrlToReferer();
         }
@@ -169,8 +168,7 @@ class MyResearchController extends AbstractBase
                 $this->getAuthManager()->create($this->getRequest());
                 return $this->forwardTo('MyResearch', 'Home');
             } catch (AuthException $e) {
-                $this->flashMessenger()->setNamespace('error')
-                    ->addMessage($e->getMessage());
+                $this->flashMessenger()->addMessage($e->getMessage(), 'error');
             }
         } else {
             // If we are not processing a submission, we need to simply display
@@ -199,12 +197,8 @@ class MyResearchController extends AbstractBase
             // Also don't attempt to process a login that hasn't happened yet;
             // if we've just been forced here from another page, we need the user
             // to click the session initiator link before anything can happen.
-            //
-            // Finally, we don't want to auto-forward if we're in a lightbox, since
-            // it may cause weird behavior -- better to display an error there!
             if (!$this->params()->fromPost('processLogin', false)
                 && !$this->params()->fromPost('forcingLogin', false)
-                && !$this->inLightbox()
             ) {
                 $this->getRequest()->getPost()->set('processLogin', true);
                 return $this->forwardTo('MyResearch', 'Home');
@@ -229,6 +223,14 @@ class MyResearchController extends AbstractBase
     {
         // Don't log in if already logged in!
         if ($this->getAuthManager()->isLoggedIn()) {
+            // inLightbox (only instance)
+            if ($this->getRequest()->getQuery('layout', 'no') === 'lightbox'
+                || 'layout/lightbox' == $this->layout()->getTemplate()
+            ) {
+                $response = $this->getResponse();
+                $response->setStatusCode(205);
+                return $response;
+            }
             return $this->redirect()->toRoute('home');
         }
         $this->clearFollowupUrl();
@@ -263,10 +265,43 @@ class MyResearchController extends AbstractBase
                 '/([?&])auth_method=[^&]*&?/', '$1', $logoutTarget
             );
             $logoutTarget = rtrim($logoutTarget, '?');
+
+            // Another special case: if logging out will send the user back to
+            // the MyResearch home action, instead send them all the way to
+            // VuFind home. Otherwise, they might get logged back in again,
+            // which is confusing. Even in the best scenario, they'll just end
+            // up on a login screen, which is not helpful.
+            if ($logoutTarget == $this->getServerUrl('myresearch-home')) {
+                $logoutTarget = $this->getServerUrl('home');
+            }
         }
 
         return $this->redirect()
             ->toUrl($this->getAuthManager()->logout($logoutTarget));
+    }
+
+    /**
+     * Support method for savesearchAction(): set the saved flag in a secure
+     * fashion, throwing an exception if somebody attempts something invalid.
+     *
+     * @param int  $searchId The search ID to save/unsave
+     * @param bool $saved    The new desired state of the saved flag
+     * @param int  $userId   The user ID requesting the change
+     *
+     * @throws \Exception
+     * @return void
+     */
+    protected function setSavedFlagSecurely($searchId, $saved, $userId)
+    {
+        $searchTable = $this->getTable('Search');
+        $sessId = $this->getServiceLocator()->get('VuFind\SessionManager')->getId();
+        $row = $searchTable->getOwnedRowById($searchId, $sessId, $userId);
+        if (empty($row)) {
+            throw new ForbiddenException('Access denied.');
+        }
+        $row->saved = $saved ? 1 : 0;
+        $row->user_id = $userId;
+        $row->save();
     }
 
     /**
@@ -276,21 +311,24 @@ class MyResearchController extends AbstractBase
      */
     public function savesearchAction()
     {
+        // Fail if saved searches are disabled.
+        $check = $this->getServiceLocator()->get('VuFind\AccountCapabilities');
+        if ($check->getSavedSearchSetting() === 'disabled') {
+            throw new ForbiddenException('Saved searches disabled.');
+        }
+
         $user = $this->getUser();
         if ($user == false) {
             return $this->forceLogin();
         }
 
         // Check for the save / delete parameters and process them appropriately:
-        $search = $this->getTable('Search');
         if (($id = $this->params()->fromQuery('save', false)) !== false) {
-            $search->setSavedFlag($id, true, $user->id);
-            $this->flashMessenger()->setNamespace('info')
-                ->addMessage('search_save_success');
+            $this->setSavedFlagSecurely($id, true, $user->id);
+            $this->flashMessenger()->addMessage('search_save_success', 'success');
         } else if (($id = $this->params()->fromQuery('delete', false)) !== false) {
-            $search->setSavedFlag($id, false);
-            $this->flashMessenger()->setNamespace('info')
-                ->addMessage('search_unsave_success');
+            $this->setSavedFlagSecurely($id, false, $user->id);
+            $this->flashMessenger()->addMessage('search_unsave_success', 'success');
         } else {
             throw new \Exception('Missing save and delete parameters.');
         }
@@ -326,8 +364,7 @@ class MyResearchController extends AbstractBase
         if (!empty($homeLibrary)) {
             $user->changeHomeLibrary($homeLibrary);
             $this->getAuthManager()->updateSession($user);
-            $this->flashMessenger()->setNamespace('info')
-                ->addMessage('profile_update');
+            $this->flashMessenger()->addMessage('profile_update', 'success');
         }
 
         // Begin building view object:
@@ -335,6 +372,7 @@ class MyResearchController extends AbstractBase
 
         // Obtain user information from ILS:
         $catalog = $this->getILS();
+        $this->addAccountBlocksToFlashMessenger($catalog, $patron);
         $profile = $catalog->getMyProfile($patron);
         $profile['home_library'] = $user->home_library;
         $view->profile = $profile;
@@ -351,14 +389,38 @@ class MyResearchController extends AbstractBase
     }
 
     /**
+     * Add account blocks to the flash messenger as errors.
+     *
+     * @param \VuFind\ILS\Connection $catalog Catalog connection
+     * @param array                  $patron  Patron details
+     *
+     * @return void
+     */
+    public function addAccountBlocksToFlashMessenger($catalog, $patron)
+    {
+        if ($catalog->checkCapability('getAccountBlocks', compact($patron))
+            && $blocks = $catalog->getAccountBlocks($patron)
+        ) {
+            foreach ($blocks as $block) {
+                $this->flashMessenger()->addMessage($block, 'error');
+            }
+        }
+    }
+
+    /**
      * Catalog Login Action
      *
      * @return mixed
      */
     public function catalogloginAction()
     {
-        // No special action needed -- just display form
-        return $this->createViewModel();
+        // Connect to the ILS and check if multiple target support is available:
+        $targets = null;
+        $catalog = $this->getILS();
+        if ($catalog->checkCapability('getLoginDrivers')) {
+            $targets = $catalog->getLoginDrivers();
+        }
+        return $this->createViewModel(['targets' => $targets]);
     }
 
     /**
@@ -389,23 +451,21 @@ class MyResearchController extends AbstractBase
         $listID = $this->params()->fromPost('listID');
         $newUrl = empty($listID)
             ? $this->url()->fromRoute('myresearch-favorites')
-            : $this->url()->fromRoute('userList', array('id' => $listID));
+            : $this->url()->fromRoute('userList', ['id' => $listID]);
 
         // Fail if we have nothing to delete:
         $ids = is_null($this->params()->fromPost('selectAll'))
             ? $this->params()->fromPost('ids')
             : $this->params()->fromPost('idsAll');
         if (!is_array($ids) || empty($ids)) {
-            $this->flashMessenger()->setNamespace('error')
-                ->addMessage('bulk_noitems_advice');
+            $this->flashMessenger()->addMessage('bulk_noitems_advice', 'error');
             return $this->redirect()->toUrl($newUrl);
         }
 
         // Process the deletes if necessary:
         if ($this->formWasSubmitted('submit')) {
             $this->favorites()->delete($ids, $listID, $user);
-            $this->flashMessenger()->setNamespace('info')
-                ->addMessage('fav_delete_success');
+            $this->flashMessenger()->addMessage('fav_delete_success', 'success');
             return $this->redirect()->toUrl($newUrl);
         }
 
@@ -418,10 +478,10 @@ class MyResearchController extends AbstractBase
             $list = $table->getExisting($listID);
         }
         return $this->createViewModel(
-            array(
+            [
                 'list' => $list, 'deleteIDS' => $ids,
                 'records' => $this->getRecordLoader()->loadBatch($ids)
-            )
+            ]
         );
     }
 
@@ -450,18 +510,17 @@ class MyResearchController extends AbstractBase
         }
 
         // Perform delete and send appropriate flash message:
-        if (!is_null($listID)) {
+        if (null !== $listID) {
             // ...Specific List
             $table = $this->getTable('UserList');
             $list = $table->getExisting($listID);
-            $list->removeResourcesById($user, array($id), $source);
-            $this->flashMessenger()->setNamespace('info')
-                ->addMessage('Item removed from list');
+            $list->removeResourcesById($user, [$id], $source);
+            $this->flashMessenger()->addMessage('Item removed from list', 'success');
         } else {
             // ...My Favorites
-            $user->removeResourcesById(array($id), $source);
-            $this->flashMessenger()->setNamespace('info')
-                ->addMessage('Item removed from favorites');
+            $user->removeResourcesById([$id], $source);
+            $this->flashMessenger()
+                ->addMessage('Item removed from favorites', 'success');
         }
 
         // All done -- return true to indicate success.
@@ -483,27 +542,26 @@ class MyResearchController extends AbstractBase
         $lists = $this->params()->fromPost('lists');
         $tagParser = $this->getServiceLocator()->get('VuFind\Tags');
         foreach ($lists as $list) {
-            $tags = $this->params()->fromPost('tags'.$list);
+            $tags = $this->params()->fromPost('tags' . $list);
             $driver->saveToFavorites(
-                array(
+                [
                     'list'  => $list,
                     'mytags'  => $tagParser->parse($tags),
-                    'notes' => $this->params()->fromPost('notes'.$list)
-                ),
+                    'notes' => $this->params()->fromPost('notes' . $list)
+                ],
                 $user
             );
         }
         // add to a new list?
         $addToList = $this->params()->fromPost('addToList');
         if ($addToList > -1) {
-            $driver->saveToFavorites(array('list' => $addToList), $user);
+            $driver->saveToFavorites(['list' => $addToList], $user);
         }
-        $this->flashMessenger()->setNamespace('info')
-            ->addMessage('edit_list_success');
+        $this->flashMessenger()->addMessage('edit_list_success', 'success');
 
         $newUrl = is_null($listID)
             ? $this->url()->fromRoute('myresearch-favorites')
-            : $this->url()->fromRoute('userList', array('id' => $listID));
+            : $this->url()->fromRoute('userList', ['id' => $listID]);
         return $this->redirect()->toUrl($newUrl);
     }
 
@@ -523,7 +581,7 @@ class MyResearchController extends AbstractBase
         // Get current record (and, if applicable, selected list ID) for convenience:
         $id = $this->params()->fromPost('id', $this->params()->fromQuery('id'));
         $source = $this->params()->fromPost(
-            'source', $this->params()->fromQuery('source', 'VuFind')
+            'source', $this->params()->fromQuery('source', DEFAULT_SEARCH_BACKEND)
         );
         $driver = $this->getRecordLoader()->load($id, $source, true);
         $listID = $this->params()->fromPost(
@@ -537,20 +595,20 @@ class MyResearchController extends AbstractBase
 
         // Get saved favorites for selected list (or all lists if $listID is null)
         $userResources = $user->getSavedData($id, $listID, $source);
-        $savedData = array();
+        $savedData = [];
         foreach ($userResources as $current) {
-            $savedData[] = array(
+            $savedData[] = [
                 'listId' => $current->list_id,
                 'listTitle' => $current->list_title,
                 'notes' => $current->notes,
                 'tags' => $user->getTagString($id, $current->list_id, $source)
-            );
+            ];
         }
 
         // In order to determine which lists contain the requested item, we may
         // need to do an extra database lookup if the previous lookup was limited
         // to a particular list ID:
-        $containingLists = array();
+        $containingLists = [];
         if (!empty($listID)) {
             $userResources = $user->getSavedData($id, null, $source);
         }
@@ -560,7 +618,7 @@ class MyResearchController extends AbstractBase
 
         // Send non-containing lists to the view for user selection:
         $userLists = $user->getLists();
-        $lists = array();
+        $lists = [];
         foreach ($userLists as $userList) {
             if (!in_array($userList->id, $containingLists)) {
                 $lists[$userList->id] = $userList->title;
@@ -568,9 +626,9 @@ class MyResearchController extends AbstractBase
         }
 
         return $this->createViewModel(
-            array(
+            [
                 'driver' => $driver, 'lists' => $lists, 'savedData' => $savedData
-            )
+            ]
         );
     }
 
@@ -590,11 +648,11 @@ class MyResearchController extends AbstractBase
         if (empty($listID)) {
             $url = $this->url()->fromRoute('myresearch-favorites');
         } else {
-            $url = $this->url()->fromRoute('userList', array('id' => $listID));
+            $url = $this->url()->fromRoute('userList', ['id' => $listID]);
         }
         return $this->confirm(
             'confirm_delete_brief', $url, $url, 'confirm_delete',
-            array('delete' => $id, 'source' => $source)
+            ['delete' => $id, 'source' => $source]
         );
     }
 
@@ -607,7 +665,7 @@ class MyResearchController extends AbstractBase
     {
         // Fail if lists are disabled:
         if (!$this->listsEnabled()) {
-            throw new \Exception('Lists disabled');
+            throw new ForbiddenException('Lists disabled');
         }
 
         // Check for "delete item" request; parameter may be in GET or POST depending
@@ -617,7 +675,8 @@ class MyResearchController extends AbstractBase
         );
         if ($deleteId) {
             $deleteSource = $this->params()->fromPost(
-                'source', $this->params()->fromQuery('source', 'VuFind')
+                'source',
+                $this->params()->fromQuery('source', DEFAULT_SEARCH_BACKEND)
             );
             // If the user already confirmed the operation, perform the delete now;
             // otherwise prompt for confirmation:
@@ -636,24 +695,28 @@ class MyResearchController extends AbstractBase
 
         // If we got this far, we just need to display the favorites:
         try {
-            $results = $this->getServiceLocator()
-                ->get('VuFind\SearchResultsPluginManager')->get('Favorites');
-            $params = $results->getParams();
-            $params->setAuthManager($this->getAuthManager());
+            $runner = $this->getServiceLocator()->get('VuFind\SearchRunner');
 
             // We want to merge together GET, POST and route parameters to
             // initialize our search object:
-            $params->initFromRequest(
-                new Parameters(
-                    $this->getRequest()->getQuery()->toArray()
-                    + $this->getRequest()->getPost()->toArray()
-                    + array('id' => $this->params()->fromRoute('id'))
-                )
-            );
+            $request = $this->getRequest()->getQuery()->toArray()
+                + $this->getRequest()->getPost()->toArray()
+                + ['id' => $this->params()->fromRoute('id')];
 
-            $results->performAndProcessSearch();
+            // Set up listener for recommendations:
+            $rManager = $this->getServiceLocator()
+                ->get('VuFind\RecommendPluginManager');
+            $setupCallback = function ($runner, $params, $searchId) use ($rManager) {
+                $listener = new RecommendListener($rManager, $searchId);
+                $listener->setConfig(
+                    $params->getOptions()->getRecommendationSettings()
+                );
+                $listener->attach($runner->getEventManager()->getSharedManager());
+            };
+
+            $results = $runner->run($request, 'Favorites', $setupCallback);
             return $this->createViewModel(
-                array('params' => $params, 'results' => $results)
+                ['params' => $results->getParams(), 'results' => $results]
             );
         } catch (ListPermissionException $e) {
             if (!$this->getUser()) {
@@ -683,38 +746,39 @@ class MyResearchController extends AbstractBase
             // to the save screen; otherwise, send them back to the list they
             // just edited.
             $recordId = $this->params()->fromQuery('recordId');
-            $recordSource = $this->params()->fromQuery('recordSource', 'VuFind');
+            $recordSource
+                = $this->params()->fromQuery('recordSource', DEFAULT_SEARCH_BACKEND);
             if (!empty($recordId)) {
                 $details = $this->getRecordRouter()->getActionRouteDetails(
                     $recordSource . '|' . $recordId, 'Save'
                 );
-                return $this
-                    ->lightboxAwareRedirect($details['route'], $details['params']);
+                return $this->redirect()->toRoute(
+                    $details['route'], $details['params']
+                );
             }
 
             // Similarly, if the user is in the process of bulk-saving records,
             // send them back to the appropriate place in the cart.
             $bulkIds = $this->params()->fromPost(
-                'ids', $this->params()->fromQuery('ids', array())
+                'ids', $this->params()->fromQuery('ids', [])
             );
             if (!empty($bulkIds)) {
-                $params = array();
+                $params = [];
                 foreach ($bulkIds as $id) {
                     $params[] = urlencode('ids[]') . '=' . urlencode($id);
                 }
-                $saveUrl = $this->getLightboxAwareUrl('cart-save');
+                $saveUrl = $this->url()->fromRoute('cart-save');
                 $saveUrl .= (strpos($saveUrl, '?') === false) ? '?' : '&';
                 return $this->redirect()
                     ->toUrl($saveUrl . implode('&', $params));
             }
 
-            return $this->lightboxAwareRedirect('userList', array('id' => $finalId));
+            return $this->redirect()->toRoute('userList', ['id' => $finalId]);
         } catch (\Exception $e) {
             switch(get_class($e)) {
             case 'VuFind\Exception\ListPermission':
             case 'VuFind\Exception\MissingField':
-                $this->flashMessenger()->setNamespace('error')
-                    ->addMessage($e->getMessage());
+                $this->flashMessenger()->addMessage($e->getMessage(), 'error');
                 return false;
             case 'VuFind\Exception\LoginRequired':
                 return $this->forceLogin();
@@ -733,7 +797,7 @@ class MyResearchController extends AbstractBase
     {
         // Fail if lists are disabled:
         if (!$this->listsEnabled()) {
-            throw new \Exception('Lists disabled');
+            throw new ForbiddenException('Lists disabled');
         }
 
         // User must be logged in to edit list:
@@ -749,6 +813,11 @@ class MyResearchController extends AbstractBase
         $newList = ($id == 'NEW');
         $list = $newList ? $table->getNew($user) : $table->getExisting($id);
 
+        // Make sure the user isn't fishing for other people's lists:
+        if (!$newList && !$list->editAllowed($user)) {
+            throw new ListPermissionException('Access denied.');
+        }
+
         // Process form submission:
         if ($this->formWasSubmitted('submit')) {
             if ($redirect = $this->processEditList($user, $list)) {
@@ -757,7 +826,7 @@ class MyResearchController extends AbstractBase
         }
 
         // Send the list to the view:
-        return $this->createViewModel(array('list' => $list, 'newList' => $newList));
+        return $this->createViewModel(['list' => $list, 'newList' => $newList]);
     }
 
     /**
@@ -769,7 +838,7 @@ class MyResearchController extends AbstractBase
     {
         // Fail if lists are disabled:
         if (!$this->listsEnabled()) {
-            throw new \Exception('Lists disabled');
+            throw new ForbiddenException('Lists disabled');
         }
 
         // Get requested list ID:
@@ -787,8 +856,7 @@ class MyResearchController extends AbstractBase
                 $list->delete($this->getUser());
 
                 // Success Message
-                $this->flashMessenger()->setNamespace('info')
-                    ->addMessage('fav_list_delete');
+                $this->flashMessenger()->addMessage('fav_list_delete', 'success');
             } catch (\Exception $e) {
                 switch(get_class($e)) {
                 case 'VuFind\Exception\LoginRequired':
@@ -810,8 +878,8 @@ class MyResearchController extends AbstractBase
         return $this->confirm(
             'confirm_delete_list_brief',
             $this->url()->fromRoute('myresearch-deletelist'),
-            $this->url()->fromRoute('userList', array('id' => $listID)),
-            'confirm_delete_list_text', array('listID' => $listID)
+            $this->url()->fromRoute('userList', ['id' => $listID]),
+            'confirm_delete_list_text', ['listID' => $listID]
         );
     }
 
@@ -826,7 +894,8 @@ class MyResearchController extends AbstractBase
     protected function getDriverForILSRecord($current)
     {
         $id = isset($current['id']) ? $current['id'] : null;
-        $source = isset($current['source']) ? $current['source'] : 'VuFind';
+        $source = isset($current['source'])
+            ? $current['source'] : DEFAULT_SEARCH_BACKEND;
         $record = $this->getServiceLocator()->get('VuFind\RecordLoader')
             ->load($id, $source, true);
         $record->setExtraDetail('ils_details', $current);
@@ -852,7 +921,7 @@ class MyResearchController extends AbstractBase
         $cancelStatus = $catalog->checkFunction('cancelHolds', compact('patron'));
         $view = $this->createViewModel();
         $view->cancelResults = $cancelStatus
-            ? $this->holds()->cancelHolds($catalog, $patron) : array();
+            ? $this->holds()->cancelHolds($catalog, $patron) : [];
         // If we need to confirm
         if (!is_array($view->cancelResults)) {
             return $view->cancelResults;
@@ -863,7 +932,7 @@ class MyResearchController extends AbstractBase
 
         // Get held item details:
         $result = $catalog->getMyHolds($patron);
-        $recordList = array();
+        $recordList = [];
         $this->holds()->resetValidation();
         foreach ($result as $current) {
             // Add cancel details if appropriate:
@@ -916,7 +985,7 @@ class MyResearchController extends AbstractBase
             ? $this->storageRetrievalRequests()->cancelStorageRetrievalRequests(
                 $catalog, $patron
             )
-            : array();
+            : [];
         // If we need to confirm
         if (!is_array($view->cancelResults)) {
             return $view->cancelResults;
@@ -927,7 +996,7 @@ class MyResearchController extends AbstractBase
 
         // Get request details:
         $result = $catalog->getMyStorageRetrievalRequests($patron);
-        $recordList = array();
+        $recordList = [];
         $this->storageRetrievalRequests()->resetValidation();
         foreach ($result as $current) {
             // Add cancel details if appropriate:
@@ -981,7 +1050,7 @@ class MyResearchController extends AbstractBase
             ? $this->ILLRequests()->cancelILLRequests(
                 $catalog, $patron
             )
-            : array();
+            : [];
         // If we need to confirm
         if (!is_array($view->cancelResults)) {
             return $view->cancelResults;
@@ -992,7 +1061,7 @@ class MyResearchController extends AbstractBase
 
         // Get request details:
         $result = $catalog->getMyILLRequests($patron);
-        $recordList = array();
+        $recordList = [];
         $this->ILLRequests()->resetValidation();
         foreach ($result as $current) {
             // Add cancel details if appropriate:
@@ -1030,21 +1099,44 @@ class MyResearchController extends AbstractBase
         // Connect to the ILS:
         $catalog = $this->getILS();
 
+        // Display account blocks, if any:
+        $this->addAccountBlocksToFlashMessenger($catalog, $patron);
+
         // Get the current renewal status and process renewal form, if necessary:
         $renewStatus = $catalog->checkFunction('Renewals', compact('patron'));
         $renewResult = $renewStatus
             ? $this->renewals()->processRenewals(
                 $this->getRequest()->getPost(), $catalog, $patron
             )
-            : array();
+            : [];
 
         // By default, assume we will not need to display a renewal form:
         $renewForm = false;
 
         // Get checked out item details:
         $result = $catalog->getMyTransactions($patron);
-        $transactions = array();
-        foreach ($result as $current) {
+
+        // Get page size:
+        $config = $this->getConfig();
+        $limit = isset($config->Catalog->checked_out_page_size)
+            ? $config->Catalog->checked_out_page_size : 50;
+
+        // Build paginator if needed:
+        if ($limit > 0 && $limit < count($result)) {
+            $adapter = new \Zend\Paginator\Adapter\ArrayAdapter($result);
+            $paginator = new \Zend\Paginator\Paginator($adapter);
+            $paginator->setItemCountPerPage($limit);
+            $paginator->setCurrentPageNumber($this->params()->fromQuery('page', 1));
+            $pageStart = $paginator->getAbsoluteItemNumber(1) - 1;
+            $pageEnd = $paginator->getAbsoluteItemNumber($limit) - 1;
+        } else {
+            $paginator = false;
+            $pageStart = 0;
+            $pageEnd = count($result);
+        }
+
+        $transactions = $hiddenTransactions = [];
+        foreach ($result as $i => $current) {
             // Add renewal details if appropriate:
             $current = $this->renewals()->addRenewDetails(
                 $catalog, $current, $renewStatus
@@ -1056,14 +1148,18 @@ class MyResearchController extends AbstractBase
                 $renewForm = true;
             }
 
-            // Build record driver:
-            $transactions[] = $this->getDriverForILSRecord($current);
+            // Build record driver (only for the current visible page):
+            if ($i >= $pageStart && $i <= $pageEnd) {
+                $transactions[] = $this->getDriverForILSRecord($current);
+            } else {
+                $hiddenTransactions[] = $current;
+            }
         }
 
         return $this->createViewModel(
-            array(
-                'transactions' => $transactions, 'renewForm' => $renewForm,
-                'renewResult' => $renewResult
+            compact(
+                'transactions', 'renewForm', 'renewResult', 'paginator',
+                'hiddenTransactions'
             )
         );
     }
@@ -1085,14 +1181,15 @@ class MyResearchController extends AbstractBase
 
         // Get fine details:
         $result = $catalog->getMyFines($patron);
-        $fines = array();
+        $fines = [];
         foreach ($result as $row) {
             // Attempt to look up and inject title:
             try {
                 if (!isset($row['id']) || empty($row['id'])) {
                     throw new \Exception();
                 }
-                $source = isset($row['source']) ? $row['source'] : 'VuFind';
+                $source = isset($row['source'])
+                    ? $row['source'] : DEFAULT_SEARCH_BACKEND;
                 $row['driver'] = $this->getServiceLocator()
                     ->get('VuFind\RecordLoader')->load($row['id'], $source);
                 $row['title'] = $row['driver']->getShortTitle();
@@ -1104,7 +1201,7 @@ class MyResearchController extends AbstractBase
             $fines[] = $row;
         }
 
-        return $this->createViewModel(array('fines' => $fines));
+        return $this->createViewModel(['fines' => $fines]);
     }
 
     /**
@@ -1129,8 +1226,7 @@ class MyResearchController extends AbstractBase
         // Make sure we're configured to do this
         $this->setUpAuthenticationFromRequest();
         if (!$this->getAuthManager()->supportsRecovery()) {
-            $this->flashMessenger()->setNamespace('error')
-                ->addMessage('recovery_disabled');
+            $this->flashMessenger()->addMessage('recovery_disabled', 'error');
             return $this->redirect()->toRoute('myresearch-home');
         }
         if ($this->getUser()) {
@@ -1153,8 +1249,8 @@ class MyResearchController extends AbstractBase
             if ($user) {
                 $this->sendRecoveryEmail($user, $this->getConfig());
             } else {
-                $this->flashMessenger()->setNamespace('error')
-                    ->addMessage('recovery_user_not_found');
+                $this->flashMessenger()
+                    ->addMessage('recovery_user_not_found', 'error');
             }
         }
         return $view;
@@ -1172,17 +1268,15 @@ class MyResearchController extends AbstractBase
     {
         // If we can't find a user
         if (null == $user) {
-            $this->flashMessenger()->setNamespace('error')
-                ->addMessage('recovery_user_not_found');
+            $this->flashMessenger()->addMessage('recovery_user_not_found', 'error');
         } else {
             // Make sure we've waiting long enough
             $hashtime = $this->getHashAge($user->verify_hash);
             $recoveryInterval = isset($config->Authentication->recover_interval)
                 ? $config->Authentication->recover_interval
                 : 60;
-            if (time()-$hashtime < $recoveryInterval) {
-                $this->flashMessenger()->setNamespace('error')
-                    ->addMessage('recovery_too_soon');
+            if (time() - $hashtime < $recoveryInterval) {
+                $this->flashMessenger()->addMessage('recovery_too_soon', 'error');
             } else {
                 // Attempt to send the email
                 try {
@@ -1194,12 +1288,12 @@ class MyResearchController extends AbstractBase
                     // Custom template for emails (text-only)
                     $message = $renderer->render(
                         'Email/recover-password.phtml',
-                        array(
+                        [
                             'library' => $config->Site->title,
                             'url' => $this->getServerUrl('myresearch-verify')
                                 . '?hash='
                                 . $user->verify_hash . '&auth_method=' . $method
-                        )
+                        ]
                     );
                     $this->getServiceLocator()->get('VuFind\Mailer')->send(
                         $user->email,
@@ -1207,11 +1301,10 @@ class MyResearchController extends AbstractBase
                         $this->translate('recovery_email_subject'),
                         $message
                     );
-                    $this->flashMessenger()->setNamespace('info')
-                        ->addMessage('recovery_email_sent');
+                    $this->flashMessenger()
+                        ->addMessage('recovery_email_sent', 'success');
                 } catch (MailException $e) {
-                    $this->flashMessenger()->setNamespace('error')
-                        ->addMessage($e->getMessage());
+                    $this->flashMessenger()->addMessage($e->getMessage(), 'error');
                 }
             }
         }
@@ -1232,9 +1325,9 @@ class MyResearchController extends AbstractBase
             $hashLifetime = isset($config->Authentication->recover_hash_lifetime)
                 ? $config->Authentication->recover_hash_lifetime
                 : 1209600; // Two weeks
-            if (time()-$hashtime > $hashLifetime) {
-                $this->flashMessenger()->setNamespace('error')
-                    ->addMessage('recovery_expired_hash');
+            if (time() - $hashtime > $hashLifetime) {
+                $this->flashMessenger()
+                    ->addMessage('recovery_expired_hash', 'error');
                 return $this->forwardTo('MyResearch', 'Login');
             } else {
                 $table = $this->getTable('User');
@@ -1248,15 +1341,34 @@ class MyResearchController extends AbstractBase
                     $view->hash = $hash;
                     $view->username = $user->username;
                     $view->useRecaptcha
-                        = $this->recaptcha()->active('passwordRecovery');
+                        = $this->recaptcha()->active('changePassword');
                     $view->setTemplate('myresearch/newpassword');
                     return $view;
                 }
             }
         }
-        $this->flashMessenger()->setNamespace('error')
-            ->addMessage('recovery_invalid_hash');
+        $this->flashMessenger()->addMessage('recovery_invalid_hash', 'error');
         return $this->forwardTo('MyResearch', 'Login');
+    }
+
+    /**
+     * Reset the new password form and return the modified view. When a user has
+     * already been loaded from an existing hash, this resets the hash and updates
+     * the form so that the user can try again.
+     *
+     * @param mixed     $userFromHash User loaded from database, or false if none.
+     * @param ViewModel $view         View object
+     *
+     * @return ViewModel
+     */
+    protected function resetNewPasswordForm($userFromHash, ViewModel $view)
+    {
+        if ($userFromHash) {
+            $userFromHash->updateHash();
+            $view->username = $userFromHash->username;
+            $view->hash = $userFromHash->verify_hash;
+        }
+        return $view;
     }
 
     /**
@@ -1284,22 +1396,19 @@ class MyResearchController extends AbstractBase
         $view->useRecaptcha = $this->recaptcha()->active('changePassword');
         // Check reCaptcha
         if (!$this->formWasSubmitted('submit', $view->useRecaptcha)) {
-            return $view;
+            $this->setUpAuthenticationFromRequest();
+            return $this->resetNewPasswordForm($userFromHash, $view);
         }
         // Missing or invalid hash
         if (false == $userFromHash) {
-            $this->flashMessenger()->setNamespace('error')
-                ->addMessage('recovery_user_not_found');
+            $this->flashMessenger()->addMessage('recovery_user_not_found', 'error');
             // Force login or restore hash
             $post->username = false;
             return $this->forwardTo('MyResearch', 'Recover');
         } elseif ($userFromHash->username !== $post->username) {
-            $this->flashMessenger()->setNamespace('error')
-                ->addMessage('authentication_error_invalid');
-            $userFromHash->updateHash();
-            $view->username = $userFromHash->username;
-            $view->hash = $userFromHash->verify_hash;
-            return $view;
+            $this->flashMessenger()
+                ->addMessage('authentication_error_invalid', 'error');
+            return $this->resetNewPasswordForm($userFromHash, $view);
         }
         // Verify old password if we're logged in
         if ($this->getUser()) {
@@ -1313,8 +1422,8 @@ class MyResearchController extends AbstractBase
                 $valid = false;
             }
             if (!$valid) {
-                $this->flashMessenger()->setNamespace('error')
-                    ->addMessage('authentication_error_invalid');
+                $this->flashMessenger()
+                    ->addMessage('authentication_error_invalid', 'error');
                 $view->verifyold = true;
                 return $view;
             }
@@ -1323,8 +1432,7 @@ class MyResearchController extends AbstractBase
         try {
             $user = $this->getAuthManager()->updatePassword($this->getRequest());
         } catch (AuthException $e) {
-            $this->flashMessenger()->setNamespace('error')
-                ->addMessage($e->getMessage());
+            $this->flashMessenger()->addMessage($e->getMessage(), 'error');
             return $view;
         }
         // Update hash to prevent reusing hash
@@ -1332,8 +1440,7 @@ class MyResearchController extends AbstractBase
         // Login
         $this->getAuthManager()->login($this->request);
         // Go to favorites
-        $this->flashMessenger()->setNamespace('info')
-            ->addMessage('new_password_success');
+        $this->flashMessenger()->addMessage('new_password_success', 'success');
         return $this->redirect()->toRoute('myresearch-home');
     }
 
@@ -1349,8 +1456,7 @@ class MyResearchController extends AbstractBase
         }
         // If not submitted, are we logged in?
         if (!$this->getAuthManager()->supportsPasswordChange()) {
-            $this->flashMessenger()->setNamespace('error')
-                ->addMessage('recovery_new_disabled');
+            $this->flashMessenger()->addMessage('recovery_new_disabled', 'error');
             return $this->redirect()->toRoute('home');
         }
         $view = $this->createViewModel($this->params()->fromPost());
@@ -1389,7 +1495,11 @@ class MyResearchController extends AbstractBase
      */
     protected function setUpAuthenticationFromRequest()
     {
-        $method = trim($this->params()->fromQuery('auth_method'));
+        $method = trim(
+            $this->params()->fromQuery(
+                'auth_method', $this->params()->fromPost('auth_method')
+            )
+        );
         if (!empty($method)) {
             $this->getAuthManager()->setAuthMethod($method);
         }

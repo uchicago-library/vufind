@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller_Plugins
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Controller\Plugin;
 use Zend\Db\Adapter\Adapter as DbAdapter, Zend\Db\Metadata\Metadata as DbMetadata,
@@ -32,11 +32,11 @@ use Zend\Db\Adapter\Adapter as DbAdapter, Zend\Db\Metadata\Metadata as DbMetadat
 /**
  * Zend action helper to perform database upgrades
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller_Plugins
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class DbUpgrade extends AbstractPlugin
 {
@@ -45,7 +45,7 @@ class DbUpgrade extends AbstractPlugin
      *
      * @var array
      */
-    protected $dbCommands = array();
+    protected $dbCommands = [];
 
     /**
      * Database adapter
@@ -83,7 +83,7 @@ class DbUpgrade extends AbstractPlugin
             if (isset($matches[2])) {
                 $table = str_replace('`', '', $matches[2]);
                 if (!isset($this->dbCommands[$table])) {
-                    $this->dbCommands[$table] = array();
+                    $this->dbCommands[$table] = [];
                 }
                 $this->dbCommands[$table][] = $statement;
             }
@@ -147,7 +147,7 @@ class DbUpgrade extends AbstractPlugin
         if ($reload || !$this->tableInfo) {
             $metadata = new DbMetadata($this->getAdapter());
             $tables = $metadata->getTables();
-            $this->tableInfo = array();
+            $this->tableInfo = [];
             foreach ($tables as $current) {
                 $this->tableInfo[$current->getName()] = $current;
             }
@@ -181,13 +181,96 @@ class DbUpgrade extends AbstractPlugin
         $results = $this->getAdapter()->query($sql, DbAdapter::QUERY_MODE_EXECUTE);
 
         // Load details:
-        $retVal = array();
+        $retVal = [];
         foreach ($results as $current) {
             if (strtolower(substr($current->Collation, 0, 6)) == 'latin1') {
                 $retVal[$current->Field] = (array)$current;
             }
         }
         return $retVal;
+    }
+
+    /**
+     * Retrieve (and statically cache) table status information.
+     *
+     * @return array
+     */
+    public function getTableStatus()
+    {
+        static $status = false;
+        if (!$status) {
+            $status = $this->getAdapter()
+                ->query('SHOW TABLE STATUS', DbAdapter::QUERY_MODE_EXECUTE)
+                ->toArray();
+        }
+        return $status;
+    }
+
+    /**
+     * Check whether the actual table collation matches the expected table
+     * collation; return false if there is no problem, the name of the desired
+     * collation otherwise.
+     *
+     * @param array $table Information about a table (from getTableStatus())
+     *
+     * @return bool|string
+     */
+    protected function getCollationProblemsForTable($table)
+    {
+        // For now, we'll only detect problems in utf8-encoded tables; if the
+        // user has a Latin1 database, they probably have more complex issues to
+        // work through anyway.
+        preg_match_all(
+            '/CHARSET=utf8 COLLATE (\w+)/', $this->dbCommands[$table['Name']][0],
+            $matches
+        );
+        if (isset($matches[1][0])
+            && strtolower($matches[1][0]) != strtolower($table['Collation'])
+        ) {
+            return $matches[1][0];
+        }
+        return false;
+    }
+
+    /**
+     * Get information on incorrectly collated tables/columns. Return value is
+     * associative array of table name => correct collation value.
+     *
+     * @throws \Exception
+     * @return array
+     */
+    public function getCollationProblems()
+    {
+        // Load details:
+        $retVal = [];
+        foreach ($this->getTableStatus() as $current) {
+            if ($problem = $this->getCollationProblemsForTable($current)) {
+                $retVal[$current['Name']] = $problem;
+            }
+        }
+        return $retVal;
+    }
+
+    /**
+     * Fix collation problems based on the output of getCollationProblems().
+     *
+     * @param array $tables Output of getCollationProblems()
+     * @param bool  $logsql Should we return the SQL as a string rather than
+     * execute it?
+     *
+     * @throws \Exception
+     * @return string       SQL if $logsql is true, empty string otherwise
+     */
+    public function fixCollationProblems($tables, $logsql = false)
+    {
+        $sqlcommands = '';
+        foreach ($tables as $table => $newCollation) {
+            // Adjust default table collation:
+            $sql = "ALTER TABLE `$table` CONVERT TO CHARACTER SET utf8 "
+                . "COLLATE $newCollation;";
+            $sqlcommands .= $this->query($sql, $logsql);
+        }
+        return $sqlcommands;
     }
 
     /**
@@ -198,16 +281,12 @@ class DbUpgrade extends AbstractPlugin
      */
     public function getEncodingProblems()
     {
-        // Get table summary:
-        $sql = "SHOW TABLE STATUS";
-        $results = $this->getAdapter()->query($sql, DbAdapter::QUERY_MODE_EXECUTE);
-
         // Load details:
-        $retVal = array();
-        foreach ($results as $current) {
-            if (strtolower(substr($current->Collation, 0, 6)) == 'latin1') {
-                $retVal[$current->Name]
-                    = $this->getEncodingProblemsForTable($current->Name);
+        $retVal = [];
+        foreach ($this->getTableStatus() as $current) {
+            if (strtolower(substr($current['Collation'], 0, 6)) == 'latin1') {
+                $retVal[$current['Name']]
+                    = $this->getEncodingProblemsForTable($current['Name']);
             }
         }
 
@@ -291,8 +370,8 @@ class DbUpgrade extends AbstractPlugin
     protected function getTableColumns($table)
     {
         $info = $this->getTableInfo(true);
-        $columns = isset($info[$table]) ? $info[$table]->getColumns() : array();
-        $retVal = array();
+        $columns = isset($info[$table]) ? $info[$table]->getColumns() : [];
+        $retVal = [];
         foreach ($columns as $current) {
             $retVal[strtolower($current->getName())] = $current;
         }
@@ -308,7 +387,7 @@ class DbUpgrade extends AbstractPlugin
     public function getMissingTables()
     {
         $tables = $this->getAllTables();
-        $missing = array();
+        $missing = [];
         foreach (array_keys($this->dbCommands) as $table) {
             if (!in_array(trim(strtolower($table)), $tables)) {
                 $missing[] = $table;
@@ -347,9 +426,9 @@ class DbUpgrade extends AbstractPlugin
      * @throws \Exception
      * @return array
      */
-    public function getMissingColumns($missingTables = array())
+    public function getMissingColumns($missingTables = [])
     {
-        $missing = array();
+        $missing = [];
         foreach ($this->dbCommands as $table => $sql) {
             // Skip missing tables if we're logging
             if (in_array($table, $missingTables)) {
@@ -363,7 +442,7 @@ class DbUpgrade extends AbstractPlugin
             $expectedColumns = $matches[1];
 
             // Create associative array of column name => SQL defining that column
-            $columnDefinitions = array();
+            $columnDefinitions = [];
             foreach ($expectedColumns as $i => $name) {
                 // Strip off any comments:
                 $parts = explode('--', $matches[0][$i]);
@@ -377,13 +456,35 @@ class DbUpgrade extends AbstractPlugin
             foreach ($expectedColumns as $column) {
                 if (!in_array(strtolower($column), $actualColumns)) {
                     if (!isset($missing[$table])) {
-                        $missing[$table] = array();
+                        $missing[$table] = [];
                     }
                     $missing[$table][] = $columnDefinitions[$column];
                 }
             }
         }
         return $missing;
+    }
+
+    /**
+     * Given a current row default, return true if the current default matches the
+     * one found in the SQL provided as the $sql parameter. Return false if there
+     * is a mismatch that will require table structure updates.
+     *
+     * @param string $currentDefault Object to check
+     * @param string $sql            SQL to compare against
+     *
+     * @return bool
+     */
+    protected function defaultMatches($currentDefault, $sql)
+    {
+        preg_match("/.* DEFAULT (.*)$/", $sql, $matches);
+        $expectedDefault = isset($matches[1]) ? $matches[1] : null;
+        if (null !== $expectedDefault) {
+            $expectedDefault = trim(rtrim($expectedDefault, ','), "'");
+            $expectedDefault = (strtoupper($expectedDefault) == 'NULL')
+                ? null : $expectedDefault;
+        }
+        return ($expectedDefault === $currentDefault);
     }
 
     /**
@@ -403,7 +504,7 @@ class DbUpgrade extends AbstractPlugin
 
         // If it's not a blob or a text (which don't have explicit sizes in our SQL),
         // we should see what the character length is, if any:
-        if ($type != 'blob' && $type != 'text') {
+        if ($type != 'blob' && $type != 'text' && $type != 'longtext') {
             $charLen = $column->getCharacterMaximumLength();
             if ($charLen) {
                 $type .= '(' . $charLen . ')';
@@ -454,10 +555,10 @@ class DbUpgrade extends AbstractPlugin
      * @throws \Exception
      * @return array
      */
-    public function getModifiedColumns($missingTables = array(),
-        $missingColumns = array()
+    public function getModifiedColumns($missingTables = [],
+        $missingColumns = []
     ) {
-        $missing = array();
+        $modified = [];
         foreach ($this->dbCommands as $table => $sql) {
             // Skip missing tables if we're logging
             if (in_array($table, $missingTables)) {
@@ -475,7 +576,7 @@ class DbUpgrade extends AbstractPlugin
             $expectedTypes = $matches[2];
 
             // Create associative array of column name => SQL defining that column
-            $columnDefinitions = array();
+            $columnDefinitions = [];
             foreach ($expectedColumns as $i => $name) {
                 // Strip off any comments:
                 $parts = explode('--', $matches[0][$i]);
@@ -494,15 +595,20 @@ class DbUpgrade extends AbstractPlugin
                     continue;
                 }
                 $currentColumn = $actualColumns[$column];
-                if (!$this->typeMatches($currentColumn, $expectedTypes[$i])) {
-                    if (!isset($missing[$table])) {
-                        $missing[$table] = array();
+                if (!$this->typeMatches($currentColumn, $expectedTypes[$i])
+                    || !$this->defaultMatches(
+                        $currentColumn->getColumnDefault(),
+                        $columnDefinitions[$column]
+                    )
+                ) {
+                    if (!isset($modified[$table])) {
+                        $modified[$table] = [];
                     }
-                    $missing[$table][] = $columnDefinitions[$column];
+                    $modified[$table][] = $columnDefinitions[$column];
                 }
             }
         }
-        return $missing;
+        return $modified;
     }
 
     /**

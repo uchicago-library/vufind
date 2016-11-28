@@ -18,26 +18,25 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\Unit;
 
 /**
  * Abstract base class for PHPUnit database test cases.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-
 abstract class DbTestCase extends TestCase
 {
     /**
@@ -58,35 +57,44 @@ abstract class DbTestCase extends TestCase
             $sm->setService('VuFind\DbAdapter', $dbFactory->getAdapter());
             $factory = new \VuFind\Db\Table\PluginManager(
                 new \Zend\ServiceManager\Config(
-                    array(
+                    [
                         'abstract_factories' =>
-                            array('VuFind\Db\Table\PluginFactory')
-                    )
+                            ['VuFind\Db\Table\PluginFactory'],
+                        'factories' => [
+                            'resource' => 'VuFind\Db\Table\Factory::getResource',
+                            'user' => 'VuFind\Db\Table\Factory::getUser',
+                            'userlist' => 'VuFind\Db\Table\Factory::getUserList',
+                        ]
+                    ]
                 )
             );
             $factory->setServiceLocator($sm);
             $sm->setService('VuFind\DbTablePluginManager', $factory);
+            $sm->setService(
+                'VuFind\SessionManager',
+                $this->getMock('Zend\Session\SessionManager')
+            );
 
             // Override the configuration so PostgreSQL tests can work:
             $sm->setAllowOverride(true);
             $sm->setService(
                 'config',
-                array(
-                    'vufind' => array(
-                        'pgsql_seq_mapping'  => array(
-                            'comments'       => array('id', 'comments_id_seq'),
-                            'oai_resumption' => array('id', 'oai_resumption_id_seq'),
-                            'resource'       => array('id', 'resource_id_seq'),
-                            'resource_tags'  => array('id', 'resource_tags_id_seq'),
-                            'search'         => array('id', 'search_id_seq'),
-                            'session'        => array('id', 'session_id_seq'),
-                            'tags'           => array('id', 'tags_id_seq'),
-                            'user'           => array('id', 'user_id_seq'),
-                            'user_list'      => array('id', 'user_list_id_seq'),
-                            'user_resource'  => array('id', 'user_resource_id_seq')
-                        )
-                    )
-                )
+                [
+                    'vufind' => [
+                        'pgsql_seq_mapping'  => [
+                            'comments'       => ['id', 'comments_id_seq'],
+                            'oai_resumption' => ['id', 'oai_resumption_id_seq'],
+                            'resource'       => ['id', 'resource_id_seq'],
+                            'resource_tags'  => ['id', 'resource_tags_id_seq'],
+                            'search'         => ['id', 'search_id_seq'],
+                            'session'        => ['id', 'session_id_seq'],
+                            'tags'           => ['id', 'tags_id_seq'],
+                            'user'           => ['id', 'user_id_seq'],
+                            'user_list'      => ['id', 'user_list_id_seq'],
+                            'user_resource'  => ['id', 'user_resource_id_seq']
+                        ]
+                    ]
+                ]
             );
         }
         return $sm;

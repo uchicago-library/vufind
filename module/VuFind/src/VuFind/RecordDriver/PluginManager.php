@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 namespace VuFind\RecordDriver;
 use Zend\ServiceManager\ConfigInterface;
@@ -31,11 +31,11 @@ use Zend\ServiceManager\ConfigInterface;
 /**
  * Record driver plugin manager
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
 {
@@ -54,9 +54,9 @@ class PluginManager extends \VuFind\ServiceManager\AbstractPluginManager
 
         // Add an initializer for setting up hierarchies
         $initializer = function ($instance, $manager) {
-            $hasHierarchyType = is_callable(array($instance, 'getHierarchyType'));
+            $hasHierarchyType = is_callable([$instance, 'getHierarchyType']);
             if ($hasHierarchyType
-                && is_callable(array($instance, 'setHierarchyDriverManager'))
+                && is_callable([$instance, 'setHierarchyDriverManager'])
             ) {
                 $sm = $manager->getServiceLocator();
                 if ($sm && $sm->has('VuFind\HierarchyDriverPluginManager')) {

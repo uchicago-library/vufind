@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFindTest\SMS;
 use VuFind\SMS\Clickatell;
@@ -31,11 +31,11 @@ use VuFind\SMS\Clickatell;
 /**
  * SMS test
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class ClickatellTest extends \VuFindTest\Unit\TestCase
 {
@@ -59,9 +59,9 @@ class ClickatellTest extends \VuFindTest\Unit\TestCase
      */
     public function testCarriers()
     {
-        $expected = array(
-            'Clickatell' => array('name' => 'Clickatell', 'domain' => null)
-        );
+        $expected = [
+            'Clickatell' => ['name' => 'Clickatell', 'domain' => null]
+        ];
         $obj = $this->getClickatell();
         $this->assertEquals($expected, $obj->getCarriers());
     }
@@ -91,7 +91,8 @@ class ClickatellTest extends \VuFindTest\Unit\TestCase
      * Test unexpected response
      *
      * @return void
-     * @expectedException VuFind\Exception\Mail
+     *
+     * @expectedException        VuFind\Exception\Mail
      * @expectedExceptionMessage badbadbad
      */
     public function testUnexpectedResponse()
@@ -112,7 +113,8 @@ class ClickatellTest extends \VuFindTest\Unit\TestCase
      * Test unsuccessful query
      *
      * @return void
-     * @expectedException VuFind\Exception\Mail
+     *
+     * @expectedException        VuFind\Exception\Mail
      * @expectedExceptionMessage Problem sending text.
      */
     public function testFailureResponse()
@@ -132,7 +134,8 @@ class ClickatellTest extends \VuFindTest\Unit\TestCase
      * Test an exception in the mail client
      *
      * @return void
-     * @expectedException VuFind\Exception\Mail
+     *
+     * @expectedException        VuFind\Exception\Mail
      * @expectedExceptionMessage Foo
      */
     public function testClientException()
@@ -164,7 +167,7 @@ class ClickatellTest extends \VuFindTest\Unit\TestCase
         }
         return new Clickatell(
             new \Zend\Config\Config($config),
-            array('client' => $client)
+            ['client' => $client]
         );
     }
 
@@ -175,13 +178,13 @@ class ClickatellTest extends \VuFindTest\Unit\TestCase
      */
     protected function getDefaultConfig()
     {
-        return array(
-            'Clickatell' => array(
+        return [
+            'Clickatell' => [
                 'user' => 'user',
                 'password' => 'password',
                 'api_id' => 'api_id',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

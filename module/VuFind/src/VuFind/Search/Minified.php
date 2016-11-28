@@ -17,16 +17,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\Search;
-use VuFind\Search\QueryAdapter;
 
 /**
  * A minified search object used exclusively for trimming a search object down to its
@@ -45,11 +44,11 @@ use VuFind\Search\QueryAdapter;
  * $searchObject = unserialize($search);
  * $searchObject->deminify($manager);
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class Minified
 {
@@ -58,14 +57,21 @@ class Minified
      *
      * @var array
      */
-    public $t = array();
+    public $t = [];
 
     /**
      * Filters
      *
      * @var array
      */
-    public $f = array();
+    public $f = [];
+
+    /**
+     * Hidden Filters
+     *
+     * @var array
+     */
+    public $hf = [];
 
     /**
      * ID, start tIme, query Speed, Result total, search TYpe, search CLass id
@@ -97,6 +103,7 @@ class Minified
         // It would be nice to shorten filter fields too, but
         //      it would be a nightmare to maintain.
         $this->f = $searchObject->getParams()->getFilters();
+        $this->hf = $searchObject->getParams()->getHiddenFilters();
     }
 
     /**

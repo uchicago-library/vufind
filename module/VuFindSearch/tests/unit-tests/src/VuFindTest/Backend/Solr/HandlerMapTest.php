@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Backend\Solr;
 
 use VuFindSearch\Backend\Solr\HandlerMap;
@@ -39,11 +38,11 @@ use RuntimeException;
 /**
  * Unit tests for SOLR HandlerMap.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class HandlerMapTest extends TestCase
 {
@@ -52,15 +51,15 @@ class HandlerMapTest extends TestCase
      *
      * @return void
      *
-     * @expectedException InvalidArgumentException
+     * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Duplicate fallback
      */
     public function testSetHandlerMapThrowsOnDuplicateFallback()
     {
-        $map = array(
-            'h1' => array('fallback' => true),
-            'h2' => array('fallback' => true),
-        );
+        $map = [
+            'h1' => ['fallback' => true],
+            'h2' => ['fallback' => true],
+        ];
         new HandlerMap($map);
     }
 
@@ -69,15 +68,15 @@ class HandlerMapTest extends TestCase
      *
      * @return void
      *
-     * @expectedException InvalidArgumentException
+     * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Handler for function already defined
      */
     public function testSetHandlerMapThrowsOnDuplicateFunctionHandler()
     {
-        $map = array(
-            'h1' => array('functions' => array('foo')),
-            'h2' => array('functions' => array('foo')),
-        );
+        $map = [
+            'h1' => ['functions' => ['foo']],
+            'h2' => ['functions' => ['foo']],
+        ];
         new HandlerMap($map);
     }
 
@@ -86,12 +85,12 @@ class HandlerMapTest extends TestCase
      *
      * @return void
      *
-     * @expectedException RuntimeException
+     * @expectedException        RuntimeException
      * @expectedExceptionMessage Undefined function handler
      */
     public function testGetHandlerThrowsOnUndefinedFunctionHandler()
     {
-        $map = new HandlerMap(array());
+        $map = new HandlerMap([]);
         $map->getHandler('search');
     }
 
@@ -100,12 +99,12 @@ class HandlerMapTest extends TestCase
      *
      * @return void
      *
-     * @expectedException InvalidArgumentException
+     * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Invalid parameter key: bad
      */
     public function testGetParametersThrowsOnUndefinedType()
     {
-        $map = new HandlerMap(array('h1' => array('functions' => array('foo'))));
+        $map = new HandlerMap(['h1' => ['functions' => ['foo']]]);
         $map->getParameters('h1', 'bad');
     }
 
@@ -114,13 +113,13 @@ class HandlerMapTest extends TestCase
      *
      * @return void
      *
-     * @expectedException InvalidArgumentException
+     * @expectedException        InvalidArgumentException
      * @expectedExceptionMessage Invalid parameter key: bad
      */
     public function testSetParametersThrowsOnUndefinedType()
     {
-        $map = new HandlerMap(array('h1' => array('functions' => array('foo'))));
-        $map->setParameters('h1', 'bad', array());
+        $map = new HandlerMap(['h1' => ['functions' => ['foo']]]);
+        $map->setParameters('h1', 'bad', []);
     }
 
     /**
@@ -131,25 +130,25 @@ class HandlerMapTest extends TestCase
     public function testGetDefaultsAppendsInvariants()
     {
         $map = new HandlerMap(
-            array(
-                'search' => array(
-                    'functions' => array('search'),
-                    'invariants' => array('p1' => 'v1'),
-                    'defaults' => array('p2' => 'v2'),
-                    'appends' => array('p3' => 'v3'),
-                )
-            )
+            [
+                'search' => [
+                    'functions' => ['search'],
+                    'invariants' => ['p1' => 'v1'],
+                    'defaults' => ['p2' => 'v2'],
+                    'appends' => ['p3' => 'v3'],
+                ]
+            ]
         );
         $this->assertEquals(
-            array('p1' => array('v1')),
+            ['p1' => ['v1']],
             $map->getInvariants('search')->getArrayCopy()
         );
         $this->assertEquals(
-            array('p2' => array('v2')),
+            ['p2' => ['v2']],
             $map->getDefaults('search')->getArrayCopy()
         );
         $this->assertEquals(
-            array('p3' => array('v3')),
+            ['p3' => ['v3']],
             $map->getAppends('search')->getArrayCopy()
         );
     }
@@ -159,30 +158,30 @@ class HandlerMapTest extends TestCase
      *
      * @return void
      *
-     * @see http://vufind.org/jira/browse/VUFIND-820 VUFIND-820
+     * @see https://vufind.org/jira/browse/VUFIND-820 VUFIND-820
      */
     public function testGetDefaultsAppendsInvariantsPureFallback()
     {
         $map = new HandlerMap(
-            array(
-                'search' => array(
+            [
+                'search' => [
                     'fallback' => true,
-                    'invariants' => array('p1' => 'v1'),
-                    'defaults' => array('p2' => 'v2'),
-                    'appends' => array('p3' => 'v3'),
-                )
-            )
+                    'invariants' => ['p1' => 'v1'],
+                    'defaults' => ['p2' => 'v2'],
+                    'appends' => ['p3' => 'v3'],
+                ]
+            ]
         );
         $this->assertEquals(
-            array('p1' => array('v1')),
+            ['p1' => ['v1']],
             $map->getInvariants('search')->getArrayCopy()
         );
         $this->assertEquals(
-            array('p2' => array('v2')),
+            ['p2' => ['v2']],
             $map->getDefaults('search')->getArrayCopy()
         );
         $this->assertEquals(
-            array('p3' => array('v3')),
+            ['p3' => ['v3']],
             $map->getAppends('search')->getArrayCopy()
         );
     }
@@ -195,16 +194,16 @@ class HandlerMapTest extends TestCase
     public function testAddParameter()
     {
         $map = new HandlerMap(
-            array(
-                'search' => array(
-                    'functions' => array('search'),
-                    'invariants' => array('p1' => 'v1'),
-                )
-            )
+            [
+                'search' => [
+                    'functions' => ['search'],
+                    'invariants' => ['p1' => 'v1'],
+                ]
+            ]
         );
         $map->addParameter('search', 'invariants', 'p2', 'v2');
         $this->assertEquals(
-            array('p1' => array('v1'), 'p2' => array('v2')),
+            ['p1' => ['v1'], 'p2' => ['v2']],
             $map->getInvariants('search')->getArrayCopy()
         );
     }

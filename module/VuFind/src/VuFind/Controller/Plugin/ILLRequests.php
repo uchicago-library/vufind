@@ -18,26 +18,26 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller_Plugins
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Controller\Plugin;
 
 /**
  * Zend action helper to perform ILL request related actions
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller_Plugins
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class ILLRequests extends AbstractRequestBase
 {
@@ -105,7 +105,7 @@ class ILLRequests extends AbstractRequestBase
             $details = $params->fromPost('cancelSelectedIDS');
         } else {
             // No button pushed -- no action needed
-            return array();
+            return [];
         }
 
         if (!empty($details)) {
@@ -119,10 +119,10 @@ class ILLRequests extends AbstractRequestBase
                         $url,
                         $url,
                         'confirm_ill_request_cancel_all_text',
-                        array(
+                        [
                             'cancelAll' => 1,
                             'cancelAllIDS' => $params->fromPost('cancelAllIDS')
-                        )
+                        ]
                     );
                 } else {
                     return $this->getController()->confirm(
@@ -130,11 +130,11 @@ class ILLRequests extends AbstractRequestBase
                         $url,
                         $url,
                         'confirm_ill_request_cancel_selected_text',
-                        array(
+                        [
                             'cancelSelected' => 1,
                             'cancelSelectedIDS' =>
                                 $params->fromPost('cancelSelectedIDS')
-                        )
+                        ]
                     );
                 }
             }
@@ -143,20 +143,17 @@ class ILLRequests extends AbstractRequestBase
                 // If the user input contains a value not found in the session
                 // whitelist, something has been tampered with -- abort the process.
                 if (!in_array($info, $this->getSession()->validIds)) {
-                    $flashMsg->setNamespace('error')
-                        ->addMessage('error_inconsistent_parameters');
-                    return array();
+                    $flashMsg->addMessage('error_inconsistent_parameters', 'error');
+                    return [];
                 }
             }
 
             // Add Patron Data to Submitted Data
             $cancelResults = $catalog->cancelILLRequests(
-                array('details' => $details, 'patron' => $patron)
+                ['details' => $details, 'patron' => $patron]
             );
             if ($cancelResults == false) {
-                $flashMsg->setNamespace('error')->addMessage(
-                    'ill_request_cancel_fail'
-                );
+                $flashMsg->addMessage('ill_request_cancel_fail', 'error');
             } else {
                 if ($cancelResults['count'] > 0) {
                     // TODO : add a mechanism for inserting tokens into translated
@@ -164,17 +161,15 @@ class ILLRequests extends AbstractRequestBase
                     $msg = $this->getController()->translate(
                         'ill_request_cancel_success_items'
                     );
-                    $flashMsg->setNamespace('info')->addMessage(
-                        $cancelResults['count'] . ' ' . $msg
+                    $flashMsg->addMessage(
+                        $cancelResults['count'] . ' ' . $msg, 'success'
                     );
                 }
                 return $cancelResults;
             }
         } else {
-            $flashMsg->setNamespace('error')->addMessage(
-                'ill_request_empty_selection'
-            );
+            $flashMsg->addMessage('ill_request_empty_selection', 'error');
         }
-        return array();
+        return [];
     }
 }

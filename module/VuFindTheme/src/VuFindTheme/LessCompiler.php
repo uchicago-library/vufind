@@ -17,25 +17,25 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Theme
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFindTheme;
-use \Zend\Console\Console;
+use Zend\Console\Console;
 
 /**
  * Class to compile LESS into CSS within a theme.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Theme
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class LessCompiler
 {
@@ -141,9 +141,6 @@ class LessCompiler
                 $this->compileFile($theme, $less);
             }
         }
-
-        \Less_Cache::SetCacheDir(APPLICATION_PATH.'/themes/'.$theme.'/css/less/');
-        \Less_Cache::CleanCache(); // deletes week old files
     }
 
     /**
@@ -157,13 +154,13 @@ class LessCompiler
     {
         $config = $this->basePath . '/themes/' . $theme . '/theme.config.php';
         if (!file_exists($config)) {
-            return array();
+            return [];
         }
         $configArr = include $config;
         $base = (isset($configArr['extends']))
             ? $this->getAllLessFiles($configArr['extends'])
-            : array();
-        $current = isset($configArr['less']) ? $configArr['less'] : array();
+            : [];
+        $current = isset($configArr['less']) ? $configArr['less'] : [];
         return array_merge($base, $current);
     }
 
@@ -177,14 +174,17 @@ class LessCompiler
      */
     protected function compileFile($theme, $less)
     {
+        $parts = explode(':', $less);
+        $less = $parts[0];
+
         $finalOutDir = $this->basePath . '/themes/' . $theme . '/css/';
         list($fileName, ) = explode('.', $less);
         $finalFile = $finalOutDir . $fileName . '.css';
 
-        $this->logMessage("\tcompiling '" . $less .  "' into '" . $finalFile . "'");
+        $this->logMessage("\tcompiling '" . $less . "' into '" . $finalFile . "'");
         $start = microtime(true);
 
-        $directories = array();
+        $directories = [];
         $info = new ThemeInfo($this->basePath . '/themes', $theme);
         foreach (array_keys($info->getThemeInfo()) as $curTheme) {
             $directories["{$this->basePath}/themes/$curTheme/less/"]
@@ -197,14 +197,14 @@ class LessCompiler
             );
             return;
         }
-        $outFile = \Less_Cache::Regen(
-            array($lessDir . $less => $this->fakePath . "themes/$theme/css/less"),
-            array(
+        $outFile = \Less_Cache::Get(
+            [$lessDir . $less => $this->fakePath . "themes/$theme/css/less"],
+            [
                 'cache_dir' => $this->tempPath,
-                'cache_method' => false,
+                'cache_method' => 'php',
                 'compress' => true,
                 'import_dirs' => $directories
-            )
+            ]
         );
         $css = file_get_contents($this->tempPath . '/' . $outFile);
         if (!is_dir(dirname($finalFile))) {
@@ -212,7 +212,7 @@ class LessCompiler
         }
         file_put_contents($finalFile, $this->makeRelative($css, $less));
 
-        $this->logMessage("\t\t" . (microtime(true)-$start) . ' sec');
+        $this->logMessage("\t\t" . (microtime(true) - $start) . ' sec');
     }
 
     /**
@@ -222,6 +222,7 @@ class LessCompiler
      * @param string $less Relative LESS filename
      *
      * @return string
+     *
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
     protected function makeRelative($css, $less)
@@ -247,7 +248,7 @@ class LessCompiler
     {
         $baseDir = $this->basePath . '/themes/';
         $dir = opendir($baseDir);
-        $list = array();
+        $list = [];
         while ($line = readdir($dir)) {
             if (is_dir($baseDir . $line)
                 && file_exists($baseDir . $line . '/theme.config.php')

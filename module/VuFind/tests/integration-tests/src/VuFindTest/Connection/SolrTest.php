@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\Integration\Connection;
 
 /**
  * Solr Connection Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class SolrTest extends \VuFindTest\Unit\TestCase
 {
@@ -56,57 +56,57 @@ class SolrTest extends \VuFindTest\Unit\TestCase
      *
      * @return void
      */
-     public function testAlphaBrowseSeeAlso()
-     {
-         $solr = $this->getServiceManager()->get('VuFind\Search\BackendManager')
+    public function testAlphaBrowseSeeAlso()
+    {
+        $solr = $this->getServiceManager()->get('VuFind\Search\BackendManager')
             ->get('Solr');
-         $result = $solr->alphabeticBrowse('author', 'Dublin Society', 0, 1);
-         $item = $result['Browse']['items'][0];
-         $this->assertEquals($item['count'], count($item['ids']));
-         $this->assertTrue(empty($item['useInstead']));
-         $this->assertTrue(in_array('vtls000013187', $item['ids']));
-         $this->assertTrue(in_array('Royal Dublin Society', $item['seeAlso']));
-         $this->assertEquals('Dublin Society', $item['heading']);
-     }
+        $result = $solr->alphabeticBrowse('author', 'Dublin Society', 0, 1);
+        $item = $result['Browse']['items'][0];
+        $this->assertEquals($item['count'], count($item['ids']));
+        $this->assertTrue(empty($item['useInstead']));
+        $this->assertTrue(in_array('vtls000013187', $item['ids']));
+        $this->assertTrue(in_array('Royal Dublin Society', $item['seeAlso']));
+        $this->assertEquals('Dublin Society', $item['heading']);
+    }
 
     /**
      * Check AlphaBrowse "use instead" functionality.
      *
      * @return void
      */
-     public function testAlphaBrowseUseInstead()
-     {
-         $solr = $this->getServiceManager()->get('VuFind\Search\BackendManager')
+    public function testAlphaBrowseUseInstead()
+    {
+        $solr = $this->getServiceManager()->get('VuFind\Search\BackendManager')
             ->get('Solr');
-         $result = $solr->alphabeticBrowse('author', 'Dublin Society, Royal', 0, 1);
-         $item = $result['Browse']['items'][0];
-         $this->assertEquals(0, $item['count']);
-         $this->assertEquals($item['count'], count($item['ids']));
-         $this->assertEquals('Dublin Society, Royal', $item['heading']);
-         $this->assertTrue(empty($item['seeAlso']));
-         $this->assertTrue(in_array('Royal Dublin Society', $item['useInstead']));
-     }
+        $result = $solr->alphabeticBrowse('author', 'Dublin Society, Royal', 0, 1);
+        $item = $result['Browse']['items'][0];
+        $this->assertEquals(0, $item['count']);
+        $this->assertEquals($item['count'], count($item['ids']));
+        $this->assertEquals('Dublin Society, Royal', $item['heading']);
+        $this->assertTrue(empty($item['seeAlso']));
+        $this->assertTrue(in_array('Royal Dublin Society', $item['useInstead']));
+    }
 
     /**
      * Check that expected Dewey values are present (tests VUFIND-701).
      *
      * @return void
      */
-     public function testDeweyValues()
-     {
-         $solr = $this->getServiceManager()->get('VuFind\Search\BackendManager')
+    public function testDeweyValues()
+    {
+        $solr = $this->getServiceManager()->get('VuFind\Search\BackendManager')
             ->get('Solr');
-         $result = $solr->alphabeticBrowse('dewey', '123.45 .I39', 0, 1);
-         $item = $result['Browse']['items'][0];
-         $this->assertEquals(1, $item['count']);
-         $this->assertEquals($item['count'], count($item['ids']));
-         $this->assertEquals('123.45 .I39', $item['heading']);
-         $result = $solr->alphabeticBrowse('dewey', '123.46 .Q39', 0, 1);
-         $item = $result['Browse']['items'][0];
-         $this->assertEquals(1, $item['count']);
-         $this->assertEquals($item['count'], count($item['ids']));
-         $this->assertEquals('123.46 .Q39', $item['heading']);
-     }
+        $result = $solr->alphabeticBrowse('dewey', '123.45 .I39', 0, 1);
+        $item = $result['Browse']['items'][0];
+        $this->assertEquals(1, $item['count']);
+        $this->assertEquals($item['count'], count($item['ids']));
+        $this->assertEquals('123.45 .I39', $item['heading']);
+        $result = $solr->alphabeticBrowse('dewey', '123.46 .Q39', 0, 1);
+        $item = $result['Browse']['items'][0];
+        $this->assertEquals(1, $item['count']);
+        $this->assertEquals($item['count'], count($item['ids']));
+        $this->assertEquals('123.46 .Q39', $item['heading']);
+    }
 
     /**
      * Check that the terms handler is working.

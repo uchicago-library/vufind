@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Backend\WorldCat;
 
 use VuFindSearch\Backend\WorldCat\QueryBuilder;
@@ -35,11 +34,11 @@ use PHPUnit_Framework_TestCase;
 /**
  * Unit tests for WorldCat query builder
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class QueryBuilderTest extends PHPUnit_Framework_TestCase
 {
@@ -53,10 +52,10 @@ class QueryBuilderTest extends PHPUnit_Framework_TestCase
         // Set up an array of expected inputs (serialized objects) and outputs
         // (queries):
         // @codingStandardsIgnoreStart
-        $tests = array(
-            array('basic', '(srw.au all "john smith" OR srw.pn all "john smith" OR srw.cn all "john smith")'),
-            array('advanced', '((srw.ti all "bananas" OR srw.se all "bananas")) AND ((srw.su all "oranges") OR (srw.su all "apples")) NOT (((srw.se all "pears")))')
-        );
+        $tests = [
+            ['basic', '(srw.au all "john smith" OR srw.pn all "john smith" OR srw.cn all "john smith")'],
+            ['advanced', '((srw.ti all "bananas" OR srw.se all "bananas")) AND ((srw.su all "oranges") OR (srw.su all "apples")) NOT (((srw.se all "pears")))']
+        ];
         // @codingStandardsIgnoreEnd
 
         $qb = new QueryBuilder();

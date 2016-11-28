@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  HierarchyTree_Renderer
  * @author   Luke O'Sullivan <l.osullivan@swansea.ac.uk>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:hierarchy_components Wiki
+ * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
 namespace VuFind\Hierarchy\TreeRenderer;
 
@@ -32,22 +32,16 @@ namespace VuFind\Hierarchy\TreeRenderer;
  *
  * This is a helper class for producing hierarchy trees.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  HierarchyTree_Renderer
  * @author   Luke O'Sullivan <l.osullivan@swansea.ac.uk>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:hierarchy_components Wiki
+ * @link     https://vufind.org/wiki/development:plugins:hierarchy_components Wiki
  */
-
 class JSTree extends AbstractBase
     implements \VuFind\I18n\Translator\TranslatorAwareInterface
 {
-    /**
-     * Translator (or null if unavailable)
-     *
-     * @var \Zend\I18n\Translator\Translator
-     */
-    protected $translator = null;
+    use \VuFind\I18n\Translator\TranslatorAwareTrait;
 
     /**
      * Router plugin
@@ -64,32 +58,6 @@ class JSTree extends AbstractBase
     public function __construct(\Zend\Mvc\Controller\Plugin\Url $router)
     {
         $this->router = $router;
-    }
-
-    /**
-     * Set a translator
-     *
-     * @param \Zend\I18n\Translator\Translator $translator Translator
-     *
-     * @return AbstractBase
-     */
-    public function setTranslator(\Zend\I18n\Translator\Translator $translator)
-    {
-        $this->translator = $translator;
-        return $this;
-    }
-
-    /**
-     * Translate a string if a translator is available.
-     *
-     * @param string $msg Message to translate
-     *
-     * @return string
-     */
-    public function translate($msg)
-    {
-        return null !== $this->translator
-            ? $this->translator->translate($msg) : $msg;
     }
 
     /**
@@ -112,19 +80,20 @@ class JSTree extends AbstractBase
             if (in_array($hierarchyID, $inHierarchies)
                 && $this->getDataSource()->supports($hierarchyID)
             ) {
-                return array(
+                return [
                     $hierarchyID => $this->getHierarchyName(
                         $hierarchyID, $inHierarchies, $inHierarchiesTitle
                     )
-                );
+                ];
             }
         } else {
             // Return All Hierarchies
             $i = 0;
-            $hierarchies = array();
+            $hierarchies = [];
             foreach ($inHierarchies as $hierarchyTopID) {
                 if ($this->getDataSource()->supports($hierarchyTopID)) {
-                    $hierarchies[$hierarchyTopID] = $inHierarchiesTitle[$i];
+                    $hierarchies[$hierarchyTopID] = isset($inHierarchiesTitle[$i])
+                        ? $inHierarchiesTitle[$i] : '';
                 }
                 $i++;
             }
@@ -151,10 +120,15 @@ class JSTree extends AbstractBase
     {
         if (!empty($context) && !empty($mode)) {
             if ($mode == 'List') {
-                return $this->jsonToHTML(
-                    json_decode($this->getJSON($hierarchyID, $context)),
-                    $this->recordDriver->getUniqueId()
-                );
+                $json = $this->getDataSource()->getJSON($hierarchyID);
+                if (!empty($json)) {
+                    return $this->jsonToHTML(
+                        json_decode($json),
+                        $context,
+                        $hierarchyID,
+                        $this->recordDriver->getUniqueId()
+                    );
+                }
             } else {
                 return $this->transformCollectionXML(
                     $context, $mode, $hierarchyID, $recordID
@@ -162,44 +136,6 @@ class JSTree extends AbstractBase
             }
         }
         return false;
-    }
-
-    /**
-     * Convert JSTree JSON structure to HTML
-     *
-     * @param object $node     JSON object of a the JSTree
-     * @param string $recordID The currently active record
-     *
-     * @return string
-     */
-    public function jsonToHTML($node, $recordID = false)
-    {
-        $name = strlen($node->text) > 100
-            ? substr($node->text, 0, 100) . '...'
-            : $node->text;
-        $icon = $node->type == 'record' ? 'file-o' : 'folder-open';
-        $html = '<li';
-        if ($node->type == 'collection') {
-            $html .= ' class="hierarchy';
-            if ($recordID && $recordID == $node->li_attr->recordid) {
-                $html .= ' currentHierarchy';
-            }
-            $html .= '"';
-        } elseif ($recordID && $recordID == $node->li_attr->recordid) {
-            $html .= ' class="currentRecord"';
-        }
-        $html .= '><i class="fa fa-li fa-' . $icon . '"></i> '
-            . '<a name="tree-' . $node->id . '" href="' . $node->a_attr->href
-            . '" title="' . $node->text . '">'
-            . $name . '</a>';
-        if (isset($node->children)) {
-            $html .= '<ul class="fa-ul">';
-            foreach ($node->children as $child) {
-                $html .= $this->jsonToHTML($child, $recordID);
-            }
-            $html .= '</ul>';
-        }
-        return $html . '</li>';
     }
 
     /**
@@ -217,7 +153,7 @@ class JSTree extends AbstractBase
             return false;
         }
         return json_encode(
-            $this->formatJSON(json_decode($json), $context, $hierarchyID)
+            $this->buildNodeArray(json_decode($json), $context, $hierarchyID)
         );
     }
 
@@ -228,27 +164,28 @@ class JSTree extends AbstractBase
      * @param string $context     Record or Collection
      * @param string $hierarchyID Collection ID
      *
-     * @return array/object
+     * @return array
      */
-    protected function formatJSON($node, $context, $hierarchyID)
+    protected function buildNodeArray($node, $context, $hierarchyID)
     {
-        $ret = array(
+        $escaper = new \Zend\Escaper\Escaper('utf-8');
+        $ret = [
             'id' => preg_replace('/\W/', '-', $node->id),
-            'text' => $node->title,
-            'li_attr' => array(
+            'text' => $escaper->escapeHtml($node->title),
+            'li_attr' => [
                 'recordid' => $node->id
-            ),
-            'a_attr' => array(
-                'href' => $this->getContextualUrl($node, $context, $hierarchyID),
+            ],
+            'a_attr' => [
+                'href' => $this->getContextualUrl($node, $context),
                 'title' => $node->title
-            ),
+            ],
             'type' => $node->type
-        );
+        ];
         if (isset($node->children)) {
-            $ret['children'] = array();
-            for ($i=0;$i<count($node->children);$i++) {
+            $ret['children'] = [];
+            for ($i = 0;$i < count($node->children);$i++) {
                 $ret['children'][$i] = $this
-                    ->formatJSON($node->children[$i], $context, $hierarchyID);
+                    ->buildNodeArray($node->children[$i], $context, $hierarchyID);
             }
         }
         return $ret;
@@ -257,29 +194,18 @@ class JSTree extends AbstractBase
     /**
      * Use the router to build the appropriate URL based on context
      *
-     * @param object $node         JSON object of a node/top node
-     * @param string $context      Record or Collection
-     * @param string $collectionID Collection ID
+     * @param object $node    JSON object of a node/top node
+     * @param string $context Record or Collection
      *
      * @return string
      */
-    protected function getContextualUrl($node, $context, $collectionID)
+    protected function getContextualUrl($node, $context)
     {
-        $params = array(
-            'id' => $node->id,
-            'tab' => 'HierarchyTree'
-        );
-        $options = array(
-            'query' => array(
-                'recordID' => $node->id
-            )
-        );
         if ($context == 'Collection') {
-            return $this->router->fromRoute('collection', $params, $options)
+            return $this->getUrlFromRouteCache('collection', $node->id)
                 . '#tabnav';
         } else {
-            $options['query']['hierarchy'] = $collectionID;
-            $url = $this->router->fromRoute($node->type, $params, $options);
+            $url = $this->getUrlFromRouteCache($node->type, $node->id);
             return $node->type == 'collection'
                 ? $url . '#tabnav'
                 : $url . '#tree-' . preg_replace('/\W/', '-', $node->id);
@@ -287,8 +213,80 @@ class JSTree extends AbstractBase
     }
 
     /**
-     * transformCollectionXML
+     * Get the URL for a record and cache it to avoid the relatively slow routing
+     * calls.
      *
+     * @param string $route Route
+     * @param string $id    Record ID
+     *
+     * @return string URL
+     */
+    protected function getUrlFromRouteCache($route, $id)
+    {
+        static $cache = [];
+        if (!isset($cache[$route])) {
+            $params = [
+                'id' => '__record_id__',
+                'tab' => 'HierarchyTree'
+            ];
+            $options = [
+                'query' => [
+                    'recordID' => '__record_id__'
+                ]
+            ];
+            $cache[$route] = $this->router->fromRoute($route, $params, $options);
+        }
+        return str_replace('__record_id__', $id, $cache[$route]);
+    }
+
+    /**
+     * Convert JSTree JSON structure to HTML
+     *
+     * @param object $node        JSON object of a the JSTree
+     * @param string $context     Record or Collection
+     * @param string $hierarchyID Collection ID
+     * @param string $recordID    The currently active record
+     *
+     * @return string
+     */
+    protected function jsonToHTML($node, $context, $hierarchyID, $recordID = false)
+    {
+        $escaper = new \Zend\Escaper\Escaper('utf-8');
+
+        $name = strlen($node->title) > 100
+            ? substr($node->title, 0, 100) . '...'
+            : $node->title;
+        $href = $this->getContextualUrl($node, $context);
+        $icon = $node->type == 'record' ? 'file-o' : 'folder-open';
+
+        $html = '<li';
+        if ($node->type == 'collection') {
+            $html .= ' class="hierarchy';
+            if ($recordID && $recordID == $node->id) {
+                $html .= ' currentHierarchy';
+            }
+            $html .= '"';
+        } elseif ($recordID && $recordID == $node->id) {
+            $html .= ' class="currentRecord"';
+        }
+        $html .= '><i class="fa fa-li fa-' . $icon . '"></i> '
+            . '<a name="tree-' . $escaper->escapeHtmlAttr($node->id) . '" href="'
+            . $escaper->escapeHtmlAttr($href) . '" title="'
+            . $escaper->escapeHtml($node->title) . '">'
+            . $escaper->escapeHtml($name) . '</a>';
+        if (isset($node->children)) {
+            $html .= '<ul class="fa-ul">';
+            foreach ($node->children as $child) {
+                $html .= $this->jsonToHTML(
+                    $child, $context, $hierarchyID, $recordID
+                );
+            }
+            $html .= '</ul>';
+        }
+        return $html . '</li>';
+    }
+
+    /**
      * Transforms Collection XML to Desired Format
      *
      * @param string $context     The Context in which the tree is being displayed
@@ -310,14 +308,14 @@ class JSTree extends AbstractBase
         );
 
         // Set up parameters for XSL transformation
-        $params = array(
+        $params = [
             'titleText' => $this->translate('collection_view_record'),
             'collectionID' => $hierarchyID,
             'collectionTitle' => $hierarchyTitle,
             'baseURL' => rtrim($this->router->fromRoute('home'), '/'),
             'context' => $context,
             'recordID' => $recordID
-        );
+        ];
 
         // Transform the XML
         $xmlFile = $this->getDataSource()->getXML($hierarchyID);

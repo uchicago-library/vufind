@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Statistics
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Statistics\Driver;
 use VuFind\Solr\Writer;
@@ -34,11 +34,11 @@ use VuFindSearch\ParamBag;
 /**
  * Writer to put statistics to the Solr index
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Statistics
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class Solr extends AbstractBase
 {
@@ -98,19 +98,19 @@ class Solr extends AbstractBase
      *
      * @return array
      */
-    public function getFullList($field, $value = array('value' => '[* TO *]'))
+    public function getFullList($field, $value = ['value' => '[* TO *]'])
     {
-        $query = new Query($field.':'.$value['value']);
+        $query = new Query($field . ':' . $value['value']);
         $params = new ParamBag();
         $params->add('fl', $field);
         $start = 0;
         $limit = 1000;
-        $data = array();
+        $data = [];
         do {
             $response = $this->solrBackend->search($query, $start, $limit, $params);
             $records = $response->getRecords();
             foreach ($records as $doc) {
-                $data[] = array($field => $doc->$field);
+                $data[] = [$field => $doc->$field];
             }
             $start += $limit;
         } while (count($records) > 0);
@@ -120,8 +120,8 @@ class Solr extends AbstractBase
     /**
      * Returns browser usage statistics
      *
-     * @param bool    $version    Include the version numbers in the list
-     * @param integer $listLength How many items to return
+     * @param bool $version    Include the version numbers in the list
+     * @param int  $listLength How many items to return
      *
      * @return array
      */
@@ -134,7 +134,7 @@ class Solr extends AbstractBase
         $params->add('group.field', 'session');
         $start = 0;
         $limit = 1000;
-        $hashes = array();
+        $hashes = [];
         do {
             $response = $this->solrBackend->search($query, $start, $limit, $params);
             $groups = $response->getGroups();
@@ -142,7 +142,7 @@ class Solr extends AbstractBase
                 if ($version) {
                     // Version specific
                     $browser = $group['doclist']['docs'][0]['browser']
-                        .' '.$group['doclist']['docs'][0]['browserVersion'];
+                        . ' ' . $group['doclist']['docs'][0]['browserVersion'];
                     if (isset($hashes[$browser])) {
                         $hashes[$browser] ++;
                     } elseif (count($hashes) < $limit) {
@@ -159,17 +159,17 @@ class Solr extends AbstractBase
             }
             $start += $limit;
         } while (count($groups['session']['groups']) > 0);
-        $solrBrowsers = array();
-        foreach ($hashes as $browser=>$count) {
-            $newBrowser = array(
+        $solrBrowsers = [];
+        foreach ($hashes as $browser => $count) {
+            $newBrowser = [
                 'browserName' => $browser,
                 'count' => $count
-            );
+            ];
             // Insert sort (limit to listLength)
-            for ($i=0;$i<$listLength-1 && $i<count($solrBrowsers);$i++) {
+            for ($i = 0;$i < $listLength - 1 && $i < count($solrBrowsers);$i++) {
                 if ($count > $solrBrowsers[$i]['count']) {
                     // Insert in order
-                    array_splice($solrBrowsers, $i, 0, array($newBrowser));
+                    array_splice($solrBrowsers, $i, 0, [$newBrowser]);
                     continue 2; // Skip the append after this loop
                 }
             }

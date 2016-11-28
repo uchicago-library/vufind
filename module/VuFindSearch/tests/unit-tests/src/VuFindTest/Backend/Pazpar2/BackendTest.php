@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Backend\Pazpar2;
 
 use VuFindSearch\Query\Query;
@@ -37,11 +36,11 @@ use InvalidArgumentException;
 /**
  * Unit tests for Pazpar2 backend.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class BackendTest extends TestCase
 {
@@ -53,8 +52,8 @@ class BackendTest extends TestCase
     public function testGetConnector()
     {
         $connector = $this->getMock(
-            'VuFindSearch\Backend\Pazpar2\Connector', array(),
-            array('http://fake', $this->getMock('Zend\Http\Client'))
+            'VuFindSearch\Backend\Pazpar2\Connector', [],
+            ['http://fake', $this->getMock('Zend\Http\Client')]
         );
         $back = new Backend(
             $connector,
@@ -70,7 +69,7 @@ class BackendTest extends TestCase
      */
     public function testSearch()
     {
-        $conn = $this->getConnectorMock(array('search', 'show', 'stat'));
+        $conn = $this->getConnectorMock(['search', 'show', 'stat']);
         $conn->expects($this->once())
             ->method('search')
             ->will($this->returnValue($this->loadResponse('pp2search')));
@@ -149,11 +148,11 @@ class BackendTest extends TestCase
      *
      * @return array
      */
-    protected function getConnectorMock(array $mock = array())
+    protected function getConnectorMock(array $mock = [])
     {
         $client = $this->getMock('Zend\Http\Client');
         return $this->getMock(
-            'VuFindSearch\Backend\Pazpar2\Connector', $mock, array('fake', $client)
+            'VuFindSearch\Backend\Pazpar2\Connector', $mock, ['fake', $client]
         );
     }
 

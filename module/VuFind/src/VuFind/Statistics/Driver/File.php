@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Statistics
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Statistics\Driver;
 
 /**
  * Writer to put statistics into an XML File
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Statistics
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class File extends AbstractBase
 {
@@ -102,23 +102,23 @@ class File extends AbstractBase
     /**
      * Convert data array to XML
      *
-     * @param array   $data Associative array of data
-     * @param integer $tab  How far the string should be indented with tabs
+     * @param array $data Associative array of data
+     * @param int   $tab  How far the string should be indented with tabs
      *
      * @return string
      */
     protected function getSaveXML($data, $tab = 0)
     {
-        $xml = str_repeat("\t", $tab)."<doc>\n";
+        $xml = str_repeat("\t", $tab) . "<doc>\n";
         $tab++;
-        foreach ($data as $tag=>$value) {
+        foreach ($data as $tag => $value) {
             $xml .= str_repeat("\t", $tab);
             $insert = (strtolower(gettype($value)) == 'boolean')
                 ? ($value)
                     ? 'true'
                     : 'false'
                 : $value;
-            $xml .= '<field name="'.$tag.'">'.$insert."</field>\n";
+            $xml .= '<field name="' . $tag . '">' . $insert . "</field>\n";
         }
         $tab--;
         return $xml . str_repeat("\t", $tab) . "</doc>";

@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindSearch;
 
 /**
@@ -36,11 +35,11 @@ namespace VuFindSearch;
  * associative array with the parameter name as key. Because e.g. SOLR allows
  * repeated query parameters the values are always stored in an array.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class ParamBag
 {
@@ -49,7 +48,7 @@ class ParamBag
      *
      * @var array
      */
-    protected $params = array();
+    protected $params = [];
 
     /**
      * Constructor.
@@ -58,7 +57,7 @@ class ParamBag
      *
      * @return void
      */
-    public function __construct(array $initial = array())
+    public function __construct(array $initial = [])
     {
         foreach ($initial as $name => $value) {
             $this->add($name, $value);
@@ -83,7 +82,7 @@ class ParamBag
      * @param string $name  Parameter name
      * @param string $value Parameter value
      *
-     * @return boolean
+     * @return bool
      */
     public function contains($name, $value)
     {
@@ -104,7 +103,7 @@ class ParamBag
         if (is_array($value)) {
             $this->params[$name] = $value;
         } else {
-            $this->params[$name] = array($value);
+            $this->params[$name] = [$value];
         }
     }
 
@@ -133,7 +132,7 @@ class ParamBag
     public function add($name, $value)
     {
         if (!isset($this->params[$name])) {
-            $this->params[$name] = array();
+            $this->params[$name] = [];
         }
         if (is_array($value)) {
             $this->params[$name] = array_merge($this->params[$name], $value);
@@ -192,7 +191,7 @@ class ParamBag
     public function exchangeArray(array $input)
     {
         $current = $this->params;
-        $this->params = array();
+        $this->params = [];
         foreach ($input as $key => $value) {
             $this->set($key, $value);
         }
@@ -209,7 +208,7 @@ class ParamBag
      */
     public function request()
     {
-        $request = array();
+        $request = [];
         foreach ($this->params as $name => $values) {
             if (!empty($values)) {
                 $request = array_merge(

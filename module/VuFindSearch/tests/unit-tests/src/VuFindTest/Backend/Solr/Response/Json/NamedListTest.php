@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Backend\Solr\Json\Response;
 
 use VuFindSearch\Backend\Solr\Response\Json\NamedList;
@@ -35,11 +34,11 @@ use PHPUnit_Framework_TestCase as TestCase;
 /**
  * Unit tests for SOLR NamedList.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class NamedListTest extends TestCase
 {
@@ -50,12 +49,12 @@ class NamedListTest extends TestCase
      */
     public function testIterate()
     {
-        $list = new NamedList(array(array('first term', 'info'), array('second term', 'info')));
-        $keys = array();
+        $list = new NamedList([['first term', 'info'], ['second term', 'info']]);
+        $keys = [];
         foreach ($list as $key => $value) {
-            $keys []= $key;
+            $keys [] = $key;
         }
-        $this->assertEquals(array('first term', 'second term'), $keys);
+        $this->assertEquals(['first term', 'second term'], $keys);
     }
 
     /**
@@ -65,7 +64,7 @@ class NamedListTest extends TestCase
      */
     public function testCountable()
     {
-        $list = new NamedList(array(array('first term', 'info'), array('second term', 'info')));
+        $list = new NamedList([['first term', 'info'], ['second term', 'info']]);
         $this->assertEquals(2, count($list));
     }
 
@@ -76,7 +75,7 @@ class NamedListTest extends TestCase
      */
     public function testToArray()
     {
-        $list = new NamedList(array(array('first term', 'info'), array('second term', 'info2')));
-        $this->assertEquals(array('first term' => 'info', 'second term' => 'info2'), $list->toArray());
+        $list = new NamedList([['first term', 'info'], ['second term', 'info2']]);
+        $this->assertEquals(['first term' => 'info', 'second term' => 'info2'], $list->toArray());
     }
 }

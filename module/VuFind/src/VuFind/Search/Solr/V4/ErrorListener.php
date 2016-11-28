@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
-
 namespace VuFind\Search\Solr\V4;
 
 use VuFindSearch\Backend\Exception\HttpErrorException;
@@ -38,15 +37,14 @@ use Zend\EventManager\EventInterface;
 /**
  * SOLR 3.x error listener.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class ErrorListener extends AbstractErrorListener
 {
-
     /**
      * Normalized media types.
      *
@@ -68,7 +66,7 @@ class ErrorListener extends AbstractErrorListener
         $backend = $event->getParam('backend_instance');
         if ($this->listenForBackend($backend)) {
             $error = $event->getTarget();
-            if ($error instanceOf HttpErrorException) {
+            if ($error instanceof HttpErrorException) {
                 $response = $error->getResponse();
 
                 $body = $response->getBody();
@@ -99,7 +97,7 @@ class ErrorListener extends AbstractErrorListener
      */
     protected function analyzeJsonErrorResponse($body)
     {
-        $tags = array();
+        $tags = [];
         if (isset($body->error->msg)) {
             $reason = $body->error->msg;
             if (stristr($reason, 'org.apache.solr.search.SyntaxError')

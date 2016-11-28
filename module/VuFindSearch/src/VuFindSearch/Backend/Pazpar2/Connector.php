@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Connection
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/system_classes Wiki
+ * @link     https://vufind.org/wiki/development:architecture Wiki
  */
 namespace VuFindSearch\Backend\Pazpar2;
 
@@ -32,19 +32,19 @@ use VuFindSearch\Backend\Exception\HttpErrorException;
 
 use Zend\Http\Request;
 
-use Zend\Log\LoggerInterface;
-
 /**
  * Central class for connecting to resources used by VuFind.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Connection
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/system_classes Wiki
+ * @link     https://vufind.org/wiki/development:architecture Wiki
  */
-class Connector
+class Connector implements \Zend\Log\LoggerAwareInterface
 {
+    use \VuFind\Log\LoggerAwareTrait;
+
     /**
      * Base url for searches
      *
@@ -67,13 +67,6 @@ class Connector
     protected $session = false;
 
     /**
-     * Logger instance.
-     *
-     * @var LoggerInterface
-     */
-    protected $logger = false;
-
-    /**
      * Constructor
      *
      * @param string            $base     Base URL for Pazpar2
@@ -94,18 +87,6 @@ class Connector
         if ($autoInit) {
             $this->init();
         }
-    }
-
-    /**
-     * Set logger instance.
-     *
-     * @param LoggerInterface $logger Logger
-     *
-     * @return void
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
     }
 
     /**
@@ -170,29 +151,27 @@ class Connector
      *
      * @return string Response body
      *
-     * @throws RemoteErrorException  SOLR signaled a server error (HTTP 5xx)
-     * @throws RequestErrorException SOLR signaled a client error (HTTP 4xx)
+     * @throws \VuFindSearch\Backend\Exception\RemoteErrorException  Server
+     * signaled a server error (HTTP 5xx)
+     * @throws \VuFindSearch\Backend\Exception\RequestErrorException Server
+     * signaled a client error (HTTP 4xx)
      */
     protected function send(\Zend\Http\Client $client)
     {
-        if ($this->logger) {
-            $this->logger->debug(
-                sprintf('=> %s %s', $client->getMethod(), $client->getUri())
-            );
-        }
+        $this->debug(
+            sprintf('=> %s %s', $client->getMethod(), $client->getUri())
+        );
 
         $time     = microtime(true);
         $response = $client->send();
         $time     = microtime(true) - $time;
 
-        if ($this->logger) {
-            $this->logger->debug(
-                sprintf(
-                    '<= %s %s', $response->getStatusCode(),
-                    $response->getReasonPhrase()
-                ), array('time' => $time)
-            );
-        }
+        $this->debug(
+            sprintf(
+                '<= %s %s', $response->getStatusCode(),
+                $response->getReasonPhrase()
+            ), ['time' => $time]
+        );
 
         if (!$response->isSuccess()) {
             throw HttpErrorException::createFromResponse($response);
@@ -224,7 +203,7 @@ class Connector
      */
     public function record($id)
     {
-        return $this->query('record', new ParamBag(array('id'=>$id)));
+        return $this->query('record', new ParamBag(['id' => $id]));
     }
 
     /**
@@ -331,6 +310,6 @@ class Connector
      */
     public function bytarget($id)
     {
-        return $this->query('bytarget', new ParamBag(array('id'=>$id)));
+        return $this->query('bytarget', new ParamBag(['id' => $id]));
     }
 }

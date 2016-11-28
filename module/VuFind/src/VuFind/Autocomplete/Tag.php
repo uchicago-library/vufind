@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Autocomplete
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:autosuggesters Wiki
+ * @link     https://vufind.org/wiki/development:plugins:autosuggesters Wiki
  */
 namespace VuFind\Autocomplete;
 
@@ -32,24 +32,17 @@ namespace VuFind\Autocomplete;
  *
  * This class provides suggestions by using the local tag database.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Autocomplete
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:autosuggesters Wiki
+ * @link     https://vufind.org/wiki/development:plugins:autosuggesters Wiki
  */
 class Tag implements AutocompleteInterface, \VuFind\Db\Table\DbTableAwareInterface
 {
-    /**
-     * Database table plugin manager
-     *
-     * @var \VuFind\Db\Table\PluginManager
-     */
-    protected $tableManager;
+    use \VuFind\Db\Table\DbTableAwareTrait;
 
     /**
-     * getSuggestions
-     *
      * This method returns an array of strings matching the user's query for
      * display in the autocomplete box.
      *
@@ -59,7 +52,7 @@ class Tag implements AutocompleteInterface, \VuFind\Db\Table\DbTableAwareInterfa
      */
     public function getSuggestions($query)
     {
-        $tagList = array();
+        $tagList = [];
         $tagTable = $this->getTagsTable();
         $tags = $tagTable->matchText($query);
         if ($tags) {
@@ -71,8 +64,6 @@ class Tag implements AutocompleteInterface, \VuFind\Db\Table\DbTableAwareInterfa
     }
 
     /**
-     * setConfig
-     *
      * Set parameters that affect the behavior of the autocomplete handler.
      * These values normally come from the search configuration file.
      *
@@ -93,31 +84,5 @@ class Tag implements AutocompleteInterface, \VuFind\Db\Table\DbTableAwareInterfa
     public function getTagsTable()
     {
         return $this->getDbTableManager()->get('Tags');
-    }
-
-    /**
-     * Get the table plugin manager.  Throw an exception if it is missing.
-     *
-     * @throws \Exception
-     * @return \VuFind\Db\Table\PluginManager
-     */
-    public function getDbTableManager()
-    {
-        if (null === $this->tableManager) {
-            throw new \Exception('DB table manager missing.');
-        }
-        return $this->tableManager;
-    }
-
-    /**
-     * Set the table plugin manager.
-     *
-     * @param \VuFind\Db\Table\PluginManager $manager Plugin manager
-     *
-     * @return void
-     */
-    public function setDbTableManager(\VuFind\Db\Table\PluginManager $manager)
-    {
-        $this->tableManager = $manager;
     }
 }

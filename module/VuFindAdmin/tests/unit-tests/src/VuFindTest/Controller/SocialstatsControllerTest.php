@@ -18,25 +18,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Controller;
 
 /**
  * Unit tests for Socialstats controller.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class SocialstatsControllerTest extends \VuFindTest\Unit\TestCase
 {
@@ -48,14 +47,14 @@ class SocialstatsControllerTest extends \VuFindTest\Unit\TestCase
     public function testHome()
     {
         // Create mocks to simulate database lookups:
-        $c = $this->getMock('VuFindAdmin\Controller\SocialstatsController', array('getTable'));
-        $comments = $this->getMock('VuFind\Db\Table\Comments', array('getStatistics'));
+        $c = $this->getMock('VuFindAdmin\Controller\SocialstatsController', ['getTable']);
+        $comments = $this->getMock('VuFind\Db\Table\Comments', ['getStatistics']);
         $comments->expects($this->once())->method('getStatistics')->will($this->returnValue('comments-data'));
         $c->expects($this->at(0))->method('getTable')->with($this->equalTo('comments'))->will($this->returnValue($comments));
-        $userresource = $this->getMock('VuFind\Db\Table\UserResource', array('getStatistics'));
+        $userresource = $this->getMock('VuFind\Db\Table\UserResource', ['getStatistics']);
         $userresource->expects($this->once())->method('getStatistics')->will($this->returnValue('userresource-data'));
         $c->expects($this->at(1))->method('getTable')->with($this->equalTo('userresource'))->will($this->returnValue($userresource));
-        $resourcetags = $this->getMock('VuFind\Db\Table\ResourceTags', array('getStatistics'));
+        $resourcetags = $this->getMock('VuFind\Db\Table\ResourceTags', ['getStatistics']);
         $resourcetags->expects($this->once())->method('getStatistics')->will($this->returnValue('resourcetags-data'));
         $c->expects($this->at(2))->method('getTable')->with($this->equalTo('resourcetags'))->will($this->returnValue($resourcetags));
 

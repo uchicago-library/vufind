@@ -17,27 +17,34 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 namespace VuFind\RecordDriver;
 
 /**
  * Model for EDS records.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 class EDS extends SolrDefault
 {
+    /**
+     * Document types that are treated as PDF links.
+     *
+     * @var array
+     */
+    protected $pdfTypes = ['ebook-pdf', 'pdflink'];
+
     /**
      * Return the unique identifier of this record within the Solr index;
      * useful for retrieving additional information (like tags and user
@@ -49,7 +56,7 @@ class EDS extends SolrDefault
     {
         $dbid = $this->fields['Header']['DbId'];
         $an = $this->fields['Header']['An'];
-        return $dbid.','.$an;
+        return $dbid . ',' . $an;
     }
 
     /**
@@ -64,7 +71,7 @@ class EDS extends SolrDefault
             return '';
         }
         if (mb_strlen($title, 'UTF-8') > 20) {
-            $title = mb_substr($title, 0, 17, 'UTF-8').'...';
+            $title = mb_substr($title, 0, 17, 'UTF-8') . '...';
         }
         return $title;
     }
@@ -109,13 +116,13 @@ class EDS extends SolrDefault
     }
 
     /**
-     * obtain an array or authors indicated on the record
+     * Obtain an array or authors indicated on the record
      *
      * @return array
      */
     protected function getItemsAuthorsArray()
     {
-        $authors = array();
+        $authors = [];
         if (isset($this->fields['Items'])) {
             foreach ($this->fields['Items'] as $item) {
                 if ('Au' == $item['Group']) {
@@ -133,8 +140,19 @@ class EDS extends SolrDefault
      */
     public function getCustomLinks()
     {
-        return isset($this->fields['CustomLinks']) ?
-        $this->fields['CustomLinks'] : array();
+        return isset($this->fields['CustomLinks'])
+            ? $this->fields['CustomLinks'] : [];
+    }
+
+    /**
+     * Get the full text custom links of the record.
+     *
+     * @return array
+     */
+    public function getFTCustomLinks()
+    {
+        return isset($this->fields['FullText']['CustomLinks'])
+            ? $this->fields['FullText']['CustomLinks'] : [];
     }
 
     /**
@@ -144,8 +162,8 @@ class EDS extends SolrDefault
      */
     public function getDbLabel()
     {
-        return isset($this->fields['Header']['DbLabel']) ?
-        $this->fields['Header']['DbLabel'] : '';
+        return isset($this->fields['Header']['DbLabel'])
+            ? $this->fields['Header']['DbLabel'] : '';
     }
 
     /**
@@ -155,10 +173,8 @@ class EDS extends SolrDefault
      */
     public function getHTMLFullText()
     {
-        return (isset($this->fields['FullText']) &&
-                isset($this->fields['FullText']['Text']) &&
-                isset($this->fields['FullText']['Text']['Value'])) ?
-        $this->toHTML($this->fields['FullText']['Text']['Value']) : '';
+        return isset($this->fields['FullText']['Text']['Value'])
+            ? $this->toHTML($this->fields['FullText']['Text']['Value']) : '';
     }
 
     /**
@@ -168,11 +184,8 @@ class EDS extends SolrDefault
      */
     public function hasHTMLFullTextAvailable()
     {
-        return (isset($this->fields['FullText']) &&
-                isset($this->fields['FullText']['Text']) &&
-                isset($this->fields['FullText']['Text']['Availability']) &&
-                '1' == $this->fields['FullText']['Text']['Availability']) ?
-                true : false;
+        return isset($this->fields['FullText']['Text']['Availability'])
+            && ('1' == $this->fields['FullText']['Text']['Availability']);
     }
 
     /**
@@ -182,15 +195,15 @@ class EDS extends SolrDefault
      */
     public function getItems()
     {
-        $items = array();
+        $items = [];
         if (isset($this->fields['Items']) && !empty($this->fields['Items'])) {
             foreach ($this->fields['Items'] as $item) {
-                $items[] = array(
+                $items[] = [
                     'Label' => isset($item['Label']) ? $item['Label'] : '',
                     'Group' => isset($item['Group']) ? $item['Group'] : '',
                     'Data'  => isset($item['Data'])
                         ? $this->toHTML($item['Data'], $item['Group']) : ''
-                );
+                ];
             }
         }
         return $items;
@@ -217,7 +230,6 @@ class EDS extends SolrDefault
             ? $this->fields['Header']['PubType'] : '';
     }
 
-
     /**
      * Get the publication type id of the record.
      *
@@ -236,11 +248,11 @@ class EDS extends SolrDefault
      */
     public function hasPdfAvailable()
     {
-        if (isset($this->fields['FullText'])
-            && isset($this->fields['FullText']['Links'])
-        ) {
+        if (isset($this->fields['FullText']['Links'])) {
             foreach ($this->fields['FullText']['Links'] as $link) {
-                if (isset($link['Type']) && 'pdflink' == $link['Type']) {
+                if (isset($link['Type'])
+                    && in_array($link['Type'], $this->pdfTypes)
+                ) {
                     return true;
                 }
             }
@@ -255,12 +267,12 @@ class EDS extends SolrDefault
      */
     public function getPdfLink()
     {
-        if (isset($this->fields['FullText'])
-            && isset($this->fields['FullText']['Links'])
-        ) {
+        if (isset($this->fields['FullText']['Links'])) {
             foreach ($this->fields['FullText']['Links'] as $link) {
-                if (isset($link['Type']) && 'pdflink' == $link['Type']) {
-                    return isset($link['Url']) ? $link['Url']: false;
+                if (isset($link['Type'])
+                    && in_array($link['Type'], $this->pdfTypes)
+                ) {
+                    return $link['Url']; // return PDF link
                 }
             }
         }
@@ -274,7 +286,7 @@ class EDS extends SolrDefault
      */
     public function getItemsSubjects()
     {
-        $subjects = array();
+        $subjects = [];
         if (isset($this->fields['Items'])) {
             foreach ($this->fields['Items'] as $item) {
                 if ('Su' == $item['Group']) {
@@ -334,7 +346,7 @@ class EDS extends SolrDefault
             foreach ($this->fields['RecordInfo']['BibRecord']['BibEntity']['Titles']
                 as $titleRecord
             ) {
-                if (isset($titleRecord['Type']) && 'main' ==$titleRecord['Type']) {
+                if (isset($titleRecord['Type']) && 'main' == $titleRecord['Type']) {
                     return $titleRecord['TitleFull'];
                 }
             }
@@ -347,11 +359,12 @@ class EDS extends SolrDefault
      *
      * @return array
      */
-    public function getAuthors()
+    public function getPrimaryAuthors()
     {
-        $authors = array();
+        $authors = [];
         if (isset($this->fields['RecordInfo']['BibRecord']['BibRelationships'])) {
-            $bibRels =& $this->fields['RecordInfo']['BibRecord']['BibRelationships'];
+            $bibRels
+                = & $this->fields['RecordInfo']['BibRecord']['BibRelationships'];
         }
         if (isset($bibRels['HasContributorRelationships'])
             && !empty($bibRels['HasContributorRelationships'])
@@ -363,17 +376,6 @@ class EDS extends SolrDefault
             }
         }
         return $authors;
-    }
-
-    /**
-     * Obtain the primary author of the record
-     *
-     * @return string
-     */
-    public function getPrimaryAuthor()
-    {
-        $authors = $this->getAuthors();
-        return empty($authors) ? '': $authors[0];
     }
 
     /**
@@ -429,12 +431,11 @@ class EDS extends SolrDefault
         // Map xml tags to the HTML tags
         // This is just a small list, the total number of xml tags is far greater
 
-
         // Any group can be added here, but we only use Au (Author)
         // Other groups, not present here, won't be transformed to HTML links
-        $allowed_searchlink_groups = array('au','su');
+        $allowed_searchlink_groups = ['au','su'];
 
-        $xml_to_html_tags = array(
+        $xml_to_html_tags = [
                 '<jsection'    => '<section',
                 '</jsection'   => '</section',
                 '<highlight'   => '<span class="highlight"',
@@ -468,10 +469,10 @@ class EDS extends SolrDefault
                 '<ulink'       => '<a',
                 '</ulink'      => '</a',
                 '<superscript' => '<sup',
-                '</superscript'=> '</sup',
+                '</superscript' => '</sup',
                 '<relatesTo'   => '<sup',
                 '</relatesTo'  => '</sup'
-        );
+        ];
 
         //  The XML data is escaped, let's unescape html entities (e.g. &lt; => <)
         $data = html_entity_decode($data, ENT_QUOTES, "utf-8");
@@ -533,7 +534,7 @@ class EDS extends SolrDefault
      */
     protected function replaceBRWithCommas($data, $group)
     {
-        $groupsToReplace = array('au','su');
+        $groupsToReplace = ['au','su'];
         if (in_array($group, $groupsToReplace)) {
             $br =  '/<br \/>/';
             $comma = ', ';
@@ -552,7 +553,7 @@ class EDS extends SolrDefault
      */
     protected function getSupportedCitationFormats()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -561,6 +562,7 @@ class EDS extends SolrDefault
      * @param string $format Export format
      *
      * @return bool
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function exportDisabled($format)

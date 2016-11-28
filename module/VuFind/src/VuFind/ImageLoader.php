@@ -17,30 +17,31 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Cover_Generator
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/use_of_external_content Wiki
+ * @link     https://vufind.org/wiki/configuration:external_content Wiki
  */
 namespace VuFind;
-use Zend\Log\LoggerInterface;
 
 /**
  * Base class for loading images (shared by Cover\Loader and QRCode\Loader)
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Cover_Generator
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/use_of_external_content Wiki
+ * @link     https://vufind.org/wiki/configuration:external_content Wiki
  */
 class ImageLoader implements \Zend\Log\LoggerAwareInterface
 {
+    use \VuFind\Log\LoggerAwareTrait;
+
     /**
      * Property for storing raw image data; may be null if image is unavailable
      *
@@ -54,13 +55,6 @@ class ImageLoader implements \Zend\Log\LoggerAwareInterface
      * @var string
      */
     protected $contentType = null;
-
-    /**
-     * Logger (or false for none)
-     *
-     * @var LoggerInterface|bool
-     */
-    protected $logger = false;
 
     /**
      * Theme tools
@@ -89,12 +83,12 @@ class ImageLoader implements \Zend\Log\LoggerAwareInterface
      *
      * @var array
      */
-    protected $allowedFileExtensions = array(
+    protected $allowedFileExtensions = [
         "gif" => "image/gif",
         "jpeg" => "image/jpeg", "jpg" => "image/jpeg",
         "png" => "image/png",
         "tiff" => "image/tiff", "tif" => "image/tiff"
-    );
+    ];
 
     /**
      * Setter for dependency
@@ -106,32 +100,6 @@ class ImageLoader implements \Zend\Log\LoggerAwareInterface
     public function setThemeInfo(\VuFindTheme\ThemeInfo $theme)
     {
         $this->themeTools = $theme;
-    }
-
-    /**
-     * Set the logger
-     *
-     * @param LoggerInterface $logger Logger to use.
-     *
-     * @return void
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Log a debug message.
-     *
-     * @param string $msg Message to log.
-     *
-     * @return void
-     */
-    protected function debug($msg)
-    {
-        if ($this->logger) {
-            $this->logger->debug($msg);
-        }
     }
 
     /**
@@ -172,10 +140,10 @@ class ImageLoader implements \Zend\Log\LoggerAwareInterface
      *
      * @return string|bool
      */
-    protected function searchTheme($path, $formats = array(''))
+    protected function searchTheme($path, $formats = [''])
     {
         // Check all supported image formats:
-        $filenames = array();
+        $filenames = [];
         foreach ($formats as $format) {
             $filenames[] =  $path . $format;
         }

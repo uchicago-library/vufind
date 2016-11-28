@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindSearch;
 
 use VuFindSearch\Backend\BackendInterface;
@@ -41,11 +40,11 @@ use Zend\EventManager\EventManager;
 /**
  * Search service.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class Service
 {
@@ -80,7 +79,7 @@ class Service
      */
     public function __construct()
     {
-        $this->backends = array();
+        $this->backends = [];
     }
 
     /**
@@ -88,8 +87,8 @@ class Service
      *
      * @param string              $backend Search backend identifier
      * @param Query\AbstractQuery $query   Search query
-     * @param integer             $offset  Search offset
-     * @param integer             $limit   Search limit
+     * @param int                 $offset  Search offset
+     * @param int                 $limit   Search limit
      * @param ParamBag            $params  Search backend parameters
      *
      * @return RecordCollectionInterface
@@ -197,7 +196,7 @@ class Service
      *
      * @param string              $backend Search backend identifier
      * @param Query\AbstractQuery $query   Search query
-     * @param integer             $limit   Search limit
+     * @param int                 $limit   Search limit
      * @param ParamBag            $params  Search backend parameters
      *
      * @return RecordCollectionInterface
@@ -247,7 +246,7 @@ class Service
             } else {
                 // Default case: retrieve n random records:
                 $response = false;
-                $retrievedIndexes = array();
+                $retrievedIndexes = [];
                 for ($i = 0; $i < $limit; $i++) {
                     $nextIndex = rand(0, $total_records - 1);
                     while (in_array($nextIndex, $retrievedIndexes)) {
@@ -316,7 +315,7 @@ class Service
      */
     public function setEventManager(EventManagerInterface $events)
     {
-        $events->setIdentifiers(array('VuFind\Search', 'VuFindSearch'));
+        $events->setIdentifiers(['VuFind\Search', 'VuFindSearch']);
         $this->events = $events;
     }
 
@@ -355,7 +354,7 @@ class Service
                 $this,
                 $args,
                 function ($o) {
-                    return ($o instanceOf BackendInterface);
+                    return ($o instanceof BackendInterface);
                 }
             );
             if (!$response->stopped()) {

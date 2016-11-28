@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
-
 namespace VuFind\Search\Factory;
 
 use VuFindSearch\Backend\EDS\Zend2 as Connector;
@@ -41,11 +40,11 @@ use Zend\ServiceManager\FactoryInterface;
 /**
  * Factory for EDS backends.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class EdsBackendFactory implements FactoryInterface
 {
@@ -104,10 +103,15 @@ class EdsBackendFactory implements FactoryInterface
      */
     protected function createBackend(Connector $connector)
     {
+        $auth = $this->serviceLocator->get('ZfcRbac\Service\AuthorizationService');
+        $isGuest = !$auth->isGranted('access.EDSExtendedResults');
+        $session = new \Zend\Session\Container(
+            'EBSCO', $this->serviceLocator->get('VuFind\SessionManager')
+        );
         $backend = new Backend(
             $connector, $this->createRecordCollectionFactory(),
             $this->serviceLocator->get('VuFind\CacheManager')->getCache('object'),
-            new \Zend\Session\Container('EBSCO'), $this->edsConfig
+            $session, $this->edsConfig, $isGuest
         );
         $backend->setAuthManager($this->serviceLocator->get('VuFind\AuthManager'));
         $backend->setLogger($this->logger);
@@ -122,14 +126,14 @@ class EdsBackendFactory implements FactoryInterface
      */
     protected function createConnector()
     {
-        $options = array();
+        $options = [];
         $id = 'EDS';
         $key = 'EDS';
         // Build HTTP client:
         $client = $this->serviceLocator->get('VuFind\Http')->createClient();
         $timeout = isset($this->edsConfig->General->timeout)
             ? $this->edsConfig->General->timeout : 30;
-        $client->setOptions(array('timeout' => $timeout));
+        $client->setOptions(['timeout' => $timeout]);
         $connector = new Connector($id, $key, $options, $client);
         $connector->setLogger($this->logger);
         return $connector;

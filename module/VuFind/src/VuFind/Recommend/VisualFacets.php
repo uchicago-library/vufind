@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Julia Bauder <bauderj@grinnell.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 namespace VuFind\Recommend;
 
@@ -36,11 +36,11 @@ namespace VuFind\Recommend;
  * It must be used in combination with a template file including the necessary
  * Javascript in order to display the visualization to the user.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Julia Bauder <bauderj@grinnell.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 class VisualFacets extends AbstractFacets
 {
@@ -52,8 +52,6 @@ class VisualFacets extends AbstractFacets
     protected $facets;
 
     /**
-     * setConfig
-     *
      * Store the configuration of the recommendation module.
      *
      * VisualFacets:[ini section]:[ini name]
@@ -67,7 +65,7 @@ class VisualFacets extends AbstractFacets
     public function setConfig($settings)
     {
         $settings = explode(':', $settings);
-        $mainSection = empty($settings[0]) ? 'Visual_Settings':$settings[0];
+        $mainSection = empty($settings[0]) ? 'Visual_Settings' : $settings[0];
         $iniName = isset($settings[1]) ? $settings[1] : 'facets';
 
         // Load the desired facet information:
@@ -77,7 +75,10 @@ class VisualFacets extends AbstractFacets
     }
 
     /**
-     * init
+     * Called at the end of the Search Params objects' initFromRequest() method.
+     * This method is responsible for setting search parameters needed by the
+     * recommendation module and for reading any existing search parameters that may
+     * be needed.
      *
      * @param \VuFind\Search\Base\Params $params  Search parameter object
      * @param \Zend\StdLib\Parameters    $request Parameter object representing user
@@ -99,7 +100,7 @@ class VisualFacets extends AbstractFacets
     public function getPivotFacetSet()
     {
         // Avoid fatal error in case of unexpected results object (e.g. EmptySet):
-        return is_callable(array($this->results, 'getPivotFacetList'))
-            ? $this->results->getPivotFacetList() : array();
+        return is_callable([$this->results, 'getPivotFacetList'])
+            ? $this->results->getPivotFacetList() : [];
     }
 }

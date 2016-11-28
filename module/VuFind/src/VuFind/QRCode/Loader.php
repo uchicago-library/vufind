@@ -17,34 +17,34 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  QRCode_Generator
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Luke O'Sullivan <l.osullivan@swansea.ac.uk>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/use_of_external_content Wiki
+ * @link     https://vufind.org/wiki/configuration:external_content Wiki
  */
 namespace VuFind\QRCode;
-use \PHPQRCode;
+use PHPQRCode;
 
 /**
  * QR Code Generator
  *
- * @category VuFind2
+ * @category VuFind
  * @package  QRCode_Generator
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Luke O'Sullivan <l.osullivan@swansea.ac.uk>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/use_of_external_content Wiki
+ * @link     https://vufind.org/wiki/configuration:external_content Wiki
  */
 class Loader extends \VuFind\ImageLoader
 {
     /**
-     * property to hold VuFind configuration settings
+     * VuFind configuration settings
      *
      * @var \Zend\Config\Config
      */
@@ -62,9 +62,9 @@ class Loader extends \VuFind\ImageLoader
      *
      * @var string
      */
-    protected $params = array(
+    protected $params = [
         'level' => "L", 'size' => "3", 'margin' => "4"
-    );
+    ];
 
     /**
      * Constructor
@@ -91,7 +91,7 @@ class Loader extends \VuFind\ImageLoader
      * @return void
      */
     public function loadQRCode($text,
-        $params = array('level' => "L", 'size' => "3", 'margin' => "4")
+        $params = ['level' => "L", 'size' => "3", 'margin' => "4"]
     ) {
         // Sanitize parameters:
         $this->text = $text;

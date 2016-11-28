@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\Content;
 use VuFindCode\ISBN;
@@ -31,40 +31,17 @@ use VuFindCode\ISBN;
 /**
  * Abstract base for content loader plug-ins.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 abstract class AbstractBase implements \VuFindHttp\HttpServiceAwareInterface,
     \Zend\Log\LoggerAwareInterface
 {
-    /**
-     * HTTP service
-     *
-     * @var \VuFindHttp\HttpServiceInterface
-     */
-    protected $httpService = null;
-
-    /**
-     * Logger
-     *
-     * @var \Zend\Log\LoggerInterface|bool
-     */
-    protected $logger = false;
-
-    /**
-     * Set logger
-     *
-     * @param \Zend\Log\LoggerInterface $logger Logger
-     *
-     * @return void
-     */
-    public function setLogger(\Zend\Log\LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
+    use \VuFind\Log\LoggerAwareTrait;
+    use \VuFindHttp\HttpServiceAwareTrait;
 
     /**
      * Attempt to get an ISBN-10; revert to ISBN-13 only when ISBN-10 representation
@@ -94,18 +71,6 @@ abstract class AbstractBase implements \VuFindHttp\HttpServiceAwareInterface,
             throw new \Exception('HTTP service missing.');
         }
         return $this->httpService->createClient($url);
-    }
-
-    /**
-     * Set the HTTP service to be used for HTTP requests.
-     *
-     * @param HttpServiceInterface $service HTTP service
-     *
-     * @return void
-     */
-    public function setHttpService(\VuFindHttp\HttpServiceInterface $service)
-    {
-        $this->httpService = $service;
     }
 
     /**

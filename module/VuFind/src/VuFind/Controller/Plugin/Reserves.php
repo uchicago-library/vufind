@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller_Plugins
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Controller\Plugin;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
@@ -31,11 +31,11 @@ use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 /**
  * Zend action helper to perform reserves-related actions
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller_Plugins
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class Reserves extends AbstractPlugin
 {
@@ -87,7 +87,7 @@ class Reserves extends AbstractPlugin
             $result = $this->getController()->getServiceLocator()
                 ->get('VuFind\Search')
                 ->retrieve('SolrReserves', $course . '|' . $inst . '|' . $dept);
-            $bibs = array();
+            $bibs = [];
             if ($result->getTotal() < 1) {
                 return $bibs;
             }
@@ -95,12 +95,12 @@ class Reserves extends AbstractPlugin
             $instructor = $record->getInstructor();
             $course = $record->getCourse();
             foreach ($record->getItemIds() as $bib_id) {
-                $bibs[] = array(
+                $bibs[] = [
                     'BIB_ID' => $bib_id,
                     'bib_id' => $bib_id,
                     'course' => $course,
                     'instructor' => $instructor
-                );
+                ];
             }
             return $bibs;
         }

@@ -18,13 +18,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Connection
  * @author   Julia Bauder <bauderj@grinnell.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/system_classes Wiki
+ * @link     https://vufind.org/wiki/development:architecture Wiki
  */
 namespace VuFindSearch\Backend\EIT;
 
@@ -33,18 +33,19 @@ use VuFindSearch\Backend\Exception\HttpErrorException;
 
 use Zend\Http\Request;
 
-use Zend\Log\LoggerInterface;
 /**
  * Central class for connecting to EIT resources used by VuFind.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Connection
  * @author   Julia Bauder <bauderj@grinnell.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/system_classes Wiki
+ * @link     https://vufind.org/wiki/development:architecture Wiki
  */
-class Connector
+class Connector implements \Zend\Log\LoggerAwareInterface
 {
+    use \VuFind\Log\LoggerAwareTrait;
+
     /**
      * Base url for searches
      *
@@ -74,18 +75,11 @@ class Connector
     protected $pwd;
 
     /**
-     * Logger instance.
-     *
-     * @var LoggerInterface
-     */
-    protected $logger = false;
-
-    /**
      * Array of 3-character EBSCO database abbreviations to include in search
      *
      * @var array
      */
-    protected $dbs = array();
+    protected $dbs = [];
 
     /**
      * Constructor
@@ -106,37 +100,11 @@ class Connector
     }
 
     /**
-     * Set logger instance.
-     *
-     * @param LoggerInterface $logger Logger
-     *
-     * @return void
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Log a debug message.
-     *
-     * @param string $msg Message to log.
-     *
-     * @return void
-     */
-    protected function debug($msg)
-    {
-        if ($this->logger) {
-            $this->logger->debug($msg);
-        }
-    }
-
-    /**
      * Execute a search.
      *
      * @param ParamBag $params Parameters
-     * @param integer  $offset Search offset
-     * @param integer  $limit  Search limit
+     * @param int      $offset Search offset
+     * @param int      $limit  Search limit
      *
      * @return array
      */
@@ -149,15 +117,15 @@ class Connector
         $params->set('pwd', $this->pwd);
         $response = $this->call('GET', $params->getArrayCopy(), false);
         $xml = simplexml_load_string($response);
-        $finalDocs = array();
+        $finalDocs = [];
         foreach ($xml->SearchResults->records->rec as $doc) {
             $finalDocs[] = simplexml_load_string($doc->asXML());
         }
-        return array(
+        return [
             'docs' => $finalDocs,
             'offset' => $offset,
             'total' => (integer)$xml->Hits
-        );
+        ];
     }
 
     /**
@@ -186,7 +154,7 @@ class Connector
     protected function call($method = 'GET', $params = null)
     {
         if ($params) {
-            $query = array();
+            $query = [];
             foreach ($params as $function => $value) {
                 if (is_array($value)) {
                     foreach ($value as $additional) {
@@ -240,14 +208,14 @@ class Connector
         $this->client->resetParameters();
         $response = $this->call('GET', $params->getArrayCopy(), false);
         $xml = simplexml_load_string($response);
-        $finalDocs = array();
+        $finalDocs = [];
         foreach ($xml->SearchResults->records->rec as $doc) {
             $finalDocs[] = simplexml_load_string($doc->asXML());
         }
-        return array(
+        return [
             'docs' => $finalDocs,
             'offset' => 0,
             'total' => (integer)$xml->Hits
-        );
+        ];
     }
 }

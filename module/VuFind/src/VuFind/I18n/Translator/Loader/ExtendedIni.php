@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Translator
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\I18n\Translator\Loader;
 use Zend\I18n\Exception\InvalidArgumentException,
@@ -33,11 +33,11 @@ use Zend\I18n\Exception\InvalidArgumentException,
 /**
  * Handles the language loading and language file parsing
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Translator
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class ExtendedIni implements FileLoaderInterface
 {
@@ -61,7 +61,7 @@ class ExtendedIni implements FileLoaderInterface
      *
      * @var array
      */
-    protected $loadedFiles = array();
+    protected $loadedFiles = [];
 
     /**
      * Helper for reading .ini files from disk.
@@ -80,26 +80,38 @@ class ExtendedIni implements FileLoaderInterface
      * @param ExtendedIniReader $reader          Helper for reading .ini files from
      * disk.
      */
-    public function __construct($pathStack = array(), $fallbackLocales = null,
+    public function __construct($pathStack = [], $fallbackLocales = null,
         ExtendedIniReader $reader = null
     ) {
         $this->pathStack = $pathStack;
         $this->fallbackLocales = $fallbackLocales;
         if (!empty($this->fallbackLocales) && !is_array($this->fallbackLocales)) {
-            $this->fallbackLocales = array($this->fallbackLocales);
+            $this->fallbackLocales = [$this->fallbackLocales];
         }
         $this->reader = ($reader === null) ? new ExtendedIniReader() : $reader;
     }
 
     /**
-     * load(): defined by LoaderInterface.
+     * Add additional directories to the path stack.
+     *
+     * @param array|string $pathStack Path stack addition(s).
+     *
+     * @return void
+     */
+    public function addToPathStack($pathStack)
+    {
+        $this->pathStack = array_merge($this->pathStack, (array)$pathStack);
+    }
+
+    /**
+     * Load method defined by FileLoaderInterface.
      *
      * @param string $locale   Locale to read from language file
-     * @param string $filename Language file to read (not used)
+     * @param string $filename Relative base path for language file (used for
+     * loading text domains; optional)
      *
      * @return TextDomain
      * @throws InvalidArgumentException
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function load($locale, $filename)
     {
@@ -107,12 +119,12 @@ class ExtendedIni implements FileLoaderInterface
         $this->resetLoadedFiles();
 
         // Load base data:
-        $data = $this->loadLanguageFile($locale . '.ini');
+        $data = $this->loadLanguageLocale($locale, $filename);
 
         // Load fallback data, if any:
         if (!empty($this->fallbackLocales)) {
             foreach ($this->fallbackLocales as $fallbackLocale) {
-                $newData = $this->loadLanguageFile($fallbackLocale . '.ini');
+                $newData = $this->loadLanguageLocale($fallbackLocale, $filename);
                 $newData->merge($data);
                 $data = $newData;
             }
@@ -122,13 +134,28 @@ class ExtendedIni implements FileLoaderInterface
     }
 
     /**
+     * Get the language file name for a language and domain
+     *
+     * @param string $locale Locale name
+     * @param string $domain Text domain (if any)
+     *
+     * @return string
+     */
+    public function getLanguageFilename($locale, $domain)
+    {
+        return empty($domain)
+            ? $locale . '.ini'
+            : $domain . '/' . $locale . '.ini';
+    }
+
+    /**
      * Reset the loaded file list.
      *
      * @return void
      */
     protected function resetLoadedFiles()
     {
-        $this->loadedFiles = array();
+        $this->loadedFiles = [];
     }
 
     /**
@@ -148,13 +175,32 @@ class ExtendedIni implements FileLoaderInterface
     }
 
     /**
-     * Search the path stack for language files and merge them together.
+     * Load the language file for a given locale and domain.
      *
-     * @param string $filename Name of file to search path stack for.
+     * @param string $locale Locale name
+     * @param string $domain Text domain (if any)
      *
      * @return TextDomain
      */
-    protected function loadLanguageFile($filename)
+    protected function loadLanguageLocale($locale, $domain)
+    {
+        $filename = $this->getLanguageFilename($locale, $domain);
+        // Load the language file, and throw a fatal exception if it's missing
+        // and we're not dealing with text domains. A missing base file is an
+        // unexpected, fatal error; a missing domain-specific file is more likely
+        // due to the possibility of incomplete translations.
+        return $this->loadLanguageFile($filename, empty($domain));
+    }
+
+    /**
+     * Search the path stack for language files and merge them together.
+     *
+     * @param string $filename    Name of file to search path stack for.
+     * @param bool   $failOnError If true, throw an exception when file not found.
+     *
+     * @return TextDomain
+     */
+    protected function loadLanguageFile($filename, $failOnError = true)
     {
         // Don't load a file that has already been loaded:
         if ($this->checkAndMarkLoadedFile($filename)) {
@@ -164,7 +210,10 @@ class ExtendedIni implements FileLoaderInterface
         $data = false;
         foreach ($this->pathStack as $path) {
             if (file_exists($path . '/' . $filename)) {
-                $current = $this->reader->getTextDomain($path . '/' . $filename);
+                // Load current file with parent data, if necessary:
+                $current = $this->loadParentData(
+                    $this->reader->getTextDomain($path . '/' . $filename)
+                );
                 if ($data === false) {
                     $data = $current;
                 } else {
@@ -173,11 +222,16 @@ class ExtendedIni implements FileLoaderInterface
             }
         }
         if ($data === false) {
-            throw new InvalidArgumentException("Ini file '{$filename}' not found");
+            // Should we throw an exception? If not, return an empty result:
+            if ($failOnError) {
+                throw new InvalidArgumentException(
+                    "Ini file '{$filename}' not found"
+                );
+            }
+            return new TextDomain();
         }
 
-        // Load parent data, if necessary:
-        return $this->loadParentData($data);
+        return $data;
     }
 
     /**

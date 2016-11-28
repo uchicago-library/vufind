@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Theme
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFindTheme;
 
 /**
  * VuFind Theme Public Resource Handler (for CSS, JS, etc.)
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Theme
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class ResourceContainer
 {
@@ -43,21 +43,21 @@ class ResourceContainer
      *
      * @var array
      */
-    protected $less = array();
+    protected $less = [];
 
     /**
      * CSS files
      *
      * @var array
      */
-    protected $css = array();
+    protected $css = [];
 
     /**
      * Javascript files
      *
      * @var array
      */
-    protected $js = array();
+    protected $js = [];
 
     /**
      * Favicon
@@ -90,7 +90,7 @@ class ResourceContainer
     public function addLessCss($less)
     {
         if (!is_array($less) && !is_a($less, 'Traversable')) {
-            $less = array($less);
+            $less = [$less];
         }
         unset($less['active']);
         foreach ($less as $current) {
@@ -110,7 +110,7 @@ class ResourceContainer
     public function addCss($css)
     {
         if (!is_array($css) && !is_a($css, 'Traversable')) {
-            $css = array($css);
+            $css = [$css];
         }
         foreach ($css as $current) {
             if (!$this->dynamicallyParsed($current)) {
@@ -130,7 +130,7 @@ class ResourceContainer
     public function addJs($js)
     {
         if (!is_array($js) && !is_a($js, 'Traversable')) {
-            $js = array($js);
+            $js = [$js];
         }
         foreach ($js as $current) {
             $this->js[] = $current;
@@ -238,7 +238,7 @@ class ResourceContainer
      *
      * @param string $file Filename to check
      *
-     * @return boolean
+     * @return bool
      */
     protected function dynamicallyParsed($file)
     {
@@ -255,7 +255,7 @@ class ResourceContainer
      *
      * @param string $file Filename to remove
      *
-     * @return boolean
+     * @return bool
      */
     protected function removeCSS($file)
     {

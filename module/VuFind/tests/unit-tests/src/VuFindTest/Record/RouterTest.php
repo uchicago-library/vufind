@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-
 namespace VuFindTest\Record;
 
 use VuFind\Record\Router;
@@ -37,11 +36,11 @@ use VuFindTest\Unit\TestCase as TestCase;
 /**
  * Record router tests.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class RouterTest extends TestCase
 {
@@ -55,7 +54,7 @@ class RouterTest extends TestCase
         $driver = $this->getDriver();
         $router = $this->getRouter($driver);
         $this->assertEquals(
-            array('params' => array('id' => 'test'), 'route' => 'record'),
+            ['params' => ['id' => 'test'], 'route' => 'record'],
             $router->getRouteDetails($driver)
         );
     }
@@ -69,7 +68,7 @@ class RouterTest extends TestCase
     {
         $router = $this->getRouter();
         $this->assertEquals(
-            array('params' => array('id' => 'test'), 'route' => 'summonrecord'),
+            ['params' => ['id' => 'test'], 'route' => 'summonrecord'],
             $router->getRouteDetails('Summon|test')
         );
     }
@@ -83,7 +82,7 @@ class RouterTest extends TestCase
     {
         $router = $this->getRouter();
         $this->assertEquals(
-            array('params' => array('id' => 'test', 'tab' => 'foo'), 'route' => 'summonrecord'),
+            ['params' => ['id' => 'test', 'tab' => 'foo'], 'route' => 'summonrecord'],
             $router->getTabRouteDetails('Summon|test', 'foo')
         );
     }
@@ -97,10 +96,10 @@ class RouterTest extends TestCase
     {
         $driver = $this->getDriver();
         $driver->expects($this->once())->method('tryMethod')->with($this->equalTo('isCollection'))->will($this->returnValue(true));
-        $router = $this->getRouter($driver, array('Collections' => array('collections' => true)));
+        $router = $this->getRouter($driver, ['Collections' => ['collections' => true]]);
         $this->assertEquals(
-            array('params' => array('id' => 'test', 'tab' => 'foo'), 'route' => 'collection'),
-            $router->getTabRouteDetails('VuFind|test', 'foo')
+            ['params' => ['id' => 'test', 'tab' => 'foo'], 'route' => 'collection'],
+            $router->getTabRouteDetails('Solr|test', 'foo')
         );
     }
 
@@ -113,9 +112,9 @@ class RouterTest extends TestCase
     {
         $driver = $this->getDriver();
         $driver->expects($this->once())->method('tryMethod')->with($this->equalTo('isCollection'))->will($this->returnValue(true));
-        $router = $this->getRouter($driver, array('Collections' => array('collections' => true)));
+        $router = $this->getRouter($driver, ['Collections' => ['collections' => true]]);
         $this->assertEquals(
-            array('params' => array('id' => 'test', 'tab' => 'foo'), 'route' => 'collection'),
+            ['params' => ['id' => 'test', 'tab' => 'foo'], 'route' => 'collection'],
             $router->getTabRouteDetails('test', 'foo')
         );
     }
@@ -129,9 +128,9 @@ class RouterTest extends TestCase
     {
         $driver = $this->getDriver();
         $driver->expects($this->once())->method('tryMethod')->with($this->equalTo('isCollection'))->will($this->returnValue(true));
-        $router = $this->getRouter($driver, array('Collections' => array('collections' => true)));
+        $router = $this->getRouter($driver, ['Collections' => ['collections' => true]]);
         $this->assertEquals(
-            array('params' => array('id' => 'test', 'tab' => 'foo'), 'route' => 'collection'),
+            ['params' => ['id' => 'test', 'tab' => 'foo'], 'route' => 'collection'],
             $router->getTabRouteDetails($driver, 'foo')
         );
     }
@@ -145,7 +144,7 @@ class RouterTest extends TestCase
     {
         $router = $this->getRouter();
         $this->assertEquals(
-            array('params' => array('id' => 'test'), 'route' => 'record'),
+            ['params' => ['id' => 'test'], 'route' => 'record'],
             $router->getRouteDetails('test')
         );
     }
@@ -160,7 +159,7 @@ class RouterTest extends TestCase
         $driver = $this->getDriver();
         $router = $this->getRouter($driver);
         $this->assertEquals(
-            array('params' => array('id' => 'test'), 'route' => 'record-sms'),
+            ['params' => ['id' => 'test'], 'route' => 'record-sms'],
             $router->getActionRouteDetails($driver, 'SMS')
         );
     }
@@ -173,12 +172,12 @@ class RouterTest extends TestCase
      *
      * @return RecordDriver
      */
-    protected function getDriver($id = 'test', $source = 'VuFind')
+    protected function getDriver($id = 'test', $source = 'Solr')
     {
         $driver = $this->getMock('VuFind\RecordDriver\AbstractBase');
         $driver->expects($this->any())->method('getUniqueId')
             ->will($this->returnValue($id));
-        $driver->expects($this->any())->method('getResourceSource')
+        $driver->expects($this->any())->method('getSourceIdentifier')
             ->will($this->returnValue($source));
         return $driver;
     }
@@ -191,17 +190,17 @@ class RouterTest extends TestCase
      *
      * @return Router
      */
-    protected function getRouter($record = null, $config = array())
+    protected function getRouter($record = null, $config = [])
     {
         if (null === $record) {
             $record = $this->getDriver();
         }
         $loader = $this->getMock(
-            'VuFind\Record\Loader', array(),
-            array(
+            'VuFind\Record\Loader', [],
+            [
                 $this->getMock('VuFindSearch\Service'),
                 $this->getMock('VuFind\RecordDriver\PluginManager')
-            )
+            ]
         );
         $loader->expects($this->any())->method('load')
             ->will($this->returnValue($record));

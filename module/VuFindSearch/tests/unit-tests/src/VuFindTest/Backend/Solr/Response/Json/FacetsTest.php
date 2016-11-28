@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Backend\Solr\Json\Response;
 
 use VuFindSearch\Backend\Solr\Response\Json\Facets;
@@ -35,11 +34,11 @@ use PHPUnit_Framework_TestCase as TestCase;
 /**
  * Unit tests for facet information.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class FacetsTest extends TestCase
 {
@@ -51,12 +50,12 @@ class FacetsTest extends TestCase
     public function testFacets()
     {
         $facets = new Facets(
-            array(
-                'facet_fields' => array(
-                    'field1' => array(array('a', 1), array('b', 2))
-                ),
-                'facet_queries' => array(),
-            )
+            [
+                'facet_fields' => [
+                    'field1' => [['a', 1], ['b', 2]]
+                ],
+                'facet_queries' => [],
+            ]
         );
         $this->assertCount(0, $facets->getQueryFacets());
         $fieldFacets = $facets->getFieldFacets();

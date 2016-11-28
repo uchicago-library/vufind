@@ -17,26 +17,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Cart
  * @author   Tuan Nguyen <tuan@yorku.ca>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind;
+use VuFind\Cookie\CookieManager;
 
 /**
  * Cart Class
  *
  * The data model object representing a user's book cart.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Cart
  * @author   Tuan Nguyen <tuan@yorku.ca>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class Cart
 {
@@ -69,11 +70,11 @@ class Cart
     protected $recordLoader;
 
     /**
-     * Domain context for cookies (null for default)
+     * Cookie manager
      *
-     * @var string
+     * @var CookieManager
      */
-    protected $cookieDomain;
+    protected $cookieManager;
 
     const CART_COOKIE =  'vufind_cart';
     const CART_COOKIE_SOURCES = 'vufind_cart_src';
@@ -82,24 +83,22 @@ class Cart
     /**
      * Constructor
      *
-     * @param \VuFind\Record\Loader $loader       Object for loading records
-     * @param int                   $maxSize      Maximum size of cart contents
-     * @param bool                  $active       Is cart enabled?
-     * @param array                 $cookies      Current cookie values (leave null
-     * to use $_COOKIE superglobal)
-     * @param string                $cookieDomain Domain context for cookies
-     * (optional)
+     * @param \VuFind\Record\Loader $loader        Object for loading records
+     * @param CookieManager         $cookieManager Cookie manager
+     * @param int                   $maxSize       Maximum size of cart contents
+     * @param bool                  $active        Is cart enabled?
      */
     public function __construct(\VuFind\Record\Loader $loader,
-        $maxSize = 100, $active = true, $cookies = null, $cookieDomain = null
+        \VuFind\Cookie\CookieManager $cookieManager,
+        $maxSize = 100, $active = true
     ) {
         $this->recordLoader = $loader;
+        $this->cookieManager = $cookieManager;
         $this->maxSize = $maxSize;
         $this->active = $active;
-        $this->cookieDomain = $cookieDomain;
 
         // Initialize contents
-        $this->init(null === $cookies ? $_COOKIE : $cookies);
+        $this->init($this->cookieManager->getCookies());
     }
 
     /**
@@ -131,7 +130,7 @@ class Cart
      */
     public function emptyCart()
     {
-        $this->items = array();
+        $this->items = [];
         $this->save();
     }
 
@@ -145,7 +144,7 @@ class Cart
      */
     public function addItem($item)
     {
-        return $this->addItems(array($item));
+        return $this->addItems([$item]);
     }
 
     /**
@@ -164,10 +163,10 @@ class Cart
         $this->items = array_slice(array_unique($items), 0, $this->maxSize);
         $this->save();
         if ($total > $this->maxSize) {
-            $notAdded = $total-$this->maxSize;
-            return array('success' => false, 'notAdded' => $notAdded);
+            $notAdded = $total - $this->maxSize;
+            return ['success' => false, 'notAdded' => $notAdded];
         }
-        return array('success' => true);
+        return ['success' => true];
     }
 
     /**
@@ -179,7 +178,7 @@ class Cart
      */
     public function removeItems($items)
     {
-        $results = array();
+        $results = [];
         foreach ($this->items as $id) {
             if (!in_array($id, $items)) {
                 $results[] = $id;
@@ -245,9 +244,9 @@ class Cart
 
             if (!isset($cookies[self::CART_COOKIE_SOURCES])) {
                 // Backward compatibility with VuFind 1.x -- if no source cookie, all
-                // items come from the VuFind source:
+                // items come from the default source:
                 for ($i = 0; $i < count($items); $i++) {
-                    $items[$i] = 'VuFind|' . $items[$i];
+                    $items[$i] = DEFAULT_SEARCH_BACKEND . '|' . $items[$i];
                 }
             } else {
                 // Default case for VuFind 2.x carts -- decompress source data:
@@ -261,7 +260,7 @@ class Cart
                 }
             }
         }
-        $this->items = $items ? $items : array();
+        $this->items = $items ? $items : [];
     }
 
     /**
@@ -272,8 +271,8 @@ class Cart
      */
     protected function save()
     {
-        $sources = array();
-        $ids = array();
+        $sources = [];
+        $ids = [];
 
         foreach ($this->items as $item) {
             // Break apart the source and the ID:
@@ -292,24 +291,9 @@ class Cart
 
         // Save the cookies:
         $cookie = implode(self::CART_COOKIE_DELIM, $ids);
-        $this->setCookie(self::CART_COOKIE, $cookie, 0, '/', $this->cookieDomain);
-        $cookie = implode(self::CART_COOKIE_DELIM, $sources);
-        $this->setCookie(
-            self::CART_COOKIE_SOURCES, $cookie, 0, '/', $this->cookieDomain
-        );
-    }
-
-    /**
-     * Set a cookie (wrapper in case Zend Framework offers a better abstraction
-     * of cookie handling in the future).
-     *
-     * @return bool
-     */
-    protected function setCookie()
-    {
-        // @codeCoverageIgnoreStart
-        return call_user_func_array('setcookie', func_get_args());
-        // @codeCoverageIgnoreEnd
+        $this->cookieManager->set(self::CART_COOKIE, $cookie, 0);
+        $srcCookie = implode(self::CART_COOKIE_DELIM, $sources);
+        $this->cookieManager->set(self::CART_COOKIE_SOURCES, $srcCookie, 0);
     }
 
     /**
@@ -319,7 +303,7 @@ class Cart
      */
     public function getCookieDomain()
     {
-        return $this->cookieDomain;
+        return $this->cookieManager->getDomain();
     }
 
     /**

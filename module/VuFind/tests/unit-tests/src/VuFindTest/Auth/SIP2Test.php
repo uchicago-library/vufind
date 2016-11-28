@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFindTest\Auth;
 use VuFind\Auth\SIP2, Zend\Config\Config;
@@ -31,11 +31,11 @@ use VuFind\Auth\SIP2, Zend\Config\Config;
 /**
  * SIP2 authentication test class.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class SIP2Test extends \VuFindTest\Unit\DbTestCase
 {
@@ -64,12 +64,12 @@ class SIP2Test extends \VuFindTest\Unit\DbTestCase
     public function getAuthConfig()
     {
         $config = new Config(
-            array(
+            [
                 'host' => 'my.fake.host',
                 'port' => '6002'
-            ), true
+            ], true
         );
-        return new Config(array('MultiAuth' => $config), true);
+        return new Config(['MultiAuth' => $config], true);
     }
 
     /**
@@ -80,11 +80,11 @@ class SIP2Test extends \VuFindTest\Unit\DbTestCase
      *
      * @return \Zend\Http\Request
      */
-    protected function getLoginRequest($overrides = array())
+    protected function getLoginRequest($overrides = [])
     {
-        $post = $overrides + array(
+        $post = $overrides + [
             'username' => 'testuser', 'password' => 'testpass'
-        );
+        ];
         $request = new \Zend\Http\Request();
         $request->setPost(new \Zend\Stdlib\Parameters($post));
         return $request;
@@ -98,7 +98,7 @@ class SIP2Test extends \VuFindTest\Unit\DbTestCase
     public function testLoginWithBlankUsername()
     {
         $this->setExpectedException('VuFind\Exception\Auth');
-        $request = $this->getLoginRequest(array('username' => ''));
+        $request = $this->getLoginRequest(['username' => '']);
         $this->getAuthObject()->authenticate($request);
     }
 
@@ -110,7 +110,7 @@ class SIP2Test extends \VuFindTest\Unit\DbTestCase
     public function testLoginWithBlankPassword()
     {
         $this->setExpectedException('VuFind\Exception\Auth');
-        $request = $this->getLoginRequest(array('password' => ''));
+        $request = $this->getLoginRequest(['password' => '']);
         $this->getAuthObject()->authenticate($request);
     }
 }

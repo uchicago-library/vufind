@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
-
 namespace VuFindTest\Record;
 
 use VuFind\Record\Loader;
@@ -39,11 +38,11 @@ use VuFindTest\Unit\TestCase as TestCase;
 /**
  * Record loader tests.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class LoaderTest extends TestCase
 {
@@ -51,15 +50,16 @@ class LoaderTest extends TestCase
      * Test exception for missing record.
      *
      * @return void
-     * @expectedException VuFind\Exception\RecordMissing
-     * @expectedExceptionMessage Record VuFind:test does not exist.
+     *
+     * @expectedException        VuFind\Exception\RecordMissing
+     * @expectedExceptionMessage Record Solr:test does not exist.
      */
     public function testMissingRecord()
     {
-        $collection = $this->getCollection(array());
+        $collection = $this->getCollection([]);
         $service = $this->getMock('VuFindSearch\Service');
         $service->expects($this->once())->method('retrieve')
-            ->with($this->equalTo('VuFind'), $this->equalTo('test'))
+            ->with($this->equalTo('Solr'), $this->equalTo('test'))
             ->will($this->returnValue($collection));
         $loader = $this->getLoader($service);
         $loader->load('test');
@@ -72,10 +72,10 @@ class LoaderTest extends TestCase
      */
     public function testToleratedMissingRecord()
     {
-        $collection = $this->getCollection(array());
+        $collection = $this->getCollection([]);
         $service = $this->getMock('VuFindSearch\Service');
         $service->expects($this->once())->method('retrieve')
-            ->with($this->equalTo('VuFind'), $this->equalTo('test'))
+            ->with($this->equalTo('Solr'), $this->equalTo('test'))
             ->will($this->returnValue($collection));
         $missing = $this->getDriver('missing', 'Missing');
         $factory = $this->getMock('VuFind\RecordDriver\PluginManager');
@@ -83,7 +83,7 @@ class LoaderTest extends TestCase
             ->with($this->equalTo('Missing'))
             ->will($this->returnValue($missing));
         $loader = $this->getLoader($service, $factory);
-        $record = $loader->load('test', 'VuFind', true);
+        $record = $loader->load('test', 'Solr', true);
         $this->assertEquals($missing, $record);
     }
 
@@ -95,10 +95,10 @@ class LoaderTest extends TestCase
     public function testSingleRecord()
     {
         $driver = $this->getDriver();
-        $collection = $this->getCollection(array($driver));
+        $collection = $this->getCollection([$driver]);
         $service = $this->getMock('VuFindSearch\Service');
         $service->expects($this->once())->method('retrieve')
-            ->with($this->equalTo('VuFind'), $this->equalTo('test'))
+            ->with($this->equalTo('Solr'), $this->equalTo('test'))
             ->will($this->returnValue($collection));
         $loader = $this->getLoader($service);
         $this->assertEquals($driver, $loader->load('test'));
@@ -111,14 +111,14 @@ class LoaderTest extends TestCase
      */
     public function testBatchLoad()
     {
-        $driver1 = $this->getDriver('test1', 'VuFind');
-        $driver2 = $this->getDriver('test2', 'VuFind');
+        $driver1 = $this->getDriver('test1', 'Solr');
+        $driver2 = $this->getDriver('test2', 'Solr');
         $driver3 = $this->getDriver('test3', 'Summon');
         $missing = $this->getDriver('missing', 'Missing');
 
-        $collection1 = $this->getCollection(array($driver1, $driver2));
-        $collection2 = $this->getCollection(array($driver3));
-        $collection3 = $this->getCollection(array());
+        $collection1 = $this->getCollection([$driver1, $driver2]);
+        $collection2 = $this->getCollection([$driver3]);
+        $collection3 = $this->getCollection([]);
 
         $factory = $this->getMock('VuFind\RecordDriver\PluginManager');
         $factory->expects($this->once())->method('get')
@@ -127,21 +127,21 @@ class LoaderTest extends TestCase
 
         $service = $this->getMock('VuFindSearch\Service');
         $service->expects($this->at(0))->method('retrieveBatch')
-            ->with($this->equalTo('VuFind'), $this->equalTo(array('test1', 'test2')))
+            ->with($this->equalTo('Solr'), $this->equalTo(['test1', 'test2']))
             ->will($this->returnValue($collection1));
         $service->expects($this->at(1))->method('retrieveBatch')
-            ->with($this->equalTo('Summon'), $this->equalTo(array('test3')))
+            ->with($this->equalTo('Summon'), $this->equalTo(['test3']))
             ->will($this->returnValue($collection2));
         $service->expects($this->at(2))->method('retrieveBatch')
-            ->with($this->equalTo('WorldCat'), $this->equalTo(array('test4')))
+            ->with($this->equalTo('WorldCat'), $this->equalTo(['test4']))
             ->will($this->returnValue($collection3));
 
         $loader = $this->getLoader($service, $factory);
-        $input = array(
-            array('source' => 'VuFind', 'id' => 'test1'),
-            'VuFind|test2', 'Summon|test3', 'WorldCat|test4'
-        );
-        $this->assertEquals(array($driver1, $driver2, $driver3, $missing), $loader->loadBatch($input));
+        $input = [
+            ['source' => 'Solr', 'id' => 'test1'],
+            'Solr|test2', 'Summon|test3', 'WorldCat|test4'
+        ];
+        $this->assertEquals([$driver1, $driver2, $driver3, $missing], $loader->loadBatch($input));
     }
 
     /**
@@ -152,12 +152,12 @@ class LoaderTest extends TestCase
      *
      * @return RecordDriver
      */
-    protected function getDriver($id = 'test', $source = 'VuFind')
+    protected function getDriver($id = 'test', $source = 'Solr')
     {
         $driver = $this->getMock('VuFind\RecordDriver\AbstractBase');
         $driver->expects($this->any())->method('getUniqueId')
             ->will($this->returnValue($id));
-        $driver->expects($this->any())->method('getResourceSource')
+        $driver->expects($this->any())->method('getSourceIdentifier')
             ->will($this->returnValue($source));
         return $driver;
     }

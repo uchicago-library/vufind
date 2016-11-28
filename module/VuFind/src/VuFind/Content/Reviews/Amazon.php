@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\Content\Reviews;
 
 /**
  * Amazon review content loader.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class Amazon extends \VuFind\Content\AbstractAmazon
 {
@@ -59,7 +59,7 @@ class Amazon extends \VuFind\Content\AbstractAmazon
         $endpoint = 'webservices.amazon.com';
         $requestURI = '/onca/xml';
         $isbn = $this->getIsbn10($isbnObj);
-        $params = array(
+        $params = [
             'AWSAccessKeyId' => $key,
             'ItemId' => $isbn,
             'Service' => 'AWSECommerceService',
@@ -68,13 +68,13 @@ class Amazon extends \VuFind\Content\AbstractAmazon
             'Version' => '2010-10-10',
             'Timestamp' => gmdate('Y-m-d\TH:i:s\Z'),
             'AssociateTag' => $this->associate
-        );
+        ];
 
         // Alphabetize the parameters:
         ksort($params);
 
         // URL encode and assemble the parameters:
-        $encodedParams = array();
+        $encodedParams = [];
         foreach ($params as $key => $value) {
             $encodedParams[] = rawurlencode($key) . '=' . rawurlencode($value);
         }
@@ -93,10 +93,10 @@ class Amazon extends \VuFind\Content\AbstractAmazon
         $data = !$result->isSuccess()
             ? false : simplexml_load_string($result->getBody());
         if (!$data) {
-            return array();
+            return [];
         }
 
-        $result = array();
+        $result = [];
         $reviews = isset($data->Items->Item->CustomerReviews->Review)
             ? $data->Items->Item->CustomerReviews->Review : null;
         if (!empty($reviews)) {
@@ -120,13 +120,15 @@ class Amazon extends \VuFind\Content\AbstractAmazon
                 // CSS for iframe (explicit dimensions needed for IE
                 // compatibility -- using 100% has bad results there):
                 $css = "width: 700px; height: 500px;";
-                $result[] = array(
+                // Replacement for http/https compatibility
+                $iframe = str_replace('http://', '//', $iframe);
+                $result[] = [
                     'Rating' => '',
                     'Summary' => '',
                     'Copyright' => $this->getCopyright($isbn),
                     'Content' =>
                         "<iframe style=\"{$css}\" src=\"{$iframe}\"></iframe>"
-                );
+                ];
             }
         }
 

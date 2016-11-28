@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  * @category EBSCOIndustries
  * @package  EBSCO
  * @author   Michelle Milton <mmilton@epnet.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindSearch\Backend\EDS;
 /**
@@ -33,7 +33,7 @@ namespace VuFindSearch\Backend\EDS;
  * @package  EBSCO
  * @author   Michelle Milton <mmilton@epnet.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class SearchRequestModel
 {
@@ -42,7 +42,7 @@ class SearchRequestModel
      *
      * @var array
      */
-    protected $query = array();
+    protected $query = [];
 
     /**
      * Whether or not to return facets with the search results. valid values are
@@ -57,7 +57,7 @@ class SearchRequestModel
      *
      * @var array
      */
-    protected $facetFilters = array();
+    protected $facetFilters = [];
 
     /**
      * Sort option to apply
@@ -71,7 +71,7 @@ class SearchRequestModel
      *
      * @var array
      */
-    protected $limiters = array();
+    protected $limiters = [];
 
     /**
      * Mode to be effective in the search
@@ -85,7 +85,7 @@ class SearchRequestModel
      *
      * @var string
      */
-    protected $expanders = array();
+    protected $expanders = [];
 
     /**
      * Requested level of detail to return the results with
@@ -112,7 +112,7 @@ class SearchRequestModel
     /**
      * Whether or not to highlight the search term in the results.
      *
-     * @var boolean
+     * @var bool
      */
     protected $highlight;
 
@@ -121,7 +121,7 @@ class SearchRequestModel
      *
      * @var array
      */
-    protected $actions = array();
+    protected $actions = [];
 
     /**
      * Constructor
@@ -130,7 +130,7 @@ class SearchRequestModel
      *
      * @param array $parameters parameters to populate request
      */
-    public function __construct($parameters = array())
+    public function __construct($parameters = [])
     {
         $this->setParameters($parameters);
     }
@@ -146,7 +146,7 @@ class SearchRequestModel
     {
         // PublicationDate:[xxxx TO xxxx]
         $dates = substr($filter, 17);
-        $dates = substr($dates, 0, strlen($dates)-1);
+        $dates = substr($dates, 0, strlen($dates) - 1);
         $parts = explode(' TO ', $dates, 2);
         if (count($parts) == 2) {
             $start = trim($parts[0]);
@@ -168,7 +168,7 @@ class SearchRequestModel
      *
      * @return void
      */
-    public function setParameters($parameters = array())
+    public function setParameters($parameters = [])
     {
         foreach ($parameters as $key => $values) {
             switch($key) {
@@ -214,7 +214,7 @@ class SearchRequestModel
      */
     public function convertToQueryStringParameterArray()
     {
-        $qs = array();
+        $qs = [];
         if (isset($this->query) && 0 < sizeof($this->query)) {
             $qs['query-x'] = $this->query;
         }
@@ -260,7 +260,7 @@ class SearchRequestModel
         }
 
         $highlightVal = isset($this->highlight) && $this->highlight ? 'y' : 'n';
-        $qs['highlight']= $highlightVal;
+        $qs['highlight'] = $highlightVal;
 
         return $qs;
     }
@@ -271,7 +271,7 @@ class SearchRequestModel
      * @param string $valueToCheck    Value to check the ending characters of
      * @param string $valueToCheckFor Characters to check for
      *
-     * @return boolean
+     * @return bool
      */
     protected static function endsWith($valueToCheck, $valueToCheckFor)
     {

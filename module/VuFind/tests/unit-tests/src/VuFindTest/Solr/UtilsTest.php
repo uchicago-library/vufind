@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\Solr;
 use VuFind\Solr\Utils;
@@ -31,11 +31,11 @@ use VuFind\Solr\Utils;
 /**
  * Solr Utils Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class UtilsTest extends \VuFindTest\Unit\TestCase
 {
@@ -68,7 +68,7 @@ class UtilsTest extends \VuFindTest\Unit\TestCase
      */
     public function testSanitizeDate()
     {
-        $tests = array(
+        $tests = [
             '[2014]' => '2014-01-01',
             'n.d.' => null,
             'may 7, 1981' => '1981-05-07',
@@ -88,7 +88,7 @@ class UtilsTest extends \VuFindTest\Unit\TestCase
             '5/1901' => '1901-05-01',
             '2nd Quarter 2004' => '2004-01-01',
             'Nov 2009 and Dec 2009' => '2009-01-01',
-        );
+        ];
         
         foreach ($tests as $in => $out) {
             $this->assertEquals(

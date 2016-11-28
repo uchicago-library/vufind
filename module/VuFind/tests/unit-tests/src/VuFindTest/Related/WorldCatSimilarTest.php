@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\Related;
 use VuFind\Related\WorldCatSimilar, VuFindSearch\Query\Query;
@@ -31,11 +31,11 @@ use VuFind\Related\WorldCatSimilar, VuFindSearch\Query\Query;
 /**
  * WorldCat Similar Related Items Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class WorldCatSimilarTest extends \VuFindTest\Unit\TestCase
 {
@@ -48,7 +48,7 @@ class WorldCatSimilarTest extends \VuFindTest\Unit\TestCase
     {
         $driver = $this->getMock(
             'VuFind\RecordDriver\WorldCat',
-            array('tryMethod', 'getPrimaryAuthor', 'getAllSubjectHeadings', 'getTitle', 'getUniqueId', 'getResourceSource')
+            ['tryMethod', 'getPrimaryAuthor', 'getAllSubjectHeadings', 'getTitle', 'getUniqueId', 'getSourceIdentifier']
         );
         $driver->expects($this->once())
             ->method('tryMethod')
@@ -59,7 +59,7 @@ class WorldCatSimilarTest extends \VuFindTest\Unit\TestCase
             ->will($this->returnValue('fakepa'));
         $driver->expects($this->once())
             ->method('getAllSubjectHeadings')
-            ->will($this->returnValue(array(array('fakesh1a', 'fakesh1b'), array('fakesh2'))));
+            ->will($this->returnValue([['fakesh1a', 'fakesh1b'], ['fakesh2']]));
         $driver->expects($this->once())
             ->method('getTitle')
             ->will($this->returnValue('faketitle'));
@@ -67,14 +67,14 @@ class WorldCatSimilarTest extends \VuFindTest\Unit\TestCase
             ->method('getUniqueId')
             ->will($this->returnValue('fakeid'));
         $driver->expects($this->once())
-            ->method('getResourceSource')
+            ->method('getSourceIdentifier')
             ->will($this->returnValue('WorldCat'));
-        $service = $this->getMock('VuFindSearch\Service', array('search'));
+        $service = $this->getMock('VuFindSearch\Service', ['search']);
         $expectedQuery = new Query('(srw.dd any "fakedc" or srw.au all "fakepa" or srw.su all "fakesh1a fakesh1b" or srw.su all "fakesh2" or srw.ti any "faketitle") not srw.no all "fakeid"');
-        $response = $this->getMock('VuFindSearch\Backend\WorldCat\Response\XML\RecordCollection', array('getRecords'), array(array('offset' => 0, 'total' => 0)));
+        $response = $this->getMock('VuFindSearch\Backend\WorldCat\Response\XML\RecordCollection', ['getRecords'], [['offset' => 0, 'total' => 0]]);
         $response->expects($this->once())
             ->method('getRecords')
-            ->will($this->returnValue(array('fakeresponse')));
+            ->will($this->returnValue(['fakeresponse']));
         $service->expects($this->once())
             ->method('search')
             ->with($this->equalTo('WorldCat'), $this->equalTo($expectedQuery), $this->equalTo(0), $this->equalTo(5))
@@ -82,6 +82,6 @@ class WorldCatSimilarTest extends \VuFindTest\Unit\TestCase
 
         $similar = new WorldCatSimilar($service);
         $similar->init('', $driver);
-        $this->assertEquals(array('fakeresponse'), $similar->getResults());
+        $this->assertEquals(['fakeresponse'], $similar->getResults());
     }
 }

@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\Recommend;
 use VuFind\Recommend\FacetCloud;
@@ -31,11 +31,11 @@ use VuFind\Recommend\FacetCloud;
 /**
  * FacetCloud recommendation module Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class FacetCloudTest extends \VuFindTest\Unit\TestCase
 {
@@ -48,8 +48,8 @@ class FacetCloudTest extends \VuFindTest\Unit\TestCase
     {
         $results = $this->getMockResults();
         $results->getParams()->expects($this->once())->method('getFacetSettings')
-            ->will($this->returnValue(array('limit' => 50)));
-        $fc = $this->getFacetCloud(null,$results);
+            ->will($this->returnValue(['limit' => 50]));
+        $fc = $this->getFacetCloud(null, $results);
         $this->assertEquals(49, $fc->getFacetLimit());
     }
 
@@ -76,7 +76,7 @@ class FacetCloudTest extends \VuFindTest\Unit\TestCase
             $emptyResults = $this->getMockResults();
         }
         if (null === $request) {
-            $request = new \Zend\StdLib\Parameters(array());
+            $request = new \Zend\StdLib\Parameters([]);
         }
         $fc = new FacetCloud($configLoader, $emptyResults);
         $fc->setConfig($settings);
@@ -93,7 +93,7 @@ class FacetCloudTest extends \VuFindTest\Unit\TestCase
      *
      * @return \VuFind\Config\PluginManager
      */
-    protected function getMockConfigLoader($config = array(), $key = 'facets')
+    protected function getMockConfigLoader($config = [], $key = 'facets')
     {
         $loader = $this->getMockBuilder('VuFind\Config\PluginManager')
             ->disableOriginalConstructor()->getMock();

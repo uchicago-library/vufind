@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Module
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://github.com/dmj/vf2-proxy
+ * @link     https://vufind.org/wiki/development
  */
 namespace VuFindLocalTemplate;
 use Zend\ModuleManager\ModuleManager,
@@ -32,11 +32,11 @@ use Zend\ModuleManager\ModuleManager,
 /**
  * Template for ZF2 module for storing local overrides.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Module
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     https://github.com/dmj/vf2-proxy
+ * @link     https://vufind.org/wiki/development
  */
 class Module
 {
@@ -57,13 +57,13 @@ class Module
      */
     public function getAutoloaderConfig()
     {
-        return array(
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
+        return [
+            'Zend\Loader\StandardAutoloader' => [
+                'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/' . __NAMESPACE__,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -72,6 +72,7 @@ class Module
      * @param ModuleManager $m Module manager
      *
      * @return void
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function init(ModuleManager $m)
@@ -84,6 +85,7 @@ class Module
      * @param MvcEvent $e Event
      *
      * @return void
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function onBootstrap(MvcEvent $e)

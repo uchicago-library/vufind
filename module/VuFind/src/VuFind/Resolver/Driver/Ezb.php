@@ -22,13 +22,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Resolver_Drivers
  * @author   Markus Fischer <info@flyingfischer.ch>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:link_resolver_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:link_resolver_drivers Wiki
  */
 namespace VuFind\Resolver\Driver;
 use DOMDocument, DOMXpath;
@@ -36,11 +36,11 @@ use DOMDocument, DOMXpath;
 /**
  * EZB Link Resolver Driver
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Resolver_Drivers
  * @author   Markus Fischer <info@flyingfischer.ch>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:link_resolver_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:link_resolver_drivers Wiki
  */
 class Ezb implements DriverInterface
 {
@@ -88,7 +88,7 @@ class Ezb implements DriverInterface
 
         // Parse OpenURL into associative array:
         $tmp = explode('&', $openURL);
-        $parsed = array();
+        $parsed = [];
 
         foreach ($tmp as $current) {
             $tmp2 = explode('=', $current, 2);
@@ -111,7 +111,6 @@ class Ezb implements DriverInterface
         return $feed;
     }
 
-
     /**
      * Parse Links
      *
@@ -124,7 +123,7 @@ class Ezb implements DriverInterface
      */
     public function parseLinks($xmlstr)
     {
-        $records = array(); // array to return
+        $records = []; // array to return
 
         $xml = new DOMDocument();
         if (!@$xml->loadXML($xmlstr)) {
@@ -156,7 +155,7 @@ class Ezb implements DriverInterface
      */
     protected function downgradeOpenUrl($parsed)
     {
-        $downgraded = array();
+        $downgraded = [];
 
         // we need 'genre' but only the values
         // article or journal are allowed...
@@ -198,7 +197,7 @@ class Ezb implements DriverInterface
      *
      * @param string   $state    The state attribute value to extract
      * @param string   $coverage The coverage string to associate with the state
-     * @param array    &$records The array of results to update
+     * @param array    $records  The array of results to update
      * @param DOMXpath $xpath    The XPath object containing parsed XML
      *
      * @return void
@@ -211,7 +210,7 @@ class Ezb implements DriverInterface
         );
         $i = 0;
         foreach ($results as $result) {
-            $record = array();
+            $record = [];
             $titleXP = "/OpenURLResponseXML/Full/ElectronicData/ResultList/" .
                 "Result[@state={$state}]/Title";
             $record['title'] = strip_tags(
@@ -240,7 +239,7 @@ class Ezb implements DriverInterface
      *
      * @param string   $state    The state attribute value to extract
      * @param string   $coverage The coverage string to associate with the state
-     * @param array    &$records The array of results to update
+     * @param array    $records  The array of results to update
      * @param DOMXpath $xpath    The XPath object containing parsed XML
      *
      * @return void
@@ -252,7 +251,7 @@ class Ezb implements DriverInterface
         );
         $i = 0;
         foreach ($results as $result) {
-            $record = array();
+            $record = [];
             $record['title'] = $coverage;
             $urlXP = "/OpenURLResponseXML/Full/PrintData/References/Reference/URL";
             $record['href'] = $xpath->query($urlXP, $result)->item($i)->nodeValue;

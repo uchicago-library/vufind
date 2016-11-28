@@ -1,6 +1,6 @@
 <?php
 /**
- * jqueryValidation view helper
+ * View helper for jQuery validation
  *
  * PHP version 5
  *
@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  View_Helpers
  * @author   Tuan Nguyen <tuan@yorku.ca>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org   Main Site
+ * @link     https://vufind.org   Main Site
  * @link     http://www.jquery.com   jQuery Project Page
  */
 namespace VuFind\View\Helper\Root;
@@ -32,11 +32,11 @@ use Zend\View\Helper\AbstractHelper;
 /**
  * Print a formatted string so jquery metadata and validation plugins can understand.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  View_Helpers
  * @author   Tuan Nguyen <tuan@yorku.ca>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org   Main Site
+ * @link     https://vufind.org   Main Site
  * @link     http://www.jquery.com   jQuery Project Page
  */
 class JqueryValidation extends AbstractHelper
@@ -52,10 +52,10 @@ class JqueryValidation extends AbstractHelper
     public function __invoke($params)
     {
         // jquery validation rules that this plugin currently supports
-        $supported_rules = array('required', 'email', 'digits', 'equalTo',
-            'phoneUS', 'mobileUK');
-        $messages = array();
-        $rules = array();
+        $supported_rules = ['required', 'email', 'digits', 'equalTo',
+            'phoneUS', 'mobileUK'];
+        $messages = [];
+        $rules = [];
         foreach ($supported_rules as $rule) {
             if (isset($params[$rule])) {
                 switch($rule) {
@@ -79,7 +79,7 @@ class JqueryValidation extends AbstractHelper
                 $output .= ',';
             }
             $translator = $this->getView()->plugin('translate');
-            $message = $translator($message);
+            $message = addslashes($translator($message));
             $output .= "$rule:'$message'";
             $first = false;
         }

@@ -17,26 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  View_Helpers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\View\Helper\Root;
-
-use Zend\View\Exception\RuntimeException;
 
 /**
  * "Load help text" view helper
  *
- * @category VuFind2
+ * @category VuFind
  * @package  View_Helpers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class HelpText extends \Zend\View\Helper\AbstractHelper
 {
@@ -66,7 +64,7 @@ class HelpText extends \Zend\View\Helper\AbstractHelper
      *
      * @var array
      */
-    protected $warnings = array();
+    protected $warnings = [];
 
     /**
      * Constructor
@@ -107,27 +105,28 @@ class HelpText extends \Zend\View\Helper\AbstractHelper
         // Set up the needed context in the view:
         $this->contextHelper->__invoke($this->getView());
         $oldContext = $this->contextHelper
-            ->apply(null === $context ? array() : $context);
+            ->apply(null === $context ? [] : $context);
 
         // Sanitize the template name to include only alphanumeric characters
         // or underscores.
         $safe_topic = preg_replace('/[^\w]/', '', $name);
 
         // Clear warnings
-        $this->warnings = array();
+        $this->warnings = [];
 
-        try {
-            $tpl = "HelpTranslations/{$this->language}/{$safe_topic}.phtml";
+        $resolver = $this->getView()->resolver();
+        $tpl = "HelpTranslations/{$this->language}/{$safe_topic}.phtml";
+        if ($resolver->resolve($tpl)) {
             $html = $this->getView()->render($tpl);
-        } catch (RuntimeException $e) {
-            try {
-                // language missing -- try default language
-                $tplFallback = 'HelpTranslations/' . $this->defaultLanguage . '/'
-                    . $safe_topic . '.phtml';
+        } else {
+            // language missing -- try default language
+            $tplFallback = 'HelpTranslations/' . $this->defaultLanguage . '/'
+                . $safe_topic . '.phtml';
+            if ($resolver->resolve($tplFallback)) {
                 $html = $this->getView()->render($tplFallback);
                 $this->warnings[] = 'Sorry, but the help you requested is '
                     . 'unavailable in your language.';
-            } catch (RuntimeException $e) {
+            } else {
                 // no translation available at all!
                 $html = false;
             }

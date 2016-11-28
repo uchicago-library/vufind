@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 namespace VuFind\Recommend;
 use VuFind\Solr\Utils as SolrUtils;
@@ -34,11 +34,11 @@ use VuFind\Search\Solr\HierarchicalFacetHelper;
  *
  * This class provides recommendations displaying facets beside search results
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 class SideFacets extends AbstractFacets
 {
@@ -47,42 +47,56 @@ class SideFacets extends AbstractFacets
      *
      * @var array
      */
-    protected $dateFacets = array();
+    protected $dateFacets = [];
 
     /**
      * Day/month/year date facet configuration
      *
      * @var array
      */
-    protected $fullDateFacets = array();
+    protected $fullDateFacets = [];
 
     /**
      * Generic range facet configuration
      *
      * @var array
      */
-    protected $genericRangeFacets = array();
+    protected $genericRangeFacets = [];
 
     /**
      * Numeric range facet configuration
      *
      * @var array
      */
-    protected $numericRangeFacets = array();
+    protected $numericRangeFacets = [];
 
     /**
      * Main facet configuration
      *
      * @var array
      */
-    protected $mainFacets = array();
+    protected $mainFacets = [];
 
     /**
      * Checkbox facet configuration
      *
      * @var array
      */
-    protected $checkboxFacets = array();
+    protected $checkboxFacets = [];
+
+    /**
+     * Settings controlling how lightbox is used for facet display.
+     *
+     * @var bool|string
+     */
+    protected $showInLightboxSettings = [];
+
+    /**
+     * Settings controlling how many values to display before "show more."
+     *
+     * @var array
+     */
+    protected $showMoreSettings = [];
 
     /**
      * Collapsed facet setting
@@ -96,14 +110,14 @@ class SideFacets extends AbstractFacets
      *
      * @var array
      */
-    protected $hierarchicalFacets = array();
+    protected $hierarchicalFacets = [];
 
     /**
      * Hierarchical facet sort options
      *
      * @var array
      */
-    protected $hierarchicalFacetSortOptions = array();
+    protected $hierarchicalFacetSortOptions = [];
 
     /**
      * Hierarchical facet helper
@@ -128,8 +142,6 @@ class SideFacets extends AbstractFacets
     }
 
     /**
-     * setConfig
-     *
      * Store the configuration of the recommendation module.
      *
      * @param string $settings Settings from searches.ini.
@@ -149,7 +161,7 @@ class SideFacets extends AbstractFacets
 
         // All standard facets to display:
         $this->mainFacets = isset($config->$mainSection) ?
-            $config->$mainSection->toArray() : array();
+            $config->$mainSection->toArray() : [];
 
         // Load boolean configurations:
         $this->loadBooleanConfigs($config, array_keys($this->mainFacets));
@@ -178,9 +190,19 @@ class SideFacets extends AbstractFacets
         }
         $this->checkboxFacets
             = ($checkboxSection && isset($config->$checkboxSection))
-            ? $config->$checkboxSection->toArray() : array();
+            ? $config->$checkboxSection->toArray() : [];
         if (isset($flipCheckboxes) && $flipCheckboxes) {
             $this->checkboxFacets = array_flip($this->checkboxFacets);
+        }
+
+        // Show more settings:
+        if (isset($config->Results_Settings->showMore)) {
+            $this->showMoreSettings
+                = $config->Results_Settings->showMore->toArray();
+        }
+        if (isset($config->Results_Settings->showMoreInLightbox)) {
+            $this->showInLightboxSettings
+                = $config->Results_Settings->showMoreInLightbox->toArray();
         }
 
         // Collapsed facets:
@@ -202,8 +224,6 @@ class SideFacets extends AbstractFacets
     }
 
     /**
-     * init
-     *
      * Called at the end of the Search Params objects' initFromRequest() method.
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may
@@ -227,8 +247,6 @@ class SideFacets extends AbstractFacets
     }
 
     /**
-     * getFacetSet
-     *
      * Get facet information from the search results.
      *
      * @return array
@@ -242,7 +260,7 @@ class SideFacets extends AbstractFacets
             if (isset($facetSet[$hierarchicalFacet])) {
                 if (!$this->hierarchicalFacetHelper) {
                     throw new \Exception(
-                        get_class($this). ': hierarchical facet helper unavailable'
+                        get_class($this) . ': hierarchical facet helper unavailable'
                     );
                 }
 
@@ -259,8 +277,6 @@ class SideFacets extends AbstractFacets
     }
 
     /**
-     * getDateFacets
-     *
      * Return year-based date facet information in a format processed for use in the
      * view.
      *
@@ -272,8 +288,6 @@ class SideFacets extends AbstractFacets
     }
 
     /**
-     * getFullDateFacets
-     *
      * Return year/month/day-based date facet information in a format processed for
      * use in the view.
      *
@@ -285,8 +299,6 @@ class SideFacets extends AbstractFacets
     }
 
     /**
-     * getGenericRangeFacets
-     *
      * Return generic range facet information in a format processed for use in the
      * view.
      *
@@ -298,8 +310,6 @@ class SideFacets extends AbstractFacets
     }
 
     /**
-     * getNumericRangeFacets
-     *
      * Return numeric range facet information in a format processed for use in the
      * view.
      *
@@ -317,16 +327,16 @@ class SideFacets extends AbstractFacets
      */
     public function getAllRangeFacets()
     {
-        $raw = array(
+        $raw = [
             'date' => $this->getDateFacets(),
             'fulldate' => $this->getFullDateFacets(),
             'generic' => $this->getGenericRangeFacets(),
             'numeric' => $this->getNumericRangeFacets()
-        );
-        $processed = array();
+        ];
+        $processed = [];
         foreach ($raw as $type => $values) {
             foreach ($values as $field => $range) {
-                $processed[$field] = array('type' => $type, 'values' => $range);
+                $processed[$field] = ['type' => $type, 'values' => $range];
             }
         }
         return $processed;
@@ -340,11 +350,54 @@ class SideFacets extends AbstractFacets
     public function getCollapsedFacets()
     {
         if (empty($this->collapsedFacets)) {
-            return array();
+            return [];
         } elseif ($this->collapsedFacets == '*') {
             return array_keys($this->getFacetSet());
         }
         return array_map('trim', explode(',', $this->collapsedFacets));
+    }
+
+    /**
+     * Return the list of facets configured to be collapsed
+     * defaults to 6
+     *
+     * @param string $facetName Name of the facet to get
+     *
+     * @return int
+     */
+    public function getShowMoreSetting($facetName)
+    {
+        // Look for either facet-specific configuration or else a configured
+        // default. If neither is found, initialize return value to 0.
+        if (isset($this->showMoreSettings[$facetName])) {
+            $val = intval($this->showMoreSettings[$facetName]);
+        } elseif (isset($this->showMoreSettings['*'])) {
+            $val = intval($this->showMoreSettings['*']);
+        }
+
+        // Validate the return value, defaulting to 6 if missing/invalid
+        return (isset($val) && $val > 0) ? $val : 6;
+    }
+
+    /**
+     * Return settings for showing more results in the lightbox
+     *
+     * @param string $facetName Name of the facet to get
+     *
+     * @return int
+     */
+    public function getShowInLightboxSetting($facetName)
+    {
+        // Look for either facet-specific configuration or else a configured
+        // default.
+        if (isset($this->showInLightboxSettings[$facetName])) {
+            return $this->showInLightboxSettings[$facetName];
+        } elseif (isset($this->showInLightboxSettings['*'])) {
+            return $this->showInLightboxSettings['*'];
+        }
+
+        // No config found; use default behavior:
+        return 'more';
     }
 
     /**
@@ -354,7 +407,7 @@ class SideFacets extends AbstractFacets
      *
      * @return array
      */
-    public function getVisibleFilters($extraFilters = array())
+    public function getVisibleFilters($extraFilters = [])
     {
         // Merge extras into main list:
         $filterList = array_merge(
@@ -362,9 +415,9 @@ class SideFacets extends AbstractFacets
         );
 
         // Filter out suppressed values:
-        $final = array();
+        $final = [];
         foreach ($filterList as $field => $filters) {
-            $current = array();
+            $current = [];
             foreach ($filters as $filter) {
                 if (!isset($filter['suppressDisplay'])
                     || !$filter['suppressDisplay']
@@ -381,8 +434,6 @@ class SideFacets extends AbstractFacets
     }
 
     /**
-     * getRangeFacets
-     *
      * Return range facet information in a format processed for use in the view.
      *
      * @param string $property Name of property containing active range facets
@@ -392,7 +443,7 @@ class SideFacets extends AbstractFacets
     protected function getRangeFacets($property)
     {
         $filters = $this->results->getParams()->getFilters();
-        $result = array();
+        $result = [];
         if (isset($this->$property) && is_array($this->$property)) {
             foreach ($this->$property as $current) {
                 $from = $to = '';
@@ -405,7 +456,7 @@ class SideFacets extends AbstractFacets
                         }
                     }
                 }
-                $result[$current] = array($from, $to);
+                $result[$current] = [$from, $to];
             }
         }
         return $result;
@@ -430,5 +481,4 @@ class SideFacets extends AbstractFacets
     {
         return $this->hierarchicalFacetSortOptions;
     }
-
 }

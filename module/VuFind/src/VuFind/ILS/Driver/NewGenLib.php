@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  ILS_Drivers
  * @author   Verus Solutions <info@verussolutions.biz>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:building_an_ils_driver Wiki
+ * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
 namespace VuFind\ILS\Driver;
 use PDO, PDOException, VuFind\Exception\ILS as ILSException;
@@ -31,11 +31,11 @@ use PDO, PDOException, VuFind\Exception\ILS as ILSException;
 /**
  * ILS Driver for NewGenLib
  *
- * @category VuFind2
+ * @category VuFind
  * @package  ILS_Drivers
  * @author   Verus Solutions <info@verussolutions.biz>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:building_an_ils_driver Wiki
+ * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
 class NewGenLib extends AbstractBase
 {
@@ -105,7 +105,7 @@ class NewGenLib extends AbstractBase
             }
             $duedate = "";
             while ($rowDD = $sqlStmt2->fetch(PDO::FETCH_ASSOC)) {
-                $duedate=$rowDD['due_date'];
+                $duedate = $rowDD['due_date'];
             }
             // add needed entries
             $holding[$i]['duedate'] = $duedate;
@@ -132,9 +132,9 @@ class NewGenLib extends AbstractBase
      */
     public function getMyFines($patron)
     {
-        $MyFines = array();
-        $pid=$patron['cat_username'];
-        $fine='Overdue';
+        $MyFines = [];
+        $pid = $patron['cat_username'];
+        $fine = 'Overdue';
         $LibId = 1;
         $mainsql = "select d.volume_id as volume_id, c.status as status, " .
             "v.volume_id as volume_id, d.accession_number as " .
@@ -157,7 +157,7 @@ class NewGenLib extends AbstractBase
         $id = "";
         while ($row = $sqlStmt->fetch(PDO::FETCH_ASSOC)) {
             $id = $row['cataloguerecordid'] . "_" . $row['owner_library_id'];
-            $amount = $row['fine_amt']*100;
+            $amount = $row['fine_amt'] * 100;
             $checkout = $row['ta_date'];
             $duedate = $row['due_date'];
             $paidamtsql = "select sum(f.fine_amt_paid) as fine_amt_paid from " .
@@ -172,16 +172,16 @@ class NewGenLib extends AbstractBase
             $paidamt = "";
             $balance = "";
             while ($rowpaid = $sqlStmt1->fetch(PDO::FETCH_ASSOC)) {
-                $paidamt=$rowpaid['fine_amt_paid']*100;
-                $balance=$amount-$paidamt;
+                $paidamt = $rowpaid['fine_amt_paid'] * 100;
+                $balance = $amount - $paidamt;
             }
 
-            $MyFines[] = array('amount' => $amount,
+            $MyFines[] = ['amount' => $amount,
                 'checkout' => $checkout,
                 'fine' => $fine,
                 'balance' => $balance,
                 'duedate' => $duedate,
-                'id'=>$id);
+                'id' => $id];
         }
 
         return $MyFines;
@@ -200,7 +200,7 @@ class NewGenLib extends AbstractBase
      */
     public function getMyHolds($patron)
     {
-        $holds = array();
+        $holds = [];
         $PatId = $patron['cat_username'];
         $LibId = 1;
         //SQL Statement
@@ -222,7 +222,7 @@ class NewGenLib extends AbstractBase
         while ($row = $sqlStmt->fetch(PDO::FETCH_ASSOC)) {
             $type = "RECALLED ITEM - Return the item to the library";
             $rIdql = "select due_date, ta_date from cir_transaction " .
-                "where patron_id='" . $row['patron_id']."'";
+                "where patron_id='" . $row['patron_id'] . "'";
             try {
                 $sqlStmt2 = $this->db->prepare($rIdql);
                 $sqlStmt2->execute();
@@ -233,15 +233,15 @@ class NewGenLib extends AbstractBase
             $duedate = "";
             $tadate = "";
             while ($rowDD = $sqlStmt2->fetch(PDO::FETCH_ASSOC)) {
-                $duedate=$rowDD['due_date'];
-                $tadate=$rowDD['ta_date'];
+                $duedate = $rowDD['due_date'];
+                $tadate = $rowDD['ta_date'];
             }
-            $holds[] = array('type' => $type,
+            $holds[] = ['type' => $type,
                 'id' => $RecordId,
                 'location' => null,
                 'reqnum' => null,
                 'expire' => $duedate . " " . $type,
-                'create' => $tadate);
+                'create' => $tadate];
         }
         //SQL Statement 2
         $mainsql2 = "select v.cataloguerecordid as cataloguerecordid, " .
@@ -272,12 +272,12 @@ class NewGenLib extends AbstractBase
             }
             $RecordId2 = $row2['cataloguerecordid'] . "_" .
                 $row2['owner_library_id'];
-            $holds[] = array('type' => $type2,
+            $holds[] = ['type' => $type2,
                 'id' => $RecordId2,
                 'location' => $location,
                 'reqnum' => $row2['queue_no'],
                 'expire' => null . " " . $type2,
-                'create' => $row2['reservation_date']);
+                'create' => $row2['reservation_date']];
         }
         return $holds;
     }
@@ -311,13 +311,13 @@ class NewGenLib extends AbstractBase
             if ($catusr != $row['patron_id'] || $catpswd != $row['user_password']) {
                 return null;
             } else {
-                $profile = array('firstname' => $row['fname'],
+                $profile = ['firstname' => $row['fname'],
                     'lastname' => $row['lname'],
                     'address1' => $row['address1'],
                     'address2' => $row['address2'],
                     'zip' => $row['pin'],
                     'phone' => $row['phone1'],
-                    'group' => null);
+                    'group' => null];
             }
         }
         return $profile;
@@ -337,7 +337,7 @@ class NewGenLib extends AbstractBase
      */
     public function getMyTransactions($patron)
     {
-        $transactions = array();
+        $transactions = [];
         $PatId = $patron['cat_username'];
         $mainsql = "select c.due_date as due_date, c.status as status, c.ta_id " .
             "as ta_id, c.library_id as library_id, c.accession_number as " .
@@ -370,11 +370,11 @@ class NewGenLib extends AbstractBase
             while ($srow = $sql->fetch(PDO::FETCH_ASSOC)) {
                 $count = "Renewed = " . $srow['total'];
             }
-            $transactions[] = array('duedate' => $row['due_date'] . " " . $count,
+            $transactions[] = ['duedate' => $row['due_date'] . " " . $count,
                 'id' => $RecordId,
                 'barcode' => $row['accession_number'],
                 'renew' => $count,
-                'reqnum' => null);
+                'reqnum' => null];
         }
         return $transactions;
     }
@@ -419,7 +419,7 @@ class NewGenLib extends AbstractBase
      */
     public function getStatuses($StatusResult)
     {
-        $status = array();
+        $status = [];
         foreach ($StatusResult as $id) {
             $status[] = $this->getStatus($id);
         }
@@ -440,39 +440,35 @@ class NewGenLib extends AbstractBase
      */
     public function patronLogin($username, $password)
     {
-        $patron = array();
-        $PatId = $username;
-        $psswrd = $password;
         //SQL Statement
         $sql = "select p.patron_id as patron_id, p.library_id as library_id, " .
             "p.fname as fname, p.lname as lname, p.user_password as " .
             "user_password, p.membership_start_date as membership_start_date, " .
             "p.membership_expiry_date as membership_expiry_date, p.email as " .
-            "email from patron p where p.patron_id='" . $PatId .
-            "' and p.user_password='" . $psswrd . "' and p.membership_start_date " .
+            "email from patron p where p.patron_id=:patronId" .
+            "' and p.user_password=:password and p.membership_start_date " .
             "<= current_date and p.membership_expiry_date > current_date";
 
         try {
             $sqlStmt = $this->db->prepare($sql);
-            $sqlStmt->execute();
+            $sqlStmt->execute([':patronId' => $username, ':password' => $password]);
         } catch (PDOException $e) {
             throw new ILSException($e->getMessage());
         }
-        while ($row = $sqlStmt->fetch(PDO::FETCH_ASSOC)) {
-            if ($PatId != $row['patron_id'] || $psswrd != $row['user_password']) {
-                return null;
-            } else {
-                $patron = array("id" => $PatId,
-                    "firstname" => $row['fname'],
-                    'lastname' => $row['lname'],
-                    'cat_username' => $PatId,
-                    'cat_password' => $psswrd,
-                    'email' => $row['email'],
-                    'major' => null,
-                    'college' => null);
-            }
+        $row = $sqlStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            return null;
         }
-        return $patron;
+        return [
+            "id" => $row['patron_id'],
+            "firstname" => $row['fname'],
+            'lastname' => $row['lname'],
+            'cat_username' => $username,
+            'cat_password' => $password,
+            'email' => $row['email'],
+            'major' => null,
+            'college' => null
+        ];
     }
 
     /**
@@ -492,12 +488,13 @@ class NewGenLib extends AbstractBase
      *
      * @throws ILSException
      * @return array       Associative array with 'count' and 'results' keys
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getNewItems($page, $limit, $daysOld, $fundId = null)
     {
         // Do some initial work in solr so we aren't repeating it inside this loop.
-        $retVal[][]=array();
+        $retVal[][] = [];
 
         $offset = ($page - 1) * $limit;
         $sql = "select cataloguerecordid,owner_library_id from cataloguerecord " .
@@ -511,14 +508,14 @@ class NewGenLib extends AbstractBase
             throw new ILSException($e->getMessage());
         }
 
-        $results = array();
+        $results = [];
         while ($row = $sqlStmt->fetch(PDO::FETCH_ASSOC)) {
-            $id=$row['cataloguerecordid'] . "_" . $row['owner_library_id'];
-            $results[]=$id;
+            $id = $row['cataloguerecordid'] . "_" . $row['owner_library_id'];
+            $results[] = $id;
         }
-        $retVal = array('count' => count($results), 'results' => array());
+        $retVal = ['count' => count($results), 'results' => []];
         foreach ($results as $result) {
-            $retVal['results'][] = array('id' => $result);
+            $retVal['results'][] = ['id' => $result];
         }
         return $retVal;
     }
@@ -533,12 +530,13 @@ class NewGenLib extends AbstractBase
      *
      * @throws ILSException
      * @return array     An array with the acquisitions data on success.
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getPurchaseHistory($id)
     {
         // TODO
-        return array();
+        return [];
     }
 
     /**
@@ -550,7 +548,7 @@ class NewGenLib extends AbstractBase
      */
     protected function getItemStatus($RecordID)
     {
-        $StatusResult = array();
+        $StatusResult = [];
         $pieces = explode("_", $RecordID);
         $CatId = $pieces[0];
         $LibId = $pieces[1];
@@ -601,9 +599,9 @@ class NewGenLib extends AbstractBase
             }
             $location = "";
             while ($rowLoc = $sqlSmt1->fetch(PDO::FETCH_ASSOC)) {
-                $location=$rowLoc['location'];
+                $location = $rowLoc['location'];
             }
-            $StatusResult[] = array('id' => $RecordID,
+            $StatusResult[] = ['id' => $RecordID,
                 'status' => $status,
                 'location' => $location,
                 'reserve' => $reserve,
@@ -611,7 +609,7 @@ class NewGenLib extends AbstractBase
                 'availability' => $available,
                 'number' => $row['accession_number'],
                 'barcode' => $row['barcode'],
-                'library_id' => $row['library_id']);
+                'library_id' => $row['library_id']];
         }
         return $StatusResult;
     }

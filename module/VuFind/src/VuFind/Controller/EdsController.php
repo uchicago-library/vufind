@@ -17,28 +17,26 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Controller;
 
-use EBSCO\EdsApi\Zend2 as EdsApi;
 use VuFind\Solr\Utils as SolrUtils;
 /**
  * EDS Controller
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
-
 class EdsController extends AbstractSearch
 {
     /**
@@ -90,7 +88,7 @@ class EdsController extends AbstractSearch
     {
         $this->setUp();
         return $this->createViewModel(
-            array('results' => $this->getHomePageFacets())
+            ['results' => $this->getHomePageFacets()]
         );
     }
 
@@ -103,7 +101,6 @@ class EdsController extends AbstractSearch
     {
         return $this->resultsAction();
     }
-
 
     /**
      * Return a Search Results object containing advanced facet information.  This
@@ -159,13 +156,13 @@ class EdsController extends AbstractSearch
             if (isset($list['LimiterValues'])) {
                 foreach ($list['LimiterValues'] as $key => $value) {
                     // Build the filter string for the URL:
-                    $fullFilter = $facet.':'.$value['Value'];
+                    $fullFilter = $facet . ':' . $value['Value'];
 
                     // If we haven't already found a selected facet and the current
                     // facet has been applied to the search, we should store it as
                     // the selected facet for the current control.
                     if ($searchObject) {
-                        $limitFilt = 'LIMIT|'.$fullFilter;
+                        $limitFilt = 'LIMIT|' . $fullFilter;
                         if ($searchObject->getParams()->hasFilter($limitFilt)) {
                             $facetList[$facet]['LimiterValues'][$key]['selected']
                                 = true;
@@ -203,7 +200,7 @@ class EdsController extends AbstractSearch
         // Process the expanders, assuming they came back
         foreach ($availableExpanders as $key => $value) {
             if ($searchObject) {
-                $expandFilt = 'EXPAND:'.$value['Value'];
+                $expandFilt = 'EXPAND:' . $value['Value'];
                 if ($searchObject->getParams()->hasFilter($expandFilt)) {
                     $availableExpanders[$key]['selected'] = true;
                     // Remove the filter from the search object -- we don't want
@@ -240,12 +237,12 @@ class EdsController extends AbstractSearch
                         $to = $range['to'] == '*' ? '12' : $range['to'];
                     }
                     $searchObject->getParams()
-                        ->removeFilter($key.':'.$value[0]['value']);
+                        ->removeFilter($key . ':' . $value[0]['value']);
                     break;
                 }
             }
         }
-        return array($from, $to);
+        return [$from, $to];
     }
 
     /**
@@ -264,7 +261,7 @@ class EdsController extends AbstractSearch
         // Process the facets, assuming they came back
         foreach ($searchModes as $key => $mode) {
             if ($searchObject) {
-                $modeFilter = 'SEARCHMODE:'.$mode['Value'];
+                $modeFilter = 'SEARCHMODE:' . $mode['Value'];
                 if ($searchObject->getParams()->hasFilter($modeFilter)) {
                     $searchModes[$key]['selected'] = true;
                     // Remove the filter from the search object -- we don't want
@@ -302,7 +299,6 @@ class EdsController extends AbstractSearch
             // catch exceptions more reliably:
             $results->performAndProcessSearch();
 
-
         } catch (\VuFindSearch\Backend\Exception\BackendException $e) {
             if ($e->hasTag('VuFind\Search\ParserError')) {
                 // If it's a parse error or the user specified an invalid field, we
@@ -321,4 +317,3 @@ class EdsController extends AbstractSearch
         }
     }
 }
-

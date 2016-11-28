@@ -3,7 +3,9 @@ return array(
     'extends' => false,
     'helpers' => array(
         'factories' => array(
+            'accountcapabilities' => 'VuFind\View\Helper\Root\Factory::getAccountCapabilities',
             'addthis' => 'VuFind\View\Helper\Root\Factory::getAddThis',
+            'alphabrowse' => 'VuFind\View\Helper\Root\Factory::getAlphaBrowse',
             'auth' => 'VuFind\View\Helper\Root\Factory::getAuth',
             'authornotes' => 'VuFind\View\Helper\Root\Factory::getAuthorNotes',
             'cart' => 'VuFind\View\Helper\Root\Factory::getCart',
@@ -13,8 +15,8 @@ return array(
             'export' => 'VuFind\View\Helper\Root\Factory::getExport',
             'feedback' => 'VuFind\View\Helper\Root\Factory::getFeedback',
             'flashmessages' => 'VuFind\View\Helper\Root\Factory::getFlashmessages',
+            'geocoords' => 'VuFind\View\Helper\Root\Factory::getGeoCoords',
             'googleanalytics' => 'VuFind\View\Helper\Root\Factory::getGoogleAnalytics',
-            'getlastsearchlink' => 'VuFind\View\Helper\Root\Factory::getGetLastSearchLink',
             'helptext' => 'VuFind\View\Helper\Root\Factory::getHelpText',
             'historylabel' => 'VuFind\View\Helper\Root\Factory::getHistoryLabel',
             'ils' => 'VuFind\View\Helper\Root\Factory::getIls',
@@ -29,6 +31,7 @@ return array(
             'related' => 'VuFind\View\Helper\Root\Factory::getRelated',
             'safemoneyformat' => 'VuFind\View\Helper\Root\Factory::getSafeMoneyFormat',
             'searchbox' => 'VuFind\View\Helper\Root\Factory::getSearchBox',
+            'searchmemory' => 'VuFind\View\Helper\Root\Factory::getSearchMemory',
             'searchoptions' => 'VuFind\View\Helper\Root\Factory::getSearchOptions',
             'searchparams' => 'VuFind\View\Helper\Root\Factory::getSearchParams',
             'searchtabs' => 'VuFind\View\Helper\Root\Factory::getSearchTabs',

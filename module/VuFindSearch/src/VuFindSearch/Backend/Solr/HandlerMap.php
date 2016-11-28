@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindSearch\Backend\Solr;
 
 use VuFindSearch\ParamBag;
@@ -38,11 +37,11 @@ use RuntimeException;
 /**
  * SOLR backend handler map.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class HandlerMap extends AbstractHandlerMap
 {
@@ -74,10 +73,10 @@ class HandlerMap extends AbstractHandlerMap
      *
      * @return void
      */
-    public function __construct(array $map = array())
+    public function __construct(array $map = [])
     {
-        $this->handlers = array();
-        $this->parameters = array();
+        $this->handlers = [];
+        $this->parameters = [];
         $this->setHandlerMap($map);
     }
 
@@ -251,7 +250,7 @@ class HandlerMap extends AbstractHandlerMap
         // Create ParamBag if not already present; this also handles validation
         // of the $type parameter.
         if (!isset($this->parameters[$handler][$type])) {
-            $this->setParameters($handler, $type, array());
+            $this->setParameters($handler, $type, []);
         }
         return $this->parameters[$handler][$type];
     }

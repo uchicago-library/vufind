@@ -18,13 +18,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Michelle Milton <mmilton@epnet.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindSearch\Backend\EDS\Response;
 use VuFindSearch\Response\AbstractRecordCollection;
@@ -32,13 +32,12 @@ use VuFindSearch\Response\AbstractRecordCollection;
 /**
  * EDS API record collection.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Michelle Milton <mmilton@epnet.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 class RecordCollection extends AbstractRecordCollection
 {
     /**
@@ -87,7 +86,7 @@ class RecordCollection extends AbstractRecordCollection
     {
         return isset($this->response['SearchResult'])
             && isset($this->response['SearchResult']['AvailableFacets'])
-            ? $this->response['SearchResult']['AvailableFacets'] : array();
+            ? $this->response['SearchResult']['AvailableFacets'] : [];
     }
 
     /**
@@ -97,21 +96,21 @@ class RecordCollection extends AbstractRecordCollection
      */
     public function getFacets()
     {
-        $vufindFacetList = array();
+        $vufindFacetList = [];
         $facets = isset($this->response['SearchResult'])
             && isset($this->response['SearchResult']['AvailableFacets'])
-            ? $this->response['SearchResult']['AvailableFacets'] : array();
+            ? $this->response['SearchResult']['AvailableFacets'] : [];
         foreach ($facets as $facet) {
             $vufindFacet['displayName'] = $facet['Id'];
             $vufindFacet['displayText'] = $facet['Label'];
             $vufindFacet['fieldName'] = $facet['Id'];
-            $values = array();
+            $values = [];
             foreach ($facet['AvailableFacetValues'] as $availableFacetValue) {
-                $values[] = array(
+                $values[] = [
                     'value' => $availableFacetValue['Value'],
                     'count' => $availableFacetValue['Count'],
                     'displayText' => $availableFacetValue['Value']
-                );
+                ];
 
             }
             $vufindFacet['counts'] = $values;
@@ -119,8 +118,6 @@ class RecordCollection extends AbstractRecordCollection
         }
         return $vufindFacetList;
     }
-
-
 
     /**
      * Return offset in the total search result set.

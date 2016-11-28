@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest;
 
 use VuFindSearch\ParamBag;
@@ -36,11 +35,11 @@ use PHPUnit_Framework_TestCase as TestCase;
 /**
  * Unit tests for ParamBag.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class ParamBagTest extends TestCase
 {
@@ -55,7 +54,7 @@ class ParamBagTest extends TestCase
         $bag->set('foo', 'bar');
         $bag->set('bar', 'baz');
         $bag->remove('foo');
-        $this->assertEquals(array('bar' => array('baz')), $bag->getArrayCopy());
+        $this->assertEquals(['bar' => ['baz']], $bag->getArrayCopy());
     }
 
     /**
@@ -65,10 +64,10 @@ class ParamBagTest extends TestCase
      */
     public function testMergeWithAll()
     {
-        $bag1 = new ParamBag(array('a' => 1));
-        $bag2 = new ParamBag(array('b' => 2));
-        $bag3 = new ParamBag(array('c' => 3));
-        $bag3->mergeWithAll(array($bag1, $bag2));
-        $this->assertEquals(array('a' => array(1), 'b' => array(2), 'c' => array(3)), $bag3->getArrayCopy());
+        $bag1 = new ParamBag(['a' => 1]);
+        $bag2 = new ParamBag(['b' => 2]);
+        $bag3 = new ParamBag(['c' => 3]);
+        $bag3->mergeWithAll([$bag1, $bag2]);
+        $this->assertEquals(['a' => [1], 'b' => [2], 'c' => [3]], $bag3->getArrayCopy());
     }
 }

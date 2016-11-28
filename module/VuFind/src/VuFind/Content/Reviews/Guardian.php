@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\Content\Reviews;
 
 /**
  * Guardian review content loader.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class Guardian extends \VuFind\Content\AbstractBase
 {
@@ -50,6 +50,7 @@ class Guardian extends \VuFind\Content\AbstractBase
      * @throws \Exception
      * @return array     Returns array with review data.
      * @author Eoghan Ó Carragáin <eoghan.ocarragain@gmail.com>
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function loadByIsbn($key, \VuFindCode\ISBN $isbnObj)
@@ -65,9 +66,7 @@ class Guardian extends \VuFind\Content\AbstractBase
             $url = $url . "&api-key=" . $key;
         }
 
-        if ($this->logger) {
-            $this->logger->debug('Guardian request: ' . $url);
-        }
+        $this->debug('Guardian request: ' . $url);
 
         // Find out if there are any reviews:
         $result = $this->getHttpClient($url)->send();
@@ -77,7 +76,7 @@ class Guardian extends \VuFind\Content\AbstractBase
             // parse json from response
             $data = json_decode($result->getBody(), true);
             if ($data) {
-                $result = array();
+                $result = [];
                 $i = 0;
                 foreach ($data['response']['results'] as $review) {
                     $result[$i]['Date'] = $review['webPublicationDate'];
@@ -115,7 +114,7 @@ class Guardian extends \VuFind\Content\AbstractBase
                 throw new \Exception('Could not parse Guardian response.');
             }
         } else {
-            return array();
+            return [];
         }
     }
 }

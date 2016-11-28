@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  SMS
  * @author   Ronan McHugh <vufind-tech@lists.sourceforge.net>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\SMS;
 use VuFind\Exception\Mail as MailException;
@@ -31,11 +31,11 @@ use VuFind\Exception\Mail as MailException;
 /**
  * Class for text messaging via Clickatell's HTTP API
  *
- * @category VuFind2
+ * @category VuFind
  * @package  SMS
  * @author   Ronan McHugh <vufind-tech@lists.sourceforge.net>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class Clickatell extends AbstractBase
 {
@@ -53,7 +53,7 @@ class Clickatell extends AbstractBase
      * @param array               $options Additional options (client may be an HTTP
      * client object)
      */
-    public function __construct(\Zend\Config\Config $config, $options = array())
+    public function __construct(\Zend\Config\Config $config, $options = [])
     {
         parent::__construct($config, $options);
         $this->client = isset($options['client'])
@@ -98,9 +98,9 @@ class Clickatell extends AbstractBase
      */
     public function getCarriers()
     {
-        return array(
-            'Clickatell' => array('name' => 'Clickatell', 'domain' => null)
-        );
+        return [
+            'Clickatell' => ['name' => 'Clickatell', 'domain' => null]
+        ];
     }
 
     /**

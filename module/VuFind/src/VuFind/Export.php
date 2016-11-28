@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Export
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind;
 use VuFind\SimpleXML, Zend\Config\Config;
@@ -31,11 +31,11 @@ use VuFind\SimpleXML, Zend\Config\Config;
 /**
  * Export support class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Export
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class Export
 {
@@ -54,11 +54,12 @@ class Export
     protected $exportConfig;
 
     /**
-     * Bulk options (initialized to boolean false, populated later)
+     * Property to cache active formats
+     * (initialized to empty array , populated later)
      *
-     * @var array|bool
+     * @var array
      */
-    protected $bulkOptions = false;
+    protected $activeFormats = [];
 
     /**
      * Constructor
@@ -75,28 +76,13 @@ class Export
     /**
      * Get bulk export options.
      *
+     * @deprecated use getActiveFormats($context) instead
+     *
      * @return array
      */
     public function getBulkOptions()
     {
-        if ($this->bulkOptions === false) {
-            $this->bulkOptions = array();
-            if (isset($this->mainConfig->BulkExport->enabled)
-                && isset($this->mainConfig->BulkExport->options)
-                && $this->mainConfig->BulkExport->enabled
-            ) {
-                $config = explode(':', $this->mainConfig->BulkExport->options);
-                foreach ($config as $option) {
-                    if (isset($this->mainConfig->Export->$option)
-                        && $this->mainConfig->Export->$option == true
-                    ) {
-                            $this->bulkOptions[] = $option;
-                    }
-                }
-            }
-        }
-
-        return $this->bulkOptions;
+        return $this->getActiveFormats('bulk');
     }
 
     /**
@@ -112,7 +98,7 @@ class Export
      */
     public function getBulkUrl($view, $format, $ids)
     {
-        $params = array();
+        $params = [];
         $params[] = 'f=' . urlencode($format);
         foreach ($ids as $id) {
             $params[] = urlencode('i[]') . '=' . urlencode($id);
@@ -190,7 +176,7 @@ class Export
         if (isset($this->exportConfig->$format->combineXpath)) {
             $ns = isset($this->exportConfig->$format->combineNamespaces)
                 ? $this->exportConfig->$format->combineNamespaces->toArray()
-                : array();
+                : [];
             $ns = array_map(
                 function ($current) {
                     return explode('|', $current, 2);
@@ -235,7 +221,7 @@ class Export
     public function recordSupportsFormat($driver, $format)
     {
         // Check if the driver explicitly disallows the format:
-        if ($driver->tryMethod('exportDisabled', array($format))) {
+        if ($driver->tryMethod('exportDisabled', [$format])) {
             return false;
         }
 
@@ -244,7 +230,7 @@ class Export
             if (isset($this->exportConfig->$format->requiredMethods)) {
                 foreach ($this->exportConfig->$format->requiredMethods as $method) {
                     // If a required method is missing, give up now:
-                    if (!is_callable(array($driver, $method))) {
+                    if (!is_callable([$driver, $method])) {
                         return false;
                     }
                 }
@@ -271,14 +257,12 @@ class Export
     {
         // Get an array of enabled export formats (from config, or use defaults
         // if nothing in config array).
-        $active = isset($this->mainConfig->Export)
-            ? $this->mainConfig->Export->toArray()
-            : array('RefWorks' => true, 'EndNote' => true);
+        $active = $this->getActiveFormats('record');
 
         // Loop through all possible formats:
-        $formats = array();
+        $formats = [];
         foreach (array_keys($this->exportConfig->toArray()) as $format) {
-            if (isset($active[$format]) && $active[$format]
+            if (in_array($format, $active)
                 && $this->recordSupportsFormat($driver, $format)
             ) {
                 $formats[] = $format;
@@ -299,10 +283,10 @@ class Export
      */
     public function getFormatsForRecords($drivers)
     {
-        $formats = $this->getBulkOptions();
+        $formats = $this->getActiveFormats('bulk');
         foreach ($drivers as $driver) {
             // Filter out unsupported export formats:
-            $newFormats = array();
+            $newFormats = [];
             foreach ($formats as $current) {
                 if ($this->recordSupportsFormat($driver, $current)) {
                     $newFormats[] = $current;
@@ -323,6 +307,81 @@ class Export
     public function getHeaders($format)
     {
         return isset($this->exportConfig->$format->headers)
-            ? $this->exportConfig->$format->headers : array();
+            ? $this->exportConfig->$format->headers : [];
+    }
+
+    /**
+     * Get the display label for the specified export format.
+     *
+     * @param string $format Format identifier
+     *
+     * @return string
+     */
+    public function getLabelForFormat($format)
+    {
+        return isset($this->exportConfig->$format->label)
+            ? $this->exportConfig->$format->label : $format;
+    }
+
+    /**
+     * Get the bulk export type for the specified export format.
+     *
+     * @param string $format Format identifier
+     *
+     * @return string
+     */
+    public function getBulkExportType($format)
+    {
+        // if exportType is set on per-format basis in export.ini then use it
+        if (isset($this->exportConfig->$format->bulkExportType)) {
+            return $this->exportConfig->$format->bulkExportType;
+        }
+
+        // else check if export type is set in config.ini
+        return isset($this->mainConfig->BulkExport->defaultType)
+            ? $this->mainConfig->BulkExport->defaultType : 'link';
+    }
+
+    /**
+     * Get active export formats for the given context.
+     *
+     * @param string $context Export context (i.e. record, bulk)
+     *
+     * @return array
+     */
+    public function getActiveFormats($context = 'record')
+    {
+        if (!isset($this->activeFormats[$context])) {
+            $formatSettings = isset($this->mainConfig->Export)
+                ? $this->mainConfig->Export->toArray()
+                : ['RefWorks' => 'record,bulk', 'EndNote' => 'record,bulk'];
+
+            $active = [];
+            foreach ($formatSettings as $format => $allowedContexts) {
+                if (strpos($allowedContexts, $context) !== false
+                    || ($context == 'record' && $allowedContexts == 1)
+                ) {
+                    $active[] = $format;
+                }
+            }
+
+            // for legacy settings [BulkExport]
+            if ($context == 'bulk'
+                && isset($this->mainConfig->BulkExport->enabled)
+                && $this->mainConfig->BulkExport->enabled
+                && isset($this->mainConfig->BulkExport->options)
+            ) {
+                $config = explode(':', $this->mainConfig->BulkExport->options);
+                foreach ($config as $option) {
+                    if (isset($this->mainConfig->Export->$option)
+                        && $this->mainConfig->Export->$option == true
+                    ) {
+                        $active[] = $option;
+                    }
+                }
+            }
+            $this->activeFormats[$context] = array_unique($active);
+        }
+        return $this->activeFormats[$context];
     }
 }

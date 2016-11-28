@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\View\Helper\Root;
 
 /**
  * Cart view helper Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class CartTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,16 +46,9 @@ class CartTest extends \PHPUnit_Framework_TestCase
     public function testCart()
     {
         // Create a mock cart object:
-        $mockLoader = $this->getMock(
-            'VuFind\Record\Loader', array(),
-            array(
-                $this->getMock('VuFindSearch\Service'),
-                $this->getMock('VuFind\RecordDriver\PluginManager')
-            )
-        );
-        $cart = $this->getMock(
-            'VuFind\Cart', null, array($mockLoader)
-        );
+        $cart = $this->getMockBuilder('VuFind\Cart')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         // Create a helper object:
         $helper = new \VuFind\View\Helper\Root\Cart($cart);

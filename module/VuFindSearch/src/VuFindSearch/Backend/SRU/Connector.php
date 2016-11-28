@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  SRU
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFindSearch\Backend\SRU;
 
@@ -32,26 +32,18 @@ use VuFindSearch\Backend\Exception\BackendException;
 
 use VuFind\XSLT\Processor as XSLTProcessor;
 
-use Zend\Log\LoggerAwareInterface;
-use Zend\Log\LoggerInterface;
-
 /**
  * SRU Search Interface
  *
- * @category VuFind2
+ * @category VuFind
  * @package  SRU
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
-class Connector implements LoggerAwareInterface
+class Connector implements \Zend\Log\LoggerAwareInterface
 {
-    /**
-     * Logger object for debug info (or false for no debugging).
-     *
-     * @var LoggerInterface|bool
-     */
-    protected $logger = false;
+    use \VuFind\Log\LoggerAwareTrait;
 
     /**
      * Whether to Serialize to a PHP Array or not.
@@ -97,32 +89,6 @@ class Connector implements LoggerAwareInterface
     }
 
     /**
-     * Set the logger
-     *
-     * @param LoggerInterface $logger Logger to use.
-     *
-     * @return void
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Log a debug message.
-     *
-     * @param string $msg Message to log.
-     *
-     * @return void
-     */
-    protected function debug($msg)
-    {
-        if ($this->logger) {
-            $this->logger->debug($msg);
-        }
-    }
-
-    /**
      * Get records similar to one record
      *
      * @param array  $record An associative array of the record data
@@ -138,11 +104,11 @@ class Connector implements LoggerAwareInterface
                  "NOT rec.id=$id";
 
         // Query String Parameters
-        $options = array('operation' => 'searchRetrieve',
+        $options = ['operation' => 'searchRetrieve',
                          'query' => $query,
                          'maximumRecords' => $max,
                          'startRecord' => 1,
-                         'recordSchema' => 'marcxml');
+                         'recordSchema' => 'marcxml'];
 
         $this->debug('More Like This Query: ' . print_r($query, true));
 
@@ -160,8 +126,8 @@ class Connector implements LoggerAwareInterface
      */
     public function scan($clause, $pos = null, $maxTerms = null)
     {
-        $options = array('operation' => 'scan',
-                         'scanClause' => $clause);
+        $options = ['operation' => 'scan',
+                         'scanClause' => $clause];
         if (!is_null($pos)) {
             $options['responsePosition'] = $pos;
         }
@@ -184,16 +150,16 @@ class Connector implements LoggerAwareInterface
      *
      * @return array          An array of query results
      */
-    public function search($query, $start = 1, $limit = null, $sortBy = null,
+    public function sruSearch($query, $start = 1, $limit = null, $sortBy = null,
         $schema = 'marcxml', $process = true
     ) {
         $this->debug('Query: ' . print_r($query, true));
 
         // Query String Parameters
-        $options = array('operation' => 'searchRetrieve',
+        $options = ['operation' => 'searchRetrieve',
                          'query' => $query,
                          'startRecord' => ($start) ? $start : 1,
-                         'recordSchema' => $schema);
+                         'recordSchema' => $schema];
         if (!is_null($limit)) {
             $options['maximumRecords'] = $limit;
         }
@@ -231,7 +197,7 @@ class Connector implements LoggerAwareInterface
     protected function call($method = 'GET', $params = null, $process = true)
     {
         if ($params) {
-            $query = array('version='.$this->sruVersion);
+            $query = ['version=' . $this->sruVersion];
             foreach ($params as $function => $value) {
                 if (is_array($value)) {
                     foreach ($value as $additional) {

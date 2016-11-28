@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Reserves
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki Wiki
+ * @link     https://vufind.org/wiki Wiki
  */
 namespace VuFind\Reserves;
 
 /**
  * Support class to build reserves data from CSV file(s).
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Reserves
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki Wiki
+ * @link     https://vufind.org/wiki Wiki
  */
 class CsvReader
 {
@@ -64,28 +64,28 @@ class CsvReader
      *
      * @var array
      */
-    protected $instructors = array();
+    protected $instructors = [];
 
     /**
      * Course data loaded from files
      *
      * @var array
      */
-    protected $courses = array();
+    protected $courses = [];
 
     /**
      * Department data loaded from files
      *
      * @var array
      */
-    protected $departments = array();
+    protected $departments = [];
 
     /**
      * Reserves data loaded from files
      *
      * @var array
      */
-    protected $reserves = array();
+    protected $reserves = [];
 
     /**
      * Flag indicating whether or not we have processed data yet.
@@ -114,7 +114,7 @@ class CsvReader
      */
     public function __construct($files, $delimiter = ',', $template = null)
     {
-        $this->files = is_array($files) ? $files : array($files);
+        $this->files = is_array($files) ? $files : [$files];
         $this->delimiter = $delimiter;
 
         // Provide default template if none passed in:
@@ -188,12 +188,12 @@ class CsvReader
             }
 
             $goodLines++;
-            $this->reserves[] = array(
+            $this->reserves[] = [
                 'BIB_ID' => $bibId,
                 'INSTRUCTOR_ID' => $instructor,
                 'COURSE_ID' => $course,
                 'DEPARTMENT_ID' => $department,
-            );
+            ];
         }
         fclose($fh);
         if ($goodLines == 0) {

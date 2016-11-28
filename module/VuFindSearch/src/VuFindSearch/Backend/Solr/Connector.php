@@ -18,21 +18,18 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindSearch\Backend\Solr;
 
-use VuFindSearch\Query\AbstractQuery;
-use VuFindSearch\Query\QueryGroup;
 use VuFindSearch\Query\Query;
 
 use VuFindSearch\ParamBag;
@@ -45,24 +42,23 @@ use Zend\Http\Request;
 use Zend\Http\Client as HttpClient;
 use Zend\Http\Client\Adapter\AdapterInterface;
 
-use Zend\Log\LoggerInterface;
-
 use InvalidArgumentException;
-use XMLWriter;
 
 /**
  * SOLR connector.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-class Connector
+class Connector implements \Zend\Log\LoggerAwareInterface
 {
+    use \VuFind\Log\LoggerAwareTrait;
+
     /**
      * Maximum length of a GET url.
      *
@@ -70,21 +66,14 @@ class Connector
      *
      * @see self::query()
      *
-     * @var integer
+     * @var int
      */
     const MAX_GET_URL_LENGTH = 2048;
 
     /**
-     * Logger instance.
+     * URL or an array of alternative URLs of the SOLR core.
      *
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * URL of SOLR core.
-     *
-     * @var string
+     * @var string|array
      */
     protected $url;
 
@@ -128,9 +117,9 @@ class Connector
     /**
      * Constructor
      *
-     * @param string     $url       SOLR base URL
-     * @param HandlerMap $map       Handler map
-     * @param string     $uniqueKey Solr field used to store unique identifier
+     * @param string|array $url       SOLR core URL or an array of alternative URLs
+     * @param HandlerMap   $map       Handler map
+     * @param string       $uniqueKey Solr field used to store unique identifier
      *
      * @return void
      */
@@ -196,23 +185,20 @@ class Connector
     /**
      * Return records similar to a given record specified by id.
      *
-     * Uses MoreLikeThis Request Handler
+     * Uses MoreLikeThis Request Component or MoreLikeThis Handler
      *
-     * @param string   $id     Id of given record
+     * @param string   $id     ID of given record (not currently used, but
+     * retained for backward compatibility / extensibility).
      * @param ParamBag $params Parameters
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function similar($id, ParamBag $params = null)
+    public function similar($id, ParamBag $params)
     {
-        $params = $params ?: new ParamBag();
-        $params
-            ->set('q', sprintf('%s:"%s"', $this->uniqueKey, addcslashes($id, '"')));
-        $params->set('qt', 'morelikethis');
-
         $handler = $this->map->getHandler(__FUNCTION__);
         $this->map->prepare(__FUNCTION__, $params);
-
         return $this->query($handler, $params);
     }
 
@@ -259,41 +245,30 @@ class Connector
         $handler = 'update', ParamBag $params = null
     ) {
         $params = $params ?: new ParamBag();
-        $url    = "{$this->url}/{$handler}";
+        $urlSuffix = "/{$handler}";
         if (count($params) > 0) {
-            $url .= '?' . implode('&', $params->request());
+            $urlSuffix .= '?' . implode('&', $params->request());
         }
-        $client = $this->createClient($url, 'POST');
-        switch ($format) {
-        case 'xml':
-            $client->setEncType('text/xml; charset=UTF-8');
-            $body = $document->asXML();
-            break;
-        case 'json':
-            $client->setEncType('application/json');
-            $body = $document->asJSON();
-            break;
-        default:
-            throw new InvalidArgumentException(
-                "Unable to serialize to selected format: {$format}"
-            );
-        }
-        $client->setRawBody($body);
-        $client->getRequest()->getHeaders()
-            ->addHeaderLine('Content-Length', strlen($body));
-        return $this->send($client);
-    }
-
-    /**
-     * Set logger instance.
-     *
-     * @param LoggerInterface $logger Logger
-     *
-     * @return void
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+        $callback = function ($client) use ($document, $format) {
+            switch ($format) {
+            case 'xml':
+                $client->setEncType('text/xml; charset=UTF-8');
+                $body = $document->asXML();
+                break;
+            case 'json':
+                $client->setEncType('application/json');
+                $body = $document->asJSON();
+                break;
+            default:
+                throw new InvalidArgumentException(
+                    "Unable to serialize to selected format: {$format}"
+                );
+            }
+            $client->setRawBody($body);
+            $client->getRequest()->getHeaders()
+                ->addHeaderLine('Content-Length', strlen($body));
+        };
+        return $this->trySolrUrls('POST', $urlSuffix, $callback);
     }
 
     /**
@@ -344,7 +319,7 @@ class Connector
      */
     public function setAdapter($adapter)
     {
-        if (is_object($adapter) && (!$adapter instanceOf AdapterInterface)) {
+        if (is_object($adapter) && (!$adapter instanceof AdapterInterface)) {
             throw new InvalidArgumentException(
                 sprintf(
                     'HTTP client adapter must implement AdapterInterface: %s',
@@ -367,35 +342,65 @@ class Connector
      */
     public function query($handler, ParamBag $params)
     {
-
-        $url         = $this->url . '/' . $handler;
+        $urlSuffix = '/' . $handler;
         $paramString = implode('&', $params->request());
         if (strlen($paramString) > self::MAX_GET_URL_LENGTH) {
             $method = Request::METHOD_POST;
+            $callback = function ($client) use ($paramString) {
+                $client->setRawBody($paramString);
+                $client->setEncType(HttpClient::ENC_URLENCODED);
+                $client->setHeaders(['Content-Length' => strlen($paramString)]);
+            };
         } else {
             $method = Request::METHOD_GET;
+            $urlSuffix .= '?' . $paramString;
+            $callback = null;
         }
 
-        if ($method === Request::METHOD_POST) {
-            $client = $this->createClient($url, $method);
-            $client->setRawBody($paramString);
-            $client->setEncType(HttpClient::ENC_URLENCODED);
-            $client->setHeaders(array('Content-Length' => strlen($paramString)));
-        } else {
-            $url = $url . '?' . $paramString;
-            $client = $this->createClient($url, $method);
+        $this->debug(sprintf('Query %s', $paramString));
+        return $this->trySolrUrls($method, $urlSuffix, $callback);
+    }
+
+    /**
+     * Try all Solr URLs until we find one that works (or throw an exception).
+     *
+     * @param string   $method    HTTP method to use
+     * @param string   $urlSuffix Suffix to append to all URLs tried
+     * @param Callable $callback  Callback to configure client (null for none)
+     *
+     * @return string Response body
+     *
+     * @throws RemoteErrorException  SOLR signaled a server error (HTTP 5xx)
+     * @throws RequestErrorException SOLR signaled a client error (HTTP 4xx)
+     */
+    protected function trySolrUrls($method, $urlSuffix, $callback = null)
+    {
+        // This exception should never get thrown; it's just a safety in case
+        // something unanticipated occurs.
+        $exception = new \Exception('Unexpected exception.');
+
+        // Loop through all base URLs and try them in turn until one works.
+        foreach ((array)$this->url as $base) {
+            $client = $this->createClient($base . $urlSuffix, $method);
+            if (is_callable($callback)) {
+                $callback($client);
+            }
+            try {
+                return $this->send($client);
+            } catch (\Exception $ex) {
+                $exception = $ex;
+            }
         }
 
-        if ($this->logger) {
-            $this->logger->debug(sprintf('Query %s', $paramString));
-        }
-        return $this->send($client);
+        // If we got this far, everything failed -- throw the most recent
+        // exception caught above.
+        throw $exception;
     }
 
     /**
      * Send request the SOLR and return the response.
      *
-     * @param HttpClient $client Prepare HTTP client
+     * @param HttpClient $client Prepared HTTP client
      *
      * @return string Response body
      *
@@ -404,24 +409,20 @@ class Connector
      */
     protected function send(HttpClient $client)
     {
-        if ($this->logger) {
-            $this->logger->debug(
-                sprintf('=> %s %s', $client->getMethod(), $client->getUri())
-            );
-        }
+        $this->debug(
+            sprintf('=> %s %s', $client->getMethod(), $client->getUri())
+        );
 
         $time     = microtime(true);
         $response = $client->send();
         $time     = microtime(true) - $time;
 
-        if ($this->logger) {
-            $this->logger->debug(
-                sprintf(
-                    '<= %s %s', $response->getStatusCode(),
-                    $response->getReasonPhrase()
-                ), array('time' => $time)
-            );
-        }
+        $this->debug(
+            sprintf(
+                '<= %s %s', $response->getStatusCode(),
+                $response->getReasonPhrase()
+            ), ['time' => $time]
+        );
 
         if (!$response->isSuccess()) {
             throw HttpErrorException::createFromResponse($response);
@@ -441,7 +442,7 @@ class Connector
     {
         $client = new HttpClient();
         $client->setAdapter($this->adapter);
-        $client->setOptions(array('timeout' => $this->timeout));
+        $client->setOptions(['timeout' => $this->timeout]);
         $client->setUri($url);
         $client->setMethod($method);
         if ($this->proxy) {

@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  SMS
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\SMS;
 use VuFind\Exception\Mail as MailException;
@@ -31,11 +31,11 @@ use VuFind\Exception\Mail as MailException;
 /**
  * VuFind Mailer Class for SMS messages
  *
- * @category VuFind2
+ * @category VuFind
  * @package  SMS
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class Mailer extends AbstractBase
 {
@@ -44,16 +44,16 @@ class Mailer extends AbstractBase
      *
      * @var array
      */
-    protected $carriers = array(
-        'virgin' => array('name' => 'Virgin Mobile', 'domain' => 'vmobl.com'),
-        'att' => array('name' => 'AT&T', 'domain' => 'mms.att.net'),
-        'verizon' => array('name' => 'Verizon', 'domain' => 'vtext.com'),
-        'nextel' => array('name' => 'Nextel', 'domain' => 'messaging.nextel.com'),
-        'sprint' => array('name' => 'Sprint', 'domain' => 'messaging.sprintpcs.com'),
-        'tmobile' => array('name' => 'T Mobile', 'domain' => 'tmomail.net'),
-        'alltel' => array('name' => 'Alltel', 'domain' => 'message.alltel.com'),
-        'Cricket' => array('name' => 'Cricket', 'domain' => 'mms.mycricket.com')
-    );
+    protected $carriers = [
+        'virgin' => ['name' => 'Virgin Mobile', 'domain' => 'vmobl.com'],
+        'att' => ['name' => 'AT&T', 'domain' => 'mms.att.net'],
+        'verizon' => ['name' => 'Verizon', 'domain' => 'vtext.com'],
+        'nextel' => ['name' => 'Nextel', 'domain' => 'messaging.nextel.com'],
+        'sprint' => ['name' => 'Sprint', 'domain' => 'messaging.sprintpcs.com'],
+        'tmobile' => ['name' => 'T Mobile', 'domain' => 'tmomail.net'],
+        'alltel' => ['name' => 'Alltel', 'domain' => 'message.alltel.com'],
+        'Cricket' => ['name' => 'Cricket', 'domain' => 'mms.mycricket.com']
+    ];
 
     /**
      * Default "from" address
@@ -76,7 +76,7 @@ class Mailer extends AbstractBase
      * @param array               $options Additional options: defaultFrom (optional)
      * and mailer (must be a \VuFind\Mailer\Mailer object)
      */
-    public function __construct(\Zend\Config\Config $config, $options = array())
+    public function __construct(\Zend\Config\Config $config, $options = [])
     {
         // Set up parent object first:
         parent::__construct($config, $options);
@@ -84,10 +84,10 @@ class Mailer extends AbstractBase
         // If found, use carriers from SMS configuration; otherwise, fall back to the
         // default list of US carriers.
         if (isset($config->Carriers) && count($config->Carriers) > 0) {
-            $this->carriers = array();
-            foreach ($config->Carriers as $id=>$settings) {
+            $this->carriers = [];
+            foreach ($config->Carriers as $id => $settings) {
                 list($domain, $name) = explode(':', $settings, 2);
-                $this->carriers[$id] = array('name'=>$name, 'domain'=>$domain);
+                $this->carriers[$id] = ['name' => $name, 'domain' => $domain];
             }
         }
 

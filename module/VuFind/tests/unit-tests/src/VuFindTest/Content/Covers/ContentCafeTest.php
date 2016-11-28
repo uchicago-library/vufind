@@ -18,13 +18,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindTest\Content\Covers;
 use VuFindCode\ISBN, VuFind\Content\Covers\ContentCafe, Zend\Config\Config;
@@ -32,11 +32,11 @@ use VuFindCode\ISBN, VuFind\Content\Covers\ContentCafe, Zend\Config\Config;
 /**
  * Unit tests for ContentCafe cover loader.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class ContentCafeTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,12 +47,12 @@ class ContentCafeTest extends \PHPUnit_Framework_TestCase
      */
     public function testValidCoverLoading()
     {
-        $loader = new ContentCafe(new Config(array('pw' => 'fakepw')));
+        $loader = new ContentCafe(new Config(['pw' => 'fakepw']));
         $this->assertEquals(
             'http://contentcafe2.btol.com/ContentCafe/Jacket.aspx?UserID=mykey'
             . '&Password=fakepw&Return=1&Type=S&Value=9780739313121&erroroverride=1',
             $loader->getUrl(
-                'mykey', 'small', array('isbn' => new ISBN('0739313126'))
+                'mykey', 'small', ['isbn' => new ISBN('0739313126')]
             )
         );
     }
@@ -64,7 +64,7 @@ class ContentCafeTest extends \PHPUnit_Framework_TestCase
      */
     public function testMissingIsbn()
     {
-        $loader = new ContentCafe(new Config(array('pw' => 'fakepw')));
-        $this->assertEquals(false, $loader->getUrl('mykey', 'small', array()));
+        $loader = new ContentCafe(new Config(['pw' => 'fakepw']));
+        $this->assertEquals(false, $loader->getUrl('mykey', 'small', []));
     }
 }

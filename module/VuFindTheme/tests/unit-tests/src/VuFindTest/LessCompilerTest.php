@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest;
 use VuFindTheme\LessCompiler;
@@ -31,11 +31,11 @@ use VuFindTheme\LessCompiler;
 /**
  * LessCompiler Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class LessCompilerTest extends Unit\TestCase
 {
@@ -116,7 +116,7 @@ class LessCompilerTest extends Unit\TestCase
     // adapted from http://php.net/manual/en/function.rmdir.php
     protected static function delTree($dir)
     {
-        $files = array_diff(scandir($dir), array('.', '..'));
+        $files = array_diff(scandir($dir), ['.', '..']);
         foreach ($files as $file) {
             is_dir("$dir/$file")
                 ? self::delTree("$dir/$file") : unlink("$dir/$file");
@@ -126,7 +126,7 @@ class LessCompilerTest extends Unit\TestCase
 
     public function testThemeCompile()
     {
-        $this->compiler->compile(array('child'));
+        $this->compiler->compile(['child']);
         $this->assertTrue(file_exists($this->testDest . 'themes/child/css/compiled.css'));
         $this->assertFalse(file_exists($this->testDest . 'themes/parent/css/compiled.css'));
         unlink($this->testDest . 'themes/child/css/compiled.css');
@@ -134,7 +134,7 @@ class LessCompilerTest extends Unit\TestCase
 
     public function testAllCompile()
     {
-        $this->compiler->compile(array());
+        $this->compiler->compile([]);
         $this->assertTrue(file_exists($this->testDest . 'themes/child/css/compiled.css'));
         $this->assertTrue(file_exists($this->testDest . 'themes/parent/css/compiled.css'));
         $this->assertTrue(file_exists($this->testDest . 'themes/parent/css/relative/relative.css'));

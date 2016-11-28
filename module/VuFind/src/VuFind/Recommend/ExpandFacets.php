@@ -19,22 +19,22 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA    02111-1307    USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Mark Triggs <vufind-tech@lists.sourceforge.net>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Recommend;
 
 /**
  * Recommendation class to expand recommendation interfaces
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class ExpandFacets implements RecommendInterface
 {
@@ -88,8 +88,6 @@ class ExpandFacets implements RecommendInterface
     }
 
     /**
-     * setConfig
-     *
      * Store the configuration of the recommendation module.
      *
      * @param string $settings Settings from searches.ini.
@@ -111,12 +109,10 @@ class ExpandFacets implements RecommendInterface
 
         // All standard facets to display:
         $this->facets = isset($config->$mainSection) ?
-            $config->$mainSection->toArray() : array();
+            $config->$mainSection->toArray() : [];
     }
 
     /**
-     * init
-     *
      * Called at the end of the Search Params objects' initFromRequest() method.
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may
@@ -137,8 +133,6 @@ class ExpandFacets implements RecommendInterface
     }
 
     /**
-     * process
-     *
      * Called after the Search Results object has performed its main search.  This
      * may be used to extract necessary information from the Search Results object
      * or to perform completely unrelated processing.

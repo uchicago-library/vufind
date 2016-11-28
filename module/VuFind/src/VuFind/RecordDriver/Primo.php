@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 namespace VuFind\RecordDriver;
 
 /**
  * Model for Primo Central records.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 class Primo extends SolrDefault
 {
@@ -67,32 +67,14 @@ class Primo extends SolrDefault
     }
 
     /**
-     * Get the main author of the record.
-     *
-     * @return string
-     */
-    public function getPrimaryAuthor()
-    {
-        return isset($this->fields['creator'][0]) ?
-            $this->fields['creator'][0] : '';
-    }
-
-    /**
-     * Get an array of all secondary authors (complementing getPrimaryAuthor()).
+     * Get the main authors of the record.
      *
      * @return array
      */
-    public function getSecondaryAuthors()
+    public function getPrimaryAuthors()
     {
-        $authors = array();
-        if (isset($this->fields['creator'])) {
-            for ($i = 1; $i < count($this->fields['creator']); $i++) {
-                if (isset($this->fields['creator'][$i])) {
-                    $authors[] = $this->fields['creator'][$i];
-                }
-            }
-        }
-        return $authors;
+        return isset($this->fields['creator'])
+            ? array_map('trim', $this->fields['creator']) : [];
     }
 
     /**
@@ -103,7 +85,7 @@ class Primo extends SolrDefault
     public function getCreators()
     {
         return isset($this->fields['creator'])
-            ? $this->fields['creator'] : array();
+            ? $this->fields['creator'] : [];
     }
 
     /**
@@ -115,23 +97,11 @@ class Primo extends SolrDefault
     public function getAllSubjectHeadings()
     {
         $base = isset($this->fields['subjects'])
-            ? $this->fields['subjects'] : array();
+            ? $this->fields['subjects'] : [];
         $callback = function ($str) {
             return array_map('trim', explode(' -- ', $str));
         };
         return array_map($callback, $base);
-    }
-
-    /**
-     * Get the title of the item that contains this record (i.e. MARC 773s of a
-     * journal).
-     *
-     * @return string
-     */
-    public function getContainerTitle()
-    {
-        $parts = explode(',', $this->getIsPartOf(), 2);
-        return isset($parts[0]) ? trim($parts[0]) : '';
     }
 
     /**
@@ -147,6 +117,17 @@ class Primo extends SolrDefault
     }
 
     /**
+     * Get the end page of the item that contains this record.
+     *
+     * @return string
+     */
+    public function getContainerEndPage()
+    {
+        return isset($this->fields['container_end_page'])
+            ? $this->fields['container_end_page'] : '';
+    }
+
+    /**
      * Get an array of all the formats associated with the record.
      *
      * @return array
@@ -154,7 +135,7 @@ class Primo extends SolrDefault
     public function getFormats()
     {
         return isset($this->fields['format'])
-            ? (array)$this->fields['format'] : array();
+            ? (array)$this->fields['format'] : [];
     }
 
     /**
@@ -176,7 +157,7 @@ class Primo extends SolrDefault
     public function getDescription()
     {
         return isset($this->fields['description'])
-            ? $this->fields['description'] : array();
+            ? $this->fields['description'] : [];
     }
 
     /**
@@ -187,9 +168,8 @@ class Primo extends SolrDefault
     public function getSource()
     {
         $base = isset($this->fields['source']) ? $this->fields['source'] : '';
-        // Trim off unwanted image:
-        $parts = explode('<img', $base);
-        return $parts[0];
+        // Trim off unwanted image and any other tags:
+        return strip_tags($base);
     }
 
     /**
@@ -199,7 +179,7 @@ class Primo extends SolrDefault
      */
     public function getISSNs()
     {
-        $issns = array();
+        $issns = [];
         if (isset($this->fields['issn'])) {
             $issns = $this->fields['issn'];
         }
@@ -214,7 +194,7 @@ class Primo extends SolrDefault
     public function getLanguages()
     {
         return isset($this->fields['language'])
-            ? (array)$this->fields['language'] : array();
+            ? (array)$this->fields['language'] : [];
     }
 
     /**
@@ -231,9 +211,9 @@ class Primo extends SolrDefault
     public function getThumbnail($size = 'small')
     {
         if ($isbn = $this->getCleanISBN()) {
-            return array('size' => $size, 'isn' => $isbn);
+            return ['size' => $size, 'isn' => $isbn];
         }
-        return array('size' => $size, 'contenttype' => 'JournalArticle');
+        return ['size' => $size, 'contenttype' => 'JournalArticle'];
     }
 
     /**
@@ -252,10 +232,10 @@ class Primo extends SolrDefault
      */
     public function getURLs()
     {
-        $retVal = array();
+        $retVal = [];
 
         if (isset($this->fields['url'])) {
-            $retVal[] = array();
+            $retVal[] = [];
             $retVal[0]['url'] = $this->fields['url'];
             if (isset($this->fields['fulltext'])) {
                 $desc = $this->fields['fulltext'] == 'fulltext'
@@ -289,7 +269,7 @@ class Primo extends SolrDefault
      */
     protected function getSupportedCitationFormats()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -298,11 +278,12 @@ class Primo extends SolrDefault
      * @param string $format Export format
      *
      * @return bool
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function exportDisabled($format)
     {
-        // Primo is not export-friendly; disable all formats.
-        return true;
+        // Support export for EndNote and RefWorks
+        return !in_array($format, ['EndNote', 'RefWorks']);
     }
 }

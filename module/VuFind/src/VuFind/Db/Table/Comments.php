@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Table
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Db\Table;
 use Zend\Db\Sql\Expression;
@@ -31,11 +31,11 @@ use Zend\Db\Sql\Expression;
 /**
  * Table Definition for comments
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Table
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class Comments extends Gateway
 {
@@ -55,19 +55,19 @@ class Comments extends Gateway
      *
      * @return array|\Zend\Db\ResultSet\AbstractResultSet
      */
-    public function getForResource($id, $source = 'VuFind')
+    public function getForResource($id, $source = DEFAULT_SEARCH_BACKEND)
     {
         $resourceTable = $this->getDbTable('Resource');
         $resource = $resourceTable->findResource($id, $source, false);
         if (empty($resource)) {
-            return array();
+            return [];
         }
 
         $callback = function ($select) use ($resource) {
-            $select->columns(array('*'));
+            $select->columns(['*']);
             $select->join(
-                array('u' => 'user'), 'u.id = comments.user_id',
-                array('firstname', 'lastname')
+                ['u' => 'user'], 'u.id = comments.user_id',
+                ['firstname', 'lastname']
             );
             $select->where->equalTo('comments.resource_id',  $resource->id);
             $select->order('comments.created');
@@ -92,7 +92,7 @@ class Comments extends Gateway
         }
 
         // Comment row must exist:
-        $matches = $this->select(array('id' => $id));
+        $matches = $this->select(['id' => $id]);
         if (count($matches) == 0 || !($row = $matches->current())) {
             return false;
         }
@@ -116,17 +116,17 @@ class Comments extends Gateway
     {
         $select = $this->sql->select();
         $select->columns(
-            array(
+            [
                 'users' => new Expression(
-                    'COUNT(DISTINCT(?))', array('user_id'),
-                    array(Expression::TYPE_IDENTIFIER)
+                    'COUNT(DISTINCT(?))', ['user_id'],
+                    [Expression::TYPE_IDENTIFIER]
                 ),
                 'resources' => new Expression(
-                    'COUNT(DISTINCT(?))', array('resource_id'),
-                    array(Expression::TYPE_IDENTIFIER)
+                    'COUNT(DISTINCT(?))', ['resource_id'],
+                    [Expression::TYPE_IDENTIFIER]
                 ),
                 'total' => new Expression('COUNT(*)')
-            )
+            ]
         );
         $statement = $this->sql->prepareStatementForSqlObject($select);
         $result = $statement->execute();

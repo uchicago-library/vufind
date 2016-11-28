@@ -18,17 +18,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindSearch\Backend\Pazpar2;
 
 use VuFindSearch\Query\AbstractQuery;
@@ -40,13 +39,13 @@ use VuFindSearch\ParamBag;
 /**
  * Pazpar2 QueryBuilder.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class QueryBuilder
 {
@@ -101,6 +100,7 @@ class QueryBuilder
      * @param QueryGroup $query QueryGroup to convert
      *
      * @return string
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function queryGroupToString(QueryGroup $query)

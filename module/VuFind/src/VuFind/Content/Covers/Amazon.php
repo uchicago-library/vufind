@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\Content\Covers;
 use ZendService\Amazon\Amazon as AmazonService;
@@ -31,15 +31,17 @@ use ZendService\Amazon\Amazon as AmazonService;
 /**
  * Amazon cover content loader.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class Amazon extends \VuFind\Content\AbstractCover
     implements \VuFindHttp\HttpServiceAwareInterface
 {
+    use \VuFindHttp\HttpServiceAwareTrait;
+
     /**
      * Associate ID
      *
@@ -53,13 +55,6 @@ class Amazon extends \VuFind\Content\AbstractCover
      * @var string
      */
     protected $secret;
-
-    /**
-     * HTTP service
-     *
-     * @var \VuFindHttp\HttpServiceInterface
-     */
-    protected $httpService = null;
 
     /**
      * Constructor
@@ -90,18 +85,6 @@ class Amazon extends \VuFind\Content\AbstractCover
     }
 
     /**
-     * Set the HTTP service to be used for HTTP requests.
-     *
-     * @param HttpServiceInterface $service HTTP service
-     *
-     * @return void
-     */
-    public function setHttpService(\VuFindHttp\HttpServiceInterface $service)
-    {
-        $this->httpService = $service;
-    }
-
-    /**
      * Get image URL for a particular API key and set of IDs (or false if invalid).
      *
      * @param string $key  API key
@@ -114,9 +97,9 @@ class Amazon extends \VuFind\Content\AbstractCover
     public function getUrl($key, $size, $ids)
     {
         try {
-            $params = array(
+            $params = [
                 'ResponseGroup' => 'Images', 'AssociateTag' => $this->associate
-            );
+            ];
             // TODO: add support for 13-digit ISBNs (requires extra lookup)
             $isbn = isset($ids['isbn']) ? $ids['isbn']->get10() : false;
             if (!$isbn) {

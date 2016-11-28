@@ -17,38 +17,45 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFindAdmin\Controller;
-use VuFind\Exception\Forbidden as ForbiddenException,
-    Zend\Mvc\MvcEvent,
-    Zend\Stdlib\Parameters;
+use Zend\Mvc\MvcEvent;
 
 /**
  * VuFind Admin Controller Base
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class AbstractAdmin extends \VuFind\Controller\AbstractBase
 {
     /**
-     * preDispatch -- block access when appropriate.
+     * Constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->accessPermission = 'access.AdminModule';
+    }
+
+    /**
+     * Use preDispatch event to block access when appropriate.
      *
      * @param MvcEvent $e Event object
      *
      * @return void
      */
-    public function preDispatch(MvcEvent $e)
+    public function validateAccessPermission(MvcEvent $e)
     {
         // Disable search box in Admin module:
         $this->layout()->searchbox = false;
@@ -69,49 +76,10 @@ class AbstractAdmin extends \VuFind\Controller\AbstractBase
             return $redirectPlugin->toRoute('admin/disabled');
         }
 
-        // Block access by IP when IP checking is enabled:
-        if (isset($config->AdminAuth->ipRegEx)) {
-            $ipMatch = preg_match(
-                $config->AdminAuth->ipRegEx,
-                $this->getRequest()->getServer()->get('REMOTE_ADDR')
-            );
-            if (!$ipMatch) {
-                throw new ForbiddenException('Access denied.');
-            }
-        }
-
-        // Block access by username when user whitelist is enabled:
-        if (isset($config->AdminAuth->userWhitelist)) {
-            $user = $this->getUser();
-            if ($user == false) {
-                $e->setResponse($this->forceLogin(null, array(), false));
-                return;
-            }
-            $matchFound = false;
-            foreach ($config->AdminAuth->userWhitelist as $check) {
-                if ($check == $user->username) {
-                    $matchFound = true;
-                    break;
-                }
-            }
-            if (!$matchFound) {
-                throw new ForbiddenException('Access denied.');
-            }
-        }
+        // Call parent method to do permission checking:
+        parent::validateAccessPermission($e);
     }
 
-    /**
-     * Register the default events for this controller
-     *
-     * @return void
-     */
-    protected function attachDefaultListeners()
-    {
-        parent::attachDefaultListeners();
-        $events = $this->getEventManager();
-        $events->attach(MvcEvent::EVENT_DISPATCH, array($this, 'preDispatch'), 1000);
-    }
-    
     /**
      * Display disabled message.
      *

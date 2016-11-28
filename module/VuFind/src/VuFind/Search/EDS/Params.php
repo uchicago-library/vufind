@@ -17,27 +17,26 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  EBSCO
  * @author   Michelle Milton <mmilton@epnet.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Search\EDS;
 use VuFindSearch\ParamBag;
 use VuFindSearch\Backend\EDS\SearchRequestModel as SearchRequestModel;
-use VuFind\Search\EDS\QueryAdapter;
 
 /**
  * EDS API Params
  *
- * @category VuFind2
+ * @category VuFind
  * @package  EBSCO
  * @author   Michelle Milton <mmilton@epnet.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class Params extends \VuFind\Search\Base\Params
 {
@@ -46,20 +45,19 @@ class Params extends \VuFind\Search\Base\Params
      *
      * @var array
      */
-    protected $dateFacetSettings = array();
+    protected $dateFacetSettings = [];
 
     /**
      * Additional filters to display as side facets
      *
      * @var array
      */
-    protected $extraFilterList = array();
+    protected $extraFilterList = [];
 
     /**
-     * property to determine if the request using this parameters objects is for
-     * setup only.
+     * Is the request using this parameters objects for setup only?
      *
-     * @var boolean
+     * @var bool
      */
     public $isSetupOnly = false;
 
@@ -112,7 +110,7 @@ class Params extends \VuFind\Search\Base\Params
             $backendParams->set('view', $view);
         }
 
-        $mode= $options->getSearchMode();
+        $mode = $options->getSearchMode();
         if (isset($mode)) {
             $backendParams->set('searchMode', $mode);
         }
@@ -137,7 +135,7 @@ class Params extends \VuFind\Search\Base\Params
         $defaultFacetLimit = isset($config->Facet_Settings->facet_limit)
             ? $config->Facet_Settings->facet_limit : 30;
 
-        $finalFacets = array();
+        $finalFacets = [];
         foreach ($this->getFullFacetSettings() as $facet) {
             // See if parameters are included as part of the facet name;
             // if not, override them with defaults.
@@ -212,24 +210,22 @@ class Params extends \VuFind\Search\Base\Params
     public function createBackendLimiterParameters(ParamBag $params)
     {
         //group limiters with same id together
-        $edsLimiters = array();
+        $edsLimiters = [];
         foreach ($this->limiters as $limiter) {
-            if (isset($limiter) &&!empty($limiter)) {
+            if (isset($limiter) && !empty($limiter)) {
                 // split the id/value
-                list ($key, $value) = explode(':', $limiter, 2);
+                list($key, $value) = explode(':', $limiter, 2);
                 $value = SearchRequestModel::escapeSpecialCharacters($value);
                 $edsLimiters[$key] = (!isset($edsLimiters[$key]))
-                     ? $value : $edsLimiters[$key].','.$value;
+                     ? $value : $edsLimiters[$key] . ',' . $value;
             }
         }
         if (!empty($edsLimiters)) {
             foreach ($edsLimiters as $key => $value) {
-                $params->add('limiters', $key.':'.$value);
+                $params->add('limiters', $key . ':' . $value);
             }
         }
     }
-
-
 
     /**
      * Set up expanders based on VuFind settings.
@@ -246,14 +242,13 @@ class Params extends \VuFind\Search\Base\Params
             $value = '';
             foreach ($this->expanders as $expander) {
                 $value = (!empty($value))
-                    ? $value.','.$expander : $expander;
+                    ? $value . ',' . $expander : $expander;
             }
             if (!empty($value)) {
                 $params->add('expander', $value);
             }
         }
     }
-
 
     /**
      * Return the value for which search view we use
@@ -312,17 +307,20 @@ class Params extends \VuFind\Search\Base\Params
      */
     public function getFullFacetSettings()
     {
-        return isset($this->fullFacetSettings) ? $this->fullFacetSettings : array();
+        return isset($this->fullFacetSettings) ? $this->fullFacetSettings : [];
     }
 
     /**
      * Get a user-friendly string to describe the provided facet field.
      *
      * @param string $field Facet field name.
+     * @param string $value Facet value.
      *
      * @return string       Human-readable description of field.
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getFacetLabel($field)
+    public function getFacetLabel($field, $value = null)
     {
         //Also store Limiter/Search Mode IDs/Values in the config file
         $facetId = $field;
@@ -345,7 +343,6 @@ class Params extends \VuFind\Search\Base\Params
     {
         return $this->dateFacetSettings;
     }
-
 
     /**
      * Populate common limiters as checkbox facets
@@ -394,12 +391,12 @@ class Params extends \VuFind\Search\Base\Params
      */
     public function getViewList()
     {
-        $list = array();
+        $list = [];
         foreach ($this->getOptions()->getViewOptions() as $key => $value) {
-            $list[$key] = array(
+            $list[$key] = [
                 'desc' => $value,
-                'selected' => ($key == $this->getView().'|'.$this->getEdsView())
-            );
+                'selected' => ($key == $this->getView() . '|' . $this->getEdsView())
+            ];
         }
         return $list;
     }
@@ -414,8 +411,8 @@ class Params extends \VuFind\Search\Base\Params
     public function getDisplayQuery()
     {
         // Set up callbacks:
-        $translate = array($this, 'translate');
-        $showField = array($this->getOptions(), 'getHumanReadableFieldName');
+        $translate = [$this, 'translate'];
+        $showField = [$this->getOptions(), 'getHumanReadableFieldName'];
 
         // Build display query:
         return QueryAdapter::display($this->getQuery(), $translate, $showField);

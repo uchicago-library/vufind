@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\Content\Reviews;
 use ZendService\Amazon\Amazon;
@@ -31,11 +31,11 @@ use ZendService\Amazon\Amazon;
 /**
  * Amazon review content loader.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class AmazonEditorial extends \VuFind\Content\AbstractAmazon
 {
@@ -57,20 +57,20 @@ class AmazonEditorial extends \VuFind\Content\AbstractAmazon
         try {
             $amazon = new Amazon($key, 'US', $this->secret);
             $amazon->getRestClient()->setHttpClient($this->getHttpClient());
-            $params = array(
+            $params = [
                 'ResponseGroup' => 'EditorialReview',
                 'AssociateTag' => $this->associate
-            );
+            ];
             $isbn = $this->getIsbn10($isbnObj);
             $data = $amazon->itemLookup($isbn, $params);
         } catch (\Exception $e) {
             // Something went wrong?  Just return empty list.
-            return array();
+            return [];
         }
 
         if ($data) {
             $i = 0;
-            $result = array();
+            $result = [];
             $reviews = isset($data->EditorialReviews)
                 ? $data->EditorialReviews : null;
             if (!empty($reviews)) {

@@ -17,14 +17,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Eoghan Ó Carragáin <eoghan.ocarragain@gmail.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 namespace VuFind\Recommend;
 
@@ -34,12 +34,12 @@ namespace VuFind\Recommend;
  * This class provides recommendations by doing a search of the catalog; useful
  * for displaying catalog recommendations in other modules (i.e. Summon, Web, etc.)
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Eoghan Ó Carragáin <eoghan.ocarragain@gmail.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 class OpenLibrarySubjectsDeferred extends OpenLibrarySubjects
 {
@@ -58,8 +58,6 @@ class OpenLibrarySubjectsDeferred extends OpenLibrarySubjects
     protected $processedParams;
 
     /**
-     * setConfig
-     *
      * Store the configuration of the recommendation module.
      *
      * @param string $settings Settings from searches.ini.
@@ -72,8 +70,6 @@ class OpenLibrarySubjectsDeferred extends OpenLibrarySubjects
     }
 
     /**
-     * init
-     *
      * Called at the end of the Search Params objects' initFromRequest() method.
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may
@@ -104,7 +100,7 @@ class OpenLibrarySubjectsDeferred extends OpenLibrarySubjects
             $settings[2] = 'publishDate';
         }
         $pubDateRange = strtolower($settings[2]) == 'false' ?
-            array() : $this->getPublishedDates($settings[2], $params, $request);
+            [] : $this->getPublishedDates($settings[2], $params, $request);
         if (!empty($pubDateRange)) {
             // Check if [Subject types] parameter has been supplied in searches.ini
             if (!isset($settings[3])) {
@@ -123,8 +119,6 @@ class OpenLibrarySubjectsDeferred extends OpenLibrarySubjects
     }
 
     /**
-     * process
-     *
      * Called after the Search Results object has performed its main search.  This
      * may be used to extract necessary information from the Search Results object
      * or to perform completely unrelated processing.

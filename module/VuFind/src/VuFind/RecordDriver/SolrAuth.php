@@ -17,34 +17,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 namespace VuFind\RecordDriver;
 
 /**
  * Model for Solr authority records.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 class SolrAuth extends SolrMarc
 {
-    /**
-     * Used for identifying database records
-     *
-     * @var string
-     */
-    protected $resourceSource = 'SolrAuth';
-
     /**
      * Get the short (pre-subtitle) title of the record.
      *
@@ -75,7 +68,7 @@ class SolrAuth extends SolrMarc
     {
         return isset($this->fields['see_also'])
             && is_array($this->fields['see_also'])
-            ? $this->fields['see_also'] : array();
+            ? $this->fields['see_also'] : [];
     }
 
     /**
@@ -87,7 +80,7 @@ class SolrAuth extends SolrMarc
     {
         return isset($this->fields['use_for'])
             && is_array($this->fields['use_for'])
-            ? $this->fields['use_for'] : array();
+            ? $this->fields['use_for'] : [];
     }
 
     /**
@@ -101,7 +94,7 @@ class SolrAuth extends SolrMarc
         if (!empty($lccn)) {
             return $lccn;
         }
-        $lccns = $this->getFieldArray('700', array('0'));
+        $lccns = $this->getFieldArray('700', ['0']);
         foreach ($lccns as $lccn) {
             if (substr($lccn, 0, '5') == '(DLC)') {
                 return substr($lccn, 5);

@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\Content\AuthorNotes;
 
 /**
  * Syndetics author notes content loader.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Content
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class Syndetics extends \VuFind\Content\AbstractSyndetics
 {
@@ -43,13 +43,13 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
      *
      * @var array
      */
-    protected $sourceList = array(
-        'ANOTES' => array(
+    protected $sourceList = [
+        'ANOTES' => [
             'title' => 'Author Notes',
             'file' => 'ANOTES.XML',
             'div' => '<div id="syn_anotes"></div>'
-        )
-    );
+        ]
+    ];
 
     /**
      * This method is responsible for connecting to Syndetics and abstracting
@@ -73,7 +73,7 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
     public function loadByIsbn($key, \VuFindCode\ISBN $isbnObj)
     {
         // Initialize return value
-        $anotes = array();
+        $anotes = [];
 
         // Find out if there are any notes
         $isbn = $this->getIsbn10($isbnObj);

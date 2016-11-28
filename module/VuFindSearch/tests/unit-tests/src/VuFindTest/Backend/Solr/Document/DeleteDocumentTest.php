@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Backend\Solr\Document;
 
 use VuFindSearch\Backend\Solr\Document\DeleteDocument;
@@ -36,11 +35,11 @@ use PHPUnit_Framework_TestCase;
 /**
  * Unit tests for SOLR delete document class.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class DeleteDocumentTest extends PHPUnit_Framework_TestCase
 {
@@ -69,7 +68,7 @@ class DeleteDocumentTest extends PHPUnit_Framework_TestCase
     public function testAsXMLMultiKey()
     {
         $document = new DeleteDocument();
-        $document->addKeys(array('foo', 'bar'));
+        $document->addKeys(['foo', 'bar']);
         $xml = $document->asXML();
         $this->assertXmlStringEqualsXmlString(
             '<delete><id>foo</id><id>bar</id></delete>',

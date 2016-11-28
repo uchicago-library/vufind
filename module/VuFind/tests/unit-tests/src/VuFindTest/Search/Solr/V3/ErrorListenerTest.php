@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
-
 namespace VuFindTest\Search\Solr\V3;
 
 use VuFind\Search\Solr\V3\ErrorListener;
@@ -43,11 +42,11 @@ use RuntimeException;
 /**
  * Unit tests for SOLR 3.x error listener.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class ErrorListenerTest extends TestCase
 {
@@ -62,7 +61,7 @@ class ErrorListenerTest extends TestCase
         $backend  = $this->getMockForAbstractClass('VuFindSearch\Backend\BackendInterface');
 
         $exception = HttpErrorException::createFromResponse($response);
-        $params    = array('backend_instance' => $backend);
+        $params    = ['backend_instance' => $backend];
         $event     = new Event(null, $exception, $params);
         $listener  = new ErrorListener($backend);
         $listener->onSearchError($event);
@@ -80,7 +79,7 @@ class ErrorListenerTest extends TestCase
         $backend  = $this->getMockForAbstractClass('VuFindSearch\Backend\BackendInterface');
 
         $exception = HttpErrorException::createFromResponse($response);
-        $params    = array('backend_instance' => $backend);
+        $params    = ['backend_instance' => $backend];
         $event     = new Event(null, $exception, $params);
         $listener  = new ErrorListener($backend);
         $listener->onSearchError($event);

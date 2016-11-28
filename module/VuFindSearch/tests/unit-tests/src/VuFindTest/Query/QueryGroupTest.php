@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Query;
 
 use VuFindSearch\Query\Query;
@@ -36,11 +35,11 @@ use PHPUnit_Framework_TestCase;
 /**
  * Unit tests for QueryGroup class.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class QueryGroupTest extends PHPUnit_Framework_TestCase
 {
@@ -123,7 +122,8 @@ class QueryGroupTest extends PHPUnit_Framework_TestCase
      * Test setting an invalid operator.
      *
      * @return void
-     * @expectedException VuFindSearch\Exception\InvalidArgumentException
+     *
+     * @expectedException        VuFindSearch\Exception\InvalidArgumentException
      * @expectedExceptionMessage Unknown or invalid boolean operator: fizz
      */
     public function testIllegalOperator()
@@ -142,6 +142,6 @@ class QueryGroupTest extends PHPUnit_Framework_TestCase
         $q1 = new Query('test');
         $q2 = new Query('query');
         $q3 = new Query('multi word query');
-        return new QueryGroup('OR', array($q1, $q2, $q3));
+        return new QueryGroup('OR', [$q1, $q2, $q3]);
     }
 }

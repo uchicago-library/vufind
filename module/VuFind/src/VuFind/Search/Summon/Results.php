@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search_Summon
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Search\Summon;
 
 /**
  * Summon Search Parameters
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search_Summon
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class Results extends \VuFind\Search\Base\Results
 {
@@ -103,11 +103,11 @@ class Results extends \VuFind\Search\Base\Results
         $dateFacets = $this->getParams()->getDateFacetSettings();
         if (!empty($dateFacets)) {
             foreach ($dateFacets as $dateFacet) {
-                $this->responseFacets[] = array(
+                $this->responseFacets[] = [
                     'fieldName' => $dateFacet,
                     'displayName' => $dateFacet,
-                    'counts' => array()
-                );
+                    'counts' => []
+                ];
             }
         }
 
@@ -135,7 +135,7 @@ class Results extends \VuFind\Search\Base\Results
         $order = array_flip(array_keys($filter));
 
         // Loop through the facets returned by Summon.
-        $facetResult = array();
+        $facetResult = [];
         if (is_array($this->responseFacets)) {
             foreach ($this->responseFacets as $current) {
                 // The "displayName" value is actually the name of the field on
@@ -161,7 +161,7 @@ class Results extends \VuFind\Search\Base\Results
         ksort($facetResult);
 
         // Rewrite the sorted array with appropriate keys:
-        $finalResult = array();
+        $finalResult = [];
         foreach ($facetResult as $current) {
             $finalResult[$current['displayName']] = $current;
         }
@@ -178,7 +178,7 @@ class Results extends \VuFind\Search\Base\Results
      */
     protected function stripFilterParameters($rawFilter)
     {
-        $filter = array();
+        $filter = [];
         foreach ($rawFilter as $key => $value) {
             $key = explode(',', $key);
             $key = trim($key[0]);
@@ -204,6 +204,10 @@ class Results extends \VuFind\Search\Base\Results
         $translate = in_array(
             $field, $this->getOptions()->getTranslatedFacets()
         );
+        if ($translate) {
+            $transTextDomain = $this->getOptions()
+                ->getTextDomainForTranslatedFacet($field);
+        }
 
         // Loop through all the facet values to see if any are applied.
         foreach ($current['counts'] as $facetIndex => $facetDetails) {
@@ -221,7 +225,7 @@ class Results extends \VuFind\Search\Base\Results
             // an active filter for the current field?
             $orField = '~' . $field;
             $itemsToCheck = isset($filterList[$field])
-                ? $filterList[$field] : array();
+                ? $filterList[$field] : [];
             if (isset($filterList[$orField])) {
                 $itemsToCheck += $filterList[$orField];
             }
@@ -236,7 +240,7 @@ class Results extends \VuFind\Search\Base\Results
 
             // Create display value:
             $current['counts'][$facetIndex]['displayText'] = $translate
-                ? $this->translate($facetDetails['value'])
+                ? $this->translate("$transTextDomain::{$facetDetails['value']}")
                 : $facetDetails['value'];
         }
 
@@ -257,12 +261,12 @@ class Results extends \VuFind\Search\Base\Results
      */
     protected function processSpelling($spelling)
     {
-        $this->suggestions = array();
+        $this->suggestions = [];
         foreach ($spelling as $current) {
             if (!isset($this->suggestions[$current['originalQuery']])) {
-                $this->suggestions[$current['originalQuery']] = array(
-                    'suggestions' => array()
-                );
+                $this->suggestions[$current['originalQuery']] = [
+                    'suggestions' => []
+                ];
             }
             $this->suggestions[$current['originalQuery']]['suggestions'][]
                 = $current['suggestedQuery'];
@@ -277,13 +281,13 @@ class Results extends \VuFind\Search\Base\Results
      */
     public function getSpellingSuggestions()
     {
-        $retVal = array();
+        $retVal = [];
         foreach ($this->getRawSuggestions() as $term => $details) {
             foreach ($details['suggestions'] as $word) {
                 // Strip escaped characters in the search term (for example, "\:")
                 $term = stripcslashes($term);
                 $word = stripcslashes($word);
-                $retVal[$term]['suggestions'][$word] = array('new_term' => $word);
+                $retVal[$term]['suggestions'][$word] = ['new_term' => $word];
             }
         }
         return $retVal;
@@ -317,5 +321,60 @@ class Results extends \VuFind\Search\Base\Results
     public function getTopicRecommendations()
     {
         return $this->topicRecommendations;
+    }
+
+    /**
+     * Get complete facet counts for several index fields
+     *
+     * @param array  $facetfields  name of the Solr fields to return facets for
+     * @param bool   $removeFilter Clear existing filters from selected fields (true)
+     * or retain them (false)?
+     * @param int    $limit        A limit for the number of facets returned, this
+     * may be useful for very large amounts of facets that can break the JSON parse
+     * method because of PHP out of memory exceptions (default = -1, no limit).
+     * @param string $facetSort    A facet sort value to use (null to retain current)
+     * @param int    $page         1 based. Offsets results by limit.
+     *
+     * @return array an array with the facet values for each index field
+     */
+    public function getPartialFieldFacets($facetfields, $removeFilter = true,
+        $limit = -1, $facetSort = null, $page = null
+    ) {
+        $params = $this->getParams();
+        $query  = $params->getQuery();
+        // No limit not implemented with Summon: cause page loop
+        if ($limit == -1) {
+            if ($page === null) {
+                $page = 1;
+            }
+            $limit = 50;
+        }
+        $params->resetFacetConfig();
+        foreach ($facetfields as $facet) {
+            $params->addFacet($facet . ',or,' . $page . ',' . $limit);
+        }
+        $params = $params->getBackendParameters();
+        $collection = $this->getSearchService()->search(
+            'Summon', $query, 0, 0, $params
+        );
+
+        $facets = $collection->getFacets();
+        $ret = [];
+        foreach ($facets as $data) {
+            if (in_array($data['displayName'], $facetfields)) {
+                $formatted = $this->formatFacetData($data);
+                $list = $formatted['counts'];
+                $ret[$data['displayName']] = [
+                    'data' => [
+                        'label' => $data['displayName'],
+                        'list' => $list,
+                    ],
+                    'more' => null
+                ];
+            }
+        }
+
+        // Send back data:
+        return $ret;
     }
 }

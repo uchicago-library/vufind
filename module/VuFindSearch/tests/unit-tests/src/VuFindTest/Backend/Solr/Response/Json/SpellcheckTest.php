@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Backend\Solr\Json\Response;
 
 use VuFindSearch\Backend\Solr\Response\Json\Spellcheck;
@@ -35,11 +34,11 @@ use PHPUnit_Framework_TestCase as TestCase;
 /**
  * Unit tests for spellcheck information.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class SpellcheckTest extends TestCase
 {
@@ -51,19 +50,19 @@ class SpellcheckTest extends TestCase
     public function testMerge()
     {
         $s1 = new Spellcheck(
-            array(
-                array('this is a phrase', array()),
-                array('foo', array()),
-                array('foobar', array())
-            ),
+            [
+                ['this is a phrase', []],
+                ['foo', []],
+                ['foobar', []]
+            ],
             'fake query'
         );
         $s2 = new Spellcheck(
-            array(
-                array('is a', array()),
-                array('bar', array()),
-                array('foo bar', array())
-            ),
+            [
+                ['is a', []],
+                ['bar', []],
+                ['foo bar', []]
+            ],
             'fake query'
         );
         $s1->mergeWith($s2);
@@ -78,9 +77,9 @@ class SpellcheckTest extends TestCase
      */
     public function testDoubleMerge()
     {
-        $s1 = new Spellcheck(array(array('a', array())), 'fake');
-        $s2 = new Spellcheck(array(array('b', array())), 'fake');
-        $s3 = new Spellcheck(array(array('c', array())), 'fake');
+        $s1 = new Spellcheck([['a', []]], 'fake');
+        $s2 = new Spellcheck([['b', []]], 'fake');
+        $s3 = new Spellcheck([['c', []]], 'fake');
         $s1->mergeWith($s2);
         $s1->mergeWith($s3);
         $this->assertCount(3, $s1);
@@ -95,8 +94,8 @@ class SpellcheckTest extends TestCase
      */
     public function testExactDuplication()
     {
-        $s1 = new Spellcheck(array(array('a', array())), 'fake');
-        $s2 = new Spellcheck(array(array('a', array())), 'fake');
+        $s1 = new Spellcheck([['a', []]], 'fake');
+        $s2 = new Spellcheck([['a', []]], 'fake');
         $s1->mergeWith($s2);
         $this->assertCount(1, $s1);
     }
@@ -108,7 +107,7 @@ class SpellcheckTest extends TestCase
      */
     public function testGetQuery()
     {
-        $s = new Spellcheck(array(), 'test');
+        $s = new Spellcheck([], 'test');
         $this->assertEquals('test', $s->getQuery());
     }
 }

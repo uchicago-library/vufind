@@ -17,36 +17,36 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Translator
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\I18n\Translator;
+use Zend\I18n\Translator\TranslatorInterface;
 
 /**
  * Lightweight translator aware marker interface (used as an alternative to
  * \Zend\I18n\Translator\TranslatorAwareInterface, which requires an excessive
- * number of methods to be implemented).  If we switch to PHP 5.4 traits in the
- * future, we can eliminate this interface in favor of the default Zend version.
+ * number of methods to be implemented).
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Translator
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 interface TranslatorAwareInterface
 {
     /**
      * Set a translator
      *
-     * @param \Zend\I18n\Translator\Translator $translator Translator
+     * @param TranslatorInterface $translator Translator
      *
      * @return TranslatorAwareInterface
      */
-    public function setTranslator(\Zend\I18n\Translator\Translator $translator);
+    public function setTranslator(TranslatorInterface $translator);
 }

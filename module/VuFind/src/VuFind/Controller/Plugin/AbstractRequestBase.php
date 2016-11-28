@@ -17,26 +17,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller_Plugins
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Controller\Plugin;
-use VuFind\ILS\Connection;
-use Zend\Mvc\Controller\Plugin\AbstractPlugin, Zend\Session\Container;
+use VuFind\Crypt\HMAC, VuFind\ILS\Connection;
+use Zend\Mvc\Controller\Plugin\AbstractPlugin, Zend\Session\Container,
+    Zend\Session\SessionManager;
 
 /**
  * Zend action helper base class to perform request-related actions
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller_Plugins
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 abstract class AbstractRequestBase extends AbstractPlugin
 {
@@ -48,20 +49,29 @@ abstract class AbstractRequestBase extends AbstractPlugin
     protected $session;
 
     /**
+     * Session manager
+     *
+     * @var SessionManager
+     */
+    protected $sessionManager;
+
+    /**
      * HMAC generator
      *
-     * @var \VuFind\Crypt\HMAC
+     * @var HMAC
      */
     protected $hmac;
 
     /**
      * Constructor
      *
-     * @param \VuFind\Crypt\HMAC $hmac HMAC generator
+     * @param HMAC           $hmac           HMAC generator
+     * @param SessionManager $sessionManager Session manager
      */
-    public function __construct(\VuFind\Crypt\HMAC $hmac)
+    public function __construct(HMAC $hmac, SessionManager $sessionManager)
     {
         $this->hmac = $hmac;
+        $this->sessionManager = $sessionManager;
     }
 
     /**
@@ -73,7 +83,9 @@ abstract class AbstractRequestBase extends AbstractPlugin
     protected function getSession()
     {
         if (!isset($this->session)) {
-            $this->session = new Container(get_class($this) . '_Helper');
+            $this->session = new Container(
+                get_class($this) . '_Helper', $this->sessionManager
+            );
         }
         return $this->session;
     }
@@ -86,7 +98,7 @@ abstract class AbstractRequestBase extends AbstractPlugin
      */
     public function resetValidation()
     {
-        $this->getSession()->validIds = array();
+        $this->getSession()->validIds = [];
     }
 
     /**
@@ -111,14 +123,14 @@ abstract class AbstractRequestBase extends AbstractPlugin
      *
      * @param array $linkData An array of keys to check
      *
-     * @return boolean|array
+     * @return bool|array
      */
     public function validateRequest($linkData)
     {
         $controller = $this->getController();
         $params = $controller->params();
 
-        $keyValueArray = array();
+        $keyValueArray = [];
         foreach ($linkData as $details) {
             // We expect most parameters to come via query, but some (mainly ID) may
             // be in the route:
@@ -137,7 +149,7 @@ abstract class AbstractRequestBase extends AbstractPlugin
         // FIRST and then override it with GET values in order to ensure that
         // the user doesn't bypass the hashkey verification by manipulating POST
         // values.
-        $gatheredDetails = $params->fromPost('gatheredDetails', array());
+        $gatheredDetails = $params->fromPost('gatheredDetails', []);
 
         // Make sure the bib ID is included, even if it's not loaded as part of
         // the validation loop below.
@@ -255,7 +267,7 @@ abstract class AbstractRequestBase extends AbstractPlugin
         // Load config:
         $dateArray = isset($checkHolds['defaultRequiredDate'])
              ? explode(":", $checkHolds['defaultRequiredDate'])
-             : array(0, 1, 0);
+             : [0, 1, 0];
 
         // Process special "driver" prefix and adjust default date
         // settings accordingly:
@@ -263,7 +275,7 @@ abstract class AbstractRequestBase extends AbstractPlugin
             $useDriver = true;
             array_shift($dateArray);
             if (count($dateArray) < 3) {
-                $dateArray = array(0, 1, 0);
+                $dateArray = [0, 1, 0];
             }
         } else {
             $useDriver = false;
@@ -272,7 +284,7 @@ abstract class AbstractRequestBase extends AbstractPlugin
         // If the driver setting is active, try it out:
         if ($useDriver && $catalog) {
             $check = $catalog->checkCapability(
-                'getHoldDefaultRequiredDate', array($patron, $holdInfo)
+                'getHoldDefaultRequiredDate', [$patron, $holdInfo]
             );
             if ($check) {
                 $result = $catalog->getHoldDefaultRequiredDate($patron, $holdInfo);
@@ -299,7 +311,7 @@ abstract class AbstractRequestBase extends AbstractPlugin
     {
         list($d, $m, $y) = $dateArray;
         return mktime(
-            0, 0, 0, date('m')+$m, date('d')+$d, date('Y')+$y
+            0, 0, 0, date('m') + $m, date('d') + $d, date('Y') + $y
         );
     }
 }

@@ -18,35 +18,31 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindSearch\Backend\Solr\Document;
 
 use VuFindSearch\Backend\Solr\Record\SerializableRecordInterface;
-use VuFindSearch\Response\RecordInterface;
-
 use SplObjectStorage;
 use XMLWriter;
 
 /**
  * SOLR update document class.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class UpdateDocument extends AbstractDocument
 {
-
     /**
      * Records and index attributes.
      *
@@ -92,7 +88,7 @@ class UpdateDocument extends AbstractDocument
                 $writer->writeAttribute($name, $value);
             }
             foreach ($record->getFields() as $name => $values) {
-                $values = is_array($values) ? $values : array($values);
+                $values = is_array($values) ? $values : [$values];
                 foreach ($values as $value) {
                     $writer->startElement('field');
                     $writer->writeAttribute('name', $name);
@@ -116,7 +112,7 @@ class UpdateDocument extends AbstractDocument
      * @return void
      */
     public function addRecord(SerializableRecordInterface $record,
-        array $indexAttr = array()
+        array $indexAttr = []
     ) {
         $this->records->attach($record, $indexAttr);
     }

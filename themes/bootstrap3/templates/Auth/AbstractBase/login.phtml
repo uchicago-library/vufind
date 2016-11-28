@@ -1,9 +1,10 @@
 <? $account = $this->auth()->getManager(); ?>
 <? $sessionInitiator = $account->getSessionInitiator($this->serverUrl($this->url('myresearch-home'))); ?>
 <? if (!$sessionInitiator): // display default login form if no login URL provided ?>
-  <form method="post" class="form-horizontal" action="<?=$this->url('myresearch-home')?>" name="loginForm" id="loginForm">
+  <form method="post" class="form-horizontal" action="<?=$this->url('myresearch-home')?>" name="loginForm">
     <?=$this->auth()->getLoginFields()?>
     <input type="hidden" name="auth_method" value="<?=$account->getAuthMethod()?>">
+    <input type="hidden" name="csrf" value="<?=$this->escapeHtmlAttr($account->getCsrfHash(true))?>" />
     <div class="form-group">
       <div class="col-sm-offset-3 col-sm-9">
         <? if ($account->supportsCreation()): ?>
@@ -18,5 +19,5 @@
     </div>
   </form>
 <? else: ?>
-  <a href="<?=$this->escapeHtmlAttr($sessionInitiator)?>"><?=$this->transEsc("Institutional Login")?></a>
+  <a href="<?=$this->escapeHtmlAttr($sessionInitiator)?>" class="btn btn-link" data-lightbox-ignore><?=$this->transEsc("Institutional Login")?></a>
 <? endif; ?>

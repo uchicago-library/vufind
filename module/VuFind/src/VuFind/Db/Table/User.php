@@ -17,38 +17,76 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Table
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Db\Table;
+use Zend\Config\Config, Zend\Session\Container;
 
 /**
  * Table Definition for user
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Table
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class User extends Gateway
 {
     /**
-     * Constructor
+     * VuFind configuration
+     *
+     * @var Config
      */
-    public function __construct()
-    {
-        parent::__construct('user', 'VuFind\Db\Row\User');
+    protected $config;
+
+    /**
+     * Session container
+     *
+     * @var Container
+     */
+    protected $session;
+
+    /**
+     * Constructor
+     *
+     * @param Config    $config   VuFind configuration
+     * @param string    $rowClass Name of class for representing rows
+     * @param Container $session  Session container to inject into rows (optional;
+     * used for privacy mode)
+     */
+    public function __construct(Config $config, $rowClass = 'VuFind\Db\Row\User',
+        Container $session = null
+    ) {
+        parent::__construct('user', $rowClass);
+        $this->config = $config;
+        $this->session = $session;
     }
 
     /**
-     * Retrieve a user object from the database based on username; create a new
-     * row if no existing match is found.
+     * Create a row for the specified username.
+     *
+     * @param string $username Username to use for retrieval.
+     *
+     * @return UserRow
+     */
+    public function createRowForUsername($username)
+    {
+        $row = $this->createRow();
+        $row->username = $username;
+        $row->created = date('Y-m-d H:i:s');
+        return $row;
+    }
+
+    /**
+     * Retrieve a user object from the database based on username; when requested,
+     * create a new row if no existing match is found.
      *
      * @param string $username Username to use for retrieval.
      * @param bool   $create   Should we create users that don't already exist?
@@ -57,13 +95,9 @@ class User extends Gateway
      */
     public function getByUsername($username, $create = true)
     {
-        $row = $this->select(array('username' => $username))->current();
-        if ($create && empty($row)) {
-            $row = $this->createRow();
-            $row->username = $username;
-            $row->created = date('Y-m-d H:i:s');
-        }
-        return $row;
+        $row = $this->select(['username' => $username])->current();
+        return ($create && empty($row))
+            ? $this->createRowForUsername($username) : $row;
     }
 
     /**
@@ -75,7 +109,7 @@ class User extends Gateway
      */
     public function getByEmail($email)
     {
-        $row = $this->select(array('email' => $email))->current();
+        $row = $this->select(['email' => $email])->current();
         return $row;
     }
 
@@ -95,6 +129,21 @@ class User extends Gateway
     }
 
     /**
+     * Construct the prototype for rows.
+     *
+     * @return object
+     */
+    protected function initializeRowPrototype()
+    {
+        $prototype = parent::initializeRowPrototype();
+        $prototype->setConfig($this->config);
+        if (null !== $this->session && is_callable([$prototype, 'setSession'])) {
+            $prototype->setSession($this->session);
+        }
+        return $prototype;
+    }
+
+    /**
      * Return a row by a verification hash
      *
      * @param string $hash User-unique hash string
@@ -103,7 +152,7 @@ class User extends Gateway
      */
     public function getByVerifyHash($hash)
     {
-        $row = $this->select(array('verify_hash' => $hash))->current();
+        $row = $this->select(['verify_hash' => $hash])->current();
         return $row;
     }
 }

@@ -17,16 +17,15 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 namespace VuFind\Recommend;
-use VuFind\I18n\Translator\TranslatorAwareInterface;
 
 /**
  * AuthorInfo Recommendations Module
@@ -34,23 +33,16 @@ use VuFind\I18n\Translator\TranslatorAwareInterface;
  * This class gathers information from the Wikipedia API and publishes the results
  * to a module at the top of an author's results page
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Lutz Biedinger <lutz.biedinger@gmail.com>
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  * @view     AuthorInfoFacets.phtml
  */
-class ResultGoogleMapAjax implements RecommendInterface, TranslatorAwareInterface
+class ResultGoogleMapAjax implements RecommendInterface
 {
-    /**
-     * Translator (or null if unavailable)
-     *
-     * @var \Zend\I18n\Translator\Translator
-     */
-    protected $translator = null;
-
     /**
      * Saved search results
      *
@@ -59,8 +51,23 @@ class ResultGoogleMapAjax implements RecommendInterface, TranslatorAwareInterfac
     protected $searchObject;
 
     /**
-     * setConfig
+     * Google Maps API key.
      *
+     * @var string
+     */
+    protected $googleMapApiKey;
+
+    /**
+     * Constructor
+     *
+     * @param string $key API key
+     */
+    public function __construct($key)
+    {
+        $this->googleMapApiKey = $key;
+    }
+
+    /**
      * Store the configuration of the recommendation module.
      *
      * @param string $settings Settings from searches.ini.
@@ -73,8 +80,6 @@ class ResultGoogleMapAjax implements RecommendInterface, TranslatorAwareInterfac
     }
 
     /**
-     * init
-     *
      * Called at the end of the Search Params objects' initFromRequest() method.
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may
@@ -92,8 +97,6 @@ class ResultGoogleMapAjax implements RecommendInterface, TranslatorAwareInterfac
     }
 
     /**
-     * process
-     *
      * Called after the Search Results object has performed its main search.  This
      * may be used to extract necessary information from the Search Results object
      * or to perform completely unrelated processing.
@@ -108,41 +111,17 @@ class ResultGoogleMapAjax implements RecommendInterface, TranslatorAwareInterfac
     }
 
     /**
-     * Set a translator
+     * Get the Google Maps API key.
      *
-     * @param \Zend\I18n\Translator\Translator $translator Translator
-     *
-     * @return ResultGoogleMapAjax
+     * @return string
      */
-    public function setTranslator(\Zend\I18n\Translator\Translator $translator)
+    public function getGoogleMapApiKey()
     {
-        $this->translator = $translator;
-        return $this;
+        return $this->googleMapApiKey;
     }
 
     /**
-     * Get translator object.
-     *
-     * @return \Zend\I18n\Translator\Translator
-     */
-    public function getTranslator()
-    {
-        return $this->translator;
-    }
-
-    /**
-     * getUserLang
-     *
-     * @return string of lang
-     */
-    public function userLang()
-    {
-        $translator = $this->getTranslator();
-        return is_object($translator) ? $translator->getLocale() : 'en';
-    }
-
-    /**
-     * getSearchParams
+     * Get search parameters
      *
      * @return string of params
      */

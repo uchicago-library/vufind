@@ -18,17 +18,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindSearch\Backend\Primo;
 
 use VuFindSearch\Query\AbstractQuery;
@@ -40,13 +39,13 @@ use VuFindSearch\ParamBag;
 /**
  * Primo Central QueryBuilder.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class QueryBuilder
 {
@@ -95,7 +94,7 @@ class QueryBuilder
     protected function queryGroupToArray(QueryGroup $query)
     {
         $nextLevel = $query->getQueries();
-        $parts = array();
+        $parts = [];
         foreach ($nextLevel[0]->getQueries() as $q) {
             $index = $q->getHandler();
             $op = $q->getOperator();
@@ -117,6 +116,6 @@ class QueryBuilder
         // Clean and validate input:
         $index = $query->getHandler();
         $lookfor = $query->getString();
-        return array(compact('index', 'lookfor'));
+        return [compact('index', 'lookfor')];
     }
 }

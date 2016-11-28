@@ -18,17 +18,16 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindSearch\Backend\WorldCat;
 
 use VuFindSearch\Query\AbstractQuery;
@@ -40,13 +39,13 @@ use VuFindSearch\ParamBag;
 /**
  * WorldCat QueryBuilder.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Andrew S. Nagy <vufind-tech@lists.sourceforge.net>
  * @author   David Maus <maus@hab.de>
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class QueryBuilder
 {
@@ -119,12 +118,12 @@ class QueryBuilder
      */
     protected function queryGroupToString(QueryGroup $query)
     {
-        $groups = $excludes = array();
+        $groups = $excludes = [];
 
         foreach ($query->getQueries() as $params) {
             // Advanced Search
             if ($params instanceof QueryGroup) {
-                $thisGroup = array();
+                $thisGroup = [];
                 // Process each search group
                 foreach ($params->getQueries() as $group) {
                     // Build this group individually as a basic search
@@ -135,7 +134,7 @@ class QueryBuilder
                     $excludes[] = join(" OR ", $thisGroup);
                 } else {
                     $groups[]
-                        = join(" ".$params->getOperator()." ", $thisGroup);
+                        = join(" " . $params->getOperator() . " ", $thisGroup);
                 }
             } else {
                 // Basic Search
@@ -177,7 +176,7 @@ class QueryBuilder
         // The index may contain multiple parts -- we want to search all listed index
         // fields:
         $index = explode(':', $index);
-        $clauses = array();
+        $clauses = [];
         foreach ($index as $currentIndex) {
             $clauses[] = "{$currentIndex} all \"{$lookfor}\"";
         }

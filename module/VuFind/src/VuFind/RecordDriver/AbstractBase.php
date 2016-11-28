@@ -17,33 +17,39 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\RecordDriver;
 use VuFind\Exception\LoginRequired as LoginRequiredException,
     VuFind\XSLT\Import\VuFind as ArticleStripper;
+use VuFind\Record\Cache;
 
 /**
  * Abstract base record model.
  *
  * This abstract class defines the basic methods for modeling a record in VuFind.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordDrivers
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     \VuFind\I18n\Translator\TranslatorAwareInterface,
-    \VuFindSearch\Response\RecordInterface
+    \VuFindSearch\Response\RecordInterface,
+    \VuFind\Record\Cache\RecordCacheAwareInterface
 {
+    use \VuFind\Db\Table\DbTableAwareTrait;
+    use \VuFind\I18n\Translator\TranslatorAwareTrait;
+    use \VuFind\Record\Cache\RecordCacheAwareTrait;
+
     /**
      * Used for identifying search backends
      *
@@ -56,7 +62,7 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      *
      * @var array
      */
-    protected $extraDetails = array();
+    protected $extraDetails = [];
 
     /**
      * Main VuFind configuration
@@ -77,21 +83,7 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      *
      * @var array
      */
-    protected $fields = array();
-
-    /**
-     * Database table plugin manager
-     *
-     * @var \VuFind\Db\Table\PluginManager
-     */
-    protected $tableManager;
-
-    /**
-     * Translator (or null if unavailable)
-     *
-     * @var \Zend\I18n\Translator\Translator
-     */
-    protected $translator = null;
+    protected $fields = [];
 
     /**
      * Constructor
@@ -158,7 +150,7 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         $table = $this->getDbTable('Comments');
         return $table->getForResource(
-            $this->getUniqueId(), $this->getResourceSource()
+            $this->getUniqueId(), $this->getSourceIdentifier()
         );
     }
 
@@ -170,7 +162,7 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     public function getSortTitle()
     {
         // Child classes should override this with smarter behavior, and the "strip
-        // articles" logic probably belongs in a more appropriate place, but for now,
+        // articles" logic probably belongs in a more appropriate place, but for now
         // in the absence of a better plan, we'll just use the XSLT Importer's strip
         // articles functionality.
         return ArticleStripper::stripArticles($this->getBreadcrumb());
@@ -182,15 +174,18 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      * @param int    $list_id ID of list to load tags from (null for all lists)
      * @param int    $user_id ID of user to load tags from (null for all users)
      * @param string $sort    Sort type ('count' or 'tag')
+     * @param int    $ownerId ID of user to check for ownership
      *
      * @return array
      */
-    public function getTags($list_id = null, $user_id = null, $sort = 'count')
-    {
+    public function getTags($list_id = null, $user_id = null, $sort = 'count',
+        $ownerId = null
+    ) {
         $tags = $this->getDbTable('Tags');
         return $tags->getForResource(
-            $this->getUniqueId(), $this->getResourceSource(), 0, $list_id, $user_id,
-            $sort
+            $this->getUniqueId(),
+            $this->getSourceIdentifier(),
+            0, $list_id, $user_id, $sort, $ownerId
         );
     }
 
@@ -206,10 +201,29 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         $resources = $this->getDbTable('Resource');
         $resource = $resources->findResource(
-            $this->getUniqueId(), $this->getResourceSource()
+            $this->getUniqueId(), $this->getSourceIdentifier()
         );
         foreach ($tags as $tag) {
             $resource->addTag($tag, $user);
+        }
+    }
+
+    /**
+     * Remove tags from the record.
+     *
+     * @param \VuFind\Db\Row\User $user The user posting the tag
+     * @param array               $tags The user-provided tags
+     *
+     * @return void
+     */
+    public function deleteTags($user, $tags)
+    {
+        $resources = $this->getDbTable('Resource');
+        $resource = $resources->findResource(
+            $this->getUniqueId(), $this->getSourceIdentifier()
+        );
+        foreach ($tags as $tag) {
+            $resource->deleteTag($tag, $user);
         }
     }
 
@@ -224,7 +238,7 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      *  </ul>
      * @param \VuFind\Db\Row\User $user   The user saving the record
      *
-     * @return void
+     * @return array list information
      */
     public function saveToFavorites($params, $user)
     {
@@ -242,21 +256,35 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
             $list->save($user);
         } else {
             $list = $table->getExisting($listId);
+            // Validate incoming list ID:
+            if (!$list->editAllowed($user)) {
+                throw new \VuFind\Exception\ListPermission('Access denied.');
+            }
             $list->rememberLastUsed(); // handled by save() in other case
         }
 
         // Get or create a resource object as needed:
         $resourceTable = $this->getDbTable('Resource');
         $resource = $resourceTable->findResource(
-            $this->getUniqueId(), $this->getResourceSource(), true, $this
+            $this->getUniqueId(), $this->getSourceIdentifier(), true, $this
         );
+
+        // Persist record in the database for "offline" use
+        if ($recordCache = $this->getRecordCache()) {
+            $recordCache->setContext(Cache::CONTEXT_FAVORITE);
+            $recordCache->createOrUpdate(
+                $resource->record_id, $resource->source,
+                $this->getRawData()
+            );
+        }
 
         // Add the information to the user's account:
         $user->saveResource(
             $resource, $list,
-            isset($params['mytags']) ? $params['mytags'] : array(),
+            isset($params['mytags']) ? $params['mytags'] : [],
             isset($params['notes']) ? $params['notes'] : ''
         );
+        return ['listId' => $list->id];
     }
 
     /**
@@ -271,9 +299,9 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         $db = $this->getDbTable('UserResource');
         $data = $db->getSavedData(
-            $this->getUniqueId(), $this->getResourceSource(), $list_id, $user_id
+            $this->getUniqueId(), $this->getSourceIdentifier(), $list_id, $user_id
         );
-        $notes = array();
+        $notes = [];
         foreach ($data as $current) {
             if (!empty($current->notes)) {
                 $notes[] = $current->notes;
@@ -293,7 +321,7 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         $table = $this->getDbTable('UserList');
         return $table->getListsContainingResource(
-            $this->getUniqueId(), $this->getResourceSource(), $user_id
+            $this->getUniqueId(), $this->getSourceIdentifier(), $user_id
         );
     }
 
@@ -301,13 +329,12 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      * Get the source value used to identify resources of this type in the database.
      *
      * @return string
+     *
+     * @deprecated Obsolete as of VuFind 3.0; use getSourceIdentifier() instead.
      */
     public function getResourceSource()
     {
-        // Normally resource source is the same as source identifier, but for legacy
-        // reasons we need to call Solr 'VuFind' instead.  TODO: clean this up.
-        $id = $this->getSourceIdentifier();
-        return $id == 'Solr' ? 'VuFind' : $id;
+        return $this->getSourceIdentifier();
     }
 
     /**
@@ -319,8 +346,7 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      */
     public function setSourceIdentifier($identifier)
     {
-        // Normalize "VuFind" identifier to "Solr" (see above).  TODO: clean this up.
-        $this->sourceIdentifier = $identifier == 'VuFind' ? 'Solr' : $identifier;
+        $this->sourceIdentifier = $identifier;
     }
 
     /**
@@ -350,9 +376,9 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     {
         if (is_null($types)) {
             $types = isset($this->recordConfig->Record->related) ?
-                $this->recordConfig->Record->related : array();
+                $this->recordConfig->Record->related : [];
         }
-        $retVal = array();
+        $retVal = [];
         foreach ($types as $current) {
             $parts = explode(':', $current);
             $type = $parts[0];
@@ -369,43 +395,6 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     }
 
     /**
-     * Does the OpenURL configuration indicate that we should display OpenURLs in
-     * the specified context?
-     *
-     * @param string $area 'results', 'record' or 'holdings'
-     *
-     * @return bool
-     */
-    public function openURLActive($area)
-    {
-        // Doesn't matter the target area if no OpenURL resolver is specified:
-        if (!isset($this->mainConfig->OpenURL->url)) {
-            return false;
-        }
-
-        // If a setting exists, return that:
-        $key = 'show_in_' . $area;
-        if (isset($this->mainConfig->OpenURL->$key)) {
-            return $this->mainConfig->OpenURL->$key;
-        }
-
-        // If we got this far, use the defaults -- true for results, false for
-        // everywhere else.
-        return ($area == 'results');
-    }
-
-    /**
-     * Should we display regular URLs when an OpenURL is present?
-     *
-     * @return bool
-     */
-    public function replaceURLsWithOpenURL()
-    {
-        return isset($this->mainConfig->OpenURL->replace_other_urls)
-            ? $this->mainConfig->OpenURL->replace_other_urls : false;
-    }
-
-    /**
      * Returns true if the record supports real-time AJAX status lookups.
      *
      * @return bool
@@ -413,6 +402,26 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
     public function supportsAjaxStatus()
     {
         return false;
+    }
+
+    /**
+     * Checks the current record if it's supported for generating OpenURLs.
+     *
+     * @return bool
+     */
+    public function supportsOpenUrl()
+    {
+        return true;
+    }
+
+    /**
+     * Checks the current record if it's supported for generating COinS-OpenURLs.
+     *
+     * @return bool
+     */
+    public function supportsCoinsOpenUrl()
+    {
+        return true;
     }
 
     /**
@@ -447,7 +456,7 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
         if ($this->mainConfig->Record->citation_formats === false
             || $this->mainConfig->Record->citation_formats === 'false'
         ) {
-            return array();
+            return [];
         }
 
         // Whitelist:
@@ -466,7 +475,7 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      */
     protected function getSupportedCitationFormats()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -491,74 +500,10 @@ abstract class AbstractBase implements \VuFind\Db\Table\DbTableAwareInterface,
      *
      * @return mixed
      */
-    public function tryMethod($method, $params = array())
+    public function tryMethod($method, $params = [])
     {
-        return is_callable(array($this, $method))
-            ? call_user_func_array(array($this, $method), $params)
+        return is_callable([$this, $method])
+            ? call_user_func_array([$this, $method], $params)
             : null;
-    }
-
-    /**
-     * Get a database table object.
-     *
-     * @param string $table Table to load.
-     *
-     * @return \VuFind\Db\Table\User
-     */
-    public function getDbTable($table)
-    {
-        return $this->getDbTableManager()->get($table);
-    }
-
-    /**
-     * Get the table plugin manager.  Throw an exception if it is missing.
-     *
-     * @throws \Exception
-     * @return \VuFind\Db\Table\PluginManager
-     */
-    public function getDbTableManager()
-    {
-        if (null === $this->tableManager) {
-            throw new \Exception('DB table manager missing.');
-        }
-        return $this->tableManager;
-    }
-
-    /**
-     * Set the table plugin manager.
-     *
-     * @param \VuFind\Db\Table\PluginManager $manager Plugin manager
-     *
-     * @return void
-     */
-    public function setDbTableManager(\VuFind\Db\Table\PluginManager $manager)
-    {
-        $this->tableManager = $manager;
-    }
-
-    /**
-     * Set a translator
-     *
-     * @param \Zend\I18n\Translator\Translator $translator Translator
-     *
-     * @return AbstractBase
-     */
-    public function setTranslator(\Zend\I18n\Translator\Translator $translator)
-    {
-        $this->translator = $translator;
-        return $this;
-    }
-
-    /**
-     * Translate a string if a translator is available.
-     *
-     * @param string $msg Message to translate
-     *
-     * @return string
-     */
-    public function translate($msg)
-    {
-        return null !== $this->translator
-            ? $this->translator->translate($msg) : $msg;
     }
 }

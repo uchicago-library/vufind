@@ -17,26 +17,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Search\Solr;
 
-use Zend\Mvc\Controller\AbstractActionController;
+use VuFind\I18n\TranslatableString;
+use VuFind\Search\UrlQueryHelper;
 
 /**
  * Functions for manipulating facets
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Ere Maijala <ere.maijala@helsinki.fi>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class HierarchicalFacetHelper
 {
@@ -44,8 +45,8 @@ class HierarchicalFacetHelper
      * Helper method for building hierarchical facets:
      * Sort a facet list according to the given sort order
      *
-     * @param array &$facetList Facet list returned from Solr
-     * @param bool  $topLevel   Whether to sort only top level
+     * @param array $facetList Facet list returned from Solr
+     * @param bool  $topLevel  Whether to sort only top level
      *
      * @return void
      */
@@ -91,22 +92,19 @@ class HierarchicalFacetHelper
      * @see http://blog.tekerson.com/2009/03/03/
      * converting-a-flat-array-with-parent-ids-to-a-nested-tree/
      * Based on this example
-     *
      */
     public function buildFacetArray($facet, $facetList, $urlHelper = false)
     {
-        // getParamArray() is expensive, so call it just once and pass it on
-        $paramArray = $urlHelper !== false ? $urlHelper->getParamArray() : null;
         // Create a keyed (for conversion to hierarchical) array of facet data
-        $keyedList = array();
+        $keyedList = [];
         foreach ($facetList as $item) {
             $keyedList[$item['value']] = $this->createFacetItem(
-                $facet, $item, $urlHelper, $paramArray
+                $facet, $item, $urlHelper
             );
         }
 
         // Convert the keyed array to a hierarchical array
-        $result = array();
+        $result = [];
         foreach ($keyedList as &$item) {
             if ($item['level'] > 0) {
                 $keyedList[$item['parent']]['children'][] = &$item;
@@ -130,11 +128,11 @@ class HierarchicalFacetHelper
      */
     public function flattenFacetHierarchy($facetList)
     {
-        $results = array();
+        $results = [];
         foreach ($facetList as $facetItem) {
             $children = !empty($facetItem['children'])
                 ? $facetItem['children']
-                : array();
+                : [];
             unset($facetItem['children']);
             $results[] = $facetItem;
             if ($children) {
@@ -154,36 +152,35 @@ class HierarchicalFacetHelper
      * the current one
      * @param string $separator   Separator string displayed between levels
      *
-     * @return string Formatted text
+     * @return TranslatableString Formatted text
      */
     public function formatDisplayText(
         $displayText, $allLevels = false, $separator = '/'
     ) {
+        $originalText = $displayText;
         $parts = explode('/', $displayText);
         if (count($parts) > 1 && is_numeric($parts[0])) {
             if (!$allLevels && isset($parts[$parts[0] + 1])) {
-                return $parts[$parts[0] + 1];
+                $displayText = $parts[$parts[0] + 1];
+            } else {
+                array_shift($parts);
+                array_pop($parts);
+                $displayText = implode($separator, $parts);
             }
-            array_shift($parts);
-            array_pop($parts);
-            return implode($separator, $parts);
         }
-        return $displayText;
+        return new TranslatableString($originalText, $displayText);
     }
 
     /**
      * Create an item for the hierarchical facet array
      *
-     * @param string         $facet      Facet name
-     * @param array          $item       Facet item received from Solr
-     * @param UrlQueryHelper $urlHelper  UrlQueryHelper for creating facet
-     * url's
-     * @param array          $paramArray URL parameters
-     * active children
+     * @param string         $facet     Facet name
+     * @param array          $item      Facet item received from Solr
+     * @param UrlQueryHelper $urlHelper UrlQueryHelper for creating facet URLs
      *
      * @return array Facet item
      */
-    protected function createFacetItem($facet, $item, $urlHelper, $paramArray)
+    protected function createFacetItem($facet, $item, $urlHelper)
     {
         $href = '';
         $exclude = '';
@@ -191,22 +188,22 @@ class HierarchicalFacetHelper
         if ($urlHelper !== false) {
             if ($item['isApplied']) {
                 $href = $urlHelper->removeFacet(
-                    $facet, $item['value'], true, $item['operator'], $paramArray
-                );
+                    $facet, $item['value'], true, $item['operator']
+                )->getParams();
             } else {
                 $href = $urlHelper->addFacet(
-                    $facet, $item['value'], $item['operator'], $paramArray
-                );
+                    $facet, $item['value'], $item['operator']
+                )->getParams();
             }
-            $exclude = $urlHelper->addFacet(
-                $facet, $item['value'], 'NOT', $paramArray
-            );
+            $exclude = $urlHelper->addFacet($facet, $item['value'], 'NOT')
+                ->getParams();
         }
 
         $displayText = $item['displayText'];
         if ($displayText == $item['value']) {
             // Only show the current level part
-            $displayText = $this->formatDisplayText($displayText);
+            $displayText = $this->formatDisplayText($displayText)
+                ->getDisplayString();
         }
 
         list($level, $value) = explode('/', $item['value'], 2);
@@ -232,7 +229,7 @@ class HierarchicalFacetHelper
         $item['hasAppliedChildren'] = false;
         $item['href'] = $href;
         $item['exclude'] = $exclude;
-        $item['children'] = array();
+        $item['children'] = [];
 
         return $item;
     }
@@ -242,7 +239,7 @@ class HierarchicalFacetHelper
      *
      * @param array $list Facet list
      *
-     * @return boolean Whether any items are applied (for recursive calls)
+     * @return bool Whether any items are applied (for recursive calls)
      */
     protected function updateAppliedChildrenStatus($list)
     {
@@ -250,7 +247,7 @@ class HierarchicalFacetHelper
         foreach ($list as &$item) {
             $item['hasAppliedChildren'] = !empty($item['children'])
                 && $this->updateAppliedChildrenStatus($item['children']);
-            if ($item['isApplied']) {
+            if ($item['isApplied'] || $item['hasAppliedChildren']) {
                 $result = true;
             }
         }

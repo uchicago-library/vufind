@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindSearch\Backend\Solr;
 
@@ -50,11 +50,11 @@ use VuFindSearch\Exception\InvalidArgumentException;
 /**
  * SOLR backend.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class Backend extends AbstractBackend
     implements SimilarInterface, RetrieveBatchInterface, RandomInterface
@@ -74,6 +74,13 @@ class Backend extends AbstractBackend
     protected $queryBuilder = null;
 
     /**
+     * Similar records query builder.
+     *
+     * @var SimilarBuilder
+     */
+    protected $similarBuilder = null;
+
+    /**
      * Constructor.
      *
      * @param Connector $connector SOLR connector
@@ -90,8 +97,8 @@ class Backend extends AbstractBackend
      * Perform a search and return record collection.
      *
      * @param AbstractQuery $query  Search query
-     * @param integer       $offset Search offset
-     * @param integer       $limit  Search limit
+     * @param int           $offset Search offset
+     * @param int           $limit  Search limit
      * @param ParamBag      $params Search backend parameters
      *
      * @return RecordCollectionInterface
@@ -116,7 +123,7 @@ class Backend extends AbstractBackend
      * Get Random records
      *
      * @param AbstractQuery $query  Search query
-     * @param integer       $limit  Search limit
+     * @param int           $limit  Search limit
      * @param ParamBag      $params Search backend parameters
      *
      * @return RecordCollectionInterface
@@ -163,6 +170,8 @@ class Backend extends AbstractBackend
      */
     public function retrieveBatch($ids, ParamBag $params = null)
     {
+        $params = $params ?: new ParamBag();
+
         // Load 100 records at a time; this is a good number to avoid memory
         // problems while still covering a lot of ground.
         $pageSize = 100;
@@ -175,15 +184,11 @@ class Backend extends AbstractBackend
         // Retrieve records a page at a time:
         $results = false;
         while (count($ids) > 0) {
-            $currentPage = array_splice($ids, 0, $pageSize, array());
+            $currentPage = array_splice($ids, 0, $pageSize, []);
             $currentPage = array_map($formatIds, $currentPage);
-            $params = new ParamBag(
-                array(
-                    'q' => 'id:(' . implode(' OR ', $currentPage) . ')',
-                    'start' => 0,
-                    'rows' => $pageSize
-                )
-            );
+            $params->set('q', 'id:(' . implode(' OR ', $currentPage) . ')');
+            $params->set('start', 0);
+            $params->set('rows', $pageSize);
             $this->injectResponseWriter($params);
             $next = $this->createRecordCollection(
                 $this->connector->search($params)
@@ -213,6 +218,7 @@ class Backend extends AbstractBackend
         $params = $params ?: new ParamBag();
         $this->injectResponseWriter($params);
 
+        $params->mergeWith($this->getSimilarBuilder()->build($id, $params));
         $response   = $this->connector->similar($id, $params);
         $collection = $this->createRecordCollection($response);
         $this->injectSourceIdentifier($collection);
@@ -307,6 +313,33 @@ class Backend extends AbstractBackend
     }
 
     /**
+     * Set the similar records query builder.
+     *
+     * @param SimilarBuilder $similarBuilder Similar builder
+     *
+     * @return void
+     */
+    public function setSimilarBuilder(SimilarBuilder $similarBuilder)
+    {
+        $this->similarBuilder = $similarBuilder;
+    }
+
+    /**
+     * Return similar records query builder.
+     *
+     * Lazy loads an empty default SimilarBuilder if none was set.
+     *
+     * @return SimilarBuilder
+     */
+    public function getSimilarBuilder()
+    {
+        if (!$this->similarBuilder) {
+            $this->similarBuilder = new SimilarBuilder();
+        }
+        return $this->similarBuilder;
+    }
+
+    /**
      * Return the record collection factory.
      *
      * Lazy loads a generic collection factory.
@@ -366,7 +399,7 @@ class Backend extends AbstractBackend
         }
         $qtime = isset($response['responseHeader']['QTime'])
             ? $response['responseHeader']['QTime'] : 'n/a';
-        $this->log('debug', 'Deserialized SOLR response', array('qtime' => $qtime));
+        $this->log('debug', 'Deserialized SOLR response', ['qtime' => $qtime]);
         return $response;
     }
 
@@ -386,7 +419,7 @@ class Backend extends AbstractBackend
         ) {
             throw new RemoteErrorException(
                 "Alphabetic Browse index missing.  See " .
-                "http://vufind.org/wiki/alphabetical_heading_browse for " .
+                "https://vufind.org/wiki/indexing:alphabetical_heading_browse for " .
                 "details on generating the index.",
                 $e->getCode(), $e->getResponse(), $e->getPrevious()
             );
@@ -406,7 +439,7 @@ class Backend extends AbstractBackend
      */
     protected function injectResponseWriter(ParamBag $params)
     {
-        if (array_diff($params->get('wt') ?: array(), array('json'))) {
+        if (array_diff($params->get('wt') ?: [], ['json'])) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Invalid response writer type: %s',
@@ -414,7 +447,7 @@ class Backend extends AbstractBackend
                 )
             );
         }
-        if (array_diff($params->get('json.nl') ?: array(), array('arrarr'))) {
+        if (array_diff($params->get('json.nl') ?: [], ['arrarr'])) {
             throw new InvalidArgumentException(
                 sprintf(
                     'Invalid named list implementation type: %s',
@@ -422,7 +455,7 @@ class Backend extends AbstractBackend
                 )
             );
         }
-        $params->set('wt', array('json'));
-        $params->set('json.nl', array('arrarr'));
+        $params->set('wt', ['json']);
+        $params->set('json.nl', ['arrarr']);
     }
 }

@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Theme
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFindTheme;
 
 /**
  * Class to represent currently-selected theme and related information.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Theme
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class ThemeInfo
 {
@@ -146,7 +146,7 @@ class ThemeInfo
         // Fill in the theme info cache if it is not already populated:
         if (null === $this->allThemeInfo) {
             // Build an array of theme information by inheriting up the theme tree:
-            $this->allThemeInfo = array();
+            $this->allThemeInfo = [];
             $currentTheme = $this->getTheme();
             do {
                 $this->allThemeInfo[$currentTheme]
@@ -174,7 +174,7 @@ class ThemeInfo
     {
         $basePath = $this->getBaseDir();
         $allPaths = is_array($relativePath)
-            ? $relativePath : array($relativePath);
+            ? $relativePath : [$relativePath];
 
         $currentTheme = $this->getTheme();
         $allThemeInfo = $this->getThemeInfo();
@@ -186,7 +186,7 @@ class ThemeInfo
                     if (true === $returnType) {
                         return $file;
                     } else if (self::RETURN_ALL_DETAILS === $returnType) {
-                        return array('path' => $file, 'theme' => $currentTheme);
+                        return ['path' => $file, 'theme' => $currentTheme];
                     }
                     // Default return type:
                     return $currentTheme;

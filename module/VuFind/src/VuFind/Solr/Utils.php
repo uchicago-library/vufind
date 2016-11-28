@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Solr
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\Solr;
 
@@ -34,11 +34,11 @@ namespace VuFind\Solr;
  * be called statically.  This allows sharing of some Solr-related logic
  * between the Solr and Summon classes.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Solr
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class Utils
 {
@@ -57,7 +57,7 @@ class Utils
         if (!preg_match($regEx, $query, $matches)) {
             return false;
         }
-        return array('from' => trim($matches[1]), 'to' => trim($matches[2]));
+        return ['from' => trim($matches[1]), 'to' => trim($matches[2])];
     }
 
     /**
@@ -71,7 +71,7 @@ class Utils
     public static function sanitizeDate($date)
     {
         // Strip brackets; we'll assume guesses are correct.
-        $date = str_replace(array('[', ']'), '', $date);
+        $date = str_replace(['[', ']'], '', $date);
 
         // Special case -- first four characters are not a year:
         if (!preg_match('/^[0-9]{4}/', $date)) {
@@ -116,8 +116,8 @@ class Utils
         $year = substr($date, 0, 4);
 
         // Let's get rid of punctuation and normalize separators:
-        $date = str_replace(array('.', ' ', '?'), '', $date);
-        $date = str_replace(array('/', '--', '-0'), '-', $date);
+        $date = str_replace(['.', ' ', '?'], '', $date);
+        $date = str_replace(['/', '--', '-0'], '-', $date);
 
         // If multiple dates are &'ed together, take just the first:
         list($date) = explode('&', $date);

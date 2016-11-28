@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  ILS_Drivers
  * @author   Adam Brin <abrin@brynmawr.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:building_an_ils_driver Wiki
+ * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
 namespace VuFind\ILS\Driver;
 use VuFind\Exception\ILS as ILSException;
@@ -34,33 +34,16 @@ use VuFind\Exception\ILS as ILSException;
  * This class uses screen scraping techniques to gather record holdings written
  * by Adam Bryn of the Tri-College consortium.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  ILS_Drivers
  * @author   Adam Brin <abrin@brynmawr.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:building_an_ils_driver Wiki
+ * @link     https://vufind.org/wiki/development:plugins:ils_drivers Wiki
  */
 class Innovative extends AbstractBase implements
     \VuFindHttp\HttpServiceAwareInterface
 {
-    /**
-     * HTTP service
-     *
-     * @var \VuFindHttp\HttpServiceInterface
-     */
-    protected $httpService = null;
-
-    /**
-     * Set the HTTP service to be used for HTTP requests.
-     *
-     * @param HttpServiceInterface $service HTTP service
-     *
-     * @return void
-     */
-    public function setHttpService(\VuFindHttp\HttpServiceInterface $service)
-    {
-        $this->httpService = $service;
-    }
+    use \VuFindHttp\HttpServiceAwareTrait;
 
     /**
      * Initialize the driver.
@@ -102,7 +85,7 @@ class Innovative extends AbstractBase implements
     }
 
     /**
-     * prepID
+     * Prepare ID
      *
      * This function returns the correct record id format as defined
      * in the Innovative.ini file.
@@ -161,7 +144,7 @@ class Innovative extends AbstractBase implements
         // '<table class="bibItems" '
         $r = substr($result, stripos($result, 'bibItems'));
         // strip out the rest of the first table tag.
-        $r = substr($r, strpos($r, ">")+1);
+        $r = substr($r, strpos($r, ">") + 1);
         // strip out the next table closing tag and everything after it.
         $r = substr($r, 0, stripos($r, "</table"));
 
@@ -171,7 +154,7 @@ class Innovative extends AbstractBase implements
         // beginning tr tag.
         $rows = preg_split("/<tr([^>]*)>/", $r);
         $count = 0;
-        $keys = array_pad(array(), 10, "");
+        $keys = array_pad([], 10, "");
 
         $loc_col_name      = $this->config['OPAC']['location_column'];
         $call_col_name     = $this->config['OPAC']['call_no_column'];
@@ -181,14 +164,14 @@ class Innovative extends AbstractBase implements
         $stat_avail        = $this->config['OPAC']['status_avail'];
         $stat_due          = $this->config['OPAC']['status_due'];
 
-        $ret = array();
+        $ret = [];
         foreach ($rows as $row) {
             // Split up the contents of the row based on the th or td tag, excluding
             // the tags themselves.
             $cols = preg_split("/<t(h|d)([^>]*)>/", $row);
 
             // for each th or td section, do the following.
-            for ($i=0; $i < sizeof($cols); $i++) {
+            for ($i = 0; $i < sizeof($cols); $i++) {
                 // replace non blocking space encodings with a space.
                 $cols[$i] = str_replace("&nbsp;", " ", $cols[$i]);
                 // remove html comment tags
@@ -206,28 +189,28 @@ class Innovative extends AbstractBase implements
                 } else if ($count > 1) { // not the first row, has holding info
                     //look for location column
                     if (stripos($keys[$i], $loc_col_name) > -1) {
-                        $ret[$count-2]['location'] = strip_tags($cols[$i]);
+                        $ret[$count - 2]['location'] = strip_tags($cols[$i]);
                     }
                     // Does column hold reserves information?
                     if (stripos($keys[$i], $reserves_col_name) > -1) {
                         if (stripos($cols[$i], $reserves_key_name) > -1) {
-                            $ret[$count-2]['reserve'] = 'Y';
+                            $ret[$count - 2]['reserve'] = 'Y';
                         } else {
-                            $ret[$count-2]['reserve'] = 'N';
+                            $ret[$count - 2]['reserve'] = 'N';
                         }
                     }
                     // Does column hold call numbers?
                     if (stripos($keys[$i], $call_col_name) > -1) {
-                        $ret[$count-2]['callnumber'] = strip_tags($cols[$i]);
+                        $ret[$count - 2]['callnumber'] = strip_tags($cols[$i]);
                     }
                     // Look for status information.
                     if (stripos($keys[$i], $status_col_name) > -1) {
                         if (stripos($cols[$i], $stat_avail) > -1) {
-                            $ret[$count-2]['status'] = "Available On Shelf";
-                            $ret[$count-2]['availability'] = 1;
+                            $ret[$count - 2]['status'] = "Available On Shelf";
+                            $ret[$count - 2]['availability'] = 1;
                         } else {
-                            $ret[$count-2]['status'] = "Available to request";
-                            $ret[$count-2]['availability'] = 0;
+                            $ret[$count - 2]['status'] = "Available to request";
+                            $ret[$count - 2]['availability'] = 0;
                         }
                         if (stripos($cols[$i], $stat_due) > -1) {
                             $t = trim(
@@ -237,17 +220,17 @@ class Innovative extends AbstractBase implements
                                 )
                             );
                             $t = substr($t, 0, stripos($t, " "));
-                            $ret[$count-2]['duedate'] = $t;
+                            $ret[$count - 2]['duedate'] = $t;
                         }
                     }
                     //$ret[$count-2][$keys[$i]] = $cols[$i];
                     //$ret[$count-2]['id'] = $bibid;
-                    $ret[$count-2]['id'] = $id;
-                    $ret[$count-2]['number'] = ($count -1);
+                    $ret[$count - 2]['id'] = $id;
+                    $ret[$count - 2]['number'] = ($count - 1);
                     // Return a fake barcode so hold link is enabled
                     // TODO: Should be dependent on settings variable, if bib level
                     // holds.
-                    $ret[$count-2]['barcode'] = '1234567890123';
+                    $ret[$count - 2]['barcode'] = '1234567890123';
                 }
             }
             $count++;
@@ -268,7 +251,7 @@ class Innovative extends AbstractBase implements
      */
     public function getStatuses($ids)
     {
-        $items = array();
+        $items = [];
         $count = 0;
         foreach ($ids as $id) {
             $items[$count] = $this->getStatus($id);
@@ -307,12 +290,13 @@ class Innovative extends AbstractBase implements
      *
      * @throws ILSException
      * @return array     An array with the acquisitions data on success.
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getPurchaseHistory($id)
     {
         // TODO
-        return array();
+        return [];
     }
 
     /**
@@ -326,6 +310,7 @@ class Innovative extends AbstractBase implements
      * @param array  $details Item details from getHoldings return array
      *
      * @return string         URL to ILS's OPAC's place hold screen.
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getHoldLink($id, $details)
@@ -335,7 +320,7 @@ class Innovative extends AbstractBase implements
 
         //Build request link
         $link = $this->config['Catalog']['url'] . '/search?/.b' . $id_ . '/.b' .
-            $id_ . '/1%2C1%2C1%2CB/request~b'. $id_;
+            $id_ . '/1%2C1%2C1%2CB/request~b' . $id_;
         //$link = $this->config['Catalog']['url'] . '/record=b' . $id_;
 
         return $link;
@@ -395,13 +380,13 @@ class Innovative extends AbstractBase implements
             // released under the GPL
             $api_contents = trim(strip_tags($result));
             $api_array_lines = explode("\n", $api_contents);
-            $api_data = array('PBARCODE' => false);
+            $api_data = ['PBARCODE' => false];
 
             foreach ($api_array_lines as $api_line) {
                 $api_line = str_replace("p=", "peq", $api_line);
                 $api_line_arr = explode("=", $api_line);
-                $regex_match = array("/\[(.*?)\]/","/\s/","/#/");
-                $regex_replace = array('','','NUM');
+                $regex_match = ["/\[(.*?)\]/","/\s/","/#/"];
+                $regex_replace = ['','','NUM'];
                 $key = trim(
                     preg_replace($regex_match, $regex_replace, $api_line_arr[0])
                 );
@@ -416,7 +401,7 @@ class Innovative extends AbstractBase implements
             }
 
             // return patron info
-            $ret = array();
+            $ret = [];
             $ret['id'] = $api_data['PBARCODE']; // or should I return patron id num?
             $names = explode(',', $api_data['PATRNNAME']);
             $ret['firstname'] = $names[1];

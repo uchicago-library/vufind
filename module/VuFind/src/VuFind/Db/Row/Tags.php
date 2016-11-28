@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Row
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Db\Row;
 use VuFind\Db\Table\Resource as ResourceTable, Zend\Db\Sql\Expression;
@@ -31,14 +31,16 @@ use VuFind\Db\Table\Resource as ResourceTable, Zend\Db\Sql\Expression;
 /**
  * Row Definition for tags
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Row
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
-class Tags extends ServiceLocatorAwareGateway
+class Tags extends RowGateway implements \VuFind\Db\Table\DbTableAwareInterface
 {
+    use \VuFind\Db\Table\DbTableAwareTrait;
+
     /**
      * Constructor
      *
@@ -66,17 +68,17 @@ class Tags extends ServiceLocatorAwareGateway
         $tag = $this;
         $callback = function ($select) use ($tag, $source, $sort, $offset, $limit) {
             $select->columns(
-                array(
+                [
                     new Expression(
-                        'DISTINCT(?)', array('resource.id'),
-                        array(Expression::TYPE_IDENTIFIER)
+                        'DISTINCT(?)', ['resource.id'],
+                        [Expression::TYPE_IDENTIFIER]
                     ), '*'
-                )
+                ]
             );
             $select->join(
-                array('rt' => 'resource_tags'),
+                ['rt' => 'resource_tags'],
                 'resource.id = rt.resource_id',
-                array()
+                []
             );
             $select->where->equalTo('rt.tag_id', $tag->id);
 
@@ -91,7 +93,7 @@ class Tags extends ServiceLocatorAwareGateway
             if ($offset > 0) {
                 $select->offset($offset);
             }
-            if (!is_null($limit)) {
+            if (null !== $limit) {
                 $select->limit($limit);
             }
         };

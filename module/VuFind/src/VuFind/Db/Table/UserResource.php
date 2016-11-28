@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Table
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Db\Table;
 use Zend\Db\Sql\Expression;
@@ -31,11 +31,11 @@ use Zend\Db\Sql\Expression;
 /**
  * Table Definition for user_resource
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Table
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class UserResource extends Gateway
 {
@@ -59,26 +59,26 @@ class UserResource extends Gateway
      *
      * @return \Zend\Db\ResultSet\AbstractResultSet
      */
-    public function getSavedData($resourceId, $source = 'VuFind', $listId = null,
-        $userId = null
+    public function getSavedData($resourceId, $source = DEFAULT_SEARCH_BACKEND,
+        $listId = null, $userId = null
     ) {
         $callback = function ($select) use ($resourceId, $source, $listId, $userId) {
             $select->columns(
-                array(
+                [
                     new Expression(
-                        'DISTINCT(?)', array('user_resource.id'),
-                        array(Expression::TYPE_IDENTIFIER)
+                        'DISTINCT(?)', ['user_resource.id'],
+                        [Expression::TYPE_IDENTIFIER]
                     ), '*'
-                )
+                ]
             );
             $select->join(
-                array('r' => 'resource'), 'r.id = user_resource.resource_id',
-                array()
+                ['r' => 'resource'], 'r.id = user_resource.resource_id',
+                []
             );
             $select->join(
-                array('ul' => 'user_list'),
+                ['ul' => 'user_list'],
                 'user_resource.list_id = ul.id',
-                array('list_title' => 'title', 'list_id' => 'id')
+                ['list_title' => 'title', 'list_id' => 'id']
             );
             $select->where->equalTo('r.source', $source)
                 ->equalTo('r.record_id', $resourceId);
@@ -106,10 +106,10 @@ class UserResource extends Gateway
     public function createOrUpdateLink($resource_id, $user_id, $list_id,
         $notes = ''
     ) {
-        $params = array(
+        $params = [
             'resource_id' => $resource_id, 'list_id' => $list_id,
             'user_id' => $user_id
-        );
+        ];
         $result = $this->select($params)->current();
 
         // Only create row if it does not already exist:
@@ -133,7 +133,9 @@ class UserResource extends Gateway
      * unlink (null for ALL matching resources)
      * @param string       $user_id     ID of user removing links
      * @param string       $list_id     ID of list to unlink
-     *                                  (null for ALL matching lists)
+     * (null for ALL matching lists, with the destruction of all tags associated
+     * with the $resource_id value; true for ALL matching lists, but retaining
+     * any tags associated with the $resource_id independently of lists)
      *
      * @return void
      */
@@ -148,17 +150,21 @@ class UserResource extends Gateway
         // Now build the where clause to figure out which rows to remove:
         $callback = function ($select) use ($resource_id, $user_id, $list_id) {
             $select->where->equalTo('user_id', $user_id);
-            if (!is_null($resource_id)) {
+            if (null !== $resource_id) {
                 if (!is_array($resource_id)) {
-                    $resource_id = array($resource_id);
+                    $resource_id = [$resource_id];
                 }
                 $select->where->in('resource_id', $resource_id);
             }
-            if (!is_null($list_id)) {
+            // null or true values of $list_id have different meanings in the
+            // context of the $resourceTags->destroyLinks() call above, since
+            // some tags have a null $list_id value. In the case of user_resource
+            // rows, however, every row has a non-null $list_id value, so the
+            // two cases are equivalent and may be handled identically.
+            if (null !== $list_id && true !== $list_id) {
                 $select->where->equalTo('list_id', $list_id);
             }
         };
-
 
         // Delete the rows:
         $this->delete($callback);
@@ -173,21 +179,21 @@ class UserResource extends Gateway
     {
         $select = $this->sql->select();
         $select->columns(
-            array(
+            [
                 'users' => new Expression(
-                    'COUNT(DISTINCT(?))', array('user_id'),
-                    array(Expression::TYPE_IDENTIFIER)
+                    'COUNT(DISTINCT(?))', ['user_id'],
+                    [Expression::TYPE_IDENTIFIER]
                 ),
                 'lists' => new Expression(
-                    'COUNT(DISTINCT(?))', array('list_id'),
-                    array(Expression::TYPE_IDENTIFIER)
+                    'COUNT(DISTINCT(?))', ['list_id'],
+                    [Expression::TYPE_IDENTIFIER]
                 ),
                 'resources' => new Expression(
-                    'COUNT(DISTINCT(?))', array('resource_id'),
-                    array(Expression::TYPE_IDENTIFIER)
+                    'COUNT(DISTINCT(?))', ['resource_id'],
+                    [Expression::TYPE_IDENTIFIER]
                 ),
                 'total' => new Expression('COUNT(*)')
-            )
+            ]
         );
         $statement = $this->sql->prepareStatementForSqlObject($select);
         $result = $statement->execute();

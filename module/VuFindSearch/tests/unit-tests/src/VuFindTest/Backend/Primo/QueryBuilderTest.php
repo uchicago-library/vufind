@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Backend\Primo;
 
 use VuFindSearch\Backend\Primo\QueryBuilder;
@@ -37,11 +36,11 @@ use PHPUnit_Framework_TestCase;
 /**
  * Unit tests for Primo query builder
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class QueryBuilderTest extends PHPUnit_Framework_TestCase
 {
@@ -54,7 +53,7 @@ class QueryBuilderTest extends PHPUnit_Framework_TestCase
     {
         $q = new Query('query1', 'handler1');
         $qb = new QueryBuilder();
-        $expected = array(array('lookfor' => 'query1', 'index' => 'handler1'));
+        $expected = [['lookfor' => 'query1', 'index' => 'handler1']];
         $result = $qb->build($q)->get('query');
         $this->assertEquals($expected, $result);
     }
@@ -70,14 +69,14 @@ class QueryBuilderTest extends PHPUnit_Framework_TestCase
         // inside another query group containing a collection of queries.
         $q1 = new Query('query1', 'handler1', 'OR');
         $q2 = new Query('query2', 'handler2', 'AND');
-        $qsub = new QueryGroup('AND', array($q1, $q2));
-        $q = new QueryGroup('AND', array($qsub));
+        $qsub = new QueryGroup('AND', [$q1, $q2]);
+        $q = new QueryGroup('AND', [$qsub]);
 
         $qb = new QueryBuilder();
-        $expected = array(
-            array('lookfor' => 'query1', 'index' => 'handler1', 'op' => 'OR'),
-            array('lookfor' => 'query2', 'index' => 'handler2', 'op' => 'AND')
-        );
+        $expected = [
+            ['lookfor' => 'query1', 'index' => 'handler1', 'op' => 'OR'],
+            ['lookfor' => 'query2', 'index' => 'handler2', 'op' => 'AND']
+        ];
         $result = $qb->build($q)->get('query');
         $this->assertEquals($expected, $result);
     }

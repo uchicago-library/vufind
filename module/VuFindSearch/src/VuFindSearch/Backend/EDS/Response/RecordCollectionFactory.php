@@ -17,28 +17,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Michelle Milton <mmilton@epnet.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 namespace VuFindSearch\Backend\EDS\Response;
 
 use VuFindSearch\Response\RecordCollectionFactoryInterface;
 use VuFindSearch\Exception\InvalidArgumentException;
-use VuFindSearch\Backend\EDS\Response\RecordCollection;
 
 /**
  * Factory for record collection.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Michelle Milton <mmilton@epnet.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class RecordCollectionFactory implements RecordCollectionFactoryInterface
 {
@@ -94,7 +93,7 @@ class RecordCollectionFactory implements RecordCollectionFactoryInterface
         }
         $collection = new $this->collectionClass($response);
         //obtain path to records
-        $records = array();
+        $records = [];
         if (isset($response['SearchResult'])
             && isset($response['SearchResult']['Data'])
             && isset($response['SearchResult']['Data']['Records'])

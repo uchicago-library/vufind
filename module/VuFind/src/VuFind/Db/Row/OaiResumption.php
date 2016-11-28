@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Row
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Db\Row;
 
 /**
  * Row Definition for oai_resumption
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Row
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class OaiResumption extends RowGateway
 {
@@ -56,7 +56,7 @@ class OaiResumption extends RowGateway
     public function restoreParams()
     {
         $parts = explode('&', $this->params);
-        $params = array();
+        $params = [];
         foreach ($parts as $part) {
             list($key, $value) = explode('=', $part);
             $key = urldecode($key);
@@ -76,7 +76,7 @@ class OaiResumption extends RowGateway
     public function saveParams($params)
     {
         ksort($params);
-        $processedParams = array();
+        $processedParams = [];
         foreach ($params as $key => $value) {
             $processedParams[] = urlencode($key) . '=' . urlencode($value);
         }

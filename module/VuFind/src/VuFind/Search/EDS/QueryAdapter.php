@@ -18,13 +18,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  EBSCO
  * @author   Michelle Milton <mmilton@epnet.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 namespace VuFind\Search\EDS;
 
@@ -36,11 +36,11 @@ use Zend\StdLib\Parameters;
 /**
  * EDS API Query Adapter: search query parameters to AbstractQuery object
  *
- * @category VuFind2
+ * @category VuFind
  * @package  EBSCO
  * @author   Michelle Milton <mmilton@epnet.com>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://www.vufind.org  Main Page
+ * @link     https://vufind.org Main Page
  */
 class QueryAdapter extends \VuFind\Search\QueryAdapter
 {
@@ -78,12 +78,12 @@ class QueryAdapter extends \VuFind\Search\QueryAdapter
     ) {
             $output = '';
         //There should only ever be 1 group with EDS queries.
-        $all = array();
+        $all = [];
         foreach ($query->getQueries() as $search) {
             if ($search instanceof QueryGroup) {
                 // Process each search group. There should only be 1 with EDS queries
                 $groupQueries = $search->getQueries();
-                for ($i=0; $i < count($groupQueries); $i++) {
+                for ($i = 0; $i < count($groupQueries); $i++) {
                     $group = $groupQueries[$i];
                     if ($group instanceof Query) {
                         // Build this group individually as a basic search

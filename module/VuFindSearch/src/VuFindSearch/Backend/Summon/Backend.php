@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindSearch\Backend\Summon;
 
 use SerialsSolutions\Summon\Zend2 as Connector;
@@ -48,11 +47,11 @@ use VuFindSearch\Backend\Exception\BackendException;
 /**
  * Summon backend.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class Backend extends AbstractBackend implements RetrieveBatchInterface
 {
@@ -93,8 +92,8 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
      * Perform a search and return record collection.
      *
      * @param AbstractQuery $query  Search query
-     * @param integer       $offset Search offset
-     * @param integer       $limit  Search limit
+     * @param int           $offset Search offset
+     * @param int           $limit  Search limit
      * @param ParamBag      $params Search backend parameters
      *
      * @return RecordCollectionInterface
@@ -165,14 +164,14 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
         // Retrieve records a page at a time:
         $results = false;
         while (count($ids) > 0) {
-            $currentPage = array_splice($ids, 0, $pageSize, array());
+            $currentPage = array_splice($ids, 0, $pageSize, []);
             $query = new SummonQuery(
                 null,
-                array(
+                [
                     'idsToFetch' => $currentPage,
                     'pageNumber' => 1,
                     'pageSize' => $pageSize
-                )
+                ]
             );
             $next = $this->createRecordCollection(
                 $this->connector->query($query)
@@ -271,10 +270,10 @@ class Backend extends AbstractBackend implements RetrieveBatchInterface
         unset($params['query']);
 
         // Convert the options:
-        $options = array();
+        $options = [];
         // Most parameters need to be flattened from array format, but a few
         // should remain as arrays:
-        $arraySettings = array('facets', 'filters', 'groupFilters', 'rangeFilters');
+        $arraySettings = ['facets', 'filters', 'groupFilters', 'rangeFilters'];
         foreach ($params as $key => $param) {
             $options[$key] = in_array($key, $arraySettings) ? $param : $param[0];
         }

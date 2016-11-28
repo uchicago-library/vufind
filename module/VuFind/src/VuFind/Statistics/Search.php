@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Statistics
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 namespace VuFind\Statistics;
 
 /**
  * VuFind Statistics Class for Searches
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Statistics
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  */
 class Search extends AbstractBase
 {
@@ -48,13 +48,13 @@ class Search extends AbstractBase
      */
     public function log($data, $request)
     {
-        $stat = array(
+        $stat = [
             'phrase'       => $data->getParams()->getDisplayQuery(),
             'searchSource' => $data->getParams()->getSearchClassId(),
             'type'         => $data->getParams()->getSearchHandler(),
             'resultCount'  => $data->getResultTotal(),
             'noresults'    => $data->getResultTotal() == 0
-        );
+        ];
         $this->save($stat, $request);
     }
 
@@ -62,8 +62,8 @@ class Search extends AbstractBase
      * Returns a set of basic statistics including total searches,
      * number of empty searches and most popular search terms.
      *
-     * @param integer $listLength Number of top searches to return
-     * @param bool    $bySource   Separate searches by search source?
+     * @param int  $listLength Number of top searches to return
+     * @param bool $bySource   Separate searches by search source?
      *
      * @return array
      */
@@ -73,9 +73,9 @@ class Search extends AbstractBase
             $summary = $driver->getFullList('phrase');
             if (!empty($summary)) {
                 $sources = $driver->getFullList('searchSource');
-                $hashes = array();
+                $hashes = [];
                 // Generate hashes (faster than grouping by looping)
-                for ($i=0;$i<count($summary);$i++) {
+                for ($i = 0;$i < count($summary);$i++) {
                     if (!isset($sources[$i]['searchSource'])) {
                         $sources[$i]['searchSource'] = 'Search';
                     } else {
@@ -93,30 +93,31 @@ class Search extends AbstractBase
                         ? $hashes[$source][$summary[$i]['phrase']] + 1
                         : 1;
                 }
-                $top = array();
+                $top = [];
                 // For each source
-                foreach ($hashes as $source=>$records) {
+                foreach ($hashes as $source => $records) {
                     // Using a reference to consolidate code dramatically
-                    $reference =& $top;
+                    $reference = & $top;
                     if ($bySource) {
-                        $top[$source] = array();
-                        $reference =& $top[$source];
+                        $top[$source] = [];
+                        $reference = & $top[$source];
                     }
                     // For each record
-                    foreach ($records as $phrase=>$count) {
+                    foreach ($records as $phrase => $count) {
                         $value = ($phrase == '' || $phrase == '*:*')
                             ? '(empty)'
                             : $phrase;
-                        $newRecord = array(
+                        $newRecord = [
                             'value'  => $value,
                             'count'  => $count,
                             'source' => $source
-                        );
+                        ];
                         // Insert sort (limit to listLength)
-                        for ($i=0;$i<$listLength-1 && $i<count($reference);$i++) {
+                        $refCount = count($reference);
+                        for ($i = 0; $i < $listLength - 1 && $i < $refCount; $i++) {
                             if ($count > $reference[$i]['count']) {
                                 // Insert in order
-                                array_splice($reference, $i, 0, array($newRecord));
+                                array_splice($reference, $i, 0, [$newRecord]);
                                 continue 2; // Skip the append after this loop
                             }
                         }
@@ -126,15 +127,15 @@ class Search extends AbstractBase
                     }
                     $reference = array_slice($reference, 0, $listLength);
                 }
-                return array(
+                return [
                     'top'   => $top,
                     'total' => count($summary),
                     'empty' => count(
-                        $driver->getFullList('noresults', array('value' => 'true'))
+                        $driver->getFullList('noresults', ['value' => 'true'])
                     )
-                );
+                ];
             }
         }
-        return array();
+        return [];
     }
 }

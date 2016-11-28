@@ -17,14 +17,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Autocomplete
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:autosuggesters Wiki
+ * @link     https://vufind.org/wiki/development:plugins:autosuggesters Wiki
  */
 namespace VuFind\Autocomplete;
 
@@ -33,11 +33,11 @@ namespace VuFind\Autocomplete;
  *
  * This class provides suggestions by using the local Solr index.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Autocomplete
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:autosuggesters Wiki
+ * @link     https://vufind.org/wiki/development:plugins:autosuggesters Wiki
  */
 class Solr implements AutocompleteInterface
 {
@@ -108,8 +108,6 @@ class Solr implements AutocompleteInterface
     }
 
     /**
-     * setConfig
-     *
      * Set parameters that affect the behavior of the autocomplete handler.
      * These values normally come from the search configuration file.
      *
@@ -124,10 +122,10 @@ class Solr implements AutocompleteInterface
         $this->handler = (isset($params[0]) && !empty($params[0])) ?
             $params[0] : null;
         $this->displayField = (isset($params[1]) && !empty($params[1])) ?
-            explode(',', $params[1]) : array($this->defaultDisplayField);
+            explode(',', $params[1]) : [$this->defaultDisplayField];
         $this->sortField = (isset($params[2]) && !empty($params[2])) ?
             $params[2] : null;
-        $this->filters = array();
+        $this->filters = [];
         if (count($params > 3)) {
             for ($x = 3; $x < count($params); $x += 2) {
                 if (isset($params[$x + 1])) {
@@ -141,8 +139,18 @@ class Solr implements AutocompleteInterface
     }
 
     /**
-     * initSearchObject
+     * Add filters (in addition to the configured ones)
      *
+     * @param array $filters Filters to add
+     *
+     * @return void
+     */
+    public function addFilters($filters)
+    {
+        $this->filters += $filters;
+    }
+
+    /**
      * Initialize the search object used for finding recommendations.
      *
      * @return void
@@ -152,12 +160,9 @@ class Solr implements AutocompleteInterface
         // Build a new search object:
         $this->searchObject = $this->resultsManager->get($this->searchClassId);
         $this->searchObject->getOptions()->spellcheckEnabled(false);
-        $this->searchObject->getParams()->recommendationsEnabled(false);
     }
 
     /**
-     * mungeQuery
-     *
      * Process the user query to make it suitable for a Solr query.
      *
      * @param string $query Incoming user query
@@ -167,7 +172,7 @@ class Solr implements AutocompleteInterface
     protected function mungeQuery($query)
     {
         // Modify the query so it makes a nice, truncated autocomplete query:
-        $forbidden = array(':', '(', ')', '*', '+', '"');
+        $forbidden = [':', '(', ')', '*', '+', '"'];
         $query = str_replace($forbidden, " ", $query);
         if (substr($query, -1) != " ") {
             $query .= "*";
@@ -176,8 +181,6 @@ class Solr implements AutocompleteInterface
     }
 
     /**
-     * getSuggestions
-     *
      * This method returns an array of strings matching the user's query for
      * display in the autocomplete box.
      *
@@ -215,7 +218,7 @@ class Solr implements AutocompleteInterface
         } catch (\Exception $e) {
             // Ignore errors -- just return empty results if we must.
         }
-        return array_unique($results);
+        return isset($results) ? array_unique($results) : [];
     }
 
     /**
@@ -229,7 +232,7 @@ class Solr implements AutocompleteInterface
      */
     protected function getSuggestionsFromSearch($searchResults, $query, $exact)
     {
-        $results = array();
+        $results = [];
         foreach ($searchResults as $object) {
             $current = $object->getRawData();
             foreach ($this->displayField as $field) {
@@ -291,8 +294,6 @@ class Solr implements AutocompleteInterface
     }
 
     /**
-     * setDisplayField
-     *
      * Set the display field list.  Useful for child classes.
      *
      * @param array $new Display field list.
@@ -305,8 +306,6 @@ class Solr implements AutocompleteInterface
     }
 
     /**
-     * setSortField
-     *
      * Set the sort field list.  Useful for child classes.
      *
      * @param string $new Sort field list.

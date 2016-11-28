@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
-
 namespace VuFind\Search\Factory;
 
 use SerialsSolutions\Summon\Zend2 as Connector;
@@ -42,11 +41,11 @@ use Zend\ServiceManager\FactoryInterface;
 /**
  * Factory for Summon backends.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class SummonBackendFactory implements FactoryInterface
 {
@@ -131,9 +130,9 @@ class SummonBackendFactory implements FactoryInterface
         $client = $this->serviceLocator->get('VuFind\Http')->createClient();
         $timeout = isset($this->summonConfig->General->timeout)
             ? $this->summonConfig->General->timeout : 30;
-        $client->setOptions(array('timeout' => $timeout));
+        $client->setOptions(['timeout' => $timeout]);
 
-        $options = array('authedUser' => $this->isAuthed());
+        $options = ['authedUser' => $this->isAuthed()];
         $connector = new Connector($id, $key, $options, $client);
         $connector->setLogger($this->logger);
         return $connector;
@@ -146,35 +145,8 @@ class SummonBackendFactory implements FactoryInterface
      */
     protected function isAuthed()
     {
-        // Check based on login status
-        if (isset($this->summonConfig->Auth->check_login)
-            && $this->summonConfig->Auth->check_login
-        ) {
-            $authManager = $this->serviceLocator->get('VuFind\AuthManager');
-            if ($authManager->isLoggedIn()) {
-                return true;
-            }
-        }
-
-        // Check based on IP range
-        if (isset($this->summonConfig->Auth->ip_range)) {
-            $request = $this->serviceLocator->get('Request');
-            $match = preg_match(
-                $this->summonConfig->Auth->ip_range,
-                $request->getServer()->get('REMOTE_ADDR')
-            );
-            if ($match === false) {
-                throw new \Exception(
-                    'Bad regular expression in Summon.ini [Auth] ip_range setting.'
-                );
-            }
-            if ($match) {
-                return true;
-            }
-        }
-
-        // If we got this far, we're not authenticated.
-        return false;
+        return $this->serviceLocator->get('ZfcRbac\Service\AuthorizationService')
+            ->isGranted('access.SummonExtendedResults');
     }
 
     /**

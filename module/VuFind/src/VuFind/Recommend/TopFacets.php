@@ -17,14 +17,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 namespace VuFind\Recommend;
 
@@ -33,12 +33,12 @@ namespace VuFind\Recommend;
  *
  * This class provides recommendations displaying facets beside search results
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Recommendations
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:recommendation_modules Wiki
+ * @link     https://vufind.org/wiki/development:plugins:recommendation_modules Wiki
  */
 class TopFacets extends AbstractFacets
 {
@@ -57,8 +57,6 @@ class TopFacets extends AbstractFacets
     protected $baseSettings;
 
     /**
-     * setConfig
-     *
      * Store the configuration of the recommendation module.
      *
      * TopFacets:[ini section]:[ini name]
@@ -72,27 +70,25 @@ class TopFacets extends AbstractFacets
     public function setConfig($settings)
     {
         $settings = explode(':', $settings);
-        $mainSection = empty($settings[0]) ? 'ResultsTop':$settings[0];
+        $mainSection = empty($settings[0]) ? 'ResultsTop' : $settings[0];
         $iniName = isset($settings[1]) ? $settings[1] : 'facets';
 
         // Load the desired facet information:
         $config = $this->configLoader->get($iniName);
         $this->facets = isset($config->$mainSection)
-            ? $config->$mainSection->toArray() : array();
+            ? $config->$mainSection->toArray() : [];
 
         // Load other relevant settings:
-        $this->baseSettings = array(
+        $this->baseSettings = [
             'rows' => $config->Results_Settings->top_rows,
             'cols' => $config->Results_Settings->top_cols
-        );
+        ];
 
         // Load boolean configurations:
         $this->loadBooleanConfigs($config, array_keys($this->facets));
     }
 
     /**
-     * init
-     *
      * Called at the end of the Search Params objects' initFromRequest() method.
      * This method is responsible for setting search parameters needed by the
      * recommendation module and for reading any existing search parameters that may

@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindTest\Backend\Primo;
 
 use VuFindSearch\Backend\Primo\Connector;
@@ -40,11 +39,11 @@ use InvalidArgumentException;
 /**
  * Unit tests for Primo connector.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class ConnectorTest extends PHPUnit_Framework_TestCase
 {
@@ -79,10 +78,10 @@ class ConnectorTest extends PHPUnit_Framework_TestCase
     public function testEmptyQueryError()
     {
         $conn = $this->createConnector();
-        $terms = array();
+        $terms = [];
         $result = $conn->query('dummyinst', $terms);
         $this->assertEquals(0, $result['recordCount']);
-        $this->assertEquals('Primo API does not accept a null query', $result['error']);
+        $this->assertEquals('Primo does not accept an empty query', $result['error']);
     }
 
     /**
@@ -93,10 +92,10 @@ class ConnectorTest extends PHPUnit_Framework_TestCase
     public function testQuery()
     {
         $conn = $this->createConnector('search-http');
-        $terms = array(
-            array('index' => 'Title', 'lookfor' => 'test'),
-            array('index' => 'Author', 'lookfor' => 'test'),
-        );
+        $terms = [
+            ['index' => 'Title', 'lookfor' => 'test'],
+            ['index' => 'Author', 'lookfor' => 'test'],
+        ];
         $result = $conn->query('dummyinst', $terms);
         $this->assertEquals(1245, $result['recordCount']);
         $this->assertEquals('Abstract Test', $result['documents'][0]['title']);
@@ -110,14 +109,14 @@ class ConnectorTest extends PHPUnit_Framework_TestCase
     public function testDifferentlyNamespacedQuery()
     {
         $conn = $this->createConnector('swansea-search-http');
-        $terms = array(
-            array('index' => 'Title', 'lookfor' => 'dummy query'),
-        );
-        $result = $conn->query('dummyinst', $terms, array('returnErr' => false));
+        $terms = [
+            ['index' => 'Title', 'lookfor' => 'dummy query'],
+        ];
+        $result = $conn->query('dummyinst', $terms, ['returnErr' => false]);
         $this->assertEquals(1, $result['recordCount']);
         $this->assertEquals('Lord', $result['documents'][0]['title']);
-        $this->assertEquals(array(), $result['didYouMean']);
-        $this->assertEquals(array('eng' => 1), $result['facets']['lang']);
+        $this->assertEquals([], $result['didYouMean']);
+        $this->assertEquals(['eng' => 1], $result['facets']['lang']);
     }
 
     /**
@@ -125,16 +124,17 @@ class ConnectorTest extends PHPUnit_Framework_TestCase
      * status.
      *
      * @return void
+     *
      * @expectedException        \Exception
      * @expectedExceptionMessage Unauthorized access
      */
     public function testErrorInSuccessfulResponse()
     {
         $conn = $this->createConnector('error-with-success-http');
-        $terms = array(
-            array('index' => 'Title', 'lookfor' => 'dummy query'),
-        );
-        $result = $conn->query('dummyinst', $terms, array('returnErr' => false));
+        $terms = [
+            ['index' => 'Title', 'lookfor' => 'dummy query'],
+        ];
+        $result = $conn->query('dummyinst', $terms, ['returnErr' => false]);
     }
 
     /**
@@ -159,7 +159,7 @@ class ConnectorTest extends PHPUnit_Framework_TestCase
         }
         $client = new HttpClient();
         $client->setAdapter($adapter);
-        $conn = new Connector('fakeid', 'fakeinst', $client);
+        $conn = new Connector('http://fakeaddress.none', 'fakeinst', $client);
         return $conn;
     }
 }

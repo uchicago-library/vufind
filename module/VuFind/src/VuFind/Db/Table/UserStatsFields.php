@@ -17,26 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Table
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Db\Table;
-
-use Zend\Db\Sql\Expression;
 
 /**
  * Table Definition for statistics
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Db_Table
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class UserStatsFields extends Gateway
 {
@@ -60,16 +58,16 @@ class UserStatsFields extends Gateway
     public function save($stats, $userData)
     {
         // Statistics data
-        foreach ($stats as $field=>$value) {
+        foreach ($stats as $field => $value) {
             if (gettype($value) == "boolean") {
-                $value = ($value) ? "true":"false";
+                $value = ($value) ? "true" : "false";
             }
             $this->insert(
-                array(
+                [
                     'id'    => $userData['id'],
                     'field' => $field . "",
                     'value' => $value . "",
-                )
+                ]
             );
         }
         // User data
@@ -85,28 +83,28 @@ class UserStatsFields extends Gateway
      *
      * @return associative array
      */
-    public function getFields($fields, $values = array())
+    public function getFields($fields, $values = [])
     {
         if (empty($fields)) {
             return null;
         }
         if (!is_array($fields)) {
-            $fields = array($fields);
+            $fields = [$fields];
         }
         $callback = function ($select) use ($fields, $values) {
             $select->columns(
-                array($fields[0] => 'value')
+                [$fields[0] => 'value']
             );
             $select->where->equalTo('field', $fields[0]);
-            for ($i=1;$i<count($fields);$i++) {
-                $select->where->equalTo('field'.$i.'.field', $fields[$i]);
+            for ($i = 1;$i < count($fields);$i++) {
+                $select->where->equalTo('field' . $i . '.field', $fields[$i]);
                 $select->join(
-                    array('field'.$i => 'user_stats_fields'),
-                    'user_stats_fields.id=field'.$i.'.id',
-                    array($fields[$i] => 'field'.$i.'.value')
+                    ['field' . $i => 'user_stats_fields'],
+                    'user_stats_fields.id=field' . $i . '.id',
+                    [$fields[$i] => 'field' . $i . '.value']
                 );
             }
-            foreach ($values as $key=>$value) {
+            foreach ($values as $key => $value) {
                 $select->where->equalTo($key, $value);
             }
         };

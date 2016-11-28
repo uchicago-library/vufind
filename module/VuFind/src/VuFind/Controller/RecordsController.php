@@ -17,24 +17,24 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace VuFind\Controller;
 
 /**
  * Records Controller
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class RecordsController extends AbstractSearch
 {
@@ -55,7 +55,7 @@ class RecordsController extends AbstractSearch
     public function homeAction()
     {
         // If there is exactly one record, send the user directly there:
-        $ids = $this->params()->fromQuery('id', array());
+        $ids = $this->params()->fromQuery('id', []);
         if (count($ids) == 1) {
             $details = $this->getRecordRouter()->getTabRouteDetails($ids[0]);
             $target = $this->url()->fromRoute($details['route'], $details['params']);
@@ -69,4 +69,3 @@ class RecordsController extends AbstractSearch
         return $this->resultsAction();
     }
 }
-

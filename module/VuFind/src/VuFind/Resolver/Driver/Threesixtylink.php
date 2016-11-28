@@ -19,13 +19,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Resolver_Drivers
  * @author   Graham Seaman <Graham.Seaman@rhul.ac.uk>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:link_resolver_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:link_resolver_drivers Wiki
  */
 namespace VuFind\Resolver\Driver;
 use DOMDocument, DOMXpath;
@@ -33,11 +33,11 @@ use DOMDocument, DOMXpath;
 /**
  * 360Link Link Resolver Driver
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Resolver_Drivers
  * @author   Graham Seaman <Graham.Seaman@rhul.ac.uk>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:link_resolver_drivers Wiki
+ * @link     https://vufind.org/wiki/development:plugins:link_resolver_drivers Wiki
  */
 class Threesixtylink implements DriverInterface
 {
@@ -85,7 +85,6 @@ class Threesixtylink implements DriverInterface
         return $feed;
     }
 
-
     /**
      * Parse Links
      *
@@ -98,7 +97,7 @@ class Threesixtylink implements DriverInterface
      */
     public function parseLinks($xmlstr)
     {
-        $records = array(); // array to return
+        $records = []; // array to return
 
         $xml = new DOMDocument();
         if (!@$xml->loadXML($xmlstr)) {
@@ -109,7 +108,7 @@ class Threesixtylink implements DriverInterface
         $linkGroups = $xpath->query("//ssopenurl:linkGroup[@type='holding']");
         if (!is_null($linkGroups)) {
             foreach ($linkGroups as $linkGroup) {
-                $record = array();
+                $record = [];
                 // select the deepest link returned
                 $elems = $xpath->query(
                     ".//ssopenurl:url[@type='article']", $linkGroup
@@ -133,7 +132,7 @@ class Threesixtylink implements DriverInterface
                 }
                 if ($elems->length > 0) {
                     $href = $elems->item(0)->nodeValue;
-                    $record['href']= $href;
+                    $record['href'] = $href;
                     $record['service_type'] = 'getFullTxt';
                 } else {
                     $record['service_type'] = 'getHolding';

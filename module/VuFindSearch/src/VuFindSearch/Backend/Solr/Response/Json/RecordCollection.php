@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
-
 namespace VuFindSearch\Backend\Solr\Response\Json;
 
 use VuFindSearch\Response\AbstractRecordCollection;
@@ -34,11 +33,11 @@ use VuFindSearch\Response\AbstractRecordCollection;
 /**
  * Simple JSON-based record collection.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Search
  * @author   David Maus <maus@hab.de>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org
+ * @link     https://vufind.org
  */
 class RecordCollection extends AbstractRecordCollection
 {
@@ -49,12 +48,12 @@ class RecordCollection extends AbstractRecordCollection
      *
      * @var array
      */
-    protected static $template = array(
-        'responseHeader' => array(),
-        'response'       => array('numFound' => 0, 'start' => 0),
-        'spellcheck'     => array('suggestions' => array()),
-        'facet_counts'   => array(),
-    );
+    protected static $template = [
+        'responseHeader' => [],
+        'response'       => ['numFound' => 0, 'start' => 0],
+        'spellcheck'     => ['suggestions' => []],
+        'facet_counts'   => [],
+    ];
 
     /**
      * Deserialized SOLR response.
@@ -137,7 +136,7 @@ class RecordCollection extends AbstractRecordCollection
     public function getGroups()
     {
         return isset($this->response['grouped'])
-            ? $this->response['grouped'] : array();
+            ? $this->response['grouped'] : [];
     }
 
     /**
@@ -148,7 +147,7 @@ class RecordCollection extends AbstractRecordCollection
     public function getHighlighting()
     {
         return isset($this->response['highlighting'])
-            ? $this->response['highlighting'] : array();
+            ? $this->response['highlighting'] : [];
     }
 
     /**
@@ -159,7 +158,7 @@ class RecordCollection extends AbstractRecordCollection
     protected function getSolrParameters()
     {
         return isset($this->response['responseHeader']['params'])
-            ? $this->response['responseHeader']['params'] : array();
+            ? $this->response['responseHeader']['params'] : [];
     }
 
     /**
@@ -183,6 +182,6 @@ class RecordCollection extends AbstractRecordCollection
     protected function getRawSpellcheckSuggestions()
     {
         return isset($this->response['spellcheck']['suggestions'])
-            ? $this->response['spellcheck']['suggestions'] : array();
+            ? $this->response['spellcheck']['suggestions'] : [];
     }
 }

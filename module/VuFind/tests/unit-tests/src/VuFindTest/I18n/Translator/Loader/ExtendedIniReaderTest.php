@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 namespace VuFindTest\I18n\Translator\Loader;
 use VuFind\I18n\Translator\Loader\ExtendedIniReader;
@@ -31,12 +31,12 @@ use VuFind\I18n\Translator\Loader\ExtendedIniReader;
 /**
  * ExtendedIniReader Test Class
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Tests
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:unit_tests Wiki
+ * @link     https://vufind.org/wiki/development:testing:unit_tests Wiki
  */
 class ExtendedIniReaderTest extends \VuFindTest\Unit\TestCase
 {
@@ -48,10 +48,10 @@ class ExtendedIniReaderTest extends \VuFindTest\Unit\TestCase
     public function testNonJoinerOptions()
     {
         $reader = new ExtendedIniReader();
-        $input = array('foo="bar"', 'baz=""');
-        $output = array('foo' => 'bar', 'baz' => '');
+        $input = ['foo="bar"', 'baz=""'];
+        $output = ['foo' => 'bar', 'baz' => ''];
         $nonJoiner = html_entity_decode('&#x200C;', ENT_NOQUOTES, 'UTF-8');
-        $nonJoinerOutput = array('foo' => 'bar', 'baz' => $nonJoiner);
+        $nonJoinerOutput = ['foo' => 'bar', 'baz' => $nonJoiner];
         // Test behavior with and without the $convertBlanks switch:
         $this->assertEquals($output, (array)$reader->getTextDomain($input, false));
         $this->assertEquals($nonJoinerOutput, (array)$reader->getTextDomain($input));
