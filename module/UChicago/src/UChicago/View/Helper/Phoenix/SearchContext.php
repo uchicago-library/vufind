@@ -24,7 +24,7 @@ class SearchContext extends AbstractHelper
      * Constructor, adds configurations.
      */
     public function __construct($config) {
-        $configArray = array();
+        $configArray = [];
         foreach ($config as $key => $val) {
            $configArray[$key] = $val; 
         }
@@ -73,13 +73,13 @@ class SearchContext extends AbstractHelper
         $keywordType = isset($_COOKIE['basic_or_advanced']) ? $_COOKIE['basic_or_advanced'] : null;
         
         /*Build a data structure*/
-        $contextTypes = array('searchType' => $searchType, 
-                              'keywordType' => $keywordType);
+        $contextTypes = ['searchType' => $searchType, 
+                              'keywordType' => $keywordType];
 
         /*Vocabulary mappings*/
-        $lookup = array('begins with' => 'alphabrowse',
-                        'basic' => 'basic-keyword',
-                        'advanced' => 'advanced-keyword');
+        $lookup = ['begins with' => 'alphabrowse',
+                   'basic' => 'basic-keyword',
+                   'advanced' => 'advanced-keyword'];
 
         /*Build the proper return string based on search context*/
         switch ($contextTypes) {
@@ -122,8 +122,8 @@ class SearchContext extends AbstractHelper
         $templateDesc = !empty($templateDir) && !empty($templateName) ? $templateDir . '-' . $templateName : null;
 
         /*Build a data structure*/
-        $contextTypes = array('searchType' => $searchType, 
-                              'keywordType' => $keywordType);
+        $contextTypes = ['searchType' => $searchType, 
+                         'keywordType' => $keywordType];
 
         /*Build the proper return string based on search context*/
         switch ($contextTypes) {

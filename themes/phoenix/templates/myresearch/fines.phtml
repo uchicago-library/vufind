@@ -7,6 +7,10 @@
 ?>
 <div class="<?=$this->layoutClass('mainbody')?>">
   <h2><?=$this->transEsc('Fines')?></h2>
+  <?=$this->flashmessages()?>
+
+  <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
+
   <? if (empty($this->fines)): ?>
     <p><?=$this->transEsc('You do not have any fines')?>.</p>
   <? else: ?>
@@ -30,7 +34,7 @@
         <td>
           <? if (empty($record['title'])): ?>
             <?=$this->transEsc('not_applicable')?>
-          <? elseif (!is_object($record['driver'])): ?>
+          <? elseif (!isset($record['driver']) || !is_object($record['driver'])): ?>
             <?=$this->escapeHtml(trim($record['title'], '/:'))?>
           <? else: ?>
             <a href="<?=$this->recordLink()->getUrl($record['driver'])?>"><?=$this->escapeHtml(trim($record['title'], '/:'))?></a>
@@ -45,13 +49,12 @@
       </tr>
       <? $totalDue += $record['balance']; ?>
     <? endforeach; ?>
-      <tr style="font-weight:bold"><td
-colspan="5"><?=$this->transEsc('Total Balance Due')?></td><td><?=$this->safeMoneyFormat($totalDue/100.00)?></td></tr>
+      <tr style="font-weight:bold"><td colspan="5"><?=$this->transEsc('Total Balance Due')?></td><td><?=$this->safeMoneyFormat($totalDue/100.00) ?></td></tr>
     </tbody>
     </table>
   <? endif; ?>
 </div>
 
 <div class="<?=$this->layoutClass('sidebar')?>">
-  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", array('active' => 'fines'))?>
+  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'fines'])?>
 </div>

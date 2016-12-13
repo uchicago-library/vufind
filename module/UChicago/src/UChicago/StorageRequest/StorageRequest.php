@@ -20,7 +20,7 @@ class StorageRequest
         // Use a session variable for the time being.
         // Switch to the database later. 
         if (!array_key_exists('asr', $_SESSION)) {
-            $_SESSION['asr'] = array();
+            $_SESSION['asr'] = [];
         }
     }
 
@@ -67,14 +67,14 @@ class StorageRequest
                 $volumeNumber = $x[0]->asXML();
             }
 
-		    $_SESSION['asr'][] = array(
+		    $_SESSION['asr'][] = [
 		        'bib' => $bib,
 		        'barcode' => $barcode,
 		        'title' => $title,
 		        'callNumber' => $callNumber,
 		        'copyNumber' => $copyNumber,
 		        'volumeNumber' => $volumeNumber
-		    );
+		    ];
 		}
         return;
     }
@@ -95,18 +95,18 @@ class StorageRequest
 
     public function removeAllRequests() 
     {
-        $_SESSION['asr'] = array();
+        $_SESSION['asr'] = [];
     }
 
     public function placeRequest($barcodes, $bibs, $location)
     {
-        $items = array();
+        $items = [];
         $i = 0;
         while ($i < count($barcodes)) {
-            $items[] = array(
+            $items[] = [
                 'barcode' => $barcodes[$i],
                 'bib' => $bibs[$i]
-            );
+            ];
             $i++;
         }
         foreach ($items as $item) {
@@ -131,10 +131,10 @@ class StorageRequest
         $request->setContent($xml->asXML());
 		$request->setUri($this->config['Catalog']['place_asr_request_url']);
         $request->getHeaders()->addHeaders(
-            array(
-                'Accept' => 'application/xml',
-                'Content-Type' => 'application/xml'
-            )
+            [
+             'Accept' => 'application/xml',
+             'Content-Type' => 'application/xml'
+            ]
         );
     
 		$client = new Client();

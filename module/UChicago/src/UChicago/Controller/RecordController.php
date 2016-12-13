@@ -19,29 +19,38 @@ class RecordController extends \VuFind\Controller\RecordController
         // Retrieve the record driver:
         $driver = $this->loadRecord();
 
+        // Create view
+        $mailer = $this->getServiceLocator()->get('VuFind\Mailer');
+        $view = $this->createEmailViewModel(
+            null, $mailer->getDefaultRecordSubject($driver)
+        );
+        $mailer->setMaxRecipients($view->maxRecipients);
+
+        // UChicago - only difference
+        $view->subject = 'Library Catalog Record: ' . $driver->getBreadcrumb();
+        // End UChicago
+
+        // Set up reCaptcha
+        $view->useRecaptcha = $this->recaptcha()->active('email');
         // Process form submission:
-        $view = $this->createEmailViewModel();
-        if ($this->params()->fromPost('submit')) {
+        if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
             // Attempt to send the email and show an appropriate flash message:
             try {
-                $this->getServiceLocator()->get('VuFind\Mailer')->sendRecord(
+                $cc = $this->params()->fromPost('ccself') && $view->from != $view->to
+                    ? $view->from : null;
+                $mailer->sendRecord(
                     $view->to, $view->from, $view->message, $driver,
-                    $this->getViewRenderer()
+                    $this->getViewRenderer(), $view->subject, $cc
                 );
-                $this->flashMessenger()->setNamespace('info')
-                    ->addMessage('email_success');
+                $this->flashMessenger()->addMessage('email_success', 'success');
                 return $this->redirectToRecord();
             } catch (MailException $e) {
-                $this->flashMessenger()->setNamespace('error')
-                    ->addMessage($e->getMessage());
+                $this->flashMessenger()->addMessage($e->getMessage(), 'error');
             }
         }
 
         // Display the template:
         $view->setTemplate('record/email');
-        
-        $view->subject = 'Library Catalog Record: ' . $driver->getBreadcrumb();
-
         return $view;
     }
 }

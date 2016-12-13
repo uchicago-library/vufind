@@ -5,29 +5,6 @@ use VuFind\Exception\Date as DateException;
 class Citation extends \VuFind\View\Helper\Root\Citation
 {
     /**
-     * Retrieve a citation in a particular format
-     * 
-     * Returns the citation in the format specified
-     * 
-     * @param string $format Citation format ('APA' or 'MLA')
-     *
-     * @return string        Formatted citation
-     */
-    public function getCitation($format)
-    {
-        // Construct method name for requested format:
-        $method = 'getCitation' . $format;
-
-        // Avoid calls to inappropriate/missing methods:
-        if (!empty($format) && method_exists($this, $method)) {
-            return $this->$method();
-        }
-
-        // Return blank string if no valid method found:
-        return '';
-    }
-
-    /**
      * Get Chicago Style citation.
      *
      * This function returns a Chicago Style citation using a modified version
@@ -79,10 +56,10 @@ class Citation extends \VuFind\View\Helper\Root\Citation
                 $format = 'Videocassette';
             }
         } 
-        $mla = array(
+        $mla = [
             'title' => $this->getMLATitle(),
             'authors' => $this->getMLAAuthors($etAlThreshold)
-        );
+        ];
         $mla['format'] = $format;
         $mla['periodAfterTitle'] = !$this->isPunctuated($mla['title']);
 

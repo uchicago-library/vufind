@@ -520,3 +520,388 @@ function getTitleTag() {
     };
     setInterval(add_target_blank, 1000);
 })();
+
+$(document).ready(function() {
+  // Lightbox
+  /*
+   * This function adds jQuery events to elements in the lightbox
+   *
+   * This is a default open action, so it runs every time changeContent
+   * is called and the 'shown' lightbox event is triggered
+   */
+  function bulkActionSubmit($form) {
+    var submit = $form.find('input[type="submit"][clicked=true]').attr('name');
+    var checks = $form.find('input.checkbox-select-item:checked');
+    if(checks.length == 0 && submit != 'empty') {
+      return Lightbox.displayError(vufindString['bulk_noitems_advice']);
+    }
+    if (submit == 'print') {
+      //redirect page
+      var url = path+'/Records/Home?print=true';
+      for(var i=0;i<checks.length;i++) {
+        url += '&id[]='+checks[i].value;
+      }
+      document.location.href = url;
+    } else {
+      Lightbox.submit($form, Lightbox.changeContent);
+    }
+    return false;
+  }
+  function registerLightboxEvents() {
+    var modal = $("#modal");
+    // New list
+    $('#make-list').click(function() {
+      var parts = this.href.split('?');
+      var get = deparam(parts[1]);
+      get['id'] = 'NEW';
+      return Lightbox.get('MyResearch', 'EditList', get);
+    });
+    // New account link handler
+    $('.createAccountLink').click(function() {
+      var parts = this.href.split('?');
+      var get = deparam(parts[1]);
+      return Lightbox.get('MyResearch', 'Account', get);
+    });
+    // Select all checkboxes
+    $(modal).find('.checkbox-select-all').change(function() {
+      $(this).closest('.modal-body').find('.checkbox-select-item').prop('checked', this.checked);
+    });
+    $(modal).find('.checkbox-select-item').change(function() {
+      $(this).closest('.modal-body').find('.checkbox-select-all').prop('checked', false);
+    });
+    // Highlight which submit button clicked
+    $(modal).find("form input[type=submit]").click(function() {
+      // Abort requests triggered by the lightbox
+      $('#modal .fa-spinner').remove();
+      // Remove other clicks
+      $(modal).find('input[type="submit"][clicked=true]').attr('clicked', false);
+      // Add useful information
+      $(this).attr("clicked", "true");
+      // Add prettiness
+      $(this).after(' <i class="fa fa-spinner fa-spin"></i> ');
+    });
+    /**
+     * Hide the header in the lightbox content
+     * if it matches the title bar of the lightbox
+     */
+    var header = $('#modal .modal-title').html();
+    var contentHeader = $('#modal .modal-body .lead');
+    if(contentHeader.length == 0) {
+      contentHeader = $('#modal .modal-body h2');
+    }
+    contentHeader.each(function(i,op) {
+      if (op.innerHTML == header) {
+        $(op).hide();
+      }
+    });
+   // Expand and collapse of No-CNet-ID login
+   $(modal).find('#login-toggle').click(function() {
+      $(this).parents('.login-toggle-wrapper').next('.login-toggle-content').toggle();
+   });
+  }
+  function updatePageForLogin() {
+    // Hide "log in" options and show "log out" options:
+    $('#loginOptions').addClass('hidden');
+    $('.logoutOptions').removeClass('hidden');
+  
+    var recordId = $('#record_id').val();
+  
+    // Update user save statuses if the current context calls for it:
+    if (typeof(checkSaveStatuses) == 'function') {
+      checkSaveStatuses();
+    }
+  
+    // refresh the comment list so the "Delete" links will show
+    $('.commentList').each(function(){
+      var recordSource = extractSource($('#record'));
+      refreshCommentList(recordId, recordSource);
+    });
+  
+    var summon = false;
+    $('.hiddenSource').each(function(i, e) {
+      if(e.value == 'Summon') {
+        summon = true;
+        // If summon, queue reload for when we close
+        Lightbox.addCloseAction(function(){document.location.reload(true);});
+      }
+    });
+  
+    // Refresh tab content
+    var recordTabs = $('.recordTabs');
+    if(!summon && recordTabs.length > 0) { // If summon, skip: about to reload anyway
+      var tab = recordTabs.find('.active a').attr('id');
+      ajaxLoadTab(tab);
+    }
+  }
+  function newAccountHandler(html) {
+    updatePageForLogin();
+    var params = deparam(Lightbox.openingURL);
+    if (params['subaction'] != 'UserLogin') {
+      Lightbox.getByUrl(Lightbox.openingURL);
+      Lightbox.openingURL = false;
+    } else {
+      Lightbox.close();
+    }
+  }
+  
+  // This is a full handler for the login form
+  function ajaxLogin(form) {
+    Lightbox.ajax({
+      url: path + '/AJAX/JSON?method=getSalt',
+      dataType: 'json',
+      success: function(response) {
+        if (response.status == 'OK') {
+          var salt = response.data;
+  
+          // get the user entered password
+          var password = form.password.value;
+  
+          // base-64 encode the password (to allow support for Unicode)
+          // and then encrypt the password with the salt
+          password = rc4Encrypt(salt, btoa(unescape(encodeURIComponent(password))));
+  
+          // hex encode the encrypted password
+          password = hexEncode(password);
+  
+          var params = {password:password};
+  
+          // get any other form values
+          for (var i = 0; i < form.length; i++) {
+            if (form.elements[i].name == 'password') {
+              continue;
+            }
+            params[form.elements[i].name] = form.elements[i].value;
+          }
+  
+          // login via ajax
+          Lightbox.ajax({
+            type: 'POST',
+            url: path + '/AJAX/JSON?method=login',
+            dataType: 'json',
+            data: params,
+            success: function(response) {
+              if (response.status == 'OK') {
+                updatePageForLogin();
+                // and we update the modal
+                var params = deparam(Lightbox.lastURL);
+                if (params['subaction'] == 'UserLogin') {
+                  Lightbox.close();
+                } else {
+                  Lightbox.getByUrl(
+                    Lightbox.lastURL,
+                    Lightbox.lastPOST,
+                    Lightbox.changeContent
+                  );
+                }
+              } else {
+                Lightbox.displayError(response.data);
+              }
+            }
+          });
+        } else {
+          Lightbox.displayError(response.data);
+        }
+      }
+    });
+  }
+
+  /******************************
+   * LIGHTBOX DEFAULT BEHAVIOUR *
+   ******************************/
+  /*
+  Lightbox.addOpenAction(registerLightboxEvents);
+  Lightbox.addFormCallback('newList', Lightbox.changeContent);
+  Lightbox.addFormHandler('loginForm', function(evt) {
+    ajaxLogin(evt.target);
+    return false;
+  });
+  Lightbox.addFormCallback('accountForm', newAccountHandler);
+  Lightbox.addFormCallback('emailSearch', function(html) {
+    Lightbox.confirm(vufindString['bulk_email_success']);
+  });
+  Lightbox.addFormCallback('saveRecord', function(html) {
+    Lightbox.close();
+    checkSaveStatuses();
+  });
+  Lightbox.addFormCallback('bulkRecord', function(html) {
+    Lightbox.close();
+    checkSaveStatuses();
+  });
+  Lightbox.addFormHandler('feedback', function(evt) {
+    var $form = $(evt.target);
+    // Grabs hidden inputs
+    var formSuccess     = $form.find("input#formSuccess").val();
+    var feedbackFailure = $form.find("input#feedbackFailure").val();
+    var feedbackSuccess = $form.find("input#feedbackSuccess").val();
+    // validate and process form here
+    var name  = $form.find("input#name").val();
+    var email = $form.find("input#email").val();
+    var comments = $form.find("textarea#comments").val();
+    if (name.length == 0 || comments.length == 0) {
+      Lightbox.displayError(feedbackFailure);
+    } else {
+      Lightbox.get('Feedback', 'Email', {}, {'name':name,'email':email,'comments':comments}, function() {
+        Lightbox.changeContent('<div class="alert alert-info">'+formSuccess+'</div>');
+      });
+    }
+    return false;
+  });
+  Lightbox.addFormHandler('KnowledgeTracker', function(evt) {
+    var $form = $(evt.target);
+    // Grabs hidden inputs
+    var formSuccess     = $form.find("input#formSuccess").val();
+    var feedbackFailure = $form.find("input#feedbackFailure").val();
+    var feedbackSuccess = $form.find("input#feedbackSuccess").val();
+    // validate and process form here
+    var name  = $form.find("input#name").val();
+    var email = $form.find("input#email").val();
+    var question = $form.find("textarea#question").val();
+    var tasks = $form.find("textarea#tasks").val();
+    var library = $form.find("input#library").val();
+    var affiliation = $form.find("select#affiliation").val();
+    var pageUrl = $form.find("input#pageUrl").val();
+    var refUrl = $form.find("input#refUrl").val();
+    if (name.length == 0 || question.length == 0) {
+      Lightbox.displayError(feedbackFailure);
+    } else {
+      Lightbox.get('Feedback', 'KnowledgeTrackerForm', {}, {'library':library, 'name':name, 'email':email, 'affiliation':affiliation, 'question':question, 'tasks':tasks, 'page_url': pageUrl, 'referring_page': refUrl}, function() {
+        Lightbox.changeContent('<div class="alert alert-info">'+formSuccess+'</div>');
+      });
+    }
+    return false;
+  });
+  */
+});
+$(document).ready(function() {
+  // Feedback
+  $('#feedbackLink').click(function() {
+    return Lightbox.get('Feedback', 'Home');
+  });
+  // Knowledge Tracker
+  /* Only commented this out because php libcurl is failing 
+  in the production envirionment. I would like to bring this back - brad 5/18/2015
+  $('#knowledgeTrackerLink').click(function() {
+    return Lightbox.get('Feedback', 'KnowledgeTracker');
+  });*/
+  // Help links
+  $('.help-link').click(function() {
+    var split = this.href.split('=');
+    return Lightbox.get('Help','Home',{topic:split[1]});
+  });
+  // Hierarchy links
+  $('.hierarchyTreeLink a').click(function() {
+    var id = $(this).parent().parent().parent().find(".hiddenId")[0].value;
+    var hierarchyID = $(this).parent().find(".hiddenHierarchyId")[0].value;
+    return Lightbox.get('Record','AjaxTab',{id:id},{hierarchy:hierarchyID,tab:'HierarchyTree'});
+  });
+  // Login link
+  // JEJ: I think we can eliminate this:
+  // see https://vufind.org/wiki/development:architecture:lightbox
+  /*
+  $('#loginOptions a.modal-link').click(function() {
+    //return Lightbox.get('MyResearch','UserLogin');
+    var url = VuFind.path + '/AJAX/JSON?' + $.param({
+        method: 'getLightbox',
+        submodule: 'MyResearch',
+        subaction: 'UserLogin'
+    });
+    $.ajax({
+        dataType: 'json',
+        cache: false,
+        url: url
+    })
+    .done(function (response) {
+        if (response.data.status) {
+            VuFind.lightbox.alert('login test');
+            // response.data.msg
+        }
+    });
+  });
+  */
+  // Email search link
+  $('.mailSearch').click(function() {
+    return Lightbox.get('Search','Email',{url:document.URL});
+  });
+  // Save record links
+  $('.save-record').click(function() {
+    var parts = this.href.split('/');
+    return Lightbox.get(parts[parts.length-3],'Save',{id:$(this).attr('id')});
+  });
+  // Expand and collapse of No-CNet-ID login, when the page is 
+  $('#login-toggle').click(function() {
+    $(this).parents('.login-toggle-wrapper').next('.login-toggle-content').toggle();
+  });
+
+  // Turn bulk action buttons off on page load. 
+  $('.bulkActionButtons input[type=submit]').prop('disabled', true);
+  // Turn bulk action buttons on when something is checked. 
+  $('.template-dir-search.template-name-results .checkbox-select-item, .checkbox-select-all').change(function() {
+    var disabled = true;
+    if ($('.checkbox-select-item:checked').length > 0) {
+        disabled = false;
+    }
+    if ($('.checkbox-select-item:checked').length > 0) {
+        disabled = false;
+    }
+    $('.bulkActionButtons input[type=submit]').prop('disabled', disabled);
+  });
+
+  // Highlight previous links, grey out following
+  $('.backlink')
+    .mouseover(function() {
+      // Underline back
+      var t = $(this);
+      do {
+        t.css({'text-decoration':'underline'});
+        t = t.prev();
+      } while(t.length > 0);
+      // Mute ahead
+      t = $(this).next();
+      do {
+        t.css({'color':'#999'});
+        t = t.next();
+      } while(t.length > 0);
+    })
+    .mouseout(function() {
+      // Underline back
+      var t = $(this);
+      do {
+        t.css({'text-decoration':'none'});
+        t = t.prev();
+      } while(t.length > 0);
+      // Mute ahead
+      t = $(this).next();
+      do {
+        t.css({'color':''});
+        t = t.next();
+      } while(t.length > 0);
+    });
+    // Advanced facets
+    function updateOrFacets(url, op) {
+      window.location.assign(url);
+      var list = $(op).parents('ul');
+      var header = $(list).find('li.nav-header');
+      list.html(header[0].outerHTML+'<div class="alert alert-info">'+vufindString.loading+'...</div>');
+    }
+    function setupOrFacets() {
+      $('.facetOR').find('.icon-check').replaceWith('<input type="checkbox" checked onChange="updateOrFacets($(this).parent().parent().attr(\'href\'), this)"/>');
+      $('.facetOR').find('.icon-check-empty').replaceWith('<input type="checkbox" onChange="updateOrFacets($(this).parent().attr(\'href\'), this)"/> ');
+    }
+
+    // Advanced facets
+    setupOrFacets();
+  
+    $('[name=bulkActionForm]').submit(function() {
+      return bulkActionSubmit($(this));
+    });
+    $('[name=bulkActionForm]').find("input[type=submit]").click(function() {
+      // Abort requests triggered by the lightbox
+      $('#modal .fa-spinner').remove();
+      // Remove other clicks
+      $(this).closest('form').find('input[type="submit"][clicked=true]').attr('clicked', false);
+      // Add useful information
+      $(this).attr("clicked", "true");
+    });
+});
+
+

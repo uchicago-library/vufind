@@ -2,6 +2,7 @@
     // Set page title.
     $this->headTitle($this->translate('Table of Contents') . ': ' . $this->driver->getBreadcrumb());
 
+    //$toc = $this->driver->getTOC();
     $toc = $this->tab->getContent();
     if (!empty($toc) && array_key_exists('Syndetics', $toc)) {
         $toc = $toc['Syndetics'];

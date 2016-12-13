@@ -16,7 +16,7 @@ class BookPlates extends AbstractHelper
     /**
      * Blacklist for deduping recurring bookplates.
      */
-    public $currentPlates = array();
+    public $currentPlates = [];
 
     /**
      * Function for adding donor information to the full record view.

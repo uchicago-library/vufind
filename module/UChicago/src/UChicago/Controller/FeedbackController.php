@@ -4,11 +4,11 @@
  *
  * PHP version 5
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Brad Busenius <bbusenius@uchicago.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace UChicago\Controller;
 use Zend\Mail as Mail,
@@ -20,11 +20,11 @@ use Zend\Mail as Mail,
  *
  * Controls the Feedback
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Brad Busenius <bbusenius@uchicago.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/building_a_recommendations_module Wiki
+ * @link     https://vufind.org/wiki/development Wiki
  *
  * Adds Knowledge Tracker support to the core VuFind FeebackController.
  */
@@ -126,14 +126,14 @@ class FeedbackController extends \VuFind\Controller\FeedbackController
         /*Don't use the zend framework for http requests. 
         The zend http client is garbage. Use php curl instead.*/
         $ch = curl_init();
-        $curlConfig = array(
+        $curlConfig = [
             CURLOPT_CUSTOMREQUEST   => 'POST',
             CURLOPT_POSTFIELDS      => $post,
             CURLOPT_RETURNTRANSFER  => true,
             CURLOPT_URL             => $config['KnowledgeTracker']['form_url'],
             CURLOPT_SSL_VERIFYPEER  => false, # We should fix this!
             CURLOPT_SSL_VERIFYHOST  => false, # Ditto
-        );
+        ];
         curl_setopt_array($ch, $curlConfig);
         curl_exec($ch);
         curl_close($ch);

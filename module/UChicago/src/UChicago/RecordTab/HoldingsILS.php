@@ -17,29 +17,27 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordTabs
  * @author   Brad Busenius <bbusenius@uchicago.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_tabs Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
 namespace UChicago\RecordTab;
 
 /**
  * Holdings (ILS) tab
  *
- * @category VuFind2
+ * @category VuFind
  * @package  RecordTabs
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:record_tabs Wiki
+ * @link     https://vufind.org/wiki/development:plugins:record_tabs Wiki
  */
 class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
 {
-
-
     /**
      * ILS connection (or false if not applicable)
      *
@@ -82,7 +80,7 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
      */
     public function getUniqueCallNumbersPhoenix($items, $display=false)
     {
-        $callNos = array();
+        $callNos = [];
         foreach ($items as $item) {
             if (isset($item['callnumberDisplay']) && strlen($item['callnumberDisplay']) > 0) {
                 $callNos['display'][] = $item['callnumberDisplay'];
@@ -92,7 +90,7 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
         }
 
         sort($callNos['sort']);
-        return array('display' => array_unique($callNos['display']), 'sort' => $callNos['sort'], 'typeid' => $callNos['callnumbertypeid']);
+        return ['display' => array_unique($callNos['display']), 'sort' => $callNos['sort'], 'typeid' => $callNos['callnumbertypeid']];
     }
 
     /**

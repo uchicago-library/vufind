@@ -102,26 +102,26 @@ $config = array(
 
 
 // Define static routes -- Controller/Action strings
-$staticRoutes = array(
+$staticRoutes = [
     'Feedback/KnowledgeTracker',
     'Feedback/KnowledgeTrackerForm',
     'MyResearch/StorageRequest',
-);
+];
     
 // Build static routes
 foreach ($staticRoutes as $route) {
     list($controller, $action) = explode('/', $route);
     $routeName = str_replace('/', '-', strtolower($route));
-    $config['router']['routes'][$routeName] = array(
+    $config['router']['routes'][$routeName] = [
         'type' => 'Zend\Mvc\Router\Http\Literal',
-        'options' => array(
+        'options' => [
             'route'    => '/' . $route,
-            'defaults' => array(
+            'defaults' => [
                 'controller' => $controller,
                 'action'     => $action,
-            )
-        )
-    );
+            ]
+        ]
+    ];
 }
 
 return $config;

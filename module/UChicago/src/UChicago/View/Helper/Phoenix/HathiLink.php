@@ -82,7 +82,7 @@ class HathiLink extends AbstractHelper
      */
     private function getOCLCNumbers() {
         $rawMarcData = $this->view->driver->crosswalk('hathiLink');
-        $oclcNumbers = array();
+        $oclcNumbers = [];
         foreach($rawMarcData['oclcNumber'] as $data) {
             $num = implode($data['subfieldData']);
             if (preg_match('/\(OCoLC\)/i', $num)) {

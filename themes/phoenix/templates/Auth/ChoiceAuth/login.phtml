@@ -1,7 +1,9 @@
 <h3 class="col-sm-12"><?=$this->transEsc('choose_login_method')?></h3>
 <div id="authcontainer">
-<? foreach ($this->auth()->getManager()->getSelectableAuthOptions() as $loop=>$method):?>
-  <div class="authmethod<?=$loop?>">
+<? $methods = $this->auth()->getManager()->getSelectableAuthOptions(); ?>
+<? $count = count($methods); ?>
+<? foreach ($methods as $loop=>$method):?>
+  <div class="authmethod<?=$loop?> span<?=floor(12/$count) ?>">
     <? $this->auth()->getManager()->setAuthMethod($method) ?>
     <?//=$this->auth()->getLoginDesc() ?>
     <?=$this->auth()->getLogin() ?>

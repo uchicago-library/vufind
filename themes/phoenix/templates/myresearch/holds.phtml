@@ -12,9 +12,11 @@
 
     <?=$this->flashmessages()?>
 
+    <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
+
     <? if (!empty($this->recordList)): ?>
       <? if ($this->cancelForm): ?>
-        <form name="cancelForm" class="inline" action="" method="post" id="cancelHold">
+        <form name="cancelForm" class="inline" method="post" id="cancelHold">
           <input type="hidden" id="submitType" name="cancelSelected" value="1"/>
           <input type="hidden" id="cancelConfirm" name="confirm" value="0"/>
           <div class="btn-group">
@@ -49,15 +51,28 @@
         <? $iteration++; ?>
         <? $ilsDetails = $resource->getExtraDetail('ils_details'); ?>
         <tr>
-        <div id="record<?=$this->escapeHtmlAttr($resource->getUniqueId()) ?>" class="row">
+        <div id="record<?=$this->escapeHtmlAttr($resource->getUniqueId()) ?>" class="row result">
           <td>
           <? if ($this->cancelForm && isset($ilsDetails['cancel_details'])): ?>
             <? $safeId = preg_replace('/[^a-zA-Z0-9]/', '', $resource->getUniqueId()); ?>
             <input type="hidden" name="cancelAllIDS[]" value="<?=$this->escapeHtmlAttr($ilsDetails['cancel_details']) ?>" />
-            <div class="pull-left">
+            <div class="col-xs-1">
               <input type="checkbox" name="cancelSelectedIDS[]" value="<?=$this->escapeHtmlAttr($ilsDetails['cancel_details']) ?>" id="checkbox_<?=$safeId?>" />
             </div>
           <? endif; ?>
+          <? $cover = $this->record($resource)->getCover('holds', 'small'); ?>
+          <? if ($cover): ?>
+            <div class="col-sm-2 col-xs-11 text-center">
+            <? /* Display thumbnail if appropriate: */ ?>
+            <? if($cover): ?>
+              <?=$cover?>
+            <? endif; ?>
+            </div>
+
+            <div class="col-sm-6 col-xs-12">
+         <? else: ?>
+            <div class="col-sm-9 col-xs-11">
+         <? endif; ?>
             <?
               // If this is a non-missing Solr record, we should display a link:
               if (is_a($resource, 'VuFind\\RecordDriver\\SolrDefault') && !is_a($resource, 'VuFind\\RecordDriver\\Missing')) {
@@ -73,13 +88,13 @@
                 echo $this->transEsc('Title not available');
               }
             ?><br/>
-            <? $listAuthor = $resource->getPrimaryAuthor(); if (!empty($listAuthor)): ?>
+            <? $listAuthors = $resource->getPrimaryAuthors(); if (!empty($listAuthors)): ?>
               <?=$this->transEsc('by')?>:
-              <a href="<?=$this->record($resource)->getLink('author', $listAuthor)?>"><?=$this->escapeHtml($listAuthor)?></a><br/>
+              <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><? if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><? endif; ?><br/>
             <? endif; ?>
 
-            <? $formats = $resource->getFormats(); if (count($formats) > 0): ?>
-              <?=str_replace('class="', 'class=" ', $this->record($resource)->getFormatList())?>
+            <? if (count($resource->getFormats()) > 0): ?>
+              <?=$this->record($resource)->getFormatList() ?>
               <br/>
             <? endif; ?>
             <? if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
@@ -93,7 +108,7 @@
             <? endif; ?>
 
             <? if (!empty($ilsDetails['requestGroup'])): ?>
-              <strong><?=$this->transEsc('hold_requested_group') ?>:</strong> <?=$this->transEsc('location_' . $ilsDetails['requestGroup'], array(), $ilsDetails['requestGroup'])?>
+              <strong><?=$this->transEsc('hold_requested_group') ?>:</strong> <?=$this->transEsc('request_group_' . $ilsDetails['requestGroup'], null, $ilsDetails['requestGroup'])?>
               <br />
             <? endif; ?>
 
@@ -122,12 +137,13 @@
           </td>
           <td>
             <? if (!empty($ilsDetails['create'])): ?>
-              <?=$this->escapeHtml($ilsDetails['create']) ?>
+              <strong><?=$this->transEsc('Created') ?>:</strong> <?=$this->escapeHtml($ilsDetails['create']) ?>
+              <? if (!empty($ilsDetails['expire'])): ?>|<? endif; ?>
             <? endif; ?>
           </td>
           <td>
             <? if (!empty($ilsDetails['expire'])): ?>
-              <?=$this->escapeHtml($ilsDetails['expire']) ?>
+              <strong><?=$this->transEsc('Expires') ?>:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?>
             <? endif; ?>
           </td>
           <td>
@@ -143,6 +159,10 @@
               <div><?=$this->transEsc("hold_queue_position") ?>: <?=$this->escapeHtml($ilsDetails['position']) ?></div>
             <? elseif (isset($ilsDetails['available']) && $ilsDetails['available'] == true): ?>
               <div class="text-success"><?=$this->transEsc("hold_available") ?></div>
+            <? elseif (isset($ilsDetails['in_transit']) && $ilsDetails['in_transit']): ?>
+              <div class="text-success"><?=$this->transEsc('request_in_transit') . (is_string($ilsDetails['in_transit']) ? ': ' . $this->transEsc('institution_' . $ilsDetails['in_transit'], [], $ilsDetails['in_transit']) : '') ?></div>
+            <? elseif (isset($ilsDetails['position'])): ?>
+              <p><strong><?=$this->transEsc("hold_queue_position") ?>:</strong> <?=$this->escapeHtml($ilsDetails['position']) ?></p>
             <? endif; ?>
             <? if (isset($ilsDetails['cancel_link'])): ?>
               <p><a href="<?=$this->escapeHtmlAttr($ilsDetails['cancel_link']) ?>"><?=$this->transEsc("hold_cancel") ?></a></p>
@@ -160,6 +180,6 @@
   </div>
 
   <div class="<?=$this->layoutClass('sidebar')?>">
-    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", array('active' => 'holds'))?>
+    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'holds'])?>
   </div>
 </div>

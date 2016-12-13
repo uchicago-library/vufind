@@ -20,13 +20,13 @@ class Eholdings extends AbstractHelper
      * @rerutns array
      */
     public function getEholdingLinks() {
-        $links = array(); 
+        $links = []; 
         $data = $this->view->driver->getEholdingsFromMarc();
         if ($data === null) {
             return $links;
         }
         foreach ($data as $urlData) {
-            $link = array();
+            $link = [];
             $i = 0;
             foreach ($urlData as $url) {
                 $filter = 'www.';
@@ -60,8 +60,8 @@ class Eholdings extends AbstractHelper
      * @returns string
      */
     public function getEholdingsLinkText($type) {
-        $lookup = array('FullText' => 'Full text online', 
-                        'Related' => 'Related text online');
+        $lookup = ['FullText' => 'Full text online', 
+                   'Related' => 'Related text online'];
         /* After PHP 5.4.8 use something like this:
         assert(in_array($type, array_keys($lookup)), 'The e-holding type is not valid.'); */
         assert(in_array($type, array_keys($lookup))); 

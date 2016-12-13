@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:building_a_controller Wiki
+ * @link     https://vufind.org/wiki/development:plugins:controllers Wiki
  */
 namespace UChicago\Controller;
 use VuFind\Exception\Auth as AuthException;
@@ -32,11 +32,11 @@ use VuFind\Exception\Auth as AuthException;
  * READ - This controller overrides the VuFind AjaxController only to hide status for analyitc 
  * records on result pages. 
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Chris Hallberg <challber@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org/wiki/vufind2:building_a_controller Wiki
+ * @link     https://vufind.org/wiki/development:plugins:controllers Wiki
  */
 class AjaxController extends \VuFind\Controller\AjaxController
 {
@@ -60,8 +60,10 @@ class AjaxController extends \VuFind\Controller\AjaxController
         $callnumberSetting
     ) {
         // Summarize call number, location and availability info across all items:
-        $callNumbers = $locations = array();
+        $callNumbers = $locations = [];
         $use_unknown_status = $available = false;
+        $services = [];
+
         foreach ($record as $info) {
             // Find an available copy
             if ($info['availability']) {
@@ -76,7 +78,15 @@ class AjaxController extends \VuFind\Controller\AjaxController
             // Store call number/location info:
             $callNumbers[] = $info['callnumber'];
             $locations[] = $info['location'];
+            // Store all available services
+            if (isset($info['services'])) {
+                $services = array_merge($services, $info['services']);
+            }
         }
+
+        $callnumberHandler = $this->getCallnumberHandler(
+            $callNumbers, $callnumberSetting
+        );
 
         // Determine call number string based on findings:
         $callNumber = $this->pickValue(
@@ -88,6 +98,9 @@ class AjaxController extends \VuFind\Controller\AjaxController
             $locations, $locationSetting, 'Multiple Locations', 'location_'
         );
 
+        if (!empty($services)) {
+            $availability_message = $this->reduceServices($services);
+        } else {
         $availability_message = $use_unknown_status
             ? $messages['unknown']
             : $messages[$available ? 'available' : 'unavailable'];
@@ -99,7 +112,7 @@ class AjaxController extends \VuFind\Controller\AjaxController
         }
 
         // Send back the collected details:
-        return array(
+        return [
             'id' => $record[0]['id'],
             'availability' => ($available ? 'true' : 'false'),
             'availability_message' => $availability_message,
@@ -110,7 +123,8 @@ class AjaxController extends \VuFind\Controller\AjaxController
             'reserve_message' => $record[0]['reserve'] == 'Y'
                 ? $this->translate('on_reserve')
                 : $this->translate('Not On Reserve'),
-            'callnumber' => htmlentities($callNumber, ENT_COMPAT, 'UTF-8')
-        );
+            'callnumber' => htmlentities($callNumber, ENT_COMPAT, 'UTF-8'),
+            'callnumber_handler' => $callnumberHandler
+        ];
     }
 }

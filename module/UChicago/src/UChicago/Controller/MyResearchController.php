@@ -17,13 +17,13 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 namespace UChicago\Controller;
 
@@ -36,11 +36,11 @@ use VuFind\Exception\Auth as AuthException,
 /**
  * Controller for the user account area.
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
 class MyResearchController extends \VuFind\Controller\MyResearchController
 {
@@ -167,9 +167,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         }
 
 	    return $this->createViewModel(
-	        array(
-	            'storagerequests' => $storagerequest->getRequests()
-	        )
+	        ['storagerequests' => $storagerequest->getRequests()]
 	    );
     }
 
@@ -192,15 +190,21 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         // Connect to the ILS:
         $catalog = $this->getILS();
 
+        // Display account blocks, if any:
+        $this->addAccountBlocksToFlashMessenger($catalog, $patron);
+
         // Get the current renewal status and process renewal form, if necessary:
         $renewStatus = $catalog->checkFunction('Renewals', compact('patron'));
         $renewResult = $renewStatus
             ? $this->renewals()->processRenewals(
                 $this->getRequest()->getPost(), $catalog, $patron
             )
-            : array();
+            : [];
 
-        // Set a flag for passing to the template.
+        // UChicago customization: this is the only difference
+        // between our custom version and the original method.
+        // We return this as part of the return value of the
+        // method. Set a flag for passing to the template.
         // This will tell us which alert message to display.
         $failure = false;
         foreach ($renewResult as $entry) {  
@@ -208,14 +212,35 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 $failure = true;
             }
         }
-        
+        // End UChicago customization.
+
         // By default, assume we will not need to display a renewal form:
         $renewForm = false;
 
         // Get checked out item details:
         $result = $catalog->getMyTransactions($patron);
-        $transactions = array();
-        foreach ($result as $current) {
+
+        // Get page size:
+        $config = $this->getConfig();
+        $limit = isset($config->Catalog->checked_out_page_size)
+            ? $config->Catalog->checked_out_page_size : 50;
+
+        // Build paginator if needed:
+        if ($limit > 0 && $limit < count($result)) {
+            $adapter = new \Zend\Paginator\Adapter\ArrayAdapter($result);
+            $paginator = new \Zend\Paginator\Paginator($adapter);
+            $paginator->setItemCountPerPage($limit);
+            $paginator->setCurrentPageNumber($this->params()->fromQuery('page', 1));
+            $pageStart = $paginator->getAbsoluteItemNumber(1) - 1;
+            $pageEnd = $paginator->getAbsoluteItemNumber($limit) - 1;
+        } else {
+            $paginator = false;
+            $pageStart = 0;
+            $pageEnd = count($result);
+        }
+
+        $transactions = $hiddenTransactions = [];
+        foreach ($result as $i => $current) {
             // Add renewal details if appropriate:
             $current = $this->renewals()->addRenewDetails(
                 $catalog, $current, $renewStatus
@@ -227,15 +252,18 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 $renewForm = true;
             }
 
-            // Build record driver:
-            $transactions[] = $this->getDriverForILSRecord($current);
+            // Build record driver (only for the current visible page):
+            if ($i >= $pageStart && $i <= $pageEnd) {
+                $transactions[] = $this->getDriverForILSRecord($current);
+            } else {
+                $hiddenTransactions[] = $current;
+            }
         }
 
         return $this->createViewModel(
-            array(
-                'transactions' => $transactions, 'renewForm' => $renewForm,
-                'renewResult' => $renewResult,
-                'failure' => $failure,
+            compact(
+                'transactions', 'renewForm', 'renewResult', 'paginator',
+                'hiddenTransactions', 'failure'
             )
         );
     }

@@ -3,14 +3,14 @@
   $this->headTitle($this->translate('email_selected_favorites'));
 
   // Set up breadcrumbs:
-  $this->layout()->breadcrumbs = '<li>' . $this->getLastSearchLink($this->transEsc('Search'), '', '</li> ')
+  $this->layout()->breadcrumbs = '<li>' . $this->searchMemory()->getLastSearchLink($this->transEsc('Search'), '', '</li> ')
     . '<li><a href="' .$this->url('cart-home'). '">' .$this->transEsc('Cart'). '</a></li> '
     . '<li class="active">' . $this->transEsc('email_selected_favorites') . '</li>';
 ?>
 <?=$this->flashmessages()?>
 <form class="form-horizontal" action="<?=$this->url('cart-email')?>" method="post"  name="bulkEmail">
   <? foreach ($this->records as $current): ?>
-    <input type="hidden" name="ids[]" value="<?=$this->escapeHtmlAttr($current->getResourceSource() . '|' . $current->getUniqueId())?>" />
+    <input type="hidden" name="ids[]" value="<?=$this->escapeHtmlAttr($current->getSourceIdentifier() . '|' . $current->getUniqueId())?>" />
   <? endforeach; ?>
   <div class="form-group">
     <label class="col-sm-3 control-label" for="email_to"><?=$this->transEsc('To')?>:</label>
@@ -37,11 +37,12 @@
       <input class="btn btn-primary" type="submit" name="submit" value="<?=$this->transEsc('Send')?>"/>
     </div>
   </div>
+  <?=$this->render('Helpers/email-form-fields.phtml')?>
 </form>
 <?
   $script = <<<JS
     $('button.btn.hidden').removeClass('hidden');
-    $('.collapse.in').removeClass('in');
+    $('#itemhide').removeClass('in');
 JS;
 ?>
 <?=$this->inlineScript(\Zend\View\Helper\HeadScript::SCRIPT, $script, 'SET') ?>

@@ -6,8 +6,11 @@
   $this->layout()->searchbox = false;
 
   // Set up breadcrumbs:
-  $this->layout()->breadcrumbs = '<li>' . $this->getLastSearchLink($this->transEsc('Search'), '', '</li> ')
-    . '<li class="active">' . $this->transEsc('Advanced') . '</li>';
+  $this->layout()->breadcrumbs = '<li>';
+  $lastSearchLink = $this->searchMemory()->getLastSearchLink($this->transEsc('Search'));
+  $this->layout()->breadcrumbs .= !empty($lastSearchLink)
+    ? $lastSearchLink : $this->transEsc('Search');
+  $this->layout()->breadcrumbs .= '</li> <li class="active">' . $this->transEsc('Advanced') . '</li>';
 
   // Set up saved search details:
   if (isset($this->saved) && is_object($this->saved)) {
@@ -20,6 +23,7 @@
     }
     $hasDefaultsApplied = $this->saved->getParams()->hasDefaultsApplied();
     $searchFilters = $this->saved->getParams()->getFilterList();
+    $hiddenFilters = $this->saved->getParams()->getHiddenFilters();
 
     // When editing an advanced search, this page displays facets in the
     // sidebar. unset the facets that get displayed as limits. 
@@ -29,6 +33,7 @@
     unset($searchFilters['unrecognized_facet_label']);
   } else {
     $hasDefaultsApplied = $searchDetails = $searchFilters = $groups = false;
+    $hiddenFilters = $this->searchtabs()->getHiddenFilters($this->searchClassId, true);
   }
 
   // Set up Javascript:
@@ -43,9 +48,28 @@
     $this->headScript()->appendScript(
       $this->partial(
         $this->buildPageOverride, 
-        array('searchDetails' => $searchDetails)
+        ['options' => $this->options, 'searchDetails' => $searchDetails]
       )
     );
+  }
+
+  // Collect previous search queries
+  $setSearchGroups = [];
+  $setGroupCount = 0;
+  $setQueries = [];
+  if (isset($searchDetails) && is_object($searchDetails)) {
+    foreach ($searchDetails->getQueries() as $group=>$searchGroup) {
+      $setSearchGroups[$group] = $searchGroup->isNegated() ? 'NOT' : $searchGroup->getOperator();
+      if ($setGroupCount < $group) {
+        $setGroupCount = $group;
+      }
+      if (!isset($setQueries[$group])) {
+        $setQueries[$group] = [];
+      }
+      foreach ($searchGroup->getQueries() as $search) {
+        $setQueries[$group][] = $search;
+      }
+    }
   }
 ?>
 
@@ -95,11 +119,11 @@
 	                                $operator = $groups[$g]->getOperator();
 	                            }
 	                        }
-	                        foreach (array(
-	                            array('value' => 'AND', 'text' => 'ALL Terms'),
-	                            array('value' => 'OR', 'text' => 'ANY Terms'),
-	                            array('value' => 'NOT', 'text' => 'NO Terms'),
-	                        ) as $option): 
+	                        foreach ([
+	                            ['value' => 'AND', 'text' => 'ALL Terms'],
+	                            ['value' => 'OR', 'text' => 'ANY Terms'],
+	                            ['value' => 'NOT', 'text' => 'NO Terms'],
+	                        ] as $option): 
 	                            $selected = '';
 	                            if ($option['value'] == $operator) {
 	                                $selected = 'selected="selected" ';
@@ -127,24 +151,24 @@
                     <input type="text" value="<?=$value?>" name="lookfor<?=$g?>[]" class="form-control input-large" id="search_lookfor<?=$g?>_<?=$s?>"/>
                     <select class="form-control" name="type<?=$g?>[]" id="search_type<?=$g?>_<?=$s?>">
                         <? 
-                            foreach (array(
-								array('value' => 'AllFields', 'text' => 'All Fields'),
-								array('value' => 'Tltle', 'text' => 'Title'),
-								array('value' => 'JournalTitle', 'text' => 'Journal Title'),
-								array('value' => 'Author', 'text' => 'Author '),
-								array('value' => 'Performer', 'text' => 'Performer'),
-								array('value' => 'Subject', 'text' => 'Subject'),
-								array('value' => 'CallNumber', 'text' => 'Call Number'),
-								array('value' => 'StandardNumbers', 'text' => 'ISBN, ISSN, etc.'),
-								array('value' => 'publisher', 'text' => 'Publisher'),
-								array('value' => 'publication_place', 'text' => 'Publication Place'),
-								array('value' => 'Series', 'text' => 'Series'),
-								array('value' => 'year', 'text' => 'Year of Publication'),
-								array('value' => 'toc', 'text' => 'Table of Contents'),
-								array('value' => 'Donor', 'text' => 'Donor'),
-								array('value' => 'Title Uniform', 'text' => 'Uniform Title'),
-								array('value' => 'Notes', 'text' => 'Notes'),
-                            ) as $o): 
+                            foreach ([
+								['value' => 'AllFields', 'text' => 'All Fields'],
+								['value' => 'Tltle', 'text' => 'Title'],
+								['value' => 'JournalTitle', 'text' => 'Journal Title'],
+								['value' => 'Author', 'text' => 'Author '],
+								['value' => 'Performer', 'text' => 'Performer'],
+								['value' => 'Subject', 'text' => 'Subject'],
+								['value' => 'CallNumber', 'text' => 'Call Number'],
+								['value' => 'StandardNumbers', 'text' => 'ISBN, ISSN, etc.'],
+								['value' => 'publisher', 'text' => 'Publisher'],
+								['value' => 'publication_place', 'text' => 'Publication Place'],
+								['value' => 'Series', 'text' => 'Series'],
+								['value' => 'year', 'text' => 'Year of Publication'],
+								['value' => 'toc', 'text' => 'Table of Contents'],
+								['value' => 'Donor', 'text' => 'Donor'],
+								['value' => 'Title Uniform', 'text' => 'Uniform Title'],
+								['value' => 'Notes', 'text' => 'Notes'],
+                            ] as $o): 
                                 $value = $o['value']; 
                                 $text = $o['text']; 
                                 $selected = '';
@@ -189,7 +213,7 @@
               </li>
             </ul>
             <? foreach ($searchFilters as $field => $data): ?>
-            <? if (!in_array($data[0]['field'], array('language', 'format',  'building', 'item_collection'))): ?>
+            <? if (!in_array($data[0]['field'], ['language', 'format',  'building', 'item_collection'])): ?>
               <ul class="list-group">
                 <li class="list-group-item title"><?=$this->transEsc($field)?></li>
                 <? foreach ($data as $value): ?>

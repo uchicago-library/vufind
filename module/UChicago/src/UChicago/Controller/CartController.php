@@ -1,5 +1,30 @@
 <?php
-
+/**
+ * Book Bag / Bulk Action Controller
+ *
+ * PHP version 5
+ *
+ * Copyright (C) Villanova University 2010.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2,
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ *
+ * @category VuFind
+ * @package  Controller
+ * @author   Demian Katz <demian.katz@villanova.edu>
+ * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
+ * @link     https://vufind.org Main Site
+ */
 namespace UChicago\Controller;
 use VuFind\Exception\Mail as MailException,
     Zend\Session\Container as SessionContainer;
@@ -7,13 +32,12 @@ use VuFind\Exception\Mail as MailException,
 /**
  * Book Bag / Bulk Action Controller
  *
- * @category VuFind2
+ * @category VuFind
  * @package  Controller
  * @author   Demian Katz <demian.katz@villanova.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
- * @link     http://vufind.org   Main Site
+ * @link     https://vufind.org Main Site
  */
-
 class CartController extends \VuFind\Controller\CartController
 {
     /**
@@ -42,26 +66,40 @@ class CartController extends \VuFind\Controller\CartController
             && !$this->getUser()
         ) {
             return $this->forceLogin(
-                null, array('cartIds' => $ids, 'cartAction' => 'Email')
+                null, ['cartIds' => $ids, 'cartAction' => 'Email']
             );
         }
 
-        $view = $this->createEmailViewModel();
+        $view = $this->createEmailViewModel(
+            null, $this->translate('bulk_email_title')
+        );
         $view->records = $this->getRecordLoader()->loadBatch($ids);
+        // Set up reCaptcha
+        $view->useRecaptcha = $this->recaptcha()->active('email');
 
         // Process form submission:
-        if ($this->formWasSubmitted('submit')) {
+        if ($this->formWasSubmitted('submit', $view->useRecaptcha)) {
+            // Build the URL to share:
+            $params = [];
+            foreach ($ids as $current) {
+                $params[] = urlencode('id[]') . '=' . urlencode($current);
+            }
+            $url = $this->getServerUrl('records-home') . '?' . implode('&', $params);
+
             // Attempt to send the email and show an appropriate flash message:
             try {
                 // If we got this far, we're ready to send the email:
-                $this->getServiceLocator()->get('VuFind\Mailer')->sendRecords(
+                $mailer = $this->getServiceLocator()->get('VuFind\Mailer');
+                $mailer->setMaxRecipients($view->maxRecipients);
+                $cc = $this->params()->fromPost('ccself') && $view->from != $view->to
+                    ? $view->from : null;
+                $mailer->sendRecords(
                     $view->to, $view->from, $view->message,
-                    $view->records, $this->getViewRenderer()
+                    $view->records, $this->getViewRenderer(), $view->subject, $cc
                 );
-                return $this->redirectToSource('info', 'email_success');
+                return $this->redirectToSource('success', 'bulk_email_success');
             } catch (MailException $e) {
-                $this->flashMessenger()->setNamespace('error')
-                    ->addMessage($e->getMessage());
+                $this->flashMessenger()->addMessage($e->getMessage(), 'error');
             }
         }
 

@@ -366,3 +366,6 @@
  <copyField source="title_full"    dest="title_full_exact"/>
  <copyField source="title_author"    dest="title_author_exact"/>
 
+ <!-- Default Boolean Operator -->
+ <solrQueryParser defaultOperator="AND"/>
+</schema>

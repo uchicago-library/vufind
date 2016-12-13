@@ -14,8 +14,18 @@
     $basicSearch = $this->searchbox()->combinedHandlersActive() ? 'combined-searchbox' : $options->getSearchAction();
     $searchHome = $options->getSearchHomeAction();
     $advSearch = $options->getAdvancedSearchAction();
-    $lastSort = $options->getLastSort();
-    $lastLimit = $options->getLastLimit();
+    $lastSort = $this->searchMemory()->getLastSort($this->searchClassId);
+    $lastLimit = $this->searchMemory()->getLastLimit($this->searchClassId);
+    $ignoreHiddenFilterMemory = isset($this->ignoreHiddenFilterMemory) && $this->ignoreHiddenFilterMemory;
+    $ignoreHiddenFiltersInRequest = isset($this->ignoreHiddenFiltersInRequest) && $this->ignoreHiddenFiltersInRequest;
+    $hiddenFilters = $this->searchtabs()->getHiddenFilters($this->searchClassId, $ignoreHiddenFilterMemory, $ignoreHiddenFiltersInRequest);
+    if (empty($hiddenFilters) && !$ignoreHiddenFilterMemory) {
+        $hiddenFilters = $this->searchMemory()->getLastHiddenFilters($this->searchClassId);
+        if (empty($hiddenFilters)) {
+            $hiddenFilters = $this->searchtabs()->getHiddenFilters($this->searchClassId);
+        }
+    }
+    $hiddenFilterParams = $this->searchtabs()->getCurrentHiddenFilterParams($this->searchClassId, $ignoreHiddenFilterMemory, '?');
 
     // Resetting $this->lookfor (not default VuFind behavior). I think this is required because the mini searchbox also displays on browse pages - brad
     $searchTerms = isset($_GET["lookfor"]) ? $_GET["lookfor"] : '';
@@ -33,17 +43,16 @@
         default:
             $this->lookfor = $this->lookfor;
     }
- 
 ?>
 <? if ($this->searchType == 'advanced'): ?>
-  <div id="searchForm">
-    <? $tabs = $this->render('search/searchTabs'); ?>
+  <div class="searchForm navbar-form navbar-left flip">
+    <? $tabs = $this->context($this)->renderInContext('search/searchTabs', ['hiddenFilters' => $hiddenFilters]); ?>
     <? if (!empty($tabs)): ?><?=$tabs ?><div class="tab-content clearfix"><? endif; ?>
       <p class="adv_search_terms"><?=$this->transEsc("Your search terms")?> : "<strong><?=$this->escapeHtml($this->lookfor)?></strong>"</p>
       <p class="adv_search_links">
         <a href="<?=$this->url($advSearch)?>?edit=<?=$this->escapeHtmlAttr($this->searchId)?>" class="mini-adv-link"><?=$this->transEsc("Edit this Advanced Search")?></a>
-        <a href="<?=$this->url($advSearch)?>" class="mini-adv-link"><?=$this->transEsc("Start a new Advanced Search")?></a>
-        <a href="<?=$this->url($searchHome)?>" class="mini-basic-link"><?=$this->transEsc("Start a new Basic Search")?></a>
+        <a href="<?=$this->url($advSearch) . $hiddenFilterParams?>" class="mini-adv-link"><?=$this->transEsc("Start a new Advanced Search")?></a>
+        <a href="<?=$this->url($searchHome) . $hiddenFilterParams?>" class="mini-basic-link"><?=$this->transEsc("Start a new Basic Search")?></a>
       </p>
     <? if (!empty($tabs)): ?></div><? endif; ?>
   </div>
@@ -52,7 +61,7 @@
     <?= $this->render('search/searchTabs'); ?>
     <input class="form-control search-query<? if($this->searchbox()->autocompleteEnabled($this->searchClassId)):?> autocomplete searcher:<?=$this->escapeHtmlAttr($this->searchClassId) ?><? endif ?>" id="searchForm_lookfor" type="text" name="lookfor" value="<?=$this->escapeHtmlAttr($this->lookfor)?>"/>
     <? if ($handlerCount > 1): ?>
-      <select class="form-control" id="searchForm_type" name="type" data-native-menu="false">
+      <select class="searchForm_type form-control" name="type" data-native-menu="false">
         <? foreach ($handlers as $handler): ?>
           <option value="<?=$this->escapeHtmlAttr($handler['value'])?>"<?=$handler['selected'] ? ' selected="selected"' : ''?>><?=$handler['indent'] ? '-- ' : ''?><?=$this->transEsc($handler['label'])?></option>
         <? endforeach; ?>
@@ -60,7 +69,7 @@
     <? elseif ($handlerCount == 1): ?>
       <input type="hidden" name="type" value="<?=$this->escapeHtmlAttr($handlers[0]['value'])?>" />
     <? endif; ?>
-    <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> <?=$this->transEsc("Find")?></button>
+    <button type="submit" class="btn btn-primary"><i class="fa fa-search" aria-hidden="true"></i> <?=$this->transEsc("Find")?></button>
     <? if ($advSearch): ?>
       <a href="#" class="btn btn-link mini-box-toggle browse"><?=$this->transEsc("Browse")?></a> | <a href="<?=$this->url($advSearch)?>" class="btn btn-link mini-adv-link"><?=$this->transEsc("Advanced")?></a>
     <? endif; ?>
@@ -78,15 +87,15 @@
     <? endif; ?>
     <?
       $filterDetails = $this->searchbox()->getFilterDetails(
-          isset($this->filterList) && is_array($this->filterList) ? $this->filterList : array(),
-          isset($this->checkboxFilters) && is_array($this->checkboxFilters) ? $this->checkboxFilters : array()
+          isset($this->filterList) && is_array($this->filterList) ? $this->filterList : [],
+          isset($this->checkboxFilters) && is_array($this->checkboxFilters) ? $this->checkboxFilters : []
       );
     ?>
     <? if ((isset($hasDefaultsApplied) && $hasDefaultsApplied) || !empty($filterDetails)): ?>
       <? $defaultFilterState = $options->getRetainFilterSetting() ? ' checked="checked"' : ''; ?>
       <div class="checkbox">
         <label>
-          <input onChange="$('.applied-filter').click()" type="checkbox"<?=$defaultFilterState?> id="searchFormKeepFilters"/>
+          <input onChange="$('.applied-filter').click()" type="checkbox"<?=$defaultFilterState?> class="searchFormKeepFilters"/>
           <?=$this->transEsc("basic_search_keep_filters")?>
         </label>
       </div>
@@ -102,6 +111,11 @@
         <? endif; ?>
       </div>
     <? endif; ?>
+    <? foreach ($hiddenFilters as $key => $filter): ?>
+      <? foreach ($filter as $value): ?>
+        <input type="hidden" name="hiddenFilters[]" value="<?=$this->escapeHtmlAttr($key) . ':' . $this->escapeHtmlAttr($value)?>" />
+      <? endforeach; ?>
+    <? endforeach; ?>
     <?
       /* Show hidden field for active search class when in combined handler mode. */
       if ($this->searchbox()->combinedHandlersActive()) {
@@ -116,5 +130,5 @@
       }
     ?>
   </form>
-  <script type="text/javascript">$("#searchForm_lookfor").focus()</script>
+  <script type="text/javascript">$(".searchForm_lookfor:visible").focus()</script>
 <? endif; ?>

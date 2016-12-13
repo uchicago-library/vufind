@@ -586,7 +586,7 @@ $(document).ready(function() {
         /*Only affects logout link currently, but this would affect general links inside #header-collapse*/
 	    $('#header-collapse a[href]').on('click', function(e) {
 	        /* deal with the help and leave feedback (knowledge tracker) links separately. */
-	        if ($(e.target).attr('title') == 'Help' || $(e.target).attr('class') == 'modal-link') {
+	        if ($(e.target).attr('title') == 'Help' || $(e.target).attr('data-lightbox') !== undefined) {
 	            return;
 	        }
             	
@@ -594,7 +594,7 @@ $(document).ready(function() {
 	        cataloglinkclick('send', 'event', 'headerLink', t, $(this), e);
 	    });
 
-		$('#header-collapse .modal-link').on('click', function(e) {
+		$('#header-collapse a[data-lightbox]').on('click', function(e) {
 	        var t = $(e.target).text().trim();
 	        catalogevent('send', 'event', 'headerLink', t);
         });
