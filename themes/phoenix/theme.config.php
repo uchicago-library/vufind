@@ -32,7 +32,8 @@ return array(
                 return new \UChicago\View\Helper\Phoenix\BootstrapAlert();
             },
             'citation' => function ($sm) {
-                return new \UChicago\View\Helper\Phoenix\Citation();
+                $converter = new \VuFind\Date\Converter();
+                return new \UChicago\View\Helper\Phoenix\Citation($converter);
             },
             'Eholdings' => function ($sm) {
                 return new \UChicago\View\Helper\Phoenix\Eholdings();

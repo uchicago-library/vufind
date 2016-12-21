@@ -5,8 +5,9 @@
   }
 
   // Set up some variables for convenience:
+  $id = $this->driver->getUniqueId();
   $cart = $this->cart();
-  $cartId = $this->driver->getSourceIdentifier() . '|' . $this->driver->getUniqueId();
+  $cartId = $this->driver->getResourceSource() . '|' . $id;
 ?>
 <ul class="nav nav-pills hidden-print">
   <? if (count($this->driver->getCitationFormats()) > 0): ?>

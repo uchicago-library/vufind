@@ -4,12 +4,12 @@ namespace UChicago\Module\Configuration;
 $config = array(
     'controllers' => array(
         'factories' => array(
+            'cart' => 'UChicago\Controller\Factory::getCartController',
             'record' => 'UChicago\Controller\Factory::getRecordController',
         ),
         'invokables' => array(
             'adminpin' => 'VuFindAdmin\Controller\PinController',
             'ajax' => 'UChicago\Controller\AjaxController',
-            'cart' => 'UChicago\Controller\CartController',
             'feedback' => 'UChicago\Controller\FeedbackController',
             'my-research' => 'UChicago\Controller\MyResearchController',
             'search' => 'UChicago\Controller\SearchController',

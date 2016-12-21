@@ -104,6 +104,7 @@ class AjaxController extends \VuFind\Controller\AjaxController
         $availability_message = $use_unknown_status
             ? $messages['unknown']
             : $messages[$available ? 'available' : 'unavailable'];
+        }
 
         // Has the effect of hiding the status for analyitc records 
         // on results pages - brad

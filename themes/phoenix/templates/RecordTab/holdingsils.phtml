@@ -9,7 +9,7 @@
     $callNumLabel = 'Call Number:';
     // Account for replace_other_urls setting
     //$urls = $this->record($this->driver)->getLinkDetails($openUrlActive);
-    $urls = ($openUrl) ? [] : $this->Eholdings()->getEholdingLinks();//Replace default 856 urls with e-holdings from the 098 fields
+    $urls = $this->Eholdings()->getEholdingLinks();//Replace default 856 urls with e-holdings from the 098 fields
     $offlineMode = $this->ils()->getOfflineMode();
     try {
         $holdings = $this->driver->getRealTimeHoldings();
@@ -63,7 +63,7 @@
   <? if (!empty($urls)): ?>
       <?/*For now, only display a browse link if the first e-holding has a callnumber - Fix later*/?>
       <? if (isset($urls[0]['callnumber'])):?>
-        <br/><h4><span><?=$this->transEsc($callNumLabel)?> </span><?=$urls[0]['callnumber']?></h4> <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&amp;from=<?=$this->escapeHtml($urls[0]['callnumber'])?>"
+        <h4><span><?=$this->transEsc($callNumLabel)?> </span><?=$urls[0]['callnumber']?></h4> <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&amp;from=<?=$this->escapeHtml($urls[0]['callnumber'])?>"
            class="ablink"><?=$callNumDisplayText?></a><br/>
       <?endif;?>
     <? foreach ($urls as $current): ?>
@@ -113,7 +113,7 @@
 </h3>
 
 <? if ($isFullTextOnline):?>
-  <br/><strong><?=$this->transEsc("Available via:")?></strong>
+  <strong><?=$this->transEsc("Available via:")?></strong>
 <? endif; ?>
 <? if ($isRelatedTextOnline):?>
   <br/><strong><?=$this->transEsc("Related Links:")?></strong>
@@ -121,7 +121,7 @@
 
 <?/*Get the first barcode to pass to the map links*/
   $firstBarcode = $this->tab->getFirstBarcode($holding);?>
-<span class="maplink"><?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $firstBarcode)?></span><br/>
+<span class="maplink"><?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $firstBarcode)?></span>
 
 <?/*Callnumbers*/?>
 <? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
@@ -152,7 +152,7 @@
       <th><?=$textFieldName == 'summary' ? $this->transEsc("Volume Holdings") : $this->transEsc(ucfirst($textFieldName))?>:</th>
       <td>
         <? foreach ($textFields as $current): ?>
-          <?=$this->escapeHtml($current)?><br/>
+          <div typeof="Enumeration"><?=$this->escapeHtml($current)?></div>
         <? endforeach; ?>
       </td>
     </tr>

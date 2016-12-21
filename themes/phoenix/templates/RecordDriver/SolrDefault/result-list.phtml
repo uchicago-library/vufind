@@ -7,7 +7,7 @@
   $hathiLink = $this->HathiLink()->getHathiLink();
   if ($cover):
     ob_start(); ?>
-    <div class="media-<?=$thumbnailAlignment ?> <?=$this->escapeHtmlAttr($coverDetails['size'])?>">
+    <div class="media-<?=$thumbnailAlignment ?> <?=$this->escapeHtmlAttr($coverDetails['size'])?> col-sm-2 col-xs-0 left hidden-xs">
       <?=$cover ?>
     </div>
     <? $thumbnail = ob_get_contents(); ?>
@@ -138,7 +138,6 @@
               <span class="callnumber holdings-info"><strong><?=$this->transEsc('Call Number')?>:</strong> <?=$this->escapeHtml($summCallNo)?><strong><?=$this->transEsc('Call Number')?>:</strong> <?=$this->escapeHtml($summCallNo)?></span>
             <? endif; ?>
           <? endif; ?>
-        </div>
   
         <? /* We need to find out if we're supposed to display an OpenURL link ($openUrlActive),
               but even if we don't plan to display the link, we still want to get the $openUrl
@@ -153,16 +152,21 @@
               <span><?=$this->transEsc('Loading')?>...</span>
             </span>
           <? endif; ?>
+        </div><!--/.callnumAndLocation -->
 
           <? if ($openUrlActive || !empty($urls)): ?>
           <? if ($openUrlActive): ?>
-            <br/>
             <?=$openUrl->renderTemplate()?>
           <? endif; ?>
           <? if (!is_array($urls)) $urls = array();
             if(!$this->driver->isCollection()):
               foreach ($urls as $current): ?>
-                <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext" target="new"><i class="fa fa-external-link" aria-hidden="true"></i> <?=($current['url'] == $current['desc']) ? $this->transEsc('Get full text') : $this->escapeHtml($current['desc'])?></a><br/>
+              <? $linkText = (!empty($current['text']) ? ': '.$current['text'] : ''); ?>
+              <div class="e-holdings">
+                <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext eLink text-success" target="new">
+                    <?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']) . $linkText)?>
+                </a> <?=$current['desc']?>
+              </div>
             <? endforeach; ?>
           <? endif; ?>
         <? endif; ?>

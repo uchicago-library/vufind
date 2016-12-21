@@ -341,7 +341,7 @@ $(document).ready(function() {
 
     $('#searchtabinfolink').popover({
         'container': '#searchtabinfolink',
-        'content': '<div style="padding: 0 10px;"><p>Keyword searches produce lists of records sorted by relevance:</p><p style="padding-left: 10px;"><strong>Basic Keyword Search</strong><br/>Use for exploring a general topic, or if the exact title or author of a book is unknown.</p><p style="padding-left: 10px;"><strong>Advanced Keyword Search</strong><br/>Use for very specific or complex topics.</p><p><strong>Begins With</strong><br/>Begins With allows you to browse through an alphabetical list of titles, authors, subjects, etc. Use to locate a book when the exact title or author\'s entire name is known, or when searching for items on a specific subject.</p><p><a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchtypes" target="_blank">More info</a><br/><a href="http://youtu.be/I4kOECCepew" target="_blank">90 second video on search types <i style="text-decoration: none;" class="icon-facetime-video "></i></a></p></div>',
+        'content': '<div style="padding: 0 10px;"><p>Keyword searches produce lists of records sorted by relevance:</p><p style="padding-left: 10px;"><strong>Basic Keyword Search</strong><br/>Use for exploring a general topic, or if the exact title or author of a book is unknown.</p><p style="padding-left: 10px;"><strong>Advanced Keyword Search</strong><br/>Use for very specific or complex topics.</p><p><strong>Begins With</strong><br/>Begins With allows you to browse through an alphabetical list of titles, authors, subjects, etc.  Use to locate a book when the exact title or author\'s entire name is known, or when searching for items on a specific subject.</p><p><a href="https://www.lib.uchicago.edu/research/help/catalog-help/selecting/" target="_blank">More info</a><br/><a href="https://goo.gl/TqhhYd" target="_blank">90 second video on search types <i style="text-decoration: none;" class="icon-facetime-video "></i></a></p></div>',
         'delay': 500,
         'html': true,
         'placement': 'right',
@@ -521,32 +521,20 @@ function getTitleTag() {
     setInterval(add_target_blank, 1000);
 })();
 
-$(document).ready(function() {
-  // Lightbox
-  /*
-   * This function adds jQuery events to elements in the lightbox
-   *
-   * This is a default open action, so it runs every time changeContent
-   * is called and the 'shown' lightbox event is triggered
-   */
-  function bulkActionSubmit($form) {
-    var submit = $form.find('input[type="submit"][clicked=true]').attr('name');
-    var checks = $form.find('input.checkbox-select-item:checked');
-    if(checks.length == 0 && submit != 'empty') {
-      return Lightbox.displayError(vufindString['bulk_noitems_advice']);
-    }
-    if (submit == 'print') {
-      //redirect page
-      var url = path+'/Records/Home?print=true';
-      for(var i=0;i<checks.length;i++) {
-        url += '&id[]='+checks[i].value;
-      }
-      document.location.href = url;
-    } else {
-      Lightbox.submit($form, Lightbox.changeContent);
-    }
+function bulkFormHandler(event, data) {
+  if ($('.checkbox-select-item:checked,checkbox-select-all:checked').length === 0) {
+    VuFind.lightbox.alert(VuFind.translate('bulk_noitems_advice'), 'danger');
     return false;
   }
+  for (var i in data) {
+    if ('print' === data[i].name) {
+      return true;
+    }
+  }
+}
+
+$(document).ready(function() {
+  // Lightbox
   function registerLightboxEvents() {
     var modal = $("#modal");
     // New list
@@ -594,10 +582,6 @@ $(document).ready(function() {
         $(op).hide();
       }
     });
-   // Expand and collapse of No-CNet-ID login
-   $(modal).find('#login-toggle').click(function() {
-      $(this).parents('.login-toggle-wrapper').next('.login-toggle-content').toggle();
-   });
   }
   function updatePageForLogin() {
     // Hide "log in" options and show "log out" options:
@@ -891,9 +875,6 @@ $(document).ready(function() {
     // Advanced facets
     setupOrFacets();
   
-    $('[name=bulkActionForm]').submit(function() {
-      return bulkActionSubmit($(this));
-    });
     $('[name=bulkActionForm]').find("input[type=submit]").click(function() {
       // Abort requests triggered by the lightbox
       $('#modal .fa-spinner').remove();
@@ -903,5 +884,15 @@ $(document).ready(function() {
       $(this).attr("clicked", "true");
     });
 });
+
+$(document).ready(function() {
+    $('#modal').on('shown.bs.modal', function() {
+        // Expand and collapse of No-CNet-ID login
+        $(this).find('#login-toggle').click(function() {
+            $(this).parents('.login-toggle-wrapper').next('.login-toggle-content').toggle();
+        });
+    }); 
+});
+
 
 

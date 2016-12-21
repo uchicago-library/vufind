@@ -45,6 +45,7 @@ $cacheHash = md5(
 );
 $cacheDir .= '/' . $cacheHash;
 if (!is_dir($cacheDir)) {
+    echo $cacheDir;
     mkdir($cacheDir);
 }
 

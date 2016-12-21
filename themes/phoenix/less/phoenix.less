@@ -1,5 +1,6 @@
 @import "bootstrap";
 @import "variables";
+@import "vendor/bootstrap-slider/bootstrap-slider";
 
 /*Variables and mixins*/
 .tiny-text-shadow {
@@ -17,6 +18,9 @@
 .highlight {
     background: transparent;
     padding: 0;
+}
+.phoenix mark {
+    background: #fcf8e3;
 }
 a.disabled {
     color: inherit;
@@ -252,7 +256,7 @@ div#searchForm p {
     cursor: pointer;
     font-size: @clear-input-size;
     color: lighten(@gray-light, 10%);
-    margin-left: -@form-control-padding - 3;
+    margin-left: -(@form-control-padding * 2) - 4;
     margin-top: (@input-height-base / 2) - (@clear-input-size / 2);
     @media (max-width: @screen-sm-min) {
         display: none;
@@ -405,6 +409,14 @@ header #alphaBrowseForm {
         padding-right: @padding-small-horizontal;
     }
 }
+/* JEJ */
+/* Override bootstrap3. */
+body.phoenix .group {
+    margin-bottom: 20px !important;
+    @media (min-width: 768px) {
+        padding: 19px;
+    }
+}
 .group .form-group {
   position: relative;
 }
@@ -432,9 +444,10 @@ header #alphaBrowseForm {
         display: none;
     }
 }
-#groupPlaceHolder {
+body.phoenix #groupPlaceHolder {
   margin-top: -16px;
   margin-bottom: 20px;
+  padding: 0;
   a {
     color: #5c5c5c;
   }
@@ -488,7 +501,7 @@ search.)
         text-shadow: none;
     }
 }
-#searchForm .twitter-typeahead,
+#searchForm .form-control,
 #searchForm_type.form-control,
 #alphaBrowseForm .twitter-typeahead,
 #alphaBrowseForm_source.form-control{
@@ -801,7 +814,7 @@ div[resource="#record"] .table > tbody > tr.title > td {
 }
 
 /* Full Record */
-#record .recordcover {
+.template-dir-record .recordcover {
     margin: 8px 0 10px 0;
     @media (min-width: @screen-md) { 
         margin-top:47px;
@@ -814,38 +827,39 @@ div[resource="#record"] .table > tbody > tr.title > td {
 .ablink {
     font-size: ceil((@font-size-base * 0.88)); // ~10.5px
 }
-#holdings-tab h3 {
+.holdings-tab h3 {
     margin-bottom: 0;
 }
-#holdings-tab table {
+.holdings-tab table {
     margin: 0;
     background: transparent;    
 }
-#holdings-tab table th,
-#holdings-tab table tr,
-#holdings-tab table td {
-    border: none;
+.holdings-tab table th,
+.holdings-tab table tr,
+.holdings-tab table td {
+    border: none !important;
     vertical-align: top;
 }
-#holdings-tab table th {
+.holdings-tab table th {
     padding-right: 15px;
     //text-align: right;
     color: @gray;
 }
 tr[typeof="Offer"] th,
-#holdings-tab .holdings-table th {
+.holdings-tab .holdings-table th {
     //max-width: 175px;
-    width: 155px;
+    width: 175px;
 }
-#holdings-tab table.holdings-table {
+.holdings-tab table.holdings-table {
     margin-top: 10px;
+    background: transparent;
 }
-#holdings-tab table tr.section td:last-child {
+.holdings-tab table tr.section td:last-child {
     padding-bottom:15px;
 }
-#holdings-tab table tr,
-#holdings-tab table td,
-#holdings-tab table th  {
+.holdings-tab table tr,
+.holdings-tab table td,
+.holdings-tab table th  {
     padding-top: 0px;
     padding-bottom: 0px;
 }
@@ -853,7 +867,7 @@ tr[typeof="Offer"] th,
     margin-top: 10px;
 }
 .holdings-unit {
-    padding: 20px 10px 20px 10px;
+    padding: 10px 10px 20px 10px;
     //line-height: 15px;
     border-bottom:1px dashed @table-border-color;
 }
@@ -892,10 +906,16 @@ tr[typeof="Offer"] th,
     font-family: "ProximaNova-Regular";
     color: @gray;
 }
-#holdings-tab h3,
+.holdings-tab h3,
 #holdings-tab h4 {
     line-height: 17px;
-}  
+} 
+
+.phoenix {
+    h3, .h3 {
+        font-size: 17px;
+    }
+} 
 
 .maplink .service {
     margin-left: 0;
@@ -1090,6 +1110,17 @@ table.alphabrowse {
     .iconlabel {
        display: block; 
     }
+    .recordcover {
+        display: block;
+    }
+    .media-left.medium {
+        a, img {
+            max-width: 88%;
+        }
+    }
+}
+.result .media {
+    margin-bottom: 0;
 }
 
 
@@ -1118,10 +1149,16 @@ table.alphabrowse {
 .callnumAndLocation {
     margin-top:@vertical-padding-div;
 }
-.iconlabel {
-    font-weight: bold;
-    color: lighten(@gray, 10%);
-    font-size: @font-size-base - 1.5;
+.result {
+    .format {
+        font-weight: bold;
+        color: lighten(@gray, 10%);
+        font-size: @font-size-base - 1.5;
+        background: none !important;
+        display: block;
+        text-align: right;
+        padding-right: 0;
+    }
 }
 .col-xs-0.right.text-right.hidden-print.hidden-xs { // Right txt (formats and save a record) 
     line-height: @line-height-base - .1;
@@ -1196,13 +1233,9 @@ I'm doing the facets in "edit this advanced search" right now.)
       box-shadow:inset 0 1px 0 rgba(0, 0, 0, 0.1);
       .slider-handle {
         background:#bbbbbb;
-        background-image:none;
         border-color:#AAA;
         border-radius:3px;
-        box-shadow:none;
-        opacity:.9;
         &:hover,&:active,&:focus {
-          opacity:1;
           background:#DDD;
         }
       }
@@ -1262,7 +1295,7 @@ a.tool:hover .arrow-left {
     img {max-width:70px;}
   }
   .middle {
-    padding:0;
+    padding: 0;
   }
   /*@media (min-width:991px) {
     .middle {padding:0;}
@@ -1270,7 +1303,9 @@ a.tool:hover .arrow-left {
   }*/
   @media (max-width:767px) {
     a {text-decoration:underline}
-    .middle,.right {padding:0}
+    .middle, .right {
+        padding: 0
+    }
   }
   @media (max-width:530px) {
     .checkbox {display: none !important;}

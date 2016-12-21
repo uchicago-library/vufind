@@ -2,7 +2,6 @@
 <html lang="<?=$this->layout()->userLang?>">
   <head>
     <?$this->headThemeResources()?>
-    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
     <meta name="google-site-verification" content="MVKdj1ykLrwrN01_2Y85qg78KiUxrdRYTSFc6TyBkNY"/>
@@ -89,7 +88,7 @@ JS;
     ?>
     <?=$this->headScript()?>
   </head>
-  <body class="<?=$this->layoutClass('offcanvas-row')?><? if ($this->layout()->rtl): ?> rtl<? endif; ?>">
+  <body class="phoenix <?=$this->layoutClass('offcanvas-row')?><? if ($this->layout()->rtl): ?> rtl<? endif; ?>">
     <? // Set up the search box -- there are three possible cases:
       // 1. No search box was set; we should default to the normal box
       // 2. It was set to false; we should display nothing
@@ -100,7 +99,7 @@ JS;
         $this->layout()->searchbox = $this->render('search/searchbox.phtml');
       }
     ?>
-    <header role="banner" class="hidden-print">
+    <header class="hidden-print">
       <div class="container navbar">
         <? if (isset($this->layout()->srmessage)): // message for benefit of screen-reader users ?>
           <span class="sr-only"><?=$this->layout()->srmessage ?></span>
@@ -147,14 +146,14 @@ JS;
         <?=$this->Alert()->getAlert()?>
       </div>
     </div>
-    <footer role="contentinfo" class="hidden-print">
+    <footer class="hidden-print">
       <div class="container">
         <?=$this->render('footer.phtml')?>
         <?=$this->layout()->poweredBy ?>
       </div>
     </footer>
     <!-- MODAL IN CASE WE NEED ONE -->
-    <div id="modal" class="modal fade hidden-print" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
+    <div id="modal" class="modal fade hidden-print" tabindex="-1" role="dialog" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
