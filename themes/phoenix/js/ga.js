@@ -27,7 +27,6 @@
  */
 
 $(document).ready(function() {
-    return;
 	/* This is universal analytics. */
 	
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
@@ -86,7 +85,7 @@ $(document).ready(function() {
 
         /* Basic search, from homepage. */	
 	    $('#advSearchForm').on('submit.googleAnalytics', function(e) {
-            /* Make sure it's a basic search. */
+            / * Make sure it's a basic search. */
             if (!$(this).hasClass('basicSearch')) {
                 return;
             }
@@ -98,7 +97,7 @@ $(document).ready(function() {
 			catalogevent('send', 'event', 'submitSearchFrom', 'Catalog Homepage');
 	        catalogevent('send', 'event', 'searchField', $(this).find('.search select').val());
 
-	        /* Short delay for analytics. */
+	        / * Short delay for analytics. */
 	        var form = this;
 	        setTimeout(function() {
 	            $(form).submit();
@@ -106,8 +105,15 @@ $(document).ready(function() {
         });
 
         /* Basic search, from a search result page or the full record view. */
-        $('#searchForm').on('submit.googleAnalytics', function(e) {
-	        $('#searchForm').unbind('submit.googleAnalytics');
+        $('.mini-search').on('submit.googleAnalytics', function(e) {
+            if (!$(this).find('input[name="lookfor"]')) {
+                return;
+            }
+            if (!$(this).find('select[name="type"]').val()) {
+                return;
+            }
+                
+            $(this).unbind('submit.googleAnalytics');
 	
 	        e.preventDefault();
 
@@ -119,7 +125,7 @@ $(document).ready(function() {
 		    else if (window.location.href.indexOf('/vufind/Record/') !== -1) {
 			    catalogevent('send', 'event', 'submitSearchFrom', 'Full Record');
 		    }
-	        catalogevent('send', 'event', 'searchField', $('#searchForm_type').val());
+	        catalogevent('send', 'event', 'searchField', $(this).find('select[name="type"]').val());
 	
 	        /* Short delay for analytics. */
 	        var form = this;
@@ -281,7 +287,11 @@ $(document).ready(function() {
 	        $('header form:not(.submitEventBound)').each(function() {
 	            $(this).addClass('submitEventBound');
 
-		        $(this).on('submit', function(e) {
+		        $(this).on('submit.googleAnalytics', function(e) {
+                    if ($(this).hasClass('submitEventSubmitted')) {
+                        return;
+                    }
+                    $(this).addClass('submitEventSubmitted');
 					if (window.location.href.toUpperCase().indexOf('/VUFIND/ALPHABROWSE/') == -1) {
 		                return;
 		            }
@@ -333,7 +343,7 @@ $(document).ready(function() {
                 link = $(link).parents('a').eq(0);
             }
 	
-	        var f = $(link).parents('ul.facet:first').find('li:first').text().trim();
+	        var f = $(link).text();
 
             /* Check to see if this was a "NOT" facet. If so, add the NOT. */
             if ($(link).attr('title') && $(link).attr('title').indexOf('exclude') > -1) { 
@@ -381,21 +391,21 @@ $(document).ready(function() {
 	            $(form).submit();
 	        }, 100);
 		});
-	
-		/* User changes the number of results per page. */
-		$('select#limit').parents('form').on('submit.googleAnalytics', function(e) {
-	        e.preventDefault();
-	        $(this).unbind('submit.googleAnalytics');
-	
-			/* will send 20, 40, 60, 80 or 100 */
-			catalogevent('send', 'event', 'changeResultsPerPage', $(this).find('select#limit').val());
-	
-	        /* Short delay for analytics. */
-	        var form = this;
-	        setTimeout(function() {
-	            $(form).submit();
-	        }, 100);
-		});
+
+        /* User changes the number of results per page. */
+        $('select#limit').parents('form').on('submit.googleAnalytics', function(e) {
+            e.preventDefault();
+            $(this).unbind('submit.googleAnalytics');
+    
+            /* will send 20, 40, 60, 80 or 100 */
+            catalogevent('send', 'event', 'changeResultsPerPage', $(this).find('select#limit').val());
+    
+            /* Short delay for analytics. */
+            var form = this;
+            setTimeout(function() {
+                $(form).submit();
+            }, 100);
+        });
 	
 	    /* On page load, record if this is a brief or detailed search result page. */
 	    if ($('span.bv').length) {
@@ -489,14 +499,13 @@ $(document).ready(function() {
 	        }
 		});
 	
-		/* User actually emails a record. Since the form is generated via
+		/* User actually texts a record. Since the form is generated via
 	     * JavaScript, keep checking to see if it's on the page. */
 	    setInterval(function() {
 	        $('form[name="smsRecord"]:not(.submitEventBound)').each(function() {
 	            $(this).addClass('submitEventBound');
 	            $(this).submit(function() {
 			        catalogevent('send', 'event', 'toolbarItem', 'Text this');
-	                // JEJ add delay for this??
 	            });
 	        });
 	    }, 250);
@@ -507,7 +516,6 @@ $(document).ready(function() {
 	            $(this).addClass('submitEventBound');
 	            $(this).submit(function() {
 			        catalogevent('send', 'event', 'toolbarItem', 'Email this');
-	                // JEJ add delay for this?
 	            });
 	        });
 	    }, 250);
@@ -530,7 +538,7 @@ $(document).ready(function() {
 		});
 	
 		/* User switches tabs. */
-		$('ul.recordTabs a[href]').on('click', function(e) {
+		$('div.record-tabs ul.nav-tabs a[href]').on('click', function(e) {
 			cataloglinkclick('send', 'event', 'changeFullRecordTab', $(this).text(), $(this), e);
 		});
 	

@@ -1,0 +1,114 @@
+<?
+    // Set up page title:
+    $this->headTitle($this->translate('My Fines'));
+
+    // Set up breadcrumbs:
+    $this->layout()->breadcrumbs = '<li><a href="' . $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') . '</a></li> <li class="active">' . $this->transEsc('Fines') . '</li>';
+?>
+<div class="<?=$this->layoutClass('mainbody')?>">
+  <h2><?=$this->transEsc('Your Fines')?></h2>
+  <?=$this->flashmessages()?>
+
+  <div class="alert alert-info" role="alert">
+    Fines and loan period information can be found at 
+    <a href="https://www.lib.uchicago.edu/borrow/borrowing/due-dates-and-loan-periods/" target="_blank" class="external">Due Dates &amp; Loan Periods</a>.
+  </div>
+
+<?
+    // Get sort labels.
+    $sort_labels = [
+        'title' => 'Title',
+        'billdate' => 'Bill Date',
+        'checkout' => 'Date Checked Out',
+        'duedate' => 'Due Date',
+        'fine' => 'Fee Type',
+        'amount' => 'Fine Amount'
+    ];
+?>
+
+  <div class="toolbar">
+    <form action="/vufind/Cart/Export" method="POST" style="display: inline;">
+      <input class="btn btn-default" name="export" value="Export as CSV" type="submit">
+      <? foreach ($this->fines as $record): ?>
+        <input type="hidden" name="ids[]" value="<?=$record['id']?>"/>
+      <? endforeach; ?>
+    </form>
+      <input class="btn btn-default" name="export" value="Export as CSV" type="submit">
+    <form action="/vufind/Cart/SearchResultsBulk" method="POST" style="display: inline;">
+      <input class="btn btn-default" type="submit" name="print" value="Print"/>
+      <? foreach ($this->fines as $record): ?>
+        <input type="hidden" name="ids[]" value="<?=$record['id']?>"/>
+      <? endforeach; ?>
+    </form>
+    <span class="dropdown">
+      <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort By: <strong id="fines_sort_label"><?=$sort_labels[$sort] ?></strong> <span class="caret"></span></button>
+      <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+        <li><a href="/vufind/MyResearch/Fines?sort=title">Title</a></li>
+        <li><a href="/vufind/MyResearch/Fines?sort=billdate">Bill Date</a></li>
+        <li><a href="/vufind/MyResearch/Fines?sort=checkout">Date Checked Out</a></li>
+        <li><a href="/vufind/MyResearch/Fines?sort=duedate">Due Date</a></li>
+        <li><a href="/vufind/MyResearch/Fines?sort=fine">Fee Type</a></li>
+        <li><a href="/vufind/MyResearch/Fines?sort=amount">Fine Amount</a></li>
+      </ul>
+    </span>
+  </div>
+
+  <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
+
+  <? if (empty($this->fines)): ?>
+    <?=$this->transEsc('You do not have any fines')?>
+  <? else: ?>
+    <table class="table table-striped" summary="<?=$this->transEsc('Your Fines')?>">
+    <thead>
+    <tr>
+      <th>Title &amp; Location</th>
+      <th>Due date</th>
+      <th>Return Date</th>
+      <th>Bill Date</th>
+      <th>Fee Type</th>
+      <th>Fine Amount</th>
+      <th>Balance</th>
+    </tr>
+    </thead>
+    <? $totalDue = 0; ?>
+    <? foreach ($this->fines as $record): ?>
+      <tr>
+        <td>
+          <? if (empty($record['title'])): ?>
+            <?=$this->transEsc('not_applicable')?>
+          <? elseif (!isset($record['driver']) || !is_object($record['driver'])): ?>
+            <? 
+              $title = $this->escapeHtml(trim($record['title'], '/:'));
+              if (isset($record['id'])) {
+                echo '<a href="/vufind/Record/' . $record['id'] . '">' . $title . '</a>';
+              } else {
+                echo $title;
+              }
+            ?>
+          <? else: ?>
+            <a href="<?=$this->recordLink()->getUrl($record['driver'])?>"><?=$this->escapeHtml(trim($record['title'], '/:'))?></a>
+          <? endif; ?>
+          <?
+            $locationName = $record['locationName'];
+            if ($locationName) {
+              echo "<br/>" . $locationName;
+            }
+          ?>
+        </td>
+        <td><?=isset($record['duedate']) ? $this->escapeHtml($record['duedate']) : ''?></td>
+        <td></td>
+        <td><?=isset($record['fine']) ?  $this->escapeHtml($record['billdate']) : ''?></td>
+        <td><?=isset($record['fine']) ?  $this->escapeHtml($record['fine']) : ''?></td>
+        <td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount']/100.00) : ''?></td>
+        <td><?=isset($record['balance']) ? $this->safeMoneyFormat($record['balance']/100.00) : ''?></td>
+      </tr>
+      <? $totalDue += $record['balance']; ?>
+    <? endforeach; ?>
+      <tr style="font-weight:bold"><td colspan="6"><?=$this->transEsc('Total Balance Due')?></td><td><?=$this->safeMoneyFormat($totalDue/100.00) ?></td></tr>
+    </table>
+  <? endif; ?>
+</div>
+
+<div class="<?=$this->layoutClass('sidebar')?>">
+  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'fines'])?>
+</div>

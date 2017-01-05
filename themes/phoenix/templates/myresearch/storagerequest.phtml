@@ -15,30 +15,34 @@ href="/vufind/MyResearch/Holds">Requested Items</a>.</p>
 	        <form action='/vufind/MyResearch/Storagerequest' method='post' name="mansuetoRequests">
             <p>
             <span id="asrselectallornone"></span>
-	        <button name='action' type='submit' value='remove'>Remove selected items</button>
+	        <button class='request' name='action' type='submit' value='remove'>Remove selected items</button>
             </p>
-	
-		    <table class="datagrid">
-		        <tr>
-				    <th/>
-			        <th>Title</th>
-				    <th>Call #</th>
-				    <th>Copy</th>
-		        </tr>
-		        <?php foreach ($this->storagerequests as $storagerequest): ?>
+
+		    <table class="table table-striped datagrid">
+                <thead>
 		            <tr>
-                        <td><input name="remove[]" type="checkbox" value="<?=$storagerequest['bib']?>|<?=$storagerequest['barcode']?>"/></td>
-		                <?php 
-		                    $title = $storagerequest['title'];
-		                    if ($storagerequest['volumeNumber']) {
-		                        $title .= ', ' .  $storagerequest['volumeNumber'];
-		                    }
-		                ?>
-		                <td><?=$title?></td>
-		                <td><?=$storagerequest['callNumber']?></td>
-		                <td><?=$storagerequest['copyNumber']?></td>
+				        <th/>
+			            <th>Title</th>
+				        <th>Call #</th>
+				        <th>Copy</th>
 		            </tr>
-		        <?php endforeach; ?>
+                </thead>
+                <tbody>
+		            <?php foreach ($this->storagerequests as $storagerequest): ?>
+		                <tr>
+                            <td><input name="remove[]" type="checkbox" value="<?=$storagerequest['bib']?>|<?=$storagerequest['barcode']?>"/></td>
+		                    <?php 
+		                        $title = $storagerequest['title'];
+		                        if ($storagerequest['volumeNumber']) {
+		                            $title .= ', ' .  $storagerequest['volumeNumber'];
+		                        }
+		                    ?>
+		                    <td><?=$title?></td>
+		                    <td><?=$storagerequest['callNumber']?></td>
+		                    <td><?=$storagerequest['copyNumber']?></td>
+		                </tr>
+		            <?php endforeach; ?>
+                </tbody>
 		    </table>
 	
 		    <?php foreach ($this->storagerequests as $storagerequest): ?>
@@ -57,7 +61,7 @@ href="/vufind/MyResearch/Holds">Requested Items</a>.</p>
 	        </select>
 
             <p style="text-align: right;">	
-	        <button name='action' type='submit' value='request'>Request all items</button>
+	        <button class='request' name='action' type='submit' value='request'>Request all items</button>
             </p>
 	    </form>
     <? endif; ?>

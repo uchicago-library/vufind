@@ -41,30 +41,36 @@ class StorageRequest
         if (!$in_array) {
             $xml = $catalog->getRecord($bib);
 
+            // get the first title that appears.
+            $title = '';
             $p = sprintf('/response/result/doc/arr[@name="ItemBarcode_search" and str/text()="%s"]/parent::doc', $barcode);
-            $nl = $xml->xpath($p);
-            $doc = $nl[0];
-
-            // does this bit include the author automatically?
-            $nl = $doc->xpath('arr[@name="Title_display"]/str');
-            $title = $nl[0]->asXML();
+            $elements = $xml->xpath($p);
+            foreach ($elements as $e) {
+                $se = $e->xpath('arr[@name="Title_display"]/str');
+                $title = $se[0]->asXML();
+                if ($title != '') {
+                    break;
+                }
+            }
 
             $callNumber = '';
-            $x = $doc->xpath('arr[@name="HoldingsCallNumber_display"]/str');
-            if (count($x)) {
-                $callNumber = $x[0]->asXML();
-            }
-
             $copyNumber = '';
-            $x = $doc->xpath('str[@name="CopyNumber_search"]');
-            if (count($x)) {
-                $copyNumber = $x[0]->asXML();
-            }
-
             $volumeNumber = '';
-            $x = $doc->xpath('str[@name="Enumeration_display"]');
-            if (count($x)) {
-                $volumeNumber = $x[0]->asXML();
+            $p = sprintf('/response/result/doc/arr[@name="ItemBarcode_search" and str/text()="%s"]/parent::doc', $barcode);
+            $elements = $xml->xpath($p);
+            foreach ($elements as $e) {
+                $se = $e->xpath('arr[@name="HoldingsCallNumber_display"]/str');
+                if ($se[0] and $se[0]->asXML()) {
+                    $callNumber = $se[0]->asXML();
+                }
+                $se = $e->xpath('str[@name="CopyNumber_search"]');
+                if ($se[0] and $se[0]->asXML()) {
+                    $copyNumber = $se[0]->asXML();
+                }
+                $se = $e->xpath('str[@name="Enumeration_display"]');
+                if ($se[0] and $se[0]->asXML()) {
+                    $volumeNumber = $se[0]->asXML();
+                }
             }
 
 		    $_SESSION['asr'][] = [

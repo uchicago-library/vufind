@@ -187,6 +187,8 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             return $patron;
         }
 
+        $sort = $this->params()->fromPost('sort');
+
         // Connect to the ILS:
         $catalog = $this->getILS();
 
@@ -201,8 +203,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             )
             : [];
 
-        // UChicago customization: this is the only difference
-        // between our custom version and the original method.
+        // UChicago customization:
         // We return this as part of the return value of the
         // method. Set a flag for passing to the template.
         // This will tell us which alert message to display.
@@ -212,13 +213,27 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 $failure = true;
             }
         }
-        // End UChicago customization.
 
         // By default, assume we will not need to display a renewal form:
         $renewForm = false;
 
         // Get checked out item details:
         $result = $catalog->getMyTransactions($patron);
+
+        // Sort results. 
+        $sort_by = [];
+        // convert dates like 1/1/2017 into something sortable.
+        if ($sort == 'loanedDate' || $sort == 'duedate') {
+            foreach ($result as $r) {
+                $d = explode('/', trim($r[$sort]));
+                $sort_by[] = sprintf("%04d%02d%02d", $d[2], $d[0], $d[1]);
+            }
+        } else {
+            foreach ($result as $r) {
+                $sort_by[] = strtolower(trim($r[$sort]));
+            }
+        }
+        array_multisort($sort_by, SORT_ASC, $result);
 
         // Get page size:
         $config = $this->getConfig();
@@ -259,13 +274,179 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 $hiddenTransactions[] = $current;
             }
         }
-
         return $this->createViewModel(
             compact(
-                'transactions', 'renewForm', 'renewResult', 'paginator',
+                'sort', 'transactions', 'renewForm', 'renewResult', 'paginator',
                 'hiddenTransactions', 'failure'
             )
         );
     }
+
+    /**
+     * Send list of holds to view
+     *
+     * @return mixed
+     */
+    public function holdsAction()
+    {
+        // Stop now if the user does not have valid catalog credentials available:
+        if (!is_array($patron = $this->catalogLogin())) {
+            return $patron;
+        }
+
+        $sort = $this->params()->fromQuery('sort');
+        if (!$sort) {
+            $sort = 'holdExpirationDate';
+        }
+
+        // Connect to the ILS:
+        $catalog = $this->getILS();
+
+        // Process cancel requests if necessary:
+        $cancelStatus = $catalog->checkFunction('cancelHolds', compact('patron'));
+        $view = $this->createViewModel();
+        $view->cancelResults = $cancelStatus
+            ? $this->holds()->cancelHolds($catalog, $patron) : [];
+        // If we need to confirm
+        if (!is_array($view->cancelResults)) {
+            return $view->cancelResults;
+        }
+
+        // By default, assume we will not need to display a cancel form:
+        $view->cancelForm = false;
+
+        // Get held item details:
+        $result = $catalog->getMyHolds($patron);
+        $recordList = [];
+        $this->holds()->resetValidation();
+        foreach ($result as $current) {
+            // Add cancel details if appropriate:
+            $current = $this->holds()->addCancelDetails(
+                $catalog, $current, $cancelStatus
+            );
+            if ($cancelStatus && $cancelStatus['function'] != "getCancelHoldLink"
+                && isset($current['cancel_details'])
+            ) {
+                // Enable cancel form if necessary:
+                $view->cancelForm = true;
+            }
+
+            // Build record driver:
+            $recordList[] = $this->getDriverForILSRecord($current);
+        }
+
+        // Sort results. 
+        $sort_by = [];
+        foreach ($recordList as $r) {
+            $ilsDetails = $r->getExtraDetail('ils_details');
+            switch ($sort) {
+                case 'author':
+                    $primaryAuthors = $r->getPrimaryAuthors();
+                    if ($primaryAuthors) {
+                        $sort_by[] = strtolower(trim($primaryAuthors[0]));
+                    } else {
+                        $sort_by[] = 'ZZZ';
+                    }
+                    break;
+                case 'callNumber':
+                    $callNumbers = $r->getCallNumbers();
+                    if ($callNumbers) {
+                        $sort_by[] = strtolower(trim($callNumbers[0]));
+                    } else {
+                        $sort_by[] = 'ZZZ';
+                    }
+                    break;
+                case 'holdExpirationDate':
+                    $sort_by[] = $ilsDetails['expire'];
+                    break;
+                case 'itemStatus':
+                    if ($ilsDetails['available']) {
+                        $sort_by[] = 'available';
+                    } else if ($ilsDetails['in_transit']) {
+                        $sort_by[] = 'in_transit';
+                    } else {
+                        $sort_by[] = 'ZZZ';
+                    }
+                    break;
+                case 'holdExpirationDate':
+                    $sort_by[] = $ilsDetails['expire'];
+                    break;
+                case 'title':
+                    $sort_by[] = strtolower(trim($r->getTitle()));
+                    break;
+                default:
+                    $sort_by[] = 'a';
+            }
+        }
+        array_multisort($sort_by, SORT_ASC, $recordList);
+
+        // Get List of PickUp Libraries based on patron's home library
+        try {
+            $view->pickup = $catalog->getPickUpLocations($patron);
+        } catch (\Exception $e) {
+            // Do nothing; if we're unable to load information about pickup
+            // locations, they are not supported and we should ignore them.
+        }
+        $view->recordList = $recordList;
+        $view->sort = $sort;
+        return $view;
+    }
+
+    /**
+     * Send list of fines to view
+     *
+     * @return mixed
+     */
+    public function finesAction()
+    {
+        // Stop now if the user does not have valid catalog credentials available:
+        if (!is_array($patron = $this->catalogLogin())) {
+            return $patron;
+        }
+
+        $sort = $this->params()->fromQuery('sort');
+        if (!$sort) {
+            $sort = 'title';
+        }
+
+        // Connect to the ILS:
+        $catalog = $this->getILS();
+
+        // Get fine details:
+        $result = $catalog->getMyFines($patron);
+        $fines = [];
+        foreach ($result as $row) {
+            // Attempt to look up and inject title:
+            try {
+                if (!isset($row['id']) || empty($row['id'])) {
+                    throw new \Exception();
+                }
+                $source = isset($row['source'])
+                    ? $row['source'] : DEFAULT_SEARCH_BACKEND;
+                $row['driver'] = $this->getServiceLocator()
+                    ->get('VuFind\RecordLoader')->load($row['id'], $source);
+                $row['title'] = $row['driver']->getShortTitle();
+            } catch (\Exception $e) {
+                if (!isset($row['title'])) {
+                    $row['title'] = null;
+                }
+            }
+            $fines[] = $row;
+        }
+
+        // Sort results. 
+        $sort_by = [];
+        foreach ($fines as $f) {
+            if ($sort == 'amount') {
+                $sort_by[] = (int)trim($f['amount']);
+            } else {
+                $sort_by[] = strtolower(trim($f[$sort]));
+            }
+        }
+        array_multisort($sort_by, SORT_ASC, $fines);
+
+        return $this->createViewModel(['fines' => $fines, 'sort' => $sort]);
+    }
+
 }
 

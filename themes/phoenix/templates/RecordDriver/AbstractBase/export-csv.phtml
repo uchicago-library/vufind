@@ -1,0 +1,10 @@
+<?
+$fields = [];
+$fields[] = rtrim($this->driver->getTitle(), " /");
+$fields[] = $this->driver->tryMethod('getPrimaryAuthor');
+foreach ($this->record($this->driver)->getUrlList() as $url) {
+    $fields[] = $url;
+}
+
+echo implode(',', $fields);
+?>

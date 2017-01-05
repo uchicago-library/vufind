@@ -1,0 +1,145 @@
+<?
+    // Set up page title:
+    $this->headTitle($this->translate('My Holds'));
+
+    // Set up breadcrumbs:
+    $this->layout()->breadcrumbs = '<li><a href="' . $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') . '</a></li> <li class="active">' . $this->transEsc('My Holds') . '</li>';
+?>
+<div class="row">
+  <div class="<?=$this->layoutClass('mainbody')?>">
+    <h2><?=$this->transEsc('Your Holds and Recalls') ?></h2>
+
+    <?=$this->flashmessages()?>
+
+    <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
+
+    <? if (!empty($this->recordList)): ?>
+      <form>
+        <div class="toolbar">
+          <?
+            $hold_labels = [
+              'title' => 'Title',
+              'author' => 'Author',
+              'callNumber' => 'Call Number',
+              'itemStatus' => 'Item Status',
+              'holdExpirationDate' => 'On Hold Expiration Date',
+              'requestExpirationDate' => 'Request Expiration Date'
+            ];
+          ?>
+          <span class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Sort By: <strong><?=$hold_labels[$this->sort]?></strong> <span class="caret"></span></button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+              <li><a href="/vufind/MyResearch/Holds?sort=title">Title</a></li>
+              <li><a href="/vufind/MyResearch/Holds?sort=author">Author</a></li>
+              <li><a href="/vufind/MyResearch/Holds?sort=callNumber">Call Number</a></li>
+              <li><a href="/vufind/MyResearch/Holds?sort=itemStatus">Item Status</a></li>
+              <li><a href="/vufind/MyResearch/Holds?sort=holdExpirationDate">On Hold Expiration Date</a></li>
+              <li><a href="/vufind/MyResearch/Holds?sort=requestExpirationDate">Request Expiration Date</a></li>
+            </ul>
+          </span>
+        </div>
+        <input type="hidden" id="submitType" name="cancelSelected" value="1"/>
+
+      <? $iteration = 0; ?>
+      <? foreach ($this->recordList as $resource): ?>
+        <hr/>
+        <? $iteration++; ?>
+        <? $ilsDetails = $resource->getExtraDetail('ils_details'); ?>
+        <div id="record<?=$this->escapeHtmlAttr($resource->getUniqueId()) ?>" class="row result">
+            <? $safeId = preg_replace('/[^a-zA-Z0-9]/', '', $resource->getUniqueId()); ?>
+            <div class="col-xs-1">
+              <input class="checkbox-select-item" type="checkbox" name="SelectedIDS[]" id="checkbox_<?=$safeId?>" data-record-id="<?=$this->escapeHtmlAttr($resource->getSourceIdentifier() . '|' . $resource->getUniqueId());?>" />
+            </div>
+            <div class="col-sm-2 hidden-xs text-center">
+              <? $cover = $this->record($resource)->getCover('holds', 'small'); ?>
+              <? if ($cover): ?>
+                <?=$cover?>
+              <? endif; ?>
+            </div>
+            <div class="col-sm-5 col-xs-12">
+              <?
+                // If this is a non-missing Solr record, we should display a link:
+                if (is_a($resource, 'VuFind\\RecordDriver\\SolrDefault') && !is_a($resource, 'VuFind\\RecordDriver\\Missing')) {
+                  $title = $resource->getTitle();
+                  $title = empty($title) ? $this->transEsc('Title not available') : $this->escapeHtml($title);
+                  echo '<a href="' . $this->recordLink()->getUrl($resource)
+                    . '" class="title">' . $title . '</a>';
+                } else if (isset($ilsDetails['title']) && !empty($ilsDetails['title'])){
+                  // If the record is not available in Solr, perhaps the ILS driver sent us a title we can show...
+                  echo $this->escapeHtml($ilsDetails['title']);
+                } else {
+                  // Last resort -- indicate that no title could be found.
+                  echo $this->transEsc('Title not available');
+                }
+              ?><br/>
+  
+              <? if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
+                <strong><?=$this->transEsc('Volume')?>:</strong> <?=$this->escapeHtml($ilsDetails['volume'])?>
+                <br />
+              <? endif; ?>
+  
+              <? if (isset($ilsDetails['publication_year']) && !empty($ilsDetails['publication_year'])): ?>
+                <strong><?=$this->transEsc('Year of Publication')?>:</strong> <?=$this->escapeHtml($ilsDetails['publication_year'])?>
+                <br />
+              <? endif; ?>
+  
+              <? $listAuthors = $resource->getPrimaryAuthors(); if (!empty($listAuthors)): ?>
+                <?=$this->transEsc('by')?>:
+                <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><? if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><? endif; ?><br/>
+              <? endif; ?>
+            </div>
+            <div class="col-sm-4 col-xs-12">
+            <?
+              $callNumbers = $resource->getCallNumbers();
+              if (!empty($callNumbers)) {
+                echo $callNumbers[0] . "<br/>";
+              }
+            ?>
+              <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
+            <? /* Depending on the ILS driver, the "location" value may be a string or an ID; figure out the best
+               value to display... */ ?>
+            <? $pickupDisplay = ''; ?>
+            <? $pickupTranslate = false; ?>
+            <? if (isset($ilsDetails['location'])): ?>
+              <? if ($this->pickup): ?>
+                <? foreach ($this->pickup as $library): ?>
+                  <? if ($library['locationID'] == $ilsDetails['location']): ?>
+                    <? $pickupDisplay = $library['locationDisplay']; ?>
+                    <? $pickupTranslate = true; ?>
+                  <? endif; ?>
+                <? endforeach; ?>
+              <? endif; ?>
+              <? if (empty($pickupDisplay)): ?>
+                <? $pickupDisplay = $ilsDetails['location']; ?>
+              <? endif; ?>
+            <? endif; ?>
+            <? if (!empty($pickupDisplay)): ?>
+              <strong><?=$this->transEsc('pick_up_location') ?>:</strong>
+              <?=$pickupTranslate ? $this->transEsc('location_' . $pickupDisplay, null, $pickupDisplay) : $this->escapeHtml($pickupDisplay)?>
+              <br />
+            <? endif; ?>
+
+            <? if (isset($ilsDetails['available']) && $ilsDetails['available'] == true): ?>
+              <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc("hold_available") ?></div>
+            <? elseif (isset($ilsDetails['in_transit']) && $ilsDetails['in_transit']): ?>
+              <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc('request_in_transit') . (is_string($ilsDetails['in_transit']) ? ': ' . $this->transEsc('institution_' . $ilsDetails['in_transit'], [], $ilsDetails['in_transit']) : '') ?></div>
+            <? elseif (isset($ilsDetails['position'])): ?>
+              <p><strong><?=$this->transEsc("hold_queue_position") ?>:</strong> <?=$this->escapeHtml($ilsDetails['position']) ?></p>
+            <? endif; ?>
+
+            <? if (!empty($ilsDetails['expire'])): ?>
+              <strong>On Hold Until:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
+            <? endif; ?>
+          </div>
+        </div>
+      <? endforeach; ?>
+      </form>
+    <? else: ?>
+      <?=$this->transEsc('You do not have any holds or recalls placed') ?>.
+    <? endif; ?>
+  </div>
+
+  <div class="<?=$this->layoutClass('sidebar')?>">
+    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'holds'])?>
+  </div>
+</div>

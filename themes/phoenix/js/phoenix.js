@@ -534,283 +534,6 @@ function bulkFormHandler(event, data) {
 }
 
 $(document).ready(function() {
-  // Lightbox
-  function registerLightboxEvents() {
-    var modal = $("#modal");
-    // New list
-    $('#make-list').click(function() {
-      var parts = this.href.split('?');
-      var get = deparam(parts[1]);
-      get['id'] = 'NEW';
-      return Lightbox.get('MyResearch', 'EditList', get);
-    });
-    // New account link handler
-    $('.createAccountLink').click(function() {
-      var parts = this.href.split('?');
-      var get = deparam(parts[1]);
-      return Lightbox.get('MyResearch', 'Account', get);
-    });
-    // Select all checkboxes
-    $(modal).find('.checkbox-select-all').change(function() {
-      $(this).closest('.modal-body').find('.checkbox-select-item').prop('checked', this.checked);
-    });
-    $(modal).find('.checkbox-select-item').change(function() {
-      $(this).closest('.modal-body').find('.checkbox-select-all').prop('checked', false);
-    });
-    // Highlight which submit button clicked
-    $(modal).find("form input[type=submit]").click(function() {
-      // Abort requests triggered by the lightbox
-      $('#modal .fa-spinner').remove();
-      // Remove other clicks
-      $(modal).find('input[type="submit"][clicked=true]').attr('clicked', false);
-      // Add useful information
-      $(this).attr("clicked", "true");
-      // Add prettiness
-      $(this).after(' <i class="fa fa-spinner fa-spin"></i> ');
-    });
-    /**
-     * Hide the header in the lightbox content
-     * if it matches the title bar of the lightbox
-     */
-    var header = $('#modal .modal-title').html();
-    var contentHeader = $('#modal .modal-body .lead');
-    if(contentHeader.length == 0) {
-      contentHeader = $('#modal .modal-body h2');
-    }
-    contentHeader.each(function(i,op) {
-      if (op.innerHTML == header) {
-        $(op).hide();
-      }
-    });
-  }
-  function updatePageForLogin() {
-    // Hide "log in" options and show "log out" options:
-    $('#loginOptions').addClass('hidden');
-    $('.logoutOptions').removeClass('hidden');
-  
-    var recordId = $('#record_id').val();
-  
-    // Update user save statuses if the current context calls for it:
-    if (typeof(checkSaveStatuses) == 'function') {
-      checkSaveStatuses();
-    }
-  
-    // refresh the comment list so the "Delete" links will show
-    $('.commentList').each(function(){
-      var recordSource = extractSource($('#record'));
-      refreshCommentList(recordId, recordSource);
-    });
-  
-    var summon = false;
-    $('.hiddenSource').each(function(i, e) {
-      if(e.value == 'Summon') {
-        summon = true;
-        // If summon, queue reload for when we close
-        Lightbox.addCloseAction(function(){document.location.reload(true);});
-      }
-    });
-  
-    // Refresh tab content
-    var recordTabs = $('.recordTabs');
-    if(!summon && recordTabs.length > 0) { // If summon, skip: about to reload anyway
-      var tab = recordTabs.find('.active a').attr('id');
-      ajaxLoadTab(tab);
-    }
-  }
-  function newAccountHandler(html) {
-    updatePageForLogin();
-    var params = deparam(Lightbox.openingURL);
-    if (params['subaction'] != 'UserLogin') {
-      Lightbox.getByUrl(Lightbox.openingURL);
-      Lightbox.openingURL = false;
-    } else {
-      Lightbox.close();
-    }
-  }
-  
-  // This is a full handler for the login form
-  function ajaxLogin(form) {
-    Lightbox.ajax({
-      url: path + '/AJAX/JSON?method=getSalt',
-      dataType: 'json',
-      success: function(response) {
-        if (response.status == 'OK') {
-          var salt = response.data;
-  
-          // get the user entered password
-          var password = form.password.value;
-  
-          // base-64 encode the password (to allow support for Unicode)
-          // and then encrypt the password with the salt
-          password = rc4Encrypt(salt, btoa(unescape(encodeURIComponent(password))));
-  
-          // hex encode the encrypted password
-          password = hexEncode(password);
-  
-          var params = {password:password};
-  
-          // get any other form values
-          for (var i = 0; i < form.length; i++) {
-            if (form.elements[i].name == 'password') {
-              continue;
-            }
-            params[form.elements[i].name] = form.elements[i].value;
-          }
-  
-          // login via ajax
-          Lightbox.ajax({
-            type: 'POST',
-            url: path + '/AJAX/JSON?method=login',
-            dataType: 'json',
-            data: params,
-            success: function(response) {
-              if (response.status == 'OK') {
-                updatePageForLogin();
-                // and we update the modal
-                var params = deparam(Lightbox.lastURL);
-                if (params['subaction'] == 'UserLogin') {
-                  Lightbox.close();
-                } else {
-                  Lightbox.getByUrl(
-                    Lightbox.lastURL,
-                    Lightbox.lastPOST,
-                    Lightbox.changeContent
-                  );
-                }
-              } else {
-                Lightbox.displayError(response.data);
-              }
-            }
-          });
-        } else {
-          Lightbox.displayError(response.data);
-        }
-      }
-    });
-  }
-
-  /******************************
-   * LIGHTBOX DEFAULT BEHAVIOUR *
-   ******************************/
-  /*
-  Lightbox.addOpenAction(registerLightboxEvents);
-  Lightbox.addFormCallback('newList', Lightbox.changeContent);
-  Lightbox.addFormHandler('loginForm', function(evt) {
-    ajaxLogin(evt.target);
-    return false;
-  });
-  Lightbox.addFormCallback('accountForm', newAccountHandler);
-  Lightbox.addFormCallback('emailSearch', function(html) {
-    Lightbox.confirm(vufindString['bulk_email_success']);
-  });
-  Lightbox.addFormCallback('saveRecord', function(html) {
-    Lightbox.close();
-    checkSaveStatuses();
-  });
-  Lightbox.addFormCallback('bulkRecord', function(html) {
-    Lightbox.close();
-    checkSaveStatuses();
-  });
-  Lightbox.addFormHandler('feedback', function(evt) {
-    var $form = $(evt.target);
-    // Grabs hidden inputs
-    var formSuccess     = $form.find("input#formSuccess").val();
-    var feedbackFailure = $form.find("input#feedbackFailure").val();
-    var feedbackSuccess = $form.find("input#feedbackSuccess").val();
-    // validate and process form here
-    var name  = $form.find("input#name").val();
-    var email = $form.find("input#email").val();
-    var comments = $form.find("textarea#comments").val();
-    if (name.length == 0 || comments.length == 0) {
-      Lightbox.displayError(feedbackFailure);
-    } else {
-      Lightbox.get('Feedback', 'Email', {}, {'name':name,'email':email,'comments':comments}, function() {
-        Lightbox.changeContent('<div class="alert alert-info">'+formSuccess+'</div>');
-      });
-    }
-    return false;
-  });
-  Lightbox.addFormHandler('KnowledgeTracker', function(evt) {
-    var $form = $(evt.target);
-    // Grabs hidden inputs
-    var formSuccess     = $form.find("input#formSuccess").val();
-    var feedbackFailure = $form.find("input#feedbackFailure").val();
-    var feedbackSuccess = $form.find("input#feedbackSuccess").val();
-    // validate and process form here
-    var name  = $form.find("input#name").val();
-    var email = $form.find("input#email").val();
-    var question = $form.find("textarea#question").val();
-    var tasks = $form.find("textarea#tasks").val();
-    var library = $form.find("input#library").val();
-    var affiliation = $form.find("select#affiliation").val();
-    var pageUrl = $form.find("input#pageUrl").val();
-    var refUrl = $form.find("input#refUrl").val();
-    if (name.length == 0 || question.length == 0) {
-      Lightbox.displayError(feedbackFailure);
-    } else {
-      Lightbox.get('Feedback', 'KnowledgeTrackerForm', {}, {'library':library, 'name':name, 'email':email, 'affiliation':affiliation, 'question':question, 'tasks':tasks, 'page_url': pageUrl, 'referring_page': refUrl}, function() {
-        Lightbox.changeContent('<div class="alert alert-info">'+formSuccess+'</div>');
-      });
-    }
-    return false;
-  });
-  */
-});
-$(document).ready(function() {
-  // Feedback
-  $('#feedbackLink').click(function() {
-    return Lightbox.get('Feedback', 'Home');
-  });
-  // Knowledge Tracker
-  /* Only commented this out because php libcurl is failing 
-  in the production envirionment. I would like to bring this back - brad 5/18/2015
-  $('#knowledgeTrackerLink').click(function() {
-    return Lightbox.get('Feedback', 'KnowledgeTracker');
-  });*/
-  // Help links
-  $('.help-link').click(function() {
-    var split = this.href.split('=');
-    return Lightbox.get('Help','Home',{topic:split[1]});
-  });
-  // Hierarchy links
-  $('.hierarchyTreeLink a').click(function() {
-    var id = $(this).parent().parent().parent().find(".hiddenId")[0].value;
-    var hierarchyID = $(this).parent().find(".hiddenHierarchyId")[0].value;
-    return Lightbox.get('Record','AjaxTab',{id:id},{hierarchy:hierarchyID,tab:'HierarchyTree'});
-  });
-  // Login link
-  // JEJ: I think we can eliminate this:
-  // see https://vufind.org/wiki/development:architecture:lightbox
-  /*
-  $('#loginOptions a.modal-link').click(function() {
-    //return Lightbox.get('MyResearch','UserLogin');
-    var url = VuFind.path + '/AJAX/JSON?' + $.param({
-        method: 'getLightbox',
-        submodule: 'MyResearch',
-        subaction: 'UserLogin'
-    });
-    $.ajax({
-        dataType: 'json',
-        cache: false,
-        url: url
-    })
-    .done(function (response) {
-        if (response.data.status) {
-            VuFind.lightbox.alert('login test');
-            // response.data.msg
-        }
-    });
-  });
-  */
-  // Email search link
-  $('.mailSearch').click(function() {
-    return Lightbox.get('Search','Email',{url:document.URL});
-  });
-  // Save record links
-  $('.save-record').click(function() {
-    var parts = this.href.split('/');
-    return Lightbox.get(parts[parts.length-3],'Save',{id:$(this).attr('id')});
-  });
   // Expand and collapse of No-CNet-ID login, when the page is 
   $('#login-toggle').click(function() {
     $(this).parents('.login-toggle-wrapper').next('.login-toggle-content').toggle();
@@ -894,5 +617,182 @@ $(document).ready(function() {
     }); 
 });
 
+$(document).ready(function() {
+    // homepage searches: basic, advanced, begins with.
+    if (window.location.pathname.toLowerCase() == '/vufind/') {
+        setInterval(function () {
+            var url = '';
+            if ($('a#advancedSearchSwitch').hasClass('disabled')) {
+                url = 'https://www.lib.uchicago.edu/research/help/catalog-help/advanced/';
+            } else {
+                url = 'https://www.lib.uchicago.edu/research/help/catalog-help/selecting/';
+            }
+            if (url != '') {
+                $('a[title="Help"]').attr('href', url);
+            }
+        }, 250);
+    // all other pages. 
+    } else {
+        var url = '';
+        if (window.location.pathname.toLowerCase().startsWith('/vufind/search/results')) {
+            // Keyword search results.
+            url = 'https://www.lib.uchicago.edu/research/help/catalog-help/keyword/';
+        } else if (window.location.pathname.toLowerCase().startsWith('/vufind/alphabrowse/home')) {
+            // Begins with search results. 
+            url = 'https://www.lib.uchicago.edu/research/help/catalog-help/begins/';
+        } else if (window.location.pathname.toLowerCase().startsWith('/vufind/record')) {
+            // Any full record.
+            url = 'https://www.lib.uchicago.edu/research/help/catalog-help/full-record/';
+        } else if (window.location.pathname.toLowerCase().startsWith('/vufind/myresearch')) {
+            // My account.
+            url = 'https://www.lib.uchicago.edu/research/help/catalog-help/my-account/';
+        }
+        if (url != '') {
+            $('a[title="Help"]').attr('href', url);
+        }
+    }
+});
+
+$(document).ready(function() {
+    if ($('.template-dir-myresearch.template-name-checkedout').length) {
+        // CHECKED OUT ITEMS EXPORT PULLDOWN
+        // add the sort pulldown.
+        var sort = $('#checked_out_items_sort_field').val();
+        var sort_labels = new Object;
+        sort_labels['callNumber'] = 'Call Number';
+        sort_labels['duedate'] = 'Due Date';
+        sort_labels['loanedDate'] = 'Checkout Date';
+        sort_labels['title'] = 'Title';
+
+        var html = ' ';
+        html = html + '<span class="dropdown">';
+        html = html + '<button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort By: <strong id="checked_out_items_sort_label">' + sort_labels[sort] + '</strong> <span class="caret"></span></button>';
+        html = html + '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
+        html = html + '<li><a class="checked_out_items_sort" data-sort="title">Title</a></li>';
+        html = html + '<li><a class="checked_out_items_sort" data-sort="callNumber">Call Number</a></li>';
+        html = html + '<li><a class="checked_out_items_sort" data-sort="loanedDate">Checkout Date</a></li>';
+        html = html + '<li><a class="checked_out_items_sort" data-sort="duedate">Due Date</a></li>';
+        html = html + '</ul>';
+        html = html + '</span>';
+        $('#renewAll').after(html);
+
+        // submit the form when the sort pulldown has changed. 
+        $('.checked_out_items_sort').click(function() {
+            // update the label and the hidden sort field and submit the form. 
+            $('#checked_out_items_sort_label').html(sort_labels[$(this).attr('data-sort')]);
+            $('#checked_out_items_sort_field').attr('value', $(this).attr('data-sort'));
+            $('#renewals').submit();
+        });
+
+        // add the export pulldown.
+        var html = ' ';
+        html = html + '<span class="dropdown">';
+        html = html + '<button type="button" class="btn btn-default dropdown-toggle checked_out_items_export_dropdown disabled" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Export <span class="caret"></span></button>';
+        html = html + '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
+        html = html + '<li><a class="checked_out_items_export" data-export-format="CSV">CSV</a></li>';
+        html = html + '<li><a class="checked_out_items_export" data-export-format="EndNoteWeb">EndNoteWeb</a></li>';
+        html = html + '<li><a class="checked_out_items_export" data-export-format="EndNote">EndNote/Zotero</a></li>';
+        html = html + '<li><a class="checked_out_items_export" data-export-format="BiBTeX">BibTex</a></li>';
+        html = html + '</ul>';
+        html = html + '</span>';
+        $('#renewAll').after(html);
+    }
+
+    // when an export link is clicked, dynamically create and submit a
+    // form to get the export. 
+    $('.checked_out_items_export').click(function() {
+        var form = $('<form>').attr('action', '/vufind/Cart/Export').attr('method', 'post').appendTo('body');
+        $('<input>').attr('type', 'hidden').attr('name', 'format').val($(this).attr('data-export-format')).appendTo(form);
+        $('.checkbox-select-item:checked').each(function() { 
+            $('<input>').attr('type', 'hidden').attr('name', 'ids[]').val($(this).attr('data-record-id')).appendTo(form);
+        });
+        $('<input>').attr('type', 'submit').attr('name', 'submit').val('Export').appendTo(form);
+        form.find('input[type="submit"]').click();
+    });
+
+    // CHECKED OUT ITEMS PRINT BUTTON
+    var html = ' <input class="btn btn-default checked_out_items_print disabled" name="print" value="Print" type="submit">';
+    $('#renewAll').after(html);
+
+    // when the print button is clicked, dynamically create and submit a
+    // form to get the print view. 
+    $('.checked_out_items_print').click(function(e) {
+        e.preventDefault();
+        var form = $('<form>').attr('action', '/vufind/Cart/SearchResultsBulk').attr('method', 'post').appendTo('body');
+        $('<input>').attr('type', 'sumbit').attr('name', 'print').attr('value', 'Print').appendTo(form);
+        $('.checkbox-select-item:checked').each(function() { 
+            $('<input>').attr('type', 'hidden').attr('name', 'ids[]').val($(this).attr('data-record-id')).appendTo(form);
+        });
+        form.submit();
+    });
+
+    // toggle the export pulldown's status and print button's status when checkboxes are selected.
+    $('.checkbox-select-item').click(function() {
+        if ($('.checkbox-select-item:checked').length) {
+            $('.checked_out_items_export_dropdown').removeClass('disabled');
+            $('.checked_out_items_print').removeClass('disabled');
+        } else {
+            $('.checked_out_items_export_dropdown').addClass('disabled');
+            $('.checked_out_items_print').addClass('disabled');
+        }
+    });
+
+    // HOLDS
+    if ($('.template-dir-myresearch.template-name-holds').length) {
+        // EXPORT BUTTON
+        var html = ' ';
+        html = html + '<span class="dropdown">';
+        html = html + '<button class="btn btn-default dropdown-toggle disabled holds_export_dropdown" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">';
+        html = html + ' Export ';
+        html = html + '<span class="caret"></span>';
+        html = html + '</button>';
+        html = html + '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
+        html = html + '<li><a class="holds_export" data-export-format="CSV">CSV</a></li>';
+        html = html + '<li><a class="holds_export" data-export-format="EndNoteWeb">EndNoteWeb</a></li>';
+        html = html + '<li><a class="holds_export" data-export-format="EndNote">EndNote/Zotero</a></li>';
+        html = html + '<li><a class="holds_export" data-export-format="BiBTeX">BibTex</a></li>';
+        html = html + '</ul>';
+        html = html + '</span>';
+        $('div.toolbar').prepend(html);
+
+        // PRINT BUTTON
+        var html = '<input class="btn btn-default disabled holds_print" name="print" value="Print" type="submit">';
+        $('div.toolbar').prepend(html);
+
+        // toggle the print button's status when checkboxes are selected.
+        $('.checkbox-select-item').click(function() {
+            if ($('.checkbox-select-item:checked').length) {
+                $('.holds_export_dropdown').removeClass('disabled');
+                $('.holds_print').removeClass('disabled');
+            } else {
+                $('.holds_export_dropdown').addClass('disabled');
+                $('.holds_print').addClass('disabled');
+            }
+        });
+        // when the print button is clicked, dynamically create and submit a 
+        // form to get the print view. 
+        $('.holds_print').click(function(e) {
+            e.preventDefault();
+            var form = $('<form>').attr('action', '/vufind/Cart/SearchResultsBulk').attr('method', 'post').appendTo('body');
+            $('<input>').attr('type', 'sumbit').attr('name', 'print').attr('value', 'Print').appendTo(form);
+            $('.checkbox-select-item:checked').each(function() { 
+                $('<input>').attr('type', 'hidden').attr('name', 'ids[]').val($(this).attr('data-record-id')).appendTo(form);
+            });
+            form.submit();
+        });
+
+        // when an export link is clicked, dynamically create and submit a
+        // form to get the export. 
+        $('.holds_export').click(function() {
+            var form = $('<form>').attr('action', '/vufind/Cart/Export').attr('method', 'post').appendTo('body');
+            $('<input>').attr('type', 'hidden').attr('name', 'format').val($(this).attr('data-export-format')).appendTo(form);
+            $('.checkbox-select-item:checked').each(function() { 
+                $('<input>').attr('type', 'hidden').attr('name', 'ids[]').val($(this).attr('data-record-id')).appendTo(form);
+            });
+            $('<input>').attr('type', 'submit').attr('name', 'submit').val('Export').appendTo(form);
+            form.find('input[type="submit"]').click();
+        });
+    }
+});
 
 

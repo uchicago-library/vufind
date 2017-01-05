@@ -409,12 +409,14 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     l.NUM_OVERDUE_NOTICES_SENT AS overdue_notices_count, i.COPY_NUMBER AS copy_number, i.ENUMERATION AS enumeration,
                     i.CHRONOLOGY AS chronology, h.CALL_NUMBER_PREFIX AS call_number_prefix, h.CALL_NUMBER AS call_number, 
                     h.IMPRINT AS imprint, bib.CONTENT AS bib_data, i.BARCODE AS barcode,
+                    loc.LOCN_NAME AS location_name,
                     l.NUM_RENEWALS AS number_of_renewals
                 FROM uc_people p
                 JOIN ole_dlvr_loan_t l ON p.id = l.OLE_PTRN_ID
                 JOIN ole_ds_item_t i ON i.BARCODE = l.ITM_ID
                 JOIN ole_ds_holdings_t h ON i.HOLDINGS_ID = h.HOLDINGS_ID
                 JOIN ole_ds_bib_t bib ON bib.BIB_ID = h.BIB_ID
+                LEFT JOIN ole_locn_t loc ON h.LOCATION_ID = loc.LOCN_ID
                     WHERE p.library_id = :barcode 
                         AND i.CURRENT_BORROWER = p.id';
          try {
@@ -510,6 +512,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                         $processRow['checkout'] = $trans['loanedDate'];
                         $processRow['duedate'] = $trans['duedate'];
                         $processRow['title'] = $trans['title'];
+                        $processRow['locationName'] = $trans['locationName'];
                         break;
                     }
                 }
@@ -686,6 +689,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $loanedTime = substr((string) $row['loaned_date'], 11);
 
         $dueStatus = ($row['overdue_notices_count'] > 0) ? "overdue" : "";
+
+        $locationName = $row['location_name'];
         
         $xml = simplexml_load_string($row['bib_data']);
 
@@ -713,6 +718,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'publication_year' => $row['imprint'],
             'renew' => $row['number_of_renewals'],
             'title' => $title != '' ? $title : "unknown title",
+            'locationName' => $locationName,
             'barcode' => $row['barcode'] 
         );
         $renewData = $this->checkRenewalsUpFront
