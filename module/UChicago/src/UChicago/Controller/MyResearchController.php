@@ -188,6 +188,9 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         }
 
         $sort = $this->params()->fromPost('sort');
+        if (!$sort) {
+            $sort = 'title';
+        }
 
         // Connect to the ILS:
         $catalog = $this->getILS();
