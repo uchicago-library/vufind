@@ -689,7 +689,7 @@ $(document).ready(function() {
         html = html + '<span class="dropdown">';
         html = html + '<button type="button" class="btn btn-default dropdown-toggle checked_out_items_export_dropdown disabled" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Export <span class="caret"></span></button>';
         html = html + '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
-        html = html + '<li><a class="checked_out_items_export" data-export-format="CSV">CSV</a></li>';
+        html = html + '<li><a class="checked_out_items_export" data-export-format="CSV">Spreadsheet (CSV)</a></li>';
         html = html + '<li><a class="checked_out_items_export" data-export-format="EndNoteWeb">EndNoteWeb</a></li>';
         html = html + '<li><a class="checked_out_items_export" data-export-format="EndNote">EndNote/Zotero</a></li>';
         html = html + '<li><a class="checked_out_items_export" data-export-format="BiBTeX">BibTex</a></li>';
@@ -747,13 +747,22 @@ $(document).ready(function() {
         html = html + '<span class="caret"></span>';
         html = html + '</button>';
         html = html + '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
-        html = html + '<li><a class="holds_export" data-export-format="CSV">CSV</a></li>';
+        html = html + '<li><a class="holds_export" data-export-format="CSV">Spreadsheet (CSV)</a></li>';
         html = html + '<li><a class="holds_export" data-export-format="EndNoteWeb">EndNoteWeb</a></li>';
         html = html + '<li><a class="holds_export" data-export-format="EndNote">EndNote/Zotero</a></li>';
         html = html + '<li><a class="holds_export" data-export-format="BiBTeX">BibTex</a></li>';
         html = html + '</ul>';
         html = html + '</span>';
         $('div.toolbar').prepend(html);
+
+        // toggle the export pulldown's status and print button's status when checkboxes are selected.
+        $('.checkbox-select-item').click(function() {
+            if ($('.checkbox-select-item:checked').length) {
+                $('.holds_export_dropdown').removeClass('disabled');
+            } else {
+                $('.holds_export_dropdown').addClass('disabled');
+            }
+        });
 
         // PRINT BUTTON
         var html = '<input class="btn btn-default holds_print" name="print" value="Print" type="submit">';
