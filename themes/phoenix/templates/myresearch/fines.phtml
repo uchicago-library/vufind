@@ -33,7 +33,6 @@
         <input type="hidden" name="ids[]" value="<?=$record['id']?>"/>
       <? endforeach; ?>
     </form>
-      <input class="btn btn-default" name="export" value="Export as CSV" type="submit">
     <form action="/vufind/Cart/SearchResultsBulk" method="POST" style="display: inline;">
       <input class="btn btn-default" type="submit" name="print" value="Print"/>
       <? foreach ($this->fines as $record): ?>
