@@ -756,29 +756,13 @@ $(document).ready(function() {
         $('div.toolbar').prepend(html);
 
         // PRINT BUTTON
-        var html = '<input class="btn btn-default disabled holds_print" name="print" value="Print" type="submit">';
+        var html = '<input class="btn btn-default holds_print" name="print" value="Print" type="submit">';
         $('div.toolbar').prepend(html);
 
-        // toggle the print button's status when checkboxes are selected.
-        $('.checkbox-select-item').click(function() {
-            if ($('.checkbox-select-item:checked').length) {
-                $('.holds_export_dropdown').removeClass('disabled');
-                $('.holds_print').removeClass('disabled');
-            } else {
-                $('.holds_export_dropdown').addClass('disabled');
-                $('.holds_print').addClass('disabled');
-            }
-        });
-        // when the print button is clicked, dynamically create and submit a 
-        // form to get the print view. 
+        // click event.
         $('.holds_print').click(function(e) {
             e.preventDefault();
-            var form = $('<form>').attr('action', '/vufind/Cart/SearchResultsBulk').attr('method', 'post').appendTo('body');
-            $('<input>').attr('type', 'sumbit').attr('name', 'print').attr('value', 'Print').appendTo(form);
-            $('.checkbox-select-item:checked').each(function() { 
-                $('<input>').attr('type', 'hidden').attr('name', 'ids[]').val($(this).attr('data-record-id')).appendTo(form);
-            });
-            form.submit();
+            window.print();
         });
 
         // when an export link is clicked, dynamically create and submit a
