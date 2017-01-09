@@ -33,12 +33,6 @@
         <input type="hidden" name="ids[]" value="<?=$record['id']?>"/>
       <? endforeach; ?>
     </form>
-    <form action="/vufind/Cart/SearchResultsBulk" method="POST" style="display: inline;">
-      <input class="btn btn-default" type="submit" name="print" value="Print"/>
-      <? foreach ($this->fines as $record): ?>
-        <input type="hidden" name="ids[]" value="<?=$record['id']?>"/>
-      <? endforeach; ?>
-    </form>
     <span class="dropdown">
       <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort By: <strong id="fines_sort_label"><?=$sort_labels[$sort] ?></strong> <span class="caret"></span></button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">

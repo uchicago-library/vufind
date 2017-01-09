@@ -777,6 +777,23 @@ $(document).ready(function() {
             form.find('input[type="submit"]').click();
         });
     }
+
+    // FINES
+    if ($('.template-dir-myresearch.template-name-fines').length) {
+        // PRINT BUTTON
+        var html = ' ';
+        html = html + '<form id="fines_print" style="display: inline;">';
+        html = html + '<input class="btn btn-default" type="submit" name="print" value="Print"/>';
+        html = html + '</form>';
+
+        $('div.toolbar').find('form:first').after(html);
+
+        // submit event.
+        $('#fines_print').submit(function(e) {
+            e.preventDefault();
+            window.print();
+        });
+    }
 });
 
 
