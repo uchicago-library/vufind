@@ -42,7 +42,7 @@
 <div class="list-group">
   <? if ($this->ils()->checkCapability('getMyHolds')): ?>
     <a href="<?=$this->url('myresearch-holds')?>" class="list-group-item<?=$this->active == 'holds' ? ' active' : ''?>">
-      <i class="fa fa-fw fa-flag" aria-hidden="true"></i> <?=$this->transEsc('Holds and Recalls')?>
+      <i class="fa fa-fw fa-flag" aria-hidden="true"></i> <?=$this->transEsc('Requested Items')?>
     </a>
   <? endif; ?>
   <a href="<?=$this->url('myresearch-storagerequest')?>" class="list-group-item<?=$this->active == 'storagerequest' ? 'active' : ''?>">
