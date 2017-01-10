@@ -28,7 +28,7 @@
 
   <div class="toolbar">
     <form action="/vufind/Cart/Export" method="POST" style="display: inline;">
-      <input class="btn btn-default" name="export" value="Export as CSV" type="submit">
+      <? /* <input class="btn btn-default" name="export" value="Export as CSV" type="submit"> */ ?>
       <? foreach ($this->fines as $record): ?>
         <input type="hidden" name="ids[]" value="<?=$record['id']?>"/>
       <? endforeach; ?>
