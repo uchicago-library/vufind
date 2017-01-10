@@ -31,14 +31,23 @@
     <?/* Display Main Details */?>
     <?
       $formatter = $this->recordDataFormatter();
-      $coreFields = $formatter->getData($driver, $formatter->getDefaults('core'));
+      /* Allowed fields from core. These are core functions/fields
+         that we want to add to our custom output from MarcFields*/
+      $allowed = ['Related Items'];
+      $defaultCoreFields = $formatter->getDefaults('core');
+      foreach (array_keys($defaultCoreFields) as $field) {
+          if (!in_array($field, $allowed)) {
+              unset($defaultCoreFields[$field]);  
+          }  
+      }
+      $coreFields = $formatter->getData($driver, $defaultCoreFields);
     ?>
     <table class="table table-striped">
       <caption><?=$this->transEsc('Bibliographic Details')?></caption>
       <? $this->MarcFields()->returnMarcData('top', $siteUrl); ?>
-        <? //foreach ($coreFields as $key => $value): ?>
-          <!--<tr><th><?//=$this->transEsc($key)?>:</th><td><?//=$value?></td></tr>-->
-        <? //endforeach; ?>
+        <? foreach ($coreFields as $key => $value): ?>
+          <tr><th><?=$this->transEsc($key)?>:</th><td><?=$value?></td></tr>
+        <? endforeach; ?>
     </table>
     <?/* End Main Details */?>
 
