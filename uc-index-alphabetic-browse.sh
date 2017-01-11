@@ -1,10 +1,32 @@
 #!/bin/bash
 
+
+#####################################################
+# Build java command
+#####################################################
+if [ "$JAVA_HOME" ]
+then
+  JAVA="$JAVA_HOME/bin/java"
+else
+  JAVA="java"
+fi
+
+if [ -z "$VUFIND_HOME" ]
+then
+  VUFIND_HOME=`dirname $0`
+fi
+
+if [ -z "$SOLR_HOME" ]
+then
+  SOLR_HOME="$VUFIND_HOME/solr/vufind"
+fi
+
 set -e
 set -x
 
 cd "`dirname $0`/import"
-CLASSPATH="browse-indexing.jar:../solr/lib/*"
+CLASSPATH="browse-indexing.jar:${SOLR_HOME}/jars/*:${SOLR_HOME}/../vendor/contrib/analysis-extras/lib/*:${SOLR_HOME}/../vendor/server/solr-webapp/webapp/WEB-INF/lib/*"
+#CLASSPATH="browse-indexing.jar:../solr/lib/*"
 
 TMPDIR=${TMPDIR:-`pwd`}
 export TMPDIR
@@ -18,7 +40,7 @@ ZENTUS_SQLITE_JDBC="/usr/local/share/java/classes/sqlitejdbc-native.jar"
 if [ $OS = FreeBSD -a -f $ZENTUS_SQLITE_JDBC ]
 then
     # browse-indexing.jar must be first
-    CLASSPATH="browse-indexing.jar:$ZENTUS_SQLITE_JDBC:../solr/lib/*"
+    CLASSPATH="browse-indexing.jar:$ZENTUS_SQLITE_JDBC:$CLASSPATH"
 fi
 
 
@@ -43,9 +65,9 @@ function locate_index
     eval $targetVar="$indexDir/$subDir"
 }
 
-locate_index "bib_index" "../solr/biblio"
-locate_index "auth_index" "../solr/authority"
-index_dir="../solr/alphabetical_browse"
+locate_index "bib_index" "${SOLR_HOME}/biblio"
+locate_index "auth_index" "${SOLR_HOME}/authority"
+index_dir="${SOLR_HOME}/alphabetical_browse"
 
 mkdir -p "$index_dir"
 
@@ -58,13 +80,13 @@ function build_browse
     extra_jvm_opts=$4
 
     if [ "$skip_authority" = "1" ]; then
-        java ${extra_jvm_opts} -Dfile.encoding="UTF-8" -Dfield.preferred=heading -Dfield.insteadof=use_for -cp $CLASSPATH PrintBrowseHeadings "$bib_index" "$field" "$TMPDIR/${browse}.tmp"
+        $JAVA ${extra_jvm_opts} -Dfile.encoding="UTF-8" -Dfield.preferred=heading -Dfield.insteadof=use_for -cp $CLASSPATH PrintBrowseHeadings "$bib_index" "$field" "$TMPDIR/${browse}.tmp"
     else
-        java ${extra_jvm_opts} -Dfile.encoding="UTF-8" -Dfield.preferred=heading -Dfield.insteadof=use_for -cp $CLASSPATH PrintBrowseHeadings "$bib_index" "$field" "$auth_index" "$TMPDIR/${browse}.tmp"
+        $JAVA ${extra_jvm_opts} -Dfile.encoding="UTF-8" -Dfield.preferred=heading -Dfield.insteadof=use_for -cp $CLASSPATH PrintBrowseHeadings "$bib_index" "$field" "$auth_index" "$TMPDIR/${browse}.tmp"
     fi
 
-    sort -u -t$'\1' -k1 "${browse}.tmp" -o "sorted-${browse}.tmp"
-    java -Dfile.encoding="UTF-8" -cp $CLASSPATH CreateBrowseSQLite "sorted-${browse}.tmp" "${browse}_browse.db"
+    sort -T $TMPDIR -u -t$'\1' -k1 "${browse}.tmp" -o "sorted-${browse}.tmp"
+    $JAVA -Dfile.encoding="UTF-8" -cp $CLASSPATH CreateBrowseSQLite "sorted-${browse}.tmp" "${browse}_browse.db"
 
     rm -f *.tmp
 
