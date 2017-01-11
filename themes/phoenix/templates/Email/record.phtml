@@ -1,15 +1,16 @@
 <? // This is a text-only email template; do not include HTML! ?>
 <? $pubDetails = $this->driver->tryMethod('getPublicationDetails');
    $edition = $this->driver->tryMethod('getEdition');
+   if (is_array($edition)) {
+      $edition = implode(" ", $edition);
+   }
    $imprint = implode("\n", $pubDetails) . "\n" . $edition;
    $holdings = $this->driver->getRealTimeHoldings();
 ?>
 <?=$this->driver->getTitle() . ' ' . $this->driver->getTitleStatement()?>
-
-<?=$imprint?>
-
-<? foreach ($holdings as $location => $holding): ?><? if (($location == 'Full Text' || $location == 'FullText') && !array_key_exists('eHolding', $holding['items'][0])): continue; endif; ?>
-<?=$location; ?>
+<?=$imprint . "\n"?>
+<? foreach ($holdings['holdings'] as $location => $holding): ?><? if (($location == 'Full Text' || $location == 'FullText') && !array_key_exists('eHolding', $holding['items'][0])): continue; endif; ?>
+<?=$location . "\n"; ?>
 <? $callnumbers = array();
    foreach ($holding['items'] as $item):
      if (array_key_exists('callnumberDisplay', $item) && !empty($item['callnumberDisplay'])):
@@ -18,8 +19,7 @@
    endforeach;
    $callnumbers = implode(", ", array_keys($callnumbers)); ?>
 <? if(!empty($callnumbers)): ?>
-
-<?=$callnumbers;?>
+<?=$callnumbers . "\n";?>
 <? endif; ?>
 <? $eholdings = array();
    foreach ($holding['items'] as $item):
@@ -29,7 +29,6 @@
    endforeach;
    $eholdings = implode(", ", array_keys($eholdings)); ?>
 <? if (!empty($eholdings)): ?>
-
 <?=$eholdings;?>
 <? endif; ?>
 
