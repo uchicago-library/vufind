@@ -698,30 +698,12 @@ $(document).ready(function() {
         form.find('input[type="submit"]').click();
     });
 
-    // CHECKED OUT ITEMS PRINT BUTTON
-    var html = ' <input class="btn btn-default checked_out_items_print disabled" name="print" value="Print" type="submit">';
-    $('#renewAll').after(html);
-
-    // when the print button is clicked, dynamically create and submit a
-    // form to get the print view. 
-    $('.checked_out_items_print').click(function(e) {
-        e.preventDefault();
-        var form = $('<form>').attr('action', '/vufind/Cart/SearchResultsBulk').attr('method', 'post').appendTo('body');
-        $('<input>').attr('type', 'sumbit').attr('name', 'print').attr('value', 'Print').appendTo(form);
-        $('.checkbox-select-item:checked').each(function() { 
-            $('<input>').attr('type', 'hidden').attr('name', 'ids[]').val($(this).attr('data-record-id')).appendTo(form);
-        });
-        form.submit();
-    });
-
-    // toggle the export pulldown's status and print button's status when checkboxes are selected.
+    // toggle the export pulldown's status when checkboxes are selected.
     $('.checkbox-select-item').click(function() {
         if ($('.checkbox-select-item:checked').length) {
             $('.checked_out_items_export_dropdown').removeClass('disabled');
-            $('.checked_out_items_print').removeClass('disabled');
         } else {
             $('.checked_out_items_export_dropdown').addClass('disabled');
-            $('.checked_out_items_print').addClass('disabled');
         }
     });
 
@@ -743,23 +725,13 @@ $(document).ready(function() {
         html = html + '</span>';
         $('div.toolbar').prepend(html);
 
-        // toggle the export pulldown's status and print button's status when checkboxes are selected.
+        // toggle the export pulldown's status when checkboxes are selected.
         $('.checkbox-select-item').click(function() {
             if ($('.checkbox-select-item:checked').length) {
                 $('.holds_export_dropdown').removeClass('disabled');
             } else {
                 $('.holds_export_dropdown').addClass('disabled');
             }
-        });
-
-        // PRINT BUTTON
-        var html = '<input class="btn btn-default holds_print" name="print" value="Print" type="submit">';
-        $('div.toolbar').prepend(html);
-
-        // click event.
-        $('.holds_print').click(function(e) {
-            e.preventDefault();
-            window.print();
         });
 
         // when an export link is clicked, dynamically create and submit a
@@ -772,23 +744,6 @@ $(document).ready(function() {
             });
             $('<input>').attr('type', 'submit').attr('name', 'submit').val('Export').appendTo(form);
             form.find('input[type="submit"]').click();
-        });
-    }
-
-    // FINES
-    if ($('.template-dir-myresearch.template-name-fines').length) {
-        // PRINT BUTTON
-        var html = ' ';
-        html = html + '<form id="fines_print" style="display: inline;">';
-        html = html + '<input class="btn btn-default" type="submit" name="print" value="Print"/>';
-        html = html + '</form>';
-
-        $('div.toolbar').find('form:first').after(html);
-
-        // submit event.
-        $('#fines_print').submit(function(e) {
-            e.preventDefault();
-            window.print();
         });
     }
 });
