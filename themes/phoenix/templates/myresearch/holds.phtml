@@ -49,7 +49,7 @@
               <input class="checkbox-select-item" type="checkbox" name="SelectedIDS[]" id="checkbox_<?=$safeId?>" data-record-id="<?=$this->escapeHtmlAttr($resource->getSourceIdentifier() . '|' . $resource->getUniqueId());?>" />
             </div>
             <div class="col-sm-2 hidden-xs text-center">
-              <? $cover = $this->record($resource)->getCover('holds', 'small'); ?>
+              <? $cover = $this->record($resource)->getCover('holds', 'medium'); ?>
               <? if ($cover): ?>
                 <?=$cover?>
               <? endif; ?>
