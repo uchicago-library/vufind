@@ -1749,6 +1749,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $request->setUri($uri);
         $request->setContent(json_encode($json));
         $client = new Client();
+        $client->setEncType('text/json');
         $client->setOptions(array('timeout' => 4030));
         // invalid parameter headers passed...
         
