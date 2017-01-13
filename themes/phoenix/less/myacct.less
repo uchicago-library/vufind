@@ -1,5 +1,15 @@
 // ** Base Styles ** //
 
+.btn-primary {
+  color: #fff!important;
+  background-color: #800;
+  border-color: #6f0000;
+  text-decoration: none!important;
+  &:focus {
+    color: #eee!important;
+  }
+}
+
 .btn-default:hover, .btn-default:focus, .btn-default:active, .btn-default.active, .open .dropdown-toggle.btn-default {
   background-color: #806362;
 }
@@ -31,6 +41,11 @@
   }
 }
 
+.mini-search div label {
+  color: #fff;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+}
+
 
 // ** Alerts ** //
 
@@ -40,7 +55,7 @@
     text-align: center;
     padding: 5px;
     margin: 10px 0;
-    border: 1px solid;
+    border: none;
   }
   & a {
     color: #32327f;
@@ -61,7 +76,7 @@
 
 // ** Checked Out Items + Holds ** //
 
-input[type="checkbox"]{
+.template-dir-myresearch input[type="checkbox"], .template-name-fines input[type="checkbox"], .template-name-holds input[type="checkbox"], .template-name-storagerequest input[type="checkbox"], .template-name-mylist input[type="checkbox"] {
   margin: 1em 0;
   cursor: pointer;
   -webkit-appearance: none;
@@ -222,11 +237,3 @@ button.request {
   background: #ccc0c0;
   color: #000;
 }
-
-
-
-
-
-
-
-
