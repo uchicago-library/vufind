@@ -189,7 +189,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
         $sort = $this->params()->fromPost('sort');
         if (!$sort) {
-            $sort = 'title';
+            $sort = 'duedate';
         }
 
         // Connect to the ILS:
