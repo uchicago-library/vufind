@@ -11,7 +11,8 @@
     <h2><?=$this->transEsc('Checked Out Items')?> <small>(<?=count($this->transactions)?>)</small></h2>
 
     <?=$this->flashmessages()?>
-
+    <? $warnMsg = 'Please do not click renew twice-renewals can take up to a minute.<br/>For help, <a href="https://www.lib.uchicago.edu/about/directory/?view=department&query=circulation" target="_blank" class="external">Call us</a> or use our <a href="https://www.lib.uchicago.edu/borrow/borrowing/contact-circulation/" target="_blank" class="external">online form</a> and Library staff will help you.'; ?>
+    <?=$this->BootstrapAlert()->makeAlert('warning', $warnMsg, ''); ?>
     <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
 
     <? if (!empty($this->transactions)): ?>
