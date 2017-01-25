@@ -124,11 +124,23 @@
  
             <? $showStatus = false; ?>
 
-            <?
+            <? /* UChicago custom code */
               $duedate = $ilsDetails['duedate'];
               if (!$duedate) {
                 $duedate = 'no due date unless recalled.';
               }
+
+              $now = new DateTime();
+              try {
+                $dateObj = new DateTime($duedate);
+                $diff = $now->diff($dateObj);
+                $days = [0 => $diff->days,
+                         1 => $diff->days * -1];
+                $interval = $days[$diff->invert];
+              } catch (Exception $e) {
+                $interval = INF;
+              }
+              $dueInterval = $this->GetConfig()->getWhenDueAlertInterval();
             ?>
 
             <? if (isset($this->renewResult[$ilsDetails['item_id']])): ?>
@@ -192,6 +204,14 @@
           <? if ($showStatus && isset($ilsDetails['message']) && !empty($ilsDetails['message'])): ?>
             <div class="col-xs-12 col-sm-10 alert alert-info"><?=$this->transEsc($ilsDetails['message'])?></div>
           <? endif; ?>
+
+          <? /* UChicago custom code */ ?>
+          <? if ($interval < 0): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-danger">Overdue </div>
+          <? elseif ($interval < $dueInterval): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-warning">Due Soon </div>
+          <? endif; ?>
+
           </div><? /* end row */ ?>
           </div>
         </div>
