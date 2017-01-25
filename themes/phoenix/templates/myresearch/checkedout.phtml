@@ -11,7 +11,8 @@
     <h2><?=$this->transEsc('Checked Out Items')?> <small>(<?=count($this->transactions)?>)</small></h2>
 
     <?=$this->flashmessages()?>
-
+    <? $warnMsg = 'Please do not click renew twice-renewals can take up to a minute.<br/>For help, <a href="https://www.lib.uchicago.edu/about/directory/?view=department&query=circulation" target="_blank" class="external">Call us</a> or use our <a href="https://www.lib.uchicago.edu/borrow/borrowing/contact-circulation/" target="_blank" class="external">online form</a> and Library staff will help you.'; ?>
+    <?=$this->BootstrapAlert()->makeAlert('warning', $warnMsg, ''); ?>
     <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
 
     <? if (!empty($this->transactions)): ?>
@@ -53,7 +54,6 @@
       <? endforeach; ?>
 
       <? $i = 0; foreach ($this->transactions as $resource): ?>
-        <hr/>
         <? $ilsDetails = $resource->getExtraDetail('ils_details'); ?>
         <div id="record<?=$this->escapeHtmlAttr($resource->getUniqueId())?>" class="row result">
           <? if ($this->renewForm): ?>
@@ -122,27 +122,37 @@
               <br />
             <? endif; ?>
  
-            <? $showStatus = true; ?>
+            <? $showStatus = false; ?>
 
-            <?
+            <? /* UChicago custom code */
               $duedate = $ilsDetails['duedate'];
               if (!$duedate) {
                 $duedate = 'no due date unless recalled.';
               }
+
+              $now = new DateTime();
+              try {
+                $dateObj = new DateTime($duedate);
+                $diff = $now->diff($dateObj);
+                $days = [0 => $diff->days,
+                         1 => $diff->days * -1];
+                $interval = $days[$diff->invert];
+              } catch (Exception $e) {
+                $interval = INF;
+              }
+              $dueInterval = $this->GetConfig()->getWhenDueAlertInterval();
             ?>
 
             <? if (isset($this->renewResult[$ilsDetails['item_id']])): ?>
               <? $renewDetails = $this->renewResult[$ilsDetails['item_id']]; ?>
               <? if (isset($renewDetails['success']) && $renewDetails['success']): ?>
                 <? $showStatus = false; ?>
-                <strong><?=$this->transEsc('Due Date')?>: <?=$this->escapeHtml($renewDetails['new_date'])?> <? if (isset($renewDetails['new_time'])): ?><?=$this->escapeHtml($renewDetails['new_time'])?><? endif; ?></strong>
-                <div class="alert alert-success"><?=$this->transEsc('renew_success')?></div>
+                <strong class="due-date"><?=$this->transEsc('Due Date')?>: <?=$this->escapeHtml($renewDetails['new_date'])?> <? if (isset($renewDetails['new_time'])): ?><?=$this->escapeHtml($renewDetails['new_time'])?><? endif; ?></strong>
               <? else: ?>
-                <strong><?=$this->transEsc('Due Date')?>: <?=$this->escapeHtml($duedate)?><? if (isset($ilsDetails['dueTime'])): ?> <?=$this->escapeHtml($ilsDetails['dueTime'])?><? endif; ?></strong>
-                <div class="alert alert-danger"><?=$this->transEsc('renew_fail')?><? if (isset($renewDetails['sysMessage'])): ?>: <?=$this->escapeHtml($renewDetails['sysMessage'])?><? endif; ?></div>
+                <strong class="due-date"><?=$this->transEsc('Due Date')?>: <?=$this->escapeHtml($duedate)?><? if (isset($ilsDetails['dueTime'])): ?> <?=$this->escapeHtml($ilsDetails['dueTime'])?><? endif; ?></strong>
               <? endif; ?>
             <? else: ?>
-              <strong><?=$this->transEsc('Due Date')?>: <?=$this->escapeHtml($duedate)?><? if (isset($ilsDetails['dueTime'])): ?> <?=$this->escapeHtml($ilsDetails['dueTime'])?><? endif; ?></strong>
+              <strong class="due-date"><?=$this->transEsc('Due Date')?>: <?=$this->escapeHtml($duedate)?><? if (isset($ilsDetails['dueTime'])): ?> <?=$this->escapeHtml($ilsDetails['dueTime'])?><? endif; ?></strong>
             <? endif; ?>
 
             <? if (isset($ilsDetails['renewable']) && $ilsDetails['renewable'] && isset($ilsDetails['renew_link'])): ?>
@@ -172,6 +182,17 @@
               <br />
             <? endif; ?>
           </div><? /* end col */ ?>
+
+            <? if (isset($this->renewResult[$ilsDetails['item_id']])): ?>
+             <? $renewDetails = $this->renewResult[$ilsDetails['item_id']]; ?>
+             <? if (isset($renewDetails['success']) && $renewDetails['success']): ?>
+                <? $showStatus = false; ?>
+                <div class="col-xs-12 col-sm-10 alert alert-success"><?=$this->transEsc('renew_success')?></div>
+              <? else: ?>
+                <div class="col-xs-12 col-sm-10 alert alert-danger"><?=$this->transEsc('renew_fail')?><? if (isset($renewDetails['sysMessage'])): ?>: <?=$this->escapeHtml($renewDetails['sysMessage'])?><? endif; ?></div>
+              <? endif; ?>
+           <? endif; ?>
+
           <? if ($showStatus): ?>
             <? if (isset($ilsDetails['dueStatus']) && $ilsDetails['dueStatus'] == "overdue"): ?>
               <div class="col-xs-12 col-sm-10 alert alert-danger"><?=$this->transEsc("renew_item_overdue")?></div>
@@ -183,6 +204,14 @@
           <? if ($showStatus && isset($ilsDetails['message']) && !empty($ilsDetails['message'])): ?>
             <div class="col-xs-12 col-sm-10 alert alert-info"><?=$this->transEsc($ilsDetails['message'])?></div>
           <? endif; ?>
+
+          <? /* UChicago custom code */ ?>
+          <? if ($interval < 0): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-danger">Overdue </div>
+          <? elseif ($interval < $dueInterval): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-warning">Due Soon </div>
+          <? endif; ?>
+
           </div><? /* end row */ ?>
           </div>
         </div>

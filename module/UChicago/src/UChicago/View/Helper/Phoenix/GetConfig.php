@@ -62,6 +62,7 @@ class GetConfig extends \Zend\View\Helper\AbstractHelper
     {
         $this->siteEmail = isset($siteConfig->Site->email) ? $siteConfig->Site->email : false;
         $this->alphabrowseSearchTypes = isset($siteConfig->AlphaBrowse_Types) ? $siteConfig->AlphaBrowse_Types : false;
+        $this->dueSoonInterval = isset($siteConfig->MyAccount->due_soon) ? $siteConfig->MyAccount->due_soon : false;
     }
 
     /**
@@ -83,4 +84,15 @@ class GetConfig extends \Zend\View\Helper\AbstractHelper
     {
         return $this->alphabrowseSearchTypes;
     }
+
+    /**
+     * Make alphabrowse search types available to the templates. 
+     *
+     * @return string $siteEmail from the config file
+     */
+    public function getWhenDueAlertInterval() 
+    {
+        return $this->dueSoonInterval;
+    }
+
 }
