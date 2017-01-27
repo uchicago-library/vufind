@@ -422,7 +422,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
          try {
             /*Query the database*/
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(array(':barcode' => $patron['barcode']));
+            //$stmt->execute(array(':barcode' => $patron['barcode']));
+            $stmt->execute(array(':barcode' => 1451581));
 
             while ($row = $stmt->fetch()) {
                 $processRow = $this->processMyTransactionsData($row, $patron);
@@ -671,6 +672,40 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     }
 
     /**
+     * UChicago helper function for calculating if
+     * an item is due soon or overdue.
+     *
+     * @param $duedate, string
+     *
+     * @return associative array with boolean entries
+     * for 'overdue' and 'duesoon'. Only one of these
+     * can be true at a given time because an item
+     * can never be overdue and due soon at the same time.
+     */
+    protected function getItemDueStatus($duedate)
+    {
+        $now = new \DateTime();
+        $itemDueStatus = ['overdue' => false, 'duesoon' => false];
+        try {
+            $dateObj = new \DateTime($duedate);
+            $diff = $now->diff($dateObj);
+            $days = [0 => $diff->days,
+                     1 => $diff->days * -1];
+            $interval = $days[$diff->invert];
+        } catch (Exception $e) {
+            $interval = INF;
+        }
+
+        if ($interval < 0) {
+            $itemDueStatus['overdue'] =  true;
+        }
+        elseif ($duedate != null and $interval < (int)$this->config['UserAccount']['due_soon']) {
+            $itemDueStatus['duesoon'] = true;
+        }
+        return $itemDueStatus;
+    }
+
+    /**
      * Protected support method for getMyTransactions.
      *
      * @param array $row data from the database
@@ -701,8 +736,11 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             }
         }
 
-        /*See if item is on indefinite loan.*/
+        /* See if item is on indefinite loan */
         $isIndefiniteLoan = strlen($dueDate) < 1;
+
+        /* See if the item is overdue or due soon */
+        $itemDueStatus = $this->getItemDueStatus($dueDate);
 
         $transactions = array(
             'id' => $row['bib_num'],
@@ -719,7 +757,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'renew' => $row['number_of_renewals'],
             'title' => $title != '' ? $title : "unknown title",
             'locationName' => $locationName,
-            'barcode' => $row['barcode'] 
+            'barcode' => $row['barcode'],
+            'overdue' => $itemDueStatus['overdue'],
+            'duesoon' => $itemDueStatus['duesoon']
         );
         $renewData = $this->checkRenewalsUpFront
             ? $this->isRenewable($patron['id'], $transactions['item_id'])

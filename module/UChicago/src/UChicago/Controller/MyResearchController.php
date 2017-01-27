@@ -171,12 +171,14 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 	    );
     }
 
+
     /**
      * Send list of checked out books to view. 
      * Overriding VuFind core so we can return a flag for detecting
      * if any of the renewal requests failed. This allows us to display
      * the appropriate message at the top of the page and saves us an 
-     * extra loop in the template.
+     * extra loop in the template. We also have custom sorting options,
+     * alert messages, and labels.
      *
      * @return mixed
      */
@@ -225,8 +227,9 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
         // Sort results. 
         $sort_by = [];
+        $search_types = [0 => 'loanedDate', 1 => 'duedate'];
         // convert dates like 1/1/2017 into something sortable.
-        if ($sort == 'loanedDate' || $sort == 'duedate') {
+        if ($sort == $search_types[0] || $sort == $search_types[1]) {
             foreach ($result as $r) {
                 $d = explode('/', trim($r[$sort]));
                 $sort_by[] = sprintf("%04d%02d%02d", $d[2], $d[0], $d[1]);
@@ -236,7 +239,12 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 $sort_by[] = strtolower(trim($r[$sort]));
             }
         }
-        array_multisort($sort_by, SORT_ASC, $result);
+        if ($sort == $search_types[1]) { 
+            array_multisort($sort_by, SORT_DESC, $result);
+        }
+        else {
+            array_multisort($sort_by, SORT_ASC, $result);
+        }
 
         // Get page size:
         $config = $this->getConfig();
@@ -258,7 +266,19 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         }
 
         $transactions = $hiddenTransactions = [];
+        $itemsOverdue = false;
+        $itemsDueSoon = false;
         foreach ($result as $i => $current) {
+            // UChicago customization
+            // Test if items are due soon or overdue
+            // Set the approptiate variables and flags
+            if ($current['overdue']) {
+                $itemsOverdue =  true;
+            }
+            elseif ($current['duesoon']) {
+                $itemsDueSoon = true; 
+            }
+
             // Add renewal details if appropriate:
             $current = $this->renewals()->addRenewDetails(
                 $catalog, $current, $renewStatus
@@ -280,7 +300,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         return $this->createViewModel(
             compact(
                 'sort', 'transactions', 'renewForm', 'renewResult', 'paginator',
-                'hiddenTransactions', 'failure'
+                'hiddenTransactions', 'failure', 'itemsOverdue', 'itemsDueSoon'
             )
         );
     }

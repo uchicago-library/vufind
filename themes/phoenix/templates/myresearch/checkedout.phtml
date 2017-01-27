@@ -11,6 +11,12 @@
     <h2><?=$this->transEsc('Checked Out Items')?> <small>(<?=count($this->transactions)?>)</small></h2>
 
     <?=$this->flashmessages()?>
+    <? if ($this->itemsOverdue) : ?>
+        <?=$this->BootstrapAlert()->makeAlert('danger', 'You have item(s) overdue.', ''); ?>
+    <? endif; ?>
+    <? if ($this->itemsDueSoon): ?>
+        <?=$this->BootstrapAlert()->makeAlert('warning', 'You have item(s) due soon.', ''); ?>
+    <? endif; ?>
     <? $warnMsg = 'Please do not click renew twice-renewals can take up to a minute.<br/>For help, <a href="https://www.lib.uchicago.edu/about/directory/?view=department&query=circulation" target="_blank" class="external">Call us</a> or use our <a href="https://www.lib.uchicago.edu/borrow/borrowing/contact-circulation/" target="_blank" class="external">online form</a> and Library staff will help you.'; ?>
     <?=$this->BootstrapAlert()->makeAlert('warning', $warnMsg, ''); ?>
     <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
@@ -124,24 +130,11 @@
  
             <? $showStatus = false; ?>
 
-            <? /* UChicago custom code */
-              $duedate = $ilsDetails['duedate'];
-              if (!$duedate) {
-                $duedate = 'no due date unless recalled.';
-              }
-
-              $now = new DateTime();
-              try {
-                $dateObj = new DateTime($duedate);
-                $diff = $now->diff($dateObj);
-                $days = [0 => $diff->days,
-                         1 => $diff->days * -1];
-                $interval = $days[$diff->invert];
-              } catch (Exception $e) {
-                $interval = INF;
-              }
-              $dueInterval = $this->GetConfig()->getWhenDueAlertInterval();
-            ?>
+            <? /* UChicago custom code */ ?>
+            <? $duedate = $ilsDetails['duedate']; ?>
+            <? if (!$duedate) :?>
+                <? $duedate = 'no due date unless recalled.'; ?>
+            <? endif; ?>
 
             <? if (isset($this->renewResult[$ilsDetails['item_id']])): ?>
               <? $renewDetails = $this->renewResult[$ilsDetails['item_id']]; ?>
@@ -160,27 +153,28 @@
             <? endif; ?>
           </div><? /* end col */ ?>
           <div class="col-sm-6 col-xs-12">
-            <? 
-              $callNumber = $ilsDetails['callNumber'];
-              if ($callNumber) {
-                echo $callNumber . "<br/>";
-              }
-              $barcode = $ilsDetails['barcode'];
-              if ($barcode) {
-                echo "<strong>Barcode:</strong> " . $barcode . "<br/>";
-              }
-              $loanedDate = $ilsDetails['loanedDate'];
-              if ($loanedDate) {
-                echo "<strong>Checked Out:</strong> " . $loanedDate .  "<br/>";
-              }
-            ?>
-            <? if (isset($ilsDetails['renew'])): ?>
-              <strong><?=$this->transEsc('Renewed')?>:</strong> <?=$this->transEsc($ilsDetails['renew'])?>
+            <? $callNumber = $ilsDetails['callNumber']; ?>
+            <? if ($callNumber) : ?>
+                <?=$callNumber?><br/>
+            <? endif; ?>
+
+            <? $barcode = $ilsDetails['barcode']; ?>
+            <? if ($barcode) : ?>
+                 <strong>Barcode: </strong> <?=$barcode?><br/>
+            <? endif; ?>
+
+           <? if (isset($ilsDetails['renew'])): ?>
+              <strong><?=$this->transEsc('Renewal Count')?>:</strong> <?=$this->transEsc($ilsDetails['renew'])?>
               <? if (isset($ilsDetails['renewLimit'])): ?>
                 / <?=$this->transEsc($ilsDetails['renewLimit'])?>
               <? endif; ?>
               <br />
             <? endif; ?>
+
+            <? $loanedDate = $ilsDetails['loanedDate']; ?>
+            <? if ($loanedDate) : ?>
+                <strong>Checked Out: </strong> <?=$loanedDate?><br/>
+            <? endif; ?> 
           </div><? /* end col */ ?>
 
             <? if (isset($this->renewResult[$ilsDetails['item_id']])): ?>
@@ -206,9 +200,9 @@
           <? endif; ?>
 
           <? /* UChicago custom code */ ?>
-          <? if ($interval < 0): ?>
+          <? if ($ilsDetails['overdue']): ?>
             <div class="col-xs-12 col-sm-10 alert alert-danger">Overdue </div>
-          <? elseif ($interval < $dueInterval): ?>
+          <? elseif ($ilsDetails['duesoon']): ?>
             <div class="col-xs-12 col-sm-10 alert alert-warning">Due Soon </div>
           <? endif; ?>
 
