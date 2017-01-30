@@ -449,6 +449,21 @@ $(document).ready(function() {
 			    cataloglinkclick('send', 'event', 'resultNumber', n, $(this), e);
             }
 		});
+
+		/**************************************** 
+		 ********* BROWSE RESULT PAGE ***********
+		 ****************************************/
+   
+        /* See also links. */ 
+        $('ul.see-also a[href]').on('click', function(e) {
+            var text = $(this).text();
+            cataloglinkclick('send', 'event', 'seeAlso', text, $(this), e);
+        });
+        /* Use instead links. */
+        $('ul.use-instead a[href]').on('click', function(e) {
+            var text = $(this).text();
+            cataloglinkclick('send', 'event', 'useInstead', text, $(this), e);
+        });
 	
 		/**************************************** 
 		 ************* RECORD VIEW **************
