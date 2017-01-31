@@ -478,7 +478,7 @@ $(document).ready(function() {
 
     // Create "Add search group" and "what is a group?" links.
     var groupPlaceHolder = $('<div id="groupPlaceHolder"><i class="fa fa-plus-circle"></i> <a href="#">Add Search Group</a> <a href="https://www.lib.uchicago.edu/research/help/catalog-help/advanced/" id="what_is_a_group" target="_blank" class="external"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Group?</a></div>');
-    $('.group:first').after(groupPlaceHolder);
+    $('.group:last').after(groupPlaceHolder);
 
     // Add click event to 'add search group'
     $('#groupPlaceHolder a:first').click(addGroup);
