@@ -422,8 +422,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
          try {
             /*Query the database*/
             $stmt = $this->db->prepare($sql);
-            //$stmt->execute(array(':barcode' => $patron['barcode']));
-            $stmt->execute(array(':barcode' => 1451581));
+            $stmt->execute(array(':barcode' => $patron['barcode']));
 
             while ($row = $stmt->fetch()) {
                 $processRow = $this->processMyTransactionsData($row, $patron);
