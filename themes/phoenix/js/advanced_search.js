@@ -85,11 +85,6 @@ $.fn.addSearch = function(term, field)
   // Get the group number. 
   var group = $(this).index('.group');
 
-  // Add the 'match' pulldown 
-  if ($(this).find('.search').length > 0) {
-    $(this).find('.search_bool').show();
-  }
-
   // Build the new search
   var inputIndex = $(this).find('input').length;
   var inputID = group+'_'+inputIndex;
@@ -178,7 +173,6 @@ $.fn.deleteSearch = function deleteSearch()
   // search box. 
   if($(this).parent('.group').find('.search .delete').length <= 2) {
     $(this).parent('.group').find('.search .delete').hide();
-    $(this).parent('.group').find('.search_bool').hide();
   }
 
   // Remove this search query and field pulldown. 
@@ -272,7 +266,6 @@ function addGroup()
 
   var searchBool = $(s);
   newGroup.append(searchBool);
-  newGroup.find('.search_bool').hide();
 
   // Create and append 'add a new field' and 'what is a field?' links. 
   var s = '';
