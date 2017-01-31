@@ -100,6 +100,9 @@ $.fn.addSearch = function(term, field)
   // Append the new search term. 
   newSearch.append(newTerm);
 
+  // Add a space between fields.
+  newSearch.append(' ');
+
   // Build the advanced field pulldown. 
   var newFieldStr = '<select id="search_type'+inputID+'" name="type'+group+'[]" class="form-control">';
   $.each([
@@ -152,6 +155,7 @@ $.fn.addSearch = function(term, field)
   });
 
   // Append the delete link. 
+  $("#search" + inputID).append(' ');
   $("#search" + inputID).append(deleteLink);
 
   // Show x if we have more than one search inputs
@@ -525,6 +529,22 @@ $(document).ready(function() {
                 });
             });
         }
+
+        $('.group').each(function() {
+            console.log('a');
+            var searchCount = $(this).find('.search').length;
+            if (searchCount > 1) {
+                $(this).find('.search').each(function() {
+                    var search = $(this);
+                    var deleteLink = $('<a class="delete" href="#">&times;</a>');
+                    search.append(' ');
+                    search.append(deleteLink);
+                    deleteLink.click(function() {
+                        search.deleteSearch();
+                    });
+                });
+            }
+        });
     }
 
     // Update keyword search placeholder text when the select pulldown changes. 
