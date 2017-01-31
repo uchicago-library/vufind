@@ -497,6 +497,10 @@ $(document).ready(function() {
         // switch the basic/advanced search switch.
         $('#basicSearchSwitch a').removeClass('disabled');
         $('#advancedSearchSwitch a').addClass('disabled');
+        // show "match: All groups"
+        if ($('.group').length > 1) {
+            $('#groupJoin').removeClass('hidden');
+        }
     }
 
     // Update keyword search placeholder text when the select pulldown changes. 
