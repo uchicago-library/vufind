@@ -105,7 +105,7 @@
 
     <? ($groups == false) ? $group_count = 1 : $group_count = count($groups); ?>
     <? for ($g = 0; $g < $group_count; $g++): ?>
-        <div class="group well" id="group0">
+        <div class="group well" id="group<?=$g?>">
             <div class="form-group form-inline">
                 <div class="search_bool">
 	                <label for="search_bool<?=$g?>">Match:&nbsp;</label>

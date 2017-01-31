@@ -236,6 +236,20 @@ function updateGroups()
     });
 }
 
+// nextGroup is the group number, beginning at 1, for the search group 
+// this link will add a search field to.
+function buildSearchPlaceHolder(nextGroup)
+{
+    // Create and append 'add a new field' and 'what is a field?' links. 
+    var s = '';
+    s = s + '<span class="searchPlaceHolder">';
+    s = s + '<i id="group'+nextGroup+'Holder" class="fa fa-plus-circle"></i>';
+    s = s + ' <a href="#" id="add_search_link_'+nextGroup+'">'+addSearchString+'</a>';
+    s = s + ' <a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchfield" class="external what_is_a_field"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Field?</a>';
+    s = s + '</span>';
+    return s;
+}
+
 function addGroup()
 {
   updateGroups();
@@ -268,13 +282,7 @@ function addGroup()
   newGroup.append(searchBool);
 
   // Create and append 'add a new field' and 'what is a field?' links. 
-  var s = '';
-  s += '<span class="searchPlaceHolder">';
-  s += '<i id="group'+nextGroup+'Holder" class="fa fa-plus-circle"></i>';
-  s += ' <a href="#" id="add_search_link_'+nextGroup+'">'+addSearchString+'</a>';
-  s += ' <a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchfield" class="external what_is_a_field"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Field?</a>';
-  s += '</span>';
-
+  var s = buildSearchPlaceHolder(nextGroup);
   var fieldLinks = $(s);
   newGroup.append(fieldLinks);
 
@@ -497,9 +505,25 @@ $(document).ready(function() {
         // switch the basic/advanced search switch.
         $('#basicSearchSwitch a').removeClass('disabled');
         $('#advancedSearchSwitch a').addClass('disabled');
-        // show "match: All groups"
+
         if ($('.group').length > 1) {
+            // show "match: All groups"
             $('#groupJoin').removeClass('hidden');
+            $('.group').each(function(i) {
+                if (i == 0) {
+                    return;
+                }
+                var nextGroup = i + 1;
+                // Create and append 'add a new field' and 'what is a field?' links. 
+                var s = buildSearchPlaceHolder(nextGroup);
+                var fieldLinks = $(s);
+                $(this).append(fieldLinks);
+
+                var group = $(this);
+                fieldLinks.find('a:first').click(function() {
+                    group.addSearch();
+                });
+            });
         }
     }
 
