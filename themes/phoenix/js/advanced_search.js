@@ -527,11 +527,14 @@ $(document).ready(function() {
                 fieldLinks.find('a:first').click(function() {
                     group.addSearch();
                 });
+
+                // Add the link to delete search groups.
+                var deleteLink = $('<a class="close" href="#" onclick="deleteGroup(this)" title="Remove Search Group">&times;</a>');
+                group.find('.search_bool').after(deleteLink);
             });
         }
 
         $('.group').each(function() {
-            console.log('a');
             var searchCount = $(this).find('.search').length;
             if (searchCount > 1) {
                 $(this).find('.search').each(function() {
