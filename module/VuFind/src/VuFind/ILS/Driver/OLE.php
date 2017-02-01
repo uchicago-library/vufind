@@ -434,7 +434,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         }
 
         /*Set the default sort order for checked out items.*/
-        switch ($this->coiSort) {
+        $sort = $_POST['sort'] ? $_POST['sort'] : $this->coiSort;
+        switch ($sort) {
             case 'dueDate':
                 /*By duedate*/
                 uasort($transList, function($a, $b) { return OLE::cmp(OLE::sortDate($a['duedate']), OLE::sortDate($b['duedate'])); });
@@ -442,6 +443,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             case 'loanedDate' :
                 /*By date checked out*/
                 uasort($transList, function($a, $b) { return OLE::cmp(OLE::sortDate($a['loanedDate']), OLE::sortDate($b['loanedDate'])); });
+                break;
+            case 'author':
+                /*Alphabetical by author*/
+                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['author']), preg_replace('/[^ \w]+/', '', $b['author'])); });
                 break;
             default:
                 /*Alphabetical*/
@@ -728,10 +733,14 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         
         $xml = simplexml_load_string($row['bib_data']);
 
-        $title = ''; 
+        $title = '';
+        $author = '';
         foreach($xml->record->xpath('*') as $field) {
             if ($field->attributes() == '245') {
                 $title = (string) $field->subfield;
+            }
+            else if ($field->attributes() == '100') {
+                $author = (string) $field->subfield;
             }
         }
 
@@ -741,7 +750,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         /* See if the item is overdue or due soon */
         $itemDueStatus = $this->getItemDueStatus($dueDate);
 
-        $transactions = array(
+        $transactions = [
             'id' => $row['bib_num'],
             'item_id' => $row['item_id'],
             'duedate' => ($isIndefiniteLoan == false ? date($dateFormat, strtotime($dueDate)) : null),
@@ -755,14 +764,15 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'publication_year' => $row['imprint'],
             'renew' => $row['number_of_renewals'],
             'title' => $title != '' ? $title : "unknown title",
+            'author' => $author != '' ? $author : '',
             'locationName' => $locationName,
             'barcode' => $row['barcode'],
             'overdue' => $itemDueStatus['overdue'],
             'duesoon' => $itemDueStatus['duesoon']
-        );
+        ];
         $renewData = $this->checkRenewalsUpFront
             ? $this->isRenewable($patron['id'], $transactions['item_id'])
-            : array('message' => 'renewable', 'renewable' => true);
+            : ['message' => 'renewable', 'renewable' => true];
 
         $transactions['renewable'] = $renewData['renewable'];
         $transactions['message'] = $isIndefiniteLoan == false ? $renewData['message'] : null;

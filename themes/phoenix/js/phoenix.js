@@ -651,12 +651,14 @@ $(document).ready(function() {
         sort_labels['duedate'] = 'Due Date';
         sort_labels['loanedDate'] = 'Checkout Date';
         sort_labels['title'] = 'Title';
+        sort_labels['author'] = 'Author';
 
         var html = ' ';
         html = html + '<span class="dropdown">';
         html = html + '<button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort By: <strong id="checked_out_items_sort_label">' + sort_labels[sort] + '</strong> <span class="caret"></span></button>';
         html = html + '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
         html = html + '<li><a class="checked_out_items_sort" data-sort="title">Title</a></li>';
+        html = html + '<li><a class="checked_out_items_sort" data-sort="author">Author</a></li>';
         html = html + '<li><a class="checked_out_items_sort" data-sort="callNumber">Call Number</a></li>';
         html = html + '<li><a class="checked_out_items_sort" data-sort="loanedDate">Checkout Date</a></li>';
         html = html + '<li><a class="checked_out_items_sort" data-sort="duedate">Due Date</a></li>';
