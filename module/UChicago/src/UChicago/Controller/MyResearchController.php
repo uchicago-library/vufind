@@ -239,12 +239,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 $sort_by[] = strtolower(trim($r[$sort]));
             }
         }
-        if ($sort == $search_types[1]) { 
-            array_multisort($sort_by, SORT_DESC, $result);
-        }
-        else {
-            array_multisort($sort_by, SORT_ASC, $result);
-        }
+        array_multisort($sort_by, SORT_ASC, $result);
 
         // Get page size:
         $config = $this->getConfig();
