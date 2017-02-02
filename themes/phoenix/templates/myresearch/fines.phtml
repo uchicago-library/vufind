@@ -34,6 +34,7 @@
       <? endforeach; ?>
     </form>
     <span class="dropdown">
+      <a href="#" onclick="window.print();return false;"><button class="btn btn-default" type="button">Print</button></a>
       <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort By: <strong id="fines_sort_label"><?=$sort_labels[$sort] ?></strong> <span class="caret"></span></button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
         <li><a href="/vufind/MyResearch/Fines?sort=title">Title</a></li>
