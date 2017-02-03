@@ -679,7 +679,7 @@ $(document).ready(function() {
         html = html + '<span class="dropdown">';
         html = html + '<button type="button" class="btn btn-default dropdown-toggle checked_out_items_export_dropdown disabled" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Export <span class="caret"></span></button>';
         html = html + '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
-        /* html = html + '<li><a class="checked_out_items_export" * data-export-format="CSV">Spreadsheet (CSV)</a></li>'; */
+        html = html + '<li><a class="checked_out_items_export" * data-export-format="CSV">Spreadsheet (CSV)</a></li>';
         html = html + '<li><a class="checked_out_items_export" data-export-format="EndNoteWeb">EndNoteWeb</a></li>';
         html = html + '<li><a class="checked_out_items_export" data-export-format="EndNote">EndNote/Zotero</a></li>';
         html = html + '<li><a class="checked_out_items_export" data-export-format="BiBTeX">BibTex</a></li>';
@@ -700,9 +700,17 @@ $(document).ready(function() {
         form.find('input[type="submit"]').click();
     });
 
-    // toggle the export pulldown's status when checkboxes are selected.
+    // toggle the export pulldown's status when individual checkboxes are selected.
     $('.checkbox-select-item').click(function() {
         if ($('.checkbox-select-item:checked').length) {
+            $('.checked_out_items_export_dropdown').removeClass('disabled');
+        } else {
+            $('.checked_out_items_export_dropdown').addClass('disabled');
+        }
+    });
+    // toggle the export pulldown's status when all checkboxes are selected.
+    $('.checkbox-select-all').click(function() {
+        if ($('.checkbox-select-all:checked').length) {
             $('.checked_out_items_export_dropdown').removeClass('disabled');
         } else {
             $('.checked_out_items_export_dropdown').addClass('disabled');
