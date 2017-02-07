@@ -50,6 +50,38 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
     public $isMarc = true;
 
     /**
+     * Get an array of lines from the table of contents.
+     *
+     * @return array
+     */
+    public function getTOC()
+    {
+        // Return empty array if we have no table of contents:
+        $fields = $this->getMarcRecord()->getFields('505');
+        if (!$fields) {
+            return [];
+        }
+
+        // If we got this far, we have a table -- collect it as a string:
+        $toc = [];
+        foreach ($fields as $field) {
+            $subfields = $field->getSubfields();
+            foreach ($subfields as $subfield) {
+                if ($subfield->getCode() == '6') {
+                    continue;
+                }
+                // Break the string into appropriate chunks, filtering empty strings,
+                // and merge them into return array:
+                $toc = array_merge(
+                    $toc,
+                    array_filter(explode('--', $subfield->getData()), 'trim')
+                );
+            }
+        }
+        return $toc;
+    }
+
+    /**
      * Get default OpenURL parameters.
      *
      * @return array
