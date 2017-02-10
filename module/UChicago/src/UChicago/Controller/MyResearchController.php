@@ -232,7 +232,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         if ($sort == $search_types[0] || $sort == $search_types[1]) {
             foreach ($result as $r) {
                 $d = explode('/', trim($r[$sort]));
-                $sort_by[] = sprintf("%04d%02d%02d", $d[2], $d[0], $d[1]);
+                $sort_by[] = sprintf("%04d%02d%02d %s", $d[2], $d[0], $d[1], trim($r['title']));
             }
         } else {
             foreach ($result as $r) {
