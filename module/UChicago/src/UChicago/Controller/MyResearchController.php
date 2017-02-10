@@ -458,7 +458,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             if ($sort == 'amount') {
                 $sort_by[] = (int)trim($f['amount']);
             } else {
-                $sort_by[] = strtolower(trim($f[$sort]));
+                $sort_by[] = sprintf("%s %s", strtolower(trim($f[$sort])), strtolower(trim($f['title'])));
             }
         }
         array_multisort($sort_by, SORT_ASC, $fines);
