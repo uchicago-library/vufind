@@ -642,7 +642,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                "WHERE ole_crcl_dsk_id = :deskid";
 
         $location = '';
-        
+ 
         try {
             $sqlStmt = $this->db->prepare($sql);
             $sqlStmt->bindParam(
@@ -652,6 +652,19 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             $row = $sqlStmt->fetch(PDO::FETCH_ASSOC);
             if (isset($row['OLE_CRCL_DSK_PUB_NAME']) && ($row['OLE_CRCL_DSK_PUB_NAME'] != '')) {
                 $location = $row['OLE_CRCL_DSK_PUB_NAME'];
+            }
+        } catch (PDOException $e) {
+            throw new ILSException($e->getMessage());
+        }
+
+        // Temporary (we hope) hack to get the "hold until date" from the DB
+        // Should be deleted when this is returned by the OLE driver
+        try {
+            $query = "select hold_exp_date from $this->dbName.ole_dlvr_rqst_t where ole_rqst_id = :requestid";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([':requestid' => $itemXml->requestId]);
+            while ($row = $stmt->fetch()) {
+                $hold_until_date = $row['hold_exp_date'];
             }
         } catch (PDOException $e) {
             throw new ILSException($e->getMessage());
@@ -670,7 +683,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'volume' => (string) $itemXml->volumeNumber,
             'publication_year' => '',
             'title' => strlen((string) $itemXml->title)
-                ? (string) $itemXml->title : "unknown title"
+                ? (string) $itemXml->title : "unknown title",
+            'status' => (string) $itemXml->availableStatus,
+            'hold_until_date' => $hold_until_date
         );
 
     }

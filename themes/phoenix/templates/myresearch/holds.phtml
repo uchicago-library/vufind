@@ -122,11 +122,14 @@
             <? elseif (isset($ilsDetails['in_transit']) && $ilsDetails['in_transit']): ?>
               <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc('request_in_transit') . (is_string($ilsDetails['in_transit']) ? ': ' . $this->transEsc('institution_' . $ilsDetails['in_transit'], [], $ilsDetails['in_transit']) : '') ?></div>
             <? elseif (isset($ilsDetails['position'])): ?>
-              <p><strong><?=$this->transEsc("hold_queue_position") ?>:</strong> <?=$this->escapeHtml($ilsDetails['position']) ?></p>
+              <div class="text-danger"><strong>Item Status:</strong> Not Yet Available</div>
+              <div class="text-danger"><strong><?=$this->transEsc("hold_queue_position") ?>:</strong> <?=$this->escapeHtml($ilsDetails['position']) ?></div>
             <? endif; ?>
 
-            <? if (!empty($ilsDetails['expire'])): ?>
-              <strong>On Hold Until:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
+            <? if (!empty($ilsDetails['expire']) && $ilsDetails['status'] != 'ONHOLD'): ?>
+              <strong>Request expires:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
+            <? elseif (!empty($ilsDetails['hold_until_date'])): ?>
+               <strong>On Hold Until:</strong> <?=$this->escapeHtml($ilsDetails['hold_until_date']) ?><br/>
             <? endif; ?>
           </div>
         </div>
