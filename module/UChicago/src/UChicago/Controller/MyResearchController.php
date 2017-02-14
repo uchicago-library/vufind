@@ -357,6 +357,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         $sort_by = [];
         foreach ($recordList as $r) {
             $ilsDetails = $r->getExtraDetail('ils_details');
+            $title = strtolower(trim($r->getTitle()));
             switch ($sort) {
                 case 'author':
                     $primaryAuthors = $r->getPrimaryAuthors();
@@ -375,7 +376,13 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                     }
                     break;
                 case 'holdExpirationDate':
-                    $sort_by[] = $ilsDetails['expire'];
+                    if ($ilsDetails['hold_until_date']) {
+                        $s = $ilsDetails['hold_until_date'] . $title;
+                    }
+                    else {
+                        $s = (string)INF . $title;
+                    }
+                    $sort_by[] = $s;
                     break;
                 case 'itemStatus':
                     if ($ilsDetails['available']) {
@@ -386,11 +393,8 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                         $sort_by[] = 'ZZZ';
                     }
                     break;
-                case 'holdExpirationDate':
-                    $sort_by[] = $ilsDetails['expire'];
-                    break;
                 case 'title':
-                    $sort_by[] = strtolower(trim($r->getTitle()));
+                    $sort_by[] = $title;
                     break;
                 default:
                     $sort_by[] = 'a';
