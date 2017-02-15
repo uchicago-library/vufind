@@ -314,7 +314,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
         $sort = $this->params()->fromQuery('sort');
         if (!$sort) {
-            $sort = 'holdExpirationDate';
+            $sort = 'title';
         }
 
         // Connect to the ILS:
