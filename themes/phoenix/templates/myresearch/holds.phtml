@@ -85,15 +85,7 @@
                 <?=$this->transEsc('by')?>:
                 <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><? if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><? endif; ?><br/>
               <? endif; ?>
-            </div>
-            <div class="col-sm-4 col-xs-12">
-            <?
-              $callNumbers = $resource->getCallNumbers();
-              if (!empty($callNumbers)) {
-                echo $callNumbers[0] . "<br/>";
-              }
-            ?>
-              <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
+
             <? /* Depending on the ILS driver, the "location" value may be a string or an ID; figure out the best
                value to display... */ ?>
             <? $pickupDisplay = ''; ?>
@@ -125,6 +117,16 @@
               <div class="text-danger"><strong>Item Status:</strong> Not Yet Available</div>
               <div class="text-danger"><strong><?=$this->transEsc("hold_queue_position") ?>:</strong> <?=$this->escapeHtml($ilsDetails['position']) ?></div>
             <? endif; ?>
+
+            </div>
+            <div class="col-sm-4 col-xs-12">
+            <?
+              $callNumbers = $resource->getCallNumbers();
+              if (!empty($callNumbers)) {
+                echo $callNumbers[0] . "<br/>";
+              }
+            ?>
+              <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
 
             <? if (!empty($ilsDetails['expire']) && $ilsDetails['status'] != 'ONHOLD'): ?>
               <strong>Request expires:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
