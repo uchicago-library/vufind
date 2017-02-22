@@ -66,6 +66,7 @@
     </thead>
     <? $totalDue = 0; ?>
     <? foreach ($this->fines as $record): ?>
+      <? if ($record['balance'] > 0): ?>
       <tr>
         <td>
           <? if (empty($record['title'])): ?>
@@ -96,6 +97,7 @@
         <td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount']/100.00) : ''?></td>
         <td><?=isset($record['balance']) ? $this->safeMoneyFormat($record['balance']/100.00) : ''?></td>
       </tr>
+      <? endif; ?>
       <? $totalDue += $record['balance']; ?>
     <? endforeach; ?>
       <tr style="font-weight:bold"><td colspan="6"><?=$this->transEsc('Total Balance Due')?></td><td><?=$this->safeMoneyFormat($totalDue/100.00) ?></td></tr>
