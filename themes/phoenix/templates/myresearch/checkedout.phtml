@@ -102,15 +102,13 @@
                 echo $this->transEsc('Title not available');
               }
             ?><br/>
-            <?
-              $locationName = $ilsDetails['locationName'];
-              if ($locationName) {
-                echo $locationName . "<br/>";
-              }
-            ?>
             <? $listAuthors = $resource->getPrimaryAuthors(); if (!empty($listAuthors)): ?>
               <?=$this->transEsc('by')?>:
               <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><? if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><? endif; ?><br/>
+            <? $locationName = $ilsDetails['locationName']; ?>
+            <? if ($locationName): ?>
+                <?=$locationName ?><br/>
+            <? endif; ?>
             <? endif; ?>
             <? if (!empty($ilsDetails['volume'])): ?>
               <strong><?=$this->transEsc('Volume')?>:</strong> <?=$this->escapeHtml($ilsDetails['volume'])?>
@@ -159,16 +157,16 @@
           <div class="col-sm-6 col-xs-12">
             <? $callNumber = $ilsDetails['callNumber']; ?>
             <? if ($callNumber) : ?>
-                <?=$callNumber?><br/>
+                Call Number: <strong><?=$callNumber?></strong><br/>
             <? endif; ?>
 
             <? $barcode = $ilsDetails['barcode']; ?>
             <? if ($barcode) : ?>
-                 <strong>Barcode: </strong> <?=$barcode?><br/>
+                 Barcode: <strong> <?=$barcode?></strong><br/>
             <? endif; ?>
 
            <? if (isset($ilsDetails['renew'])): ?>
-              <strong><?=$this->transEsc('Renewal Count')?>:</strong> <?=$this->transEsc($ilsDetails['renew'])?>
+              <?=$this->transEsc('Renewal Count')?>:<strong> <?=$this->transEsc($ilsDetails['renew'])?></strong>
               <? if (isset($ilsDetails['renewLimit'])): ?>
                 / <?=$this->transEsc($ilsDetails['renewLimit'])?>
               <? endif; ?>
@@ -177,8 +175,15 @@
 
             <? $loanedDate = $ilsDetails['loanedDate']; ?>
             <? if ($loanedDate) : ?>
-                <strong>Checked Out: </strong> <?=$loanedDate?><br/>
+                Checked Out: <strong> <?=$loanedDate?></strong><br/>
             <? endif; ?> 
+
+            <? /* UChicago custom code */ ?>
+            <? $loanTypeCode = $ilsDetails['loanTypeCode']; ?>
+            <? $loanTypeLabel = $ilsDetails['loanType']; ?>
+            <? if ($loanTypeCode != 'stks' && !empty($loanTypeLabel)) :?>
+                <span class="item-type"><?=$loanTypeLabel?></span><br/>
+            <? endif; ?>
           </div><? /* end col */ ?>
 
             <? if (isset($this->renewResult[$ilsDetails['item_id']])): ?>

@@ -410,12 +410,14 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     i.CHRONOLOGY AS chronology, h.CALL_NUMBER_PREFIX AS call_number_prefix, h.CALL_NUMBER AS call_number, 
                     h.IMPRINT AS imprint, bib.CONTENT AS bib_data, i.BARCODE AS barcode,
                     loc.LOCN_NAME AS location_name,
-                    l.NUM_RENEWALS AS number_of_renewals
+                    l.NUM_RENEWALS AS number_of_renewals,
+                    it.itm_typ_cd, it.itm_typ_desc
                 FROM uc_people p
                 JOIN ole_dlvr_loan_t l ON p.id = l.OLE_PTRN_ID
                 JOIN ole_ds_item_t i ON i.BARCODE = l.ITM_ID
                 JOIN ole_ds_holdings_t h ON i.HOLDINGS_ID = h.HOLDINGS_ID
                 JOIN ole_ds_bib_t bib ON bib.BIB_ID = h.BIB_ID
+                LEFT JOIN ole_cat_itm_typ_t it ON it.itm_typ_cd_id = i.item_type_id
                 LEFT JOIN ole_locn_t loc ON h.LOCATION_ID = loc.LOCN_ID
                     WHERE p.library_id = :barcode 
                         AND i.CURRENT_BORROWER = p.id';
@@ -448,11 +450,15 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 /*Alphabetical by author*/
                 usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['author']), preg_replace('/[^ \w]+/', '', $b['author'])); });
                 break;
+            case 'loanType':
+                /*Alphabetical by item (loan) type*/
+                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['itemTypeLabel']), preg_replace('/[^ \w]+/', '', $b['itemTypeLabel'])); });
+                break;
             default:
                 /*Alphabetical*/
                 usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['title']), preg_replace('/[^ \w]+/', '', $b['title'])); });
+                break;
         }
-
         return $transList;
     }
 
@@ -783,7 +789,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'locationName' => $locationName,
             'barcode' => $row['barcode'],
             'overdue' => $itemDueStatus['overdue'],
-            'duesoon' => $itemDueStatus['duesoon']
+            'duesoon' => $itemDueStatus['duesoon'],
+            'loanTypeCode' => $row['itm_typ_cd'],
+            'loanType' => $row['itm_typ_desc'] != '' ? $row['itm_typ_desc'] : "ZZZ",
         ];
         $renewData = $this->checkRenewalsUpFront
             ? $this->isRenewable($patron['id'], $transactions['item_id'])

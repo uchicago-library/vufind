@@ -652,6 +652,7 @@ $(document).ready(function() {
         sort_labels['loanedDate'] = 'Checkout Date';
         sort_labels['title'] = 'Title';
         sort_labels['author'] = 'Author';
+        sort_labels['loanType'] = 'Loan Type';
 
         var html = ' ';
         html = html + '<span class="dropdown">';
@@ -662,6 +663,7 @@ $(document).ready(function() {
         html = html + '<li><a class="checked_out_items_sort" data-sort="callNumber">Call Number</a></li>';
         html = html + '<li><a class="checked_out_items_sort" data-sort="loanedDate">Checkout Date</a></li>';
         html = html + '<li><a class="checked_out_items_sort" data-sort="duedate">Due Date</a></li>';
+        html = html + '<li><a class="checked_out_items_sort" data-sort="loanType">Loan Type</a></li>';
         html = html + '</ul>';
         html = html + '</span>';
         $('#renewAll').after(html);
