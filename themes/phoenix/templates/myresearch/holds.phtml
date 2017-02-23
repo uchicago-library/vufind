@@ -128,6 +128,9 @@
             ?>
               <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
 
+              <? if ($ilsDetails['loan_type']): ?>
+                <span class="item-type"><?=$ilsDetails['loan_type']?></span><br/>
+              <? endif; ?>
             <? if (!empty($ilsDetails['expire']) && $ilsDetails['status'] != 'ONHOLD'): ?>
               <strong>Request expires:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
             <? elseif (!empty($ilsDetails['hold_until_date'])): ?>

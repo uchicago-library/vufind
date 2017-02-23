@@ -664,7 +664,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         }
 
         // Temporary (we hope) hack to get the "hold until date" from the DB
-        // Should be deleted when this is returned by the OLE driver
+        // Should be deleted when this is returned by the OLE Driver via circ api
         try {
             $query = "select hold_exp_date from $this->dbName.ole_dlvr_rqst_t where ole_rqst_id = :requestid";
             $stmt = $this->db->prepare($query);
@@ -673,6 +673,21 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $hold_until_date = $row['hold_exp_date'];
             }
         } catch (PDOException $e) {
+            throw new ILSException($e->getMessage());
+        }
+
+        /* Temporary, this should come from the circ api */
+        $sql = 'select itm_typ_desc from ole_cat_itm_typ_t where itm_typ_cd = :code';
+        try {
+            /*Query the database*/
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(array(':code' => $itemXml->itemType));
+
+            while ($row = $stmt->fetch()) {
+                $loanType = $row->itm_typ_desc;
+            }
+        }
+        catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
 
@@ -691,7 +706,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'title' => strlen((string) $itemXml->title)
                 ? (string) $itemXml->title : "unknown title",
             'status' => (string) $itemXml->availableStatus,
-            'hold_until_date' => $hold_until_date
+            'hold_until_date' => $hold_until_date,
+            'loan_type' => $loanType 
         );
 
     }
