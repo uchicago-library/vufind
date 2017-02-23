@@ -23,6 +23,10 @@
 
     <? if (!empty($this->transactions)): ?>
       <? if ($this->renewForm): ?>
+      <? $disabled = ''; ?>
+      <? if ($_POST['renewSelected'] || $_POST['renewAll']): ?>
+        <? $disabled = 'disabled'; ?>
+      <? endif; ?>
       <form name="renewals" method="post" id="renewals">
         <input id="checked_out_items_sort_field" type="hidden" name="sort" value="<?=$this->sort; ?>"/>
         <div class="toolbar">
@@ -31,8 +35,8 @@
                <input type="checkbox" class="checkbox-select-all" name="selectAll" id="<?=$this->idPrefix?>addFormCheckboxSelectAll"/>
                <span>Select all</span>
              </label>
-            <input type="submit" class="btn btn-default" id="renewSelected" name="renewSelected" value="<?=$this->transEsc("renew_selected")?>" />
-            <input type="submit" class="btn btn-default" id="renewAll" name="renewAll" value="<?=$this->transEsc('renew_all')?>" />
+            <input type="submit" class="btn btn-default <?=$disabled?>" id="renewSelected" name="renewSelected" value="<?=$this->transEsc("renew_selected")?>" />
+            <input type="submit" class="btn btn-default <?=$disabled?>" id="renewAll" name="renewAll" value="<?=$this->transEsc('renew_all')?>" />
           </div>
         </div>
       <? endif; ?>
