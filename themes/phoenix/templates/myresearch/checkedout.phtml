@@ -186,7 +186,9 @@
             <? $loanTypeCode = $ilsDetails['loanTypeCode']; ?>
             <? $loanTypeLabel = $ilsDetails['loanType']; ?>
             <? if ($loanTypeCode != 'stks' && !empty($loanTypeLabel)) :?>
-                <span class="item-type"><?=$loanTypeLabel?></span><br/>
+                <? if ($loanTypeLabel != 'ZZZ'):?>
+                    <span class="item-type"><?=$loanTypeLabel?></span><br/>
+                <? endif; ?>
             <? endif; ?>
           </div><? /* end col */ ?>
 

@@ -452,7 +452,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 break;
             case 'loanType':
                 /*Alphabetical by item (loan) type*/
-                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['itemTypeLabel']), preg_replace('/[^ \w]+/', '', $b['itemTypeLabel'])); });
+                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['loanType']), preg_replace('/[^ \w]+/', '', $b['loanType'])); });
                 break;
             default:
                 /*Alphabetical*/
