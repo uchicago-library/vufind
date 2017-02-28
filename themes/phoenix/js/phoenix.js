@@ -8,8 +8,12 @@ function getAlert(){
             var msg = page.banner_message;
             var url = page.url;
             var html = '';
+            var link = '';
+            if (page.more_info) {
+                link = '| <a href="' + url + '">More info...</a>';
+            }
             if (level == 'alert-high') {
-                html += '<div id="alert" class="container">' + msg +' | <a href="' + url + '">More info...</a></div>';
+                html += '<div id="alert" class="container">' + msg + link + ' </div>';
                 $('.container.navbar').before(html);
                 return false;
             }
