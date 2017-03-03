@@ -684,7 +684,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             $stmt->execute(array(':code' => $itemXml->itemType));
 
             while ($row = $stmt->fetch()) {
-                $loanType = $row->itm_typ_desc;
+                $loanType = $row['itm_typ_desc'];
             }
         }
         catch (Exception $e){
