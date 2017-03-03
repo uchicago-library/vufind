@@ -115,18 +115,20 @@
               <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc('request_in_transit') . (is_string($ilsDetails['in_transit']) ? ': ' . $this->transEsc('institution_' . $ilsDetails['in_transit'], [], $ilsDetails['in_transit']) : '') ?></div>
             <? elseif (isset($ilsDetails['position'])): ?>
               <div class="text-danger"><strong>Item Status:</strong> Not Yet Available</div>
-              <div class="text-danger"><strong><?=$this->transEsc("hold_queue_position") ?>:</strong> <?=$this->escapeHtml($ilsDetails['position']) ?></div>
+              <? $qp = (int)$ilsDetails['position']; ?>
+              <? if ($qp > 1): ?>
+                <div class="text-danger"><strong><?=$this->transEsc("hold_queue_position") ?>:</strong> <?=$this->escapeHtml($ilsDetails['position']) ?></div>
+              <? endif; ?>
             <? endif; ?>
 
             </div>
             <div class="col-sm-4 col-xs-12">
-            <?
-              $callNumbers = $resource->getCallNumbers();
-              if (!empty($callNumbers)) {
-                echo $callNumbers[0] . "<br/>";
-              }
-            ?>
-              <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
+            <? $callNumbers = $resource->getCallNumbers(); ?>
+            <? if (!empty($callNumbers)): ?>
+                <strong><?=$this->transEsc('Call Number') ?>:</strong>
+                <?=$callNumbers[0]; ?><br/>
+            <? endif; ?>
+            <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
 
               <? if ($ilsDetails['loan_type']): ?>
                 <span class="item-type"><?=$ilsDetails['loan_type']?></span><br/>
