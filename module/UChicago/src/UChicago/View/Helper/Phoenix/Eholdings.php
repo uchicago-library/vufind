@@ -15,6 +15,26 @@ class Eholdings extends AbstractHelper
 {
 
     /**
+     * Return the first key name if it begins 
+     * with the input.
+     *
+     * @param $array, an array to search.
+     * @param $q, string to search for.
+     *
+     * @returns string, name of the key beginning
+     * with what is being looked for.
+     */
+    public function geKeyBeginsWith($array, $q) {
+        $filtered = array();
+        foreach ($array as $key => $value) {
+            if (strpos($key, $q) === 0) {
+                return $key;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Gets e-holding links and associated data 
      *
      * @rerutns array
@@ -25,29 +45,41 @@ class Eholdings extends AbstractHelper
         if ($data === null) {
             return $links;
         }
-        foreach ($data as $urlData) {
-            $link = [];
-            $i = 0;
-            foreach ($urlData as $url) {
-                $filter = 'www.';
-                $descriptionArray = parse_url($url['subfieldData']['u-1']);
-                $host = $descriptionArray['host'];
-                $hasFilter = (substr($host, 0, 4) == $filter);
-                $description = $hasFilter ? substr($host, strlen($filter)) : $host;
-                 
-                $link[$i]['url'] = $url['subfieldData']['u-1'];
-                if (!array_key_exists('z', $url['subfieldData'])) { 
-                    $link[$i]['desc'] = array_key_exists('p', $url['subfieldData']) ? $url['subfieldData']['p'] : $description;
-                }
-                else {
-                    $link[$i]['desc'] = array_key_exists('p', $url['subfieldData']) ? $url['subfieldData']['p'] : '';
-                }
-                $link[$i]['type'] = isset($url['subfieldData']['c']) ? $url['subfieldData']['c'] : null;
-                $link[$i]['callnumber'] = isset($url['subfieldData']['a']) ? $url['subfieldData']['a'] : null;
-                $link[$i]['text'] = array_key_exists('z', $url['subfieldData']) ? $url['subfieldData']['z'] : null;
-                $i++; 
+
+        $i = 0;
+        $link = [];
+        foreach ($data['urls'] as $urlData) {
+
+            $filter = 'www.';
+            $subfields = $data['urls'][$i]['subfieldData'];
+            $url = $subfields[$this->geKeyBeginsWith($subfields, 'u')];
+            $descriptionArray = parse_url($url);
+            $host = $descriptionArray['host'];
+            $hasFilter = (substr($host, 0, 4) == $filter);
+            $description = $hasFilter ? substr($host, strlen($filter)) : $host;
+
+            /* Get the subfield keys */
+            $z = $this->geKeyBeginsWith($subfields, 'z');
+            $p = $this->geKeyBeginsWith($subfields, 'p');
+            $c = $this->geKeyBeginsWith($subfields, 'c');
+            $a = $this->geKeyBeginsWith($subfields, 'a');
+
+            /* Get the url */ 
+            $link[$i]['url'] = $url;
+            if (!array_key_exists($z, $subfields)) {
+                $link[$i]['desc'] = array_key_exists($p, $subfields) ? $subfields[$p] : $description;
             }
+            else {
+                $link[$i]['desc'] = array_key_exists($p, $subfields) ? $subfields[$p] : '';
+            }
+
+            /* Get the link type, callnumber and display text*/ 
+            $link[$i]['type'] = isset($subfields[$c]) ? $subfields[$c] : null;
+            $link[$i]['callnumber'] = isset($subfields[$a]) ? $subfields[$a] : null;
+            $link[$i]['text'] = array_key_exists($z, $subfields) ? $subfields[$z] : null;
+
             $links = $link;
+            $i++; 
         }
         return $links;
     }

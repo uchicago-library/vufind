@@ -231,98 +231,14 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
     }
 
     /**
-     * A heinous junk method for combining subfield data between multiple eholdings incorrectly
-     * returned from OLE. This is necessary because of a bug in the way OLE is 
-     * returning 098 fields. This method should be deleted and the getAllRecordLinks
-     * method updated when this is finally fixed. The order of subfields matters!
-     *
-     * @param array of subfield data to clean up.
-     *
-     * @return array of combined subfield data.
-     */
-    protected function combineLinkData($marcData) {
-        $retval = [];
-        $i = 0;
-
-        if (isset($marcData['urls'])) {
-            foreach ($marcData['urls'] as $urls) {
-                if (!empty($urls['subfieldData'])) {
-                    $retval['urls'][$i]['label'] = $urls['label'];
-                    $retval['urls'][$i]['currentField'] = $urls['currentField'];
-                    $retval['urls'][$i]['subfieldData'] = $urls['subfieldData'];
-                    foreach($marcData['displayText'] as $num => $displayText) {
-                        if(!empty($displayText['subfieldData'])) {
-                            foreach($displayText['subfieldData'] as $key => $value) {
-                                $retval['urls'][$i]['subfieldData'][$key[0]] = $value; 
-                            }
-                            unset($marcData['displayText'][$num]);
-                            break;
-                        }
-                    }
-                    foreach($marcData['callnumber'] as $num => $callnumber) {
-                        if(!empty($callnumber['subfieldData'])) {
-                            foreach($callnumber['subfieldData'] as $key => $value) {
-                                $retval['urls'][$i]['subfieldData'][$key[0]] = $value; 
-                            }
-                            unset($marcData['callnumber'][$num]);
-                            break;
-                        }
-                    }
-                    foreach($marcData['linkText'] as $num => $linkText) {
-                        if(!empty($linkText['subfieldData'])) {
-                            foreach($linkText['subfieldData'] as $key => $value) {
-                                $retval['urls'][$i]['subfieldData'][$key[0]] = $value; 
-                            }
-                            unset($marcData['linkText'][$num]);
-                            break;
-                        }
-                    }
-                    foreach($marcData['note'] as $num => $note) {
-                        if(!empty($note['subfieldData'])) {
-                            $retval['urls'][$i]['subfieldData']['p'] = implode(' ', $note['subfieldData']);
-                            unset($marcData['note'][$num]);
-                            break;
-                        }
-                    }
-                }
-                $i++;
-            }
-        }
-
-        return $retval;
-    }
-
-    /**
      * Get e-holdings from the marc record. Each link is returned as
      * array.
-     * Format:
-     * <code>
-     * array 
-     *  (
-     *  [urls] => array
-     *      (
-     *          [1] => array
-     *              (
-     *                  [label] => urls
-     *                  [currentField] => 098
-     *                  [subfieldData] => Array
-     *                      (
-     *                          [u-1] => http://heinonline.org/HOL/Page?handle=hein.beal/cllwh0001&id=1&collection=beal&index=beal
-     *                          [c-2] => FullText
-     *                          [l-4] => Online
-     *                      )
-     *              )
-     *      )
-     *  )
-     *
-     * </code>
      *
      * @return null|array
      */
     public function getEholdingsFromMarc()
     {
         $rawMarcData = $this->crosswalk('eHoldings');
-        $rawMarcData = $this->combineLinkData($rawMarcData);
         return !empty($rawMarcData) ? $rawMarcData : null;
     }
 
@@ -549,15 +465,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
          */
         'eHoldings' => [
             ['label'  => 'urls',
-             'values' => ['098|u']],
-            ['label'  => 'displayText',
-             'values' => ['098|cl']],
-            ['label'  => 'callnumber',
-             'values' => ['098|a']],
-            ['label'  => 'note',
-             'values' => ['098|p']],
-            ['label'  => 'linkText',
-             'values' => ['098|z']],
+             'values' => ['098|uclapz']],
         ],
         /**
          * Array of marc fields to display for 
