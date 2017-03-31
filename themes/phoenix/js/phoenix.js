@@ -9,8 +9,8 @@ function getAlert(){
             var url = page.url;
             var html = '';
             var link = '';
-            if (page.more_info) {
-                link = '| <a href="' + url + '">More info...</a>';
+            if (page.more_info.length) {
+                link = ' | <a href="' + url + '">More info...</a>';
             }
             if (level == 'alert-high') {
                 html += '<div id="alert" class="container">' + msg + link + ' </div>';
