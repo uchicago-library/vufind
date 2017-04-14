@@ -15,23 +15,34 @@ class Eholdings extends AbstractHelper
 {
 
     /**
-     * Return the first key name if it begins 
-     * with the input.
-     *
-     * @param $array, an array to search.
-     * @param $q, string to search for.
-     *
-     * @returns string, name of the key beginning
-     * with what is being looked for.
+     * Sort subfield data from 908 fields for eholdings.
+     * This method assumes that order is respected for
+     * repeatable fields that matter.
+     * 
+     * @param $array, subfield data
+     * 
+     * @returns associative array of data sorted by subfield
      */
-    public function geKeyBeginsWith($array, $q) {
-        $filtered = array();
+    public function sortEholdingSubfields($array) {
+        $data = ['u' => [], 'z' => [], 'p' => [], 'c' => [], 'a' => []];
         foreach ($array as $key => $value) {
-            if (strpos($key, $q) === 0) {
-                return $key;
+            if (strpos($key, 'u') === 0) {
+                array_push($data['u'], $value);
+            }
+            else if (strpos($key, 'z') === 0) {
+                array_push($data['z'], $value);
+            }
+            else if (strpos($key, 'p') === 0) {
+                array_push($data['p'], $value);
+            }
+            else if (strpos($key, 'c') === 0) {
+                array_push($data['c'], $value);
+            }
+            else if (strpos($key, 'a') === 0) {
+                array_push($data['a'], $value);
             }
         }
-        return null;
+        return $data;
     }
 
     /**
@@ -46,43 +57,49 @@ class Eholdings extends AbstractHelper
             return $links;
         }
 
-        $i = 0;
+
         $link = [];
+        $i = 0;
         foreach ($data['urls'] as $urlData) {
 
             $filter = 'www.';
-            $subfields = $data['urls'][$i]['subfieldData'];
-            $url = $subfields[$this->geKeyBeginsWith($subfields, 'u')];
-            $descriptionArray = parse_url($url);
-            $host = $descriptionArray['host'];
-            $hasFilter = (substr($host, 0, 4) == $filter);
-            $description = $hasFilter ? substr($host, strlen($filter)) : $host;
+            $subfields = $urlData['subfieldData'];
 
-            /* Get the subfield keys */
-            $z = $this->geKeyBeginsWith($subfields, 'z');
-            $p = $this->geKeyBeginsWith($subfields, 'p');
-            $c = $this->geKeyBeginsWith($subfields, 'c');
-            $a = $this->geKeyBeginsWith($subfields, 'a');
+            /* Sort repeatable subfields into clusters */
+            $sortedSubfields = $this->sortEholdingSubfields($subfields);
 
-            /* Get the url */ 
-            $link[$i]['url'] = $url;
-            if (!array_key_exists($z, $subfields)) {
-                $link[$i]['desc'] = array_key_exists($p, $subfields) ? $subfields[$p] : $description;
+            /* Loop over subfield u data and build links for display */
+            foreach($sortedSubfields['u'] as $url) {
+                
+                $link[$i]['url'] = $url;
+                
+                /* Build human readable text for the link as a fallback */
+                $descriptionArray = parse_url($url);
+                $host = $descriptionArray['host'];
+                $hasFilter = (substr($host, 0, 4) == $filter);
+                $description = $hasFilter ? substr($host, strlen($filter)) : $host;
+
+                /* Choose link text */
+                if (empty($sortedSubfields['z'])) {
+                    $link[$i]['desc'] = !empty($sortedSubfields['p']) ? array_shift($sortedSubfields['p']) : $description;
+                }
+                else {
+                    $link[$i]['desc'] = !empty($sortedSubfields['p']) ?  array_shift($sortedSubfields['p']) : '';
+                }
+
+                /* Get the link type, callnumber and display text*/
+                $link[$i]['type'] = !empty($sortedSubfields['c']) ? $sortedSubfields['c'][0] : null; // <--- Don't use array_shift because this is holdings level?
+                $link[$i]['callnumber'] = !empty($sortedSubfields['a'])? array_shift($sortedSubfields['a']) : null;
+                $link[$i]['text'] = !empty($sortedSubfields['z']) ? array_shift($sortedSubfields['z']) : null;
+
+                $links = $link;
+                $i++;
             }
-            else {
-                $link[$i]['desc'] = array_key_exists($p, $subfields) ? $subfields[$p] : '';
-            }
 
-            /* Get the link type, callnumber and display text*/ 
-            $link[$i]['type'] = isset($subfields[$c]) ? $subfields[$c] : null;
-            $link[$i]['callnumber'] = isset($subfields[$a]) ? $subfields[$a] : null;
-            $link[$i]['text'] = array_key_exists($z, $subfields) ? $subfields[$z] : null;
-
-            $links = $link;
-            $i++; 
         }
         return $links;
     }
+
 
     /**
      * Returns a friendly display label for an e-holdings link.
