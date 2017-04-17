@@ -85,11 +85,6 @@ $.fn.addSearch = function(term, field)
   // Get the group number. 
   var group = $(this).index('.group');
 
-  // Add the 'match' pulldown 
-  if ($(this).find('.search').length > 0) {
-    $(this).find('.search_bool').show();
-  }
-
   // Build the new search
   var inputIndex = $(this).find('input').length;
   var inputID = group+'_'+inputIndex;
@@ -104,6 +99,9 @@ $.fn.addSearch = function(term, field)
 
   // Append the new search term. 
   newSearch.append(newTerm);
+
+  // Add a space between fields.
+  newSearch.append(' ');
 
   // Build the advanced field pulldown. 
   var newFieldStr = '<select id="search_type'+inputID+'" name="type'+group+'[]" class="form-control">';
@@ -157,6 +155,7 @@ $.fn.addSearch = function(term, field)
   });
 
   // Append the delete link. 
+  $("#search" + inputID).append(' ');
   $("#search" + inputID).append(deleteLink);
 
   // Show x if we have more than one search inputs
@@ -178,7 +177,6 @@ $.fn.deleteSearch = function deleteSearch()
   // search box. 
   if($(this).parent('.group').find('.search .delete').length <= 2) {
     $(this).parent('.group').find('.search .delete').hide();
-    $(this).parent('.group').find('.search_bool').hide();
   }
 
   // Remove this search query and field pulldown. 
@@ -242,6 +240,20 @@ function updateGroups()
     });
 }
 
+// nextGroup is the group number, beginning at 1, for the search group 
+// this link will add a search field to.
+function buildSearchPlaceHolder(nextGroup)
+{
+    // Create and append 'add a new field' and 'what is a field?' links. 
+    var s = '';
+    s = s + '<span class="searchPlaceHolder">';
+    s = s + '<i id="group'+nextGroup+'Holder" class="fa fa-plus-circle"></i>';
+    s = s + ' <a href="#" id="add_search_link_'+nextGroup+'">'+addSearchString+'</a>';
+    s = s + ' <a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchfield" class="external what_is_a_field"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Field?</a>';
+    s = s + '</span>';
+    return s;
+}
+
 function addGroup()
 {
   updateGroups();
@@ -272,16 +284,9 @@ function addGroup()
 
   var searchBool = $(s);
   newGroup.append(searchBool);
-  newGroup.find('.search_bool').hide();
 
   // Create and append 'add a new field' and 'what is a field?' links. 
-  var s = '';
-  s += '<span class="searchPlaceHolder">';
-  s += '<i id="group'+nextGroup+'Holder" class="fa fa-plus-circle"></i>';
-  s += ' <a href="#" id="add_search_link_'+nextGroup+'">'+addSearchString+'</a>';
-  s += ' <a href="http://www.lib.uchicago.edu/e/using/catalog/help.html#searchfield" class="external what_is_a_field"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Field?</a>';
-  s += '</span>';
-
+  var s = buildSearchPlaceHolder(nextGroup);
   var fieldLinks = $(s);
   newGroup.append(fieldLinks);
 
@@ -477,7 +482,7 @@ $(document).ready(function() {
 
     // Create "Add search group" and "what is a group?" links.
     var groupPlaceHolder = $('<div id="groupPlaceHolder"><i class="fa fa-plus-circle"></i> <a href="#">Add Search Group</a> <a href="https://www.lib.uchicago.edu/research/help/catalog-help/advanced/" id="what_is_a_group" target="_blank" class="external"><i style="text-decoration: none;" class="icon-info-sign icon-large"></i>What is a Group?</a></div>');
-    $('.group:first').after(groupPlaceHolder);
+    $('.group:last').after(groupPlaceHolder);
 
     // Add click event to 'add search group'
     $('#groupPlaceHolder a:first').click(addGroup);
@@ -504,6 +509,45 @@ $(document).ready(function() {
         // switch the basic/advanced search switch.
         $('#basicSearchSwitch a').removeClass('disabled');
         $('#advancedSearchSwitch a').addClass('disabled');
+
+        if ($('.group').length > 1) {
+            // show "match: All groups"
+            $('#groupJoin').removeClass('hidden');
+            $('.group').each(function(i) {
+                if (i == 0) {
+                    return;
+                }
+                var nextGroup = i + 1;
+                // Create and append 'add a new field' and 'what is a field?' links. 
+                var s = buildSearchPlaceHolder(nextGroup);
+                var fieldLinks = $(s);
+                $(this).append(fieldLinks);
+
+                var group = $(this);
+                fieldLinks.find('a:first').click(function() {
+                    group.addSearch();
+                });
+
+                // Add the link to delete search groups.
+                var deleteLink = $('<a class="close" href="#" onclick="deleteGroup(this)" title="Remove Search Group">&times;</a>');
+                group.find('.search_bool').after(deleteLink);
+            });
+        }
+
+        $('.group').each(function() {
+            var searchCount = $(this).find('.search').length;
+            if (searchCount > 1) {
+                $(this).find('.search').each(function() {
+                    var search = $(this);
+                    var deleteLink = $('<a class="delete" href="#">&times;</a>');
+                    search.append(' ');
+                    search.append(deleteLink);
+                    deleteLink.click(function() {
+                        search.deleteSearch();
+                    });
+                });
+            }
+        });
     }
 
     // Update keyword search placeholder text when the select pulldown changes. 

@@ -22,7 +22,7 @@
               'author' => 'Author',
               'callNumber' => 'Call Number',
               'itemStatus' => 'Item Status',
-              'holdExpirationDate' => 'On Hold Expiration Date'
+              'holdExpirationDate' => 'On Hold Until Date'
             ];
           ?>
           <span class="dropdown">
@@ -32,7 +32,7 @@
               <li><a href="/vufind/MyResearch/Holds?sort=author">Author</a></li>
               <li><a href="/vufind/MyResearch/Holds?sort=callNumber">Call Number</a></li>
               <li><a href="/vufind/MyResearch/Holds?sort=itemStatus">Item Status</a></li>
-              <li><a href="/vufind/MyResearch/Holds?sort=holdExpirationDate">On Hold Expiration Date</a></li>
+              <li><a href="/vufind/MyResearch/Holds?sort=holdExpirationDate">On Hold Until Date</a></li>
             </ul>
           </span>
         </div>
@@ -85,15 +85,7 @@
                 <?=$this->transEsc('by')?>:
                 <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><? if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><? endif; ?><br/>
               <? endif; ?>
-            </div>
-            <div class="col-sm-4 col-xs-12">
-            <?
-              $callNumbers = $resource->getCallNumbers();
-              if (!empty($callNumbers)) {
-                echo $callNumbers[0] . "<br/>";
-              }
-            ?>
-              <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
+
             <? /* Depending on the ILS driver, the "location" value may be a string or an ID; figure out the best
                value to display... */ ?>
             <? $pickupDisplay = ''; ?>
@@ -122,18 +114,36 @@
             <? elseif (isset($ilsDetails['in_transit']) && $ilsDetails['in_transit']): ?>
               <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc('request_in_transit') . (is_string($ilsDetails['in_transit']) ? ': ' . $this->transEsc('institution_' . $ilsDetails['in_transit'], [], $ilsDetails['in_transit']) : '') ?></div>
             <? elseif (isset($ilsDetails['position'])): ?>
-              <p><strong><?=$this->transEsc("hold_queue_position") ?>:</strong> <?=$this->escapeHtml($ilsDetails['position']) ?></p>
+              <div class="text-danger"><strong>Item Status:</strong> Not Yet Available</div>
+              <? $qp = (int)$ilsDetails['position']; ?>
+              <? if ($qp > 1): ?>
+                <div class="text-danger"><strong><?=$this->transEsc("hold_queue_position") ?>:</strong> <?=$this->escapeHtml($ilsDetails['position']) ?></div>
+              <? endif; ?>
             <? endif; ?>
 
-            <? if (!empty($ilsDetails['expire'])): ?>
-              <strong>On Hold Until:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
+            </div>
+            <div class="col-sm-4 col-xs-12">
+            <? $callNumbers = $resource->getCallNumbers(); ?>
+            <? if (!empty($callNumbers)): ?>
+                <strong><?=$this->transEsc('Call Number') ?>:</strong>
+                <?=$callNumbers[0]; ?><br/>
+            <? endif; ?>
+            <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
+
+              <? if ($ilsDetails['loan_type']): ?>
+                <span class="item-type"><?=$ilsDetails['loan_type']?></span><br/>
+              <? endif; ?>
+            <? if (!empty($ilsDetails['expire']) && $ilsDetails['status'] != 'ONHOLD'): ?>
+              <strong>Request expires:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
+            <? elseif (!empty($ilsDetails['hold_until_date'])): ?>
+               <strong>On Hold Until:</strong> <?=$this->escapeHtml($ilsDetails['hold_until_date']) ?><br/>
             <? endif; ?>
           </div>
         </div>
       <? endforeach; ?>
       </form>
     <? else: ?>
-      <?=$this->transEsc('You do not have any holds or recalls placed') ?>.
+      <?=$this->transEsc('You have no outstanding requests') ?>.
     <? endif; ?>
   </div>
 

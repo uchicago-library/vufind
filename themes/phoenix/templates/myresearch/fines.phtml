@@ -34,6 +34,7 @@
       <? endforeach; ?>
     </form>
     <span class="dropdown">
+      <a href="#" onclick="window.print();return false;"><button class="btn btn-default" type="button">Print</button></a>
       <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort By: <strong id="fines_sort_label"><?=$sort_labels[$sort] ?></strong> <span class="caret"></span></button>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
         <li><a href="/vufind/MyResearch/Fines?sort=title">Title</a></li>
@@ -65,6 +66,7 @@
     </thead>
     <? $totalDue = 0; ?>
     <? foreach ($this->fines as $record): ?>
+      <? if ($record['balance'] > 0): ?>
       <tr>
         <td>
           <? if (empty($record['title'])): ?>
@@ -95,6 +97,7 @@
         <td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount']/100.00) : ''?></td>
         <td><?=isset($record['balance']) ? $this->safeMoneyFormat($record['balance']/100.00) : ''?></td>
       </tr>
+      <? endif; ?>
       <? $totalDue += $record['balance']; ?>
     <? endforeach; ?>
       <tr style="font-weight:bold"><td colspan="6"><?=$this->transEsc('Total Balance Due')?></td><td><?=$this->safeMoneyFormat($totalDue/100.00) ?></td></tr>

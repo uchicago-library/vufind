@@ -171,12 +171,14 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 	    );
     }
 
+
     /**
      * Send list of checked out books to view. 
      * Overriding VuFind core so we can return a flag for detecting
      * if any of the renewal requests failed. This allows us to display
      * the appropriate message at the top of the page and saves us an 
-     * extra loop in the template.
+     * extra loop in the template. We also have custom sorting options,
+     * alert messages, and labels.
      *
      * @return mixed
      */
@@ -225,11 +227,12 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
         // Sort results. 
         $sort_by = [];
+        $search_types = [0 => 'loanedDate', 1 => 'duedate'];
         // convert dates like 1/1/2017 into something sortable.
-        if ($sort == 'loanedDate' || $sort == 'duedate') {
+        if ($sort == $search_types[0] || $sort == $search_types[1]) {
             foreach ($result as $r) {
                 $d = explode('/', trim($r[$sort]));
-                $sort_by[] = sprintf("%04d%02d%02d", $d[2], $d[0], $d[1]);
+                $sort_by[] = sprintf("%04d%02d%02d %s", $d[2], $d[0], $d[1], trim($r['title']));
             }
         } else {
             foreach ($result as $r) {
@@ -258,7 +261,19 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         }
 
         $transactions = $hiddenTransactions = [];
+        $itemsOverdue = false;
+        $itemsDueSoon = false;
         foreach ($result as $i => $current) {
+            // UChicago customization
+            // Test if items are due soon or overdue
+            // Set the approptiate variables and flags
+            if ($current['overdue']) {
+                $itemsOverdue =  true;
+            }
+            elseif ($current['duesoon']) {
+                $itemsDueSoon = true; 
+            }
+
             // Add renewal details if appropriate:
             $current = $this->renewals()->addRenewDetails(
                 $catalog, $current, $renewStatus
@@ -280,7 +295,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         return $this->createViewModel(
             compact(
                 'sort', 'transactions', 'renewForm', 'renewResult', 'paginator',
-                'hiddenTransactions', 'failure'
+                'hiddenTransactions', 'failure', 'itemsOverdue', 'itemsDueSoon'
             )
         );
     }
@@ -299,7 +314,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
         $sort = $this->params()->fromQuery('sort');
         if (!$sort) {
-            $sort = 'holdExpirationDate';
+            $sort = 'title';
         }
 
         // Connect to the ILS:
@@ -342,6 +357,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         $sort_by = [];
         foreach ($recordList as $r) {
             $ilsDetails = $r->getExtraDetail('ils_details');
+            $title = strtolower(trim($r->getTitle()));
             switch ($sort) {
                 case 'author':
                     $primaryAuthors = $r->getPrimaryAuthors();
@@ -360,7 +376,13 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                     }
                     break;
                 case 'holdExpirationDate':
-                    $sort_by[] = $ilsDetails['expire'];
+                    if ($ilsDetails['hold_until_date']) {
+                        $s = $ilsDetails['hold_until_date'] . $title;
+                    }
+                    else {
+                        $s = (string)INF . $title;
+                    }
+                    $sort_by[] = $s;
                     break;
                 case 'itemStatus':
                     if ($ilsDetails['available']) {
@@ -371,11 +393,8 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                         $sort_by[] = 'ZZZ';
                     }
                     break;
-                case 'holdExpirationDate':
-                    $sort_by[] = $ilsDetails['expire'];
-                    break;
                 case 'title':
-                    $sort_by[] = strtolower(trim($r->getTitle()));
+                    $sort_by[] = $title;
                     break;
                 default:
                     $sort_by[] = 'a';
@@ -443,7 +462,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             if ($sort == 'amount') {
                 $sort_by[] = (int)trim($f['amount']);
             } else {
-                $sort_by[] = strtolower(trim($f[$sort]));
+                $sort_by[] = sprintf("%s %s", strtolower(trim($f[$sort])), strtolower(trim($f['title'])));
             }
         }
         array_multisort($sort_by, SORT_ASC, $fines);

@@ -68,7 +68,7 @@
             <? if (count($item['useInstead']) > 0): ?>
               <div>
                 <?=$this->transEsc('Use instead') ?>:
-                <ul>
+                <ul class="use-instead">
                   <? foreach ($item['useInstead'] as $heading): ?>
                   <li><a href="<?=$this->escapeHtmlAttr($this->url('alphabrowse-home', [], ['query' => ['from' => $heading] + $baseQuery]))?>"><?=$this->escapeHtml($heading)?></a></li>
                   <? endforeach; ?>
@@ -79,7 +79,7 @@
             <? if (count($item['seeAlso']) > 0): ?>
               <div>
                 <?=$this->transEsc('See also') ?>:
-                <ul>
+                <ul class="see-also">
                   <? foreach ($item['seeAlso'] as $heading): ?>
                   <li><a href="<?=$this->escapeHtmlAttr($this->url('alphabrowse-home', [], ['query' => ['from' => $heading] + $baseQuery]))?>"><?=$this->escapeHtml($heading)?></a></li>
                   <? endforeach; ?>

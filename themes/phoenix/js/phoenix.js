@@ -8,8 +8,12 @@ function getAlert(){
             var msg = page.banner_message;
             var url = page.url;
             var html = '';
+            var link = '';
+            if (page.more_info.length) {
+                link = ' | <a href="' + url + '">More info...</a>';
+            }
             if (level == 'alert-high') {
-                html += '<div id="alert" class="container">' + msg +' | <a href="' + url + '">More info...</a></div>';
+                html += '<div id="alert" class="container">' + msg + link + ' </div>';
                 $('.container.navbar').before(html);
                 return false;
             }
@@ -651,15 +655,19 @@ $(document).ready(function() {
         sort_labels['duedate'] = 'Due Date';
         sort_labels['loanedDate'] = 'Checkout Date';
         sort_labels['title'] = 'Title';
+        sort_labels['author'] = 'Author';
+        sort_labels['loanType'] = 'Loan Type';
 
         var html = ' ';
         html = html + '<span class="dropdown">';
         html = html + '<button type="button" class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Sort By: <strong id="checked_out_items_sort_label">' + sort_labels[sort] + '</strong> <span class="caret"></span></button>';
         html = html + '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
         html = html + '<li><a class="checked_out_items_sort" data-sort="title">Title</a></li>';
+        html = html + '<li><a class="checked_out_items_sort" data-sort="author">Author</a></li>';
         html = html + '<li><a class="checked_out_items_sort" data-sort="callNumber">Call Number</a></li>';
         html = html + '<li><a class="checked_out_items_sort" data-sort="loanedDate">Checkout Date</a></li>';
         html = html + '<li><a class="checked_out_items_sort" data-sort="duedate">Due Date</a></li>';
+        html = html + '<li><a class="checked_out_items_sort" data-sort="loanType">Loan Type</a></li>';
         html = html + '</ul>';
         html = html + '</span>';
         $('#renewAll').after(html);
@@ -677,7 +685,6 @@ $(document).ready(function() {
         html = html + '<span class="dropdown">';
         html = html + '<button type="button" class="btn btn-default dropdown-toggle checked_out_items_export_dropdown disabled" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Export <span class="caret"></span></button>';
         html = html + '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
-        /* html = html + '<li><a class="checked_out_items_export" * data-export-format="CSV">Spreadsheet (CSV)</a></li>'; */
         html = html + '<li><a class="checked_out_items_export" data-export-format="EndNoteWeb">EndNoteWeb</a></li>';
         html = html + '<li><a class="checked_out_items_export" data-export-format="EndNote">EndNote/Zotero</a></li>';
         html = html + '<li><a class="checked_out_items_export" data-export-format="BiBTeX">BibTex</a></li>';
@@ -698,9 +705,17 @@ $(document).ready(function() {
         form.find('input[type="submit"]').click();
     });
 
-    // toggle the export pulldown's status when checkboxes are selected.
+    // toggle the export pulldown's status when individual checkboxes are selected.
     $('.checkbox-select-item').click(function() {
         if ($('.checkbox-select-item:checked').length) {
+            $('.checked_out_items_export_dropdown').removeClass('disabled');
+        } else {
+            $('.checked_out_items_export_dropdown').addClass('disabled');
+        }
+    });
+    // toggle the export pulldown's status when all checkboxes are selected.
+    $('.checkbox-select-all').click(function() {
+        if ($('.checkbox-select-all:checked').length) {
             $('.checked_out_items_export_dropdown').removeClass('disabled');
         } else {
             $('.checked_out_items_export_dropdown').addClass('disabled');
@@ -717,7 +732,6 @@ $(document).ready(function() {
         html = html + '<span class="caret"></span>';
         html = html + '</button>';
         html = html + '<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">';
-        /* html = html + '<li><a class="holds_export" * data-export-format="CSV">Spreadsheet (CSV)</a></li>'; */
         html = html + '<li><a class="holds_export" data-export-format="EndNoteWeb">EndNoteWeb</a></li>';
         html = html + '<li><a class="holds_export" data-export-format="EndNote">EndNote/Zotero</a></li>';
         html = html + '<li><a class="holds_export" data-export-format="BiBTeX">BibTex</a></li>';

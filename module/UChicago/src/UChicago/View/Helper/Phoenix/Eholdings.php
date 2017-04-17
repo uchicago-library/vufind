@@ -15,6 +15,37 @@ class Eholdings extends AbstractHelper
 {
 
     /**
+     * Sort subfield data from 908 fields for eholdings.
+     * This method assumes that order is respected for
+     * repeatable fields that matter.
+     * 
+     * @param $array, subfield data
+     * 
+     * @returns associative array of data sorted by subfield
+     */
+    public function sortEholdingSubfields($array) {
+        $data = ['u' => [], 'z' => [], 'p' => [], 'c' => [], 'a' => []];
+        foreach ($array as $key => $value) {
+            if (strpos($key, 'u') === 0) {
+                array_push($data['u'], $value);
+            }
+            else if (strpos($key, 'z') === 0) {
+                array_push($data['z'], $value);
+            }
+            else if (strpos($key, 'p') === 0) {
+                array_push($data['p'], $value);
+            }
+            else if (strpos($key, 'c') === 0) {
+                array_push($data['c'], $value);
+            }
+            else if (strpos($key, 'a') === 0) {
+                array_push($data['a'], $value);
+            }
+        }
+        return $data;
+    }
+
+    /**
      * Gets e-holding links and associated data 
      *
      * @rerutns array
@@ -25,32 +56,50 @@ class Eholdings extends AbstractHelper
         if ($data === null) {
             return $links;
         }
-        foreach ($data as $urlData) {
-            $link = [];
-            $i = 0;
-            foreach ($urlData as $url) {
-                $filter = 'www.';
-                $descriptionArray = parse_url($url['subfieldData']['u-1']);
+
+
+        $link = [];
+        $i = 0;
+        foreach ($data['urls'] as $urlData) {
+
+            $filter = 'www.';
+            $subfields = $urlData['subfieldData'];
+
+            /* Sort repeatable subfields into clusters */
+            $sortedSubfields = $this->sortEholdingSubfields($subfields);
+
+            /* Loop over subfield u data and build links for display */
+            foreach($sortedSubfields['u'] as $url) {
+                
+                $link[$i]['url'] = $url;
+                
+                /* Build human readable text for the link as a fallback */
+                $descriptionArray = parse_url($url);
                 $host = $descriptionArray['host'];
                 $hasFilter = (substr($host, 0, 4) == $filter);
                 $description = $hasFilter ? substr($host, strlen($filter)) : $host;
-                 
-                $link[$i]['url'] = $url['subfieldData']['u-1'];
-                if (!array_key_exists('z', $url['subfieldData'])) { 
-                    $link[$i]['desc'] = array_key_exists('p', $url['subfieldData']) ? $url['subfieldData']['p'] : $description;
+
+                /* Choose link text */
+                if (empty($sortedSubfields['z'])) {
+                    $link[$i]['desc'] = !empty($sortedSubfields['p']) ? array_shift($sortedSubfields['p']) : $description;
                 }
                 else {
-                    $link[$i]['desc'] = array_key_exists('p', $url['subfieldData']) ? $url['subfieldData']['p'] : '';
+                    $link[$i]['desc'] = !empty($sortedSubfields['p']) ?  array_shift($sortedSubfields['p']) : '';
                 }
-                $link[$i]['type'] = isset($url['subfieldData']['c']) ? $url['subfieldData']['c'] : null;
-                $link[$i]['callnumber'] = isset($url['subfieldData']['a']) ? $url['subfieldData']['a'] : null;
-                $link[$i]['text'] = array_key_exists('z', $url['subfieldData']) ? $url['subfieldData']['z'] : null;
-                $i++; 
+
+                /* Get the link type, callnumber and display text*/
+                $link[$i]['type'] = !empty($sortedSubfields['c']) ? $sortedSubfields['c'][0] : null; // <--- Don't use array_shift because this is holdings level?
+                $link[$i]['callnumber'] = !empty($sortedSubfields['a'])? array_shift($sortedSubfields['a']) : null;
+                $link[$i]['text'] = !empty($sortedSubfields['z']) ? array_shift($sortedSubfields['z']) : null;
+
+                $links = $link;
+                $i++;
             }
-            $links = $link;
+
         }
         return $links;
     }
+
 
     /**
      * Returns a friendly display label for an e-holdings link.

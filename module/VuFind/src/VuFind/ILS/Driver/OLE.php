@@ -410,12 +410,14 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     i.CHRONOLOGY AS chronology, h.CALL_NUMBER_PREFIX AS call_number_prefix, h.CALL_NUMBER AS call_number, 
                     h.IMPRINT AS imprint, bib.CONTENT AS bib_data, i.BARCODE AS barcode,
                     loc.LOCN_NAME AS location_name,
-                    l.NUM_RENEWALS AS number_of_renewals
+                    l.NUM_RENEWALS AS number_of_renewals,
+                    it.itm_typ_cd, it.itm_typ_desc
                 FROM uc_people p
                 JOIN ole_dlvr_loan_t l ON p.id = l.OLE_PTRN_ID
                 JOIN ole_ds_item_t i ON i.BARCODE = l.ITM_ID
                 JOIN ole_ds_holdings_t h ON i.HOLDINGS_ID = h.HOLDINGS_ID
                 JOIN ole_ds_bib_t bib ON bib.BIB_ID = h.BIB_ID
+                LEFT JOIN ole_cat_itm_typ_t it ON it.itm_typ_cd_id = i.item_type_id
                 LEFT JOIN ole_locn_t loc ON h.LOCATION_ID = loc.LOCN_ID
                     WHERE p.library_id = :barcode 
                         AND i.CURRENT_BORROWER = p.id';
@@ -434,7 +436,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         }
 
         /*Set the default sort order for checked out items.*/
-        switch ($this->coiSort) {
+        $sort = $_POST['sort'] ? $_POST['sort'] : $this->coiSort;
+        switch ($sort) {
             case 'dueDate':
                 /*By duedate*/
                 uasort($transList, function($a, $b) { return OLE::cmp(OLE::sortDate($a['duedate']), OLE::sortDate($b['duedate'])); });
@@ -443,11 +446,19 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 /*By date checked out*/
                 uasort($transList, function($a, $b) { return OLE::cmp(OLE::sortDate($a['loanedDate']), OLE::sortDate($b['loanedDate'])); });
                 break;
+            case 'author':
+                /*Alphabetical by author*/
+                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['author']), preg_replace('/[^ \w]+/', '', $b['author'])); });
+                break;
+            case 'loanType':
+                /*Alphabetical by item (loan) type*/
+                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['loanType']), preg_replace('/[^ \w]+/', '', $b['loanType'])); });
+                break;
             default:
                 /*Alphabetical*/
                 usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['title']), preg_replace('/[^ \w]+/', '', $b['title'])); });
+                break;
         }
-
         return $transList;
     }
 
@@ -637,7 +648,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                "WHERE ole_crcl_dsk_id = :deskid";
 
         $location = '';
-        
+ 
         try {
             $sqlStmt = $this->db->prepare($sql);
             $sqlStmt->bindParam(
@@ -649,6 +660,34 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $location = $row['OLE_CRCL_DSK_PUB_NAME'];
             }
         } catch (PDOException $e) {
+            throw new ILSException($e->getMessage());
+        }
+
+        // Temporary (we hope) hack to get the "hold until date" from the DB
+        // Should be deleted when this is returned by the OLE Driver via circ api
+        try {
+            $query = "select hold_exp_date from $this->dbName.ole_dlvr_rqst_t where ole_rqst_id = :requestid";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([':requestid' => $itemXml->requestId]);
+            while ($row = $stmt->fetch()) {
+                $hold_until_date = $row['hold_exp_date'];
+            }
+        } catch (PDOException $e) {
+            throw new ILSException($e->getMessage());
+        }
+
+        /* Temporary, this should come from the circ api */
+        $sql = 'select itm_typ_desc from ole_cat_itm_typ_t where itm_typ_cd = :code';
+        try {
+            /*Query the database*/
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(array(':code' => $itemXml->itemType));
+
+            while ($row = $stmt->fetch()) {
+                $loanType = $row['itm_typ_desc'];
+            }
+        }
+        catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
 
@@ -665,9 +704,46 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'volume' => (string) $itemXml->volumeNumber,
             'publication_year' => '',
             'title' => strlen((string) $itemXml->title)
-                ? (string) $itemXml->title : "unknown title"
+                ? (string) $itemXml->title : "unknown title",
+            'status' => (string) $itemXml->availableStatus,
+            'hold_until_date' => $hold_until_date,
+            'loan_type' => $loanType 
         );
 
+    }
+
+    /**
+     * UChicago helper function for calculating if
+     * an item is due soon or overdue.
+     *
+     * @param $duedate, string
+     *
+     * @return associative array with boolean entries
+     * for 'overdue' and 'duesoon'. Only one of these
+     * can be true at a given time because an item
+     * can never be overdue and due soon at the same time.
+     */
+    protected function getItemDueStatus($duedate)
+    {
+        $now = new \DateTime();
+        $itemDueStatus = ['overdue' => false, 'duesoon' => false];
+        try {
+            $dateObj = new \DateTime($duedate);
+            $diff = $now->diff($dateObj);
+            $days = [0 => $diff->days,
+                     1 => $diff->days * -1];
+            $interval = $days[$diff->invert];
+        } catch (Exception $e) {
+            $interval = INF;
+        }
+
+        if ($interval < 0) {
+            $itemDueStatus['overdue'] =  true;
+        }
+        elseif ($duedate != null and $interval < (int)$this->config['UserAccount']['due_soon']) {
+            $itemDueStatus['duesoon'] = true;
+        }
+        return $itemDueStatus;
     }
 
     /**
@@ -694,17 +770,24 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         
         $xml = simplexml_load_string($row['bib_data']);
 
-        $title = ''; 
+        $title = '';
+        $author = '';
         foreach($xml->record->xpath('*') as $field) {
             if ($field->attributes() == '245') {
                 $title = (string) $field->subfield;
             }
+            else if ($field->attributes() == '100') {
+                $author = (string) $field->subfield;
+            }
         }
 
-        /*See if item is on indefinite loan.*/
+        /* See if item is on indefinite loan */
         $isIndefiniteLoan = strlen($dueDate) < 1;
 
-        $transactions = array(
+        /* See if the item is overdue or due soon */
+        $itemDueStatus = $this->getItemDueStatus($dueDate);
+
+        $transactions = [
             'id' => $row['bib_num'],
             'item_id' => $row['item_id'],
             'duedate' => ($isIndefiniteLoan == false ? date($dateFormat, strtotime($dueDate)) : null),
@@ -718,12 +801,17 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'publication_year' => $row['imprint'],
             'renew' => $row['number_of_renewals'],
             'title' => $title != '' ? $title : "unknown title",
+            'author' => $author != '' ? $author : '',
             'locationName' => $locationName,
-            'barcode' => $row['barcode'] 
-        );
+            'barcode' => $row['barcode'],
+            'overdue' => $itemDueStatus['overdue'],
+            'duesoon' => $itemDueStatus['duesoon'],
+            'loanTypeCode' => $row['itm_typ_cd'],
+            'loanType' => $row['itm_typ_desc'] != '' ? $row['itm_typ_desc'] : "ZZZ",
+        ];
         $renewData = $this->checkRenewalsUpFront
             ? $this->isRenewable($patron['id'], $transactions['item_id'])
-            : array('message' => 'renewable', 'renewable' => true);
+            : ['message' => 'renewable', 'renewable' => true];
 
         $transactions['renewable'] = $renewData['renewable'];
         $transactions['message'] = $isIndefiniteLoan == false ? $renewData['message'] : null;

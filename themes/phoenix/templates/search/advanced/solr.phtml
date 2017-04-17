@@ -688,7 +688,15 @@ $collections = [
             </div><!--end row-->
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="slider-container"><input type="text" id="publishDatedateSlider" class="hidden"></div>
+                    <? if (isset($this->ranges) && !empty($this->ranges)): ?>
+                        <? 
+                            $slider_value = '';
+                            if (isset($this->ranges[0]['values']) && !empty($this->ranges[0]['values'])) {
+                                $slider_value =  sprintf("%s,%s", $this->ranges[0]['values'][0], $this->ranges[0]['values'][1]);
+                            }
+                        ?>
+                    <? endif; ?>
+                    <div class="slider-container"><input type="text" id="publishDatedateSlider" class="hidden"<? if ($slider_value):?> value="<?=$slider_value?>"<? endif; ?>></div>
                 </div><!--end col-sm-12-->
             </div><!--end row-->
 		</fieldset>
@@ -699,6 +707,13 @@ $collections = [
 <?
     $min = 1400;
     $max = date('Y') + 1;
+    if ($slider_value && $slider_value != ',') {
+        $min_val = array_shift(explode(",", $slider_value));
+        $max_val = array_pop(explode(",", $slider_value));
+    } else {
+        $min_val = $min;
+        $max_val = $max;
+    }
     $script = <<<JS
 $(document).ready(function() {
   var fillTexts = function() {
@@ -711,10 +726,13 @@ $(document).ready(function() {
      'max':$max,
      'handle':"square",
      'tooltip':"hide",
-     'value':[$min,$max]
+     'value':[$min_val,$max_val]
   })
   .on('slide', fillTexts)
   .data('slider');
+  if ($min_val != $min || $max_val != $max) {
+    fillTexts();
+  }
 });
 JS;
 ?>

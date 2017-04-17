@@ -94,7 +94,7 @@
         <? endif; ?>
           <input type="hidden" name="sort" value="relevance">
           <div class="clearfix">
-            <div id="groupJoin" class="form-inline pull-right hidden">
+            <div id="groupJoin" class="form-inline hidden">
               <label for="groupJoinOptions"><?=$this->transEsc("search_match")?>:</label>
               <select id="groupJoinOptions" name="join" class="form-control">
                 <option value="AND"<? if($searchDetails && $searchDetails->getOperator()=='ALL'):?> selected<?endif?>><?= $this->transEsc('group_AND') ?></option>
@@ -105,7 +105,7 @@
 
     <? ($groups == false) ? $group_count = 1 : $group_count = count($groups); ?>
     <? for ($g = 0; $g < $group_count; $g++): ?>
-        <div class="group well" id="group0">
+        <div class="group well" id="group<?=$g?>">
             <div class="form-group form-inline">
                 <div class="search_bool">
 	                <label for="search_bool<?=$g?>">Match:&nbsp;</label>
