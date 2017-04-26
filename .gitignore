@@ -29,8 +29,10 @@ local/config/
 
 # Ignore lots of dynamic Solr stuff
 solr/vufind/alphabetical_browse/
-solr/vufind/authority/index/
-solr/vufind/biblio/index/
+solr/vufind/authority/
+solr/vufind/biblio/
+solr/vufind/summ/
+solr/vufind/toc/
 solr/vufind/biblio/spellShingle/
 solr/vufind/biblio/spellchecker/
 solr/vufind/biblio/tlog/tlog*
