@@ -39,11 +39,13 @@
        If replication is in use, this should match the replication configuration. -->
   <dataDir>${solr.solr.home:./solr}/biblio</dataDir>
 
-  <lib dir="../../vendor/contrib/analysis-extras/lib" regex=".*\.jar" />
-  <lib dir="../../vendor/contrib/analysis-extras/lucene-libs" regex=".*\.jar" />
-  <lib dir="../jars" regex=".*\.jar" />
+		      <lib dir="./lib" />
+     -->	  
+     	      <lib dir="../../vendor/contrib/analysis-extras/lib" regex=".*\.jar" />
+ 	      <lib dir="../../vendor/contrib/analysis-extras/lucene-libs" regex=".*\.jar" />
+              <lib dir="../jars" regex=".*\.jar" />
 
-  <indexConfig>
+    <indexConfig>
 
     <useCompoundFile>false</useCompoundFile>
 
@@ -689,6 +691,25 @@
       </formatter>
     </highlighting>
   </searchComponent>
+
+
+
+<requestHandler name="/replication" class="solr.ReplicationHandler">
+  <lst name="master">
+    <str name="replicateAfter">optimize</str>
+    <str name="backupAfter">optimize</str>
+    <str name="replicateAfter">commit</str>
+    <str name="confFiles">solrconfig-slave.xml:solrconfig.xml,schema.xml</str>
+    <str name="commitReserveDuration">00:05:10</str>
+  </lst>
+  <int name="maxNumberOfBackups">1</int>
+  <lst name="invariants">
+    <str name="maxWriteMBPerSec">460</str>
+  </lst>
+</requestHandler>
+
+
+
 
   <!-- queryResponseWriter plugins... query responses will be written using the
     writer specified by the 'wt' request parameter matching the name of a registered

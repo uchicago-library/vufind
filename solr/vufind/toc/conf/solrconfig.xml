@@ -48,6 +48,8 @@
        Please note that <lib/> directives are processed in the order
        that they appear in your solrconfig.xml file, and are "stacked" 
        on top of each other when building a ClassLoader - so if you have 
+
+
        plugin jars with dependencies on other jars, the "lower level" 
        dependency jars should be loaded first.
 
@@ -72,6 +74,7 @@
        The examples below can be used to load some solr-contribs along 
        with their external dependencies.
     -->
+  <!--
   <lib dir="${solr.install.dir:../../../..}/contrib/extraction/lib" regex=".*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-cell-\d.*\.jar" />
 
@@ -83,6 +86,12 @@
 
   <lib dir="${solr.install.dir:../../../..}/contrib/velocity/lib" regex=".*\.jar" />
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
+  -->
+  
+  <lib dir="../../vendor/contrib/analysis-extras/lib" regex=".*\.jar" />
+  <lib dir="../../vendor/contrib/analysis-extras/lucene-libs" regex=".*\.jar" />
+  <lib dir="../jars" regex=".*\.jar" />
+
   <!-- an exact 'path' can be used instead of a 'dir' to specify a 
        specific jar file.  This will cause a serious error to be logged 
        if it can't be loaded.
@@ -628,6 +637,24 @@
     <maxWarmingSearchers>2</maxWarmingSearchers>
 
   </query>
+
+
+<requestHandler name="/replication" class="solr.ReplicationHandler">
+  <lst name="master">
+    <str name="replicateAfter">optimize</str>
+    <str name="backupAfter">optimize</str>
+    <str name="replicateAfter">commit</str>
+    <str name="confFiles">solrconfig-slave.xml:solrconfig.xml,schema.xml</str>
+    <str name="commitReserveDuration">00:05:10</str>
+  </lst>
+  <int name="maxNumberOfBackups">1</int>
+  <lst name="invariants">
+    <str name="maxWriteMBPerSec">160</str>
+  </lst>
+</requestHandler>
+
+
+
 
 
   <!-- Request Dispatcher
@@ -1346,9 +1373,9 @@
         <str>yyyy-MM-dd</str>
       </arr>
     </processor>
- <!--   <processor class="solr.AddSchemaFieldsUpdateProcessorFactory">  THIS PART IS REMOVED TO USE schema.xml instead of managed-schema
  
 
+<!--   <processor class="solr.AddSchemaFieldsUpdateProcessorFactory">    THIS PART IS REMOVED TO USE schema.xml instead of managed-schema 
       <str name="defaultFieldType">strings</str>
       <lst name="typeMapping">
         <str name="valueClass">java.lang.Boolean</str>
@@ -1369,7 +1396,7 @@
       </lst>
     </processor>
 
--->
+  -->
     <processor class="solr.RunUpdateProcessorFactory"/>
   </updateRequestProcessorChain>
 
