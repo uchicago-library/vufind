@@ -26,6 +26,8 @@ local/import/import_auth.properties
 local/cache/
 local/config/
 
+import/solrmarc.log.1
+
 # Ignore lots of dynamic Solr stuff
 solr/vufind/alphabetical_browse/
 solr/vufind/authority/
