@@ -207,7 +207,7 @@ public class CallNumberTools
                         callTypeMatch = true;
                     }
                 }
-                System.err.println("callTypeMatch after loop: " + callTypeMatch);
+               // System.err.println("callTypeMatch after loop: " + callTypeMatch);
                 if (callTypeMatch) {
                     result.add(df.getSubfieldsAsString(sfSpec));
                 }
