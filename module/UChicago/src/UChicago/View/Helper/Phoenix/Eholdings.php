@@ -15,6 +15,21 @@ class Eholdings extends AbstractHelper
 {
 
     /**
+     * Determine if the MARC data for 098s is
+     * using the old style export (bad = true)
+     * or the new style (bad = false)
+     */
+    public function isBad($array) {
+        $keys = array_keys($array);
+        $a = mb_substr($keys[0], 0, 1);
+        $b = mb_substr($keys[1], 0, 1);
+        if ($a == $b) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Sort subfield data from 908 fields for eholdings.
      * This method assumes that order is respected for
      * repeatable fields that matter.
@@ -56,8 +71,6 @@ class Eholdings extends AbstractHelper
         if ($data === null) {
             return $links;
         }
-
-
         $link = [];
         $i = 0;
         foreach ($data['urls'] as $urlData) {
@@ -96,7 +109,15 @@ class Eholdings extends AbstractHelper
                 $i++;
             }
 
+            // If the 098s use the old style of export,
+            // break out of the loop because we already
+            // have them all
+            if ($this->isBad($urlData['subfieldData'])) {
+                break;
+            }
+
         }
+
         return $links;
     }
 
