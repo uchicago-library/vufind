@@ -216,6 +216,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         foreach ($renewResult as $entry) {  
             if ($entry['success'] == false) {
                 $failure = true;
+                break;
             }
         }
 

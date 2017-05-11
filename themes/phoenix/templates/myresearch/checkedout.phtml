@@ -11,6 +11,13 @@
     <h2><?=$this->transEsc('Checked Out Items')?> <small>(<?=count($this->transactions)?>)</small></h2>
 
     <?=$this->flashmessages()?>
+    <? if ($_POST['renewSelected'] || $_POST['renewAll']): ?>
+        <? if ($failure): ?>
+            <?=$this->BootstrapAlert()->makeAlert('danger', 'Some items could not be renewed. Please see below.', ''); ?>
+        <? else: ?>
+            <?=$this->BootstrapAlert()->makeAlert('success', 'Success! All of your items renewed.', ''); ?>
+        <? endif; ?>
+    <? endif; ?>
     <? if ($this->itemsOverdue) : ?>
         <?=$this->BootstrapAlert()->makeAlert('danger', 'You have item(s) overdue.', ''); ?>
     <? endif; ?>
