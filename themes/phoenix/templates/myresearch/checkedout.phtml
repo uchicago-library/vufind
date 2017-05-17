@@ -21,8 +21,17 @@
     <? if ($this->itemsOverdue) : ?>
         <?=$this->BootstrapAlert()->makeAlert('danger', 'You have item(s) overdue.', ''); ?>
     <? endif; ?>
+    <? if ($this->isLost) : ?>
+        <?=$this->BootstrapAlert()->makeAlert('danger', 'You have item(s) billed as lost.', ''); ?>
+    <? endif; ?>
+    <? if ($this->recalled) : ?>
+        <?=$this->BootstrapAlert()->makeAlert('danger', 'You have item(s) recalled.', ''); ?>
+    <? endif; ?>
     <? if ($this->itemsDueSoon): ?>
         <?=$this->BootstrapAlert()->makeAlert('warning', 'You have item(s) due soon.', ''); ?>
+    <? endif; ?>
+    <? if ($this->claimsReturned): ?>
+        <?=$this->BootstrapAlert()->makeAlert('info', 'You have item(s) claimed as returned.', ''); ?>
     <? endif; ?>
     <? $warnMsg = 'Please do not click renew twice-renewals can take up to a minute.<br/>For help, <a href="https://www.lib.uchicago.edu/about/directory/?view=department&query=circulation" target="_blank" class="external">Call us</a> or use our <a href="https://www.lib.uchicago.edu/borrow/borrowing/contact-circulation/" target="_blank" class="external">online form</a> and Library staff will help you.'; ?>
     <?=$this->BootstrapAlert()->makeAlert('warning', $warnMsg, ''); ?>
@@ -187,7 +196,11 @@
             <? $loanedDate = $ilsDetails['loanedDate']; ?>
             <? if ($loanedDate) : ?>
                 Checked Out: <strong> <?=$loanedDate?></strong><br/>
-            <? endif; ?> 
+            <? endif; ?>
+ 
+            <? if ($ilsDetails['proxyBorrower']): ?>
+              Checked Out By: <strong> <?=$ilsDetails['proxyBorrower']; ?></strong><br/>
+            <? endif; ?>
 
             <? /* UChicago custom code */ ?>
             <? $loanTypeCode = $ilsDetails['loanTypeCode']; ?>
@@ -228,18 +241,14 @@
             <div class="col-xs-12 col-sm-10 alert alert-warning">Due Soon </div>
           <? endif; ?>
           <? if ($ilsDetails['claimsReturned']): ?>
-            <div class="col-xs-12 col-sm-10 alert alert-warning">Claimed as returned</div>
+            <div class="col-xs-12 col-sm-10 alert alert-info">Claimed as returned</div>
           <? endif; ?>
           <? if ($ilsDetails['isLost']): ?>
-            <div class="col-xs-12 col-sm-10 alert alert-warning">Billed as Lost</div>
+            <div class="col-xs-12 col-sm-10 alert alert-danger">Billed as Lost</div>
           <? endif; ?>
           <? if ($ilsDetails['recalled']): ?>
             <div class="col-xs-12 col-sm-10 alert alert-danger">This item has been recalled </div>
           <? endif; ?>
-          <? if ($ilsDetails['proxyBorrower']): ?>
-            <div class="col-xs-12 col-sm-10 alert alert-warning">Checked out by: <?=$ilsDetails['proxyBorrower']; ?> </div>
-          <? endif; ?>
-
           </div><? /* end row */ ?>
           </div>
         </div>

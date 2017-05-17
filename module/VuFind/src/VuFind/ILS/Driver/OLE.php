@@ -835,7 +835,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'loanType' => $row['itm_typ_desc'] != '' ? $row['itm_typ_desc'] : "ZZZ",
             'claimsReturned' => true ? strtolower($row['claims_returned']) == 'y' : false,
             'isLost' => true ? $row['item_status_id'] == 14 : false,
-            'proxyBorrower' => $row['ole_proxy_borrower_nm'],
+            'proxyBorrower' => str_replace(',', ', ', $row['ole_proxy_borrower_nm']),
             'recalled' => $row['ole_rqst_typ_id'] == 2 
         ];
         $renewData = $this->checkRenewalsUpFront

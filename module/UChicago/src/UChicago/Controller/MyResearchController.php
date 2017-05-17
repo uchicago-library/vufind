@@ -264,6 +264,9 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         $transactions = $hiddenTransactions = [];
         $itemsOverdue = false;
         $itemsDueSoon = false;
+        $claimsReturned = false;
+        $isLost = false;
+        $recalled = false;
         foreach ($result as $i => $current) {
             // UChicago customization
             // Test if items are due soon or overdue
@@ -271,9 +274,19 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             if ($current['overdue']) {
                 $itemsOverdue =  true;
             }
-            elseif ($current['duesoon']) {
+            if ($current['duesoon']) {
                 $itemsDueSoon = true; 
             }
+            if ($current['claimsReturned']) {
+                $claimsReturned = true; 
+            }
+            if ($current['isLost']) {
+                $isLost = true; 
+            }
+            if ($current['recalled']) {
+                $recalled = true; 
+            }
+
 
             // Add renewal details if appropriate:
             $current = $this->renewals()->addRenewDetails(
@@ -296,7 +309,8 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         return $this->createViewModel(
             compact(
                 'sort', 'transactions', 'renewForm', 'renewResult', 'paginator',
-                'hiddenTransactions', 'failure', 'itemsOverdue', 'itemsDueSoon'
+                'hiddenTransactions', 'failure', 'itemsOverdue', 'itemsDueSoon',
+                'claimsReturned', 'isLost', 'recalled'
             )
         );
     }
