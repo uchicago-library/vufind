@@ -93,12 +93,20 @@
         <td><?=isset($record['duedate']) ? $this->escapeHtml($record['duedate']) : ''?></td>
         <td></td>
         <td><?=isset($record['fine']) ?  $this->escapeHtml($record['billdate']) : ''?></td>
-        <td><?=isset($record['fine']) ?  $this->escapeHtml($record['fine']) : ''?></td>
-        <td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount']/100.00) : ''?></td>
-        <td><?=isset($record['balance']) ? $this->safeMoneyFormat($record['balance']/100.00) : ''?></td>
+        <? if ($record['suspended']): ?>
+          <td><?=isset($record['fine']) ?  $this->escapeHtml('Suspended') : ''?></td>
+          <td><?=isset($record['amount']) ? $this->safeMoneyFormat(0.00) : ''?></td>
+          <td><?=isset($record['balance']) ? $this->safeMoneyFormat(0.00) : ''?></td>
+        <? else: ?>
+          <td><?=isset($record['fine']) ?  $this->escapeHtml($record['fine']) : ''?></td>
+          <td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount']/100.00) : ''?></td>
+          <td><?=isset($record['balance']) ? $this->safeMoneyFormat($record['balance']/100.00) : ''?></td>
+        <? endif; ?>
       </tr>
       <? endif; ?>
-      <? $totalDue += $record['balance']; ?>
+      <? if (!$record['suspended']): ?>
+        <? $totalDue += $record['balance']; ?>
+      <? endif; ?>
     <? endforeach; ?>
       <tr style="font-weight:bold"><td colspan="6"><?=$this->transEsc('Total Balance Due')?></td><td><?=$this->safeMoneyFormat($totalDue/100.00) ?></td></tr>
     </table>

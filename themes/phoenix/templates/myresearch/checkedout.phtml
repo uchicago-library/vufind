@@ -116,10 +116,10 @@
             <? $listAuthors = $resource->getPrimaryAuthors(); if (!empty($listAuthors)): ?>
               <?=$this->transEsc('by')?>:
               <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><? if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><? endif; ?><br/>
+            <? endif; ?>
             <? $locationName = $ilsDetails['locationName']; ?>
             <? if ($locationName): ?>
                 <?=$locationName ?><br/>
-            <? endif; ?>
             <? endif; ?>
             <? if (!empty($ilsDetails['volume'])): ?>
               <strong><?=$this->transEsc('Volume')?>:</strong> <?=$this->escapeHtml($ilsDetails['volume'])?>
@@ -226,6 +226,18 @@
             <div class="col-xs-12 col-sm-10 alert alert-danger">Overdue </div>
           <? elseif ($ilsDetails['duesoon']): ?>
             <div class="col-xs-12 col-sm-10 alert alert-warning">Due Soon </div>
+          <? endif; ?>
+          <? if ($ilsDetails['claimsReturned']): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-warning">Claimed as returned</div>
+          <? endif; ?>
+          <? if ($ilsDetails['isLost']): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-warning">Billed as Lost</div>
+          <? endif; ?>
+          <? if ($ilsDetails['recalled']): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-danger">This item has been recalled </div>
+          <? endif; ?>
+          <? if ($ilsDetails['proxyBorrower']): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-warning">Checked out by: <?=$ilsDetails['proxyBorrower']; ?> </div>
           <? endif; ?>
 
           </div><? /* end row */ ?>

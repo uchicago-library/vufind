@@ -411,14 +411,19 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     h.IMPRINT AS imprint, bib.CONTENT AS bib_data, i.BARCODE AS barcode,
                     loc.LOCN_NAME AS location_name,
                     l.NUM_RENEWALS AS number_of_renewals,
-                    it.itm_typ_cd, it.itm_typ_desc
+                    l.ole_proxy_borrower_nm,
+                    it.itm_typ_cd, it.itm_typ_desc,
+                    i.claims_returned,
+                    r.loan_tran_id,
+                    r.ole_rqst_typ_id
                 FROM uc_people p
                 JOIN ole_dlvr_loan_t l ON p.id = l.OLE_PTRN_ID
                 JOIN ole_ds_item_t i ON i.BARCODE = l.ITM_ID
                 JOIN ole_ds_holdings_t h ON i.HOLDINGS_ID = h.HOLDINGS_ID
                 JOIN ole_ds_bib_t bib ON bib.BIB_ID = h.BIB_ID
+                LEFT JOIN ole_dlvr_rqst_t r on r.loan_tran_id = l.loan_tran_id
                 LEFT JOIN ole_cat_itm_typ_t it ON it.itm_typ_cd_id = i.item_type_id
-                LEFT JOIN ole_locn_t loc ON h.LOCATION_ID = loc.LOCN_ID
+                LEFT JOIN ole_locn_t loc on loc.LOCN_CD = SUBSTRING_INDEX(h.LOCATION, \'/\', -1)
                     WHERE p.library_id = :barcode 
                         AND i.CURRENT_BORROWER = p.id';
          try {
@@ -490,9 +495,11 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     public function getMyFines($patron)
     {
 
+        // Variables to use later
         $fineList = array();
         $transList = $this->getMyTransactions($patron);
 
+        // Build a request to the OLE circ API
         $uri = $this->circService . '?service=fine&patronBarcode=' . $patron['barcode'] . '&operatorId=' . $this->operatorId;
         $request = new Request();
         $request->setMethod(Request::METHOD_GET);
@@ -501,22 +508,40 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $client = new Client();
         $client->setOptions(array('timeout' => 30));
 
+        // Make a request to the OLE circ API and retrieve data
         try {
             $response = $client->dispatch($request);
         } catch (Exception $e) { 
             throw new ILSException($e->getMessage());
         }
-        
         $content_str = $response->getBody();
         $xml = simplexml_load_string($content_str);
-        
         $fines = $xml->xpath('//fineItem');
 
+        // Make a request to the database because the OLE circ API is insufficient  
+        $finesData = [];
+        $sql = 'select pb.ole_ptrn_id, pb.ptrn_bill_id, ft.pay_status_id
+                from ole_dlvr_ptrn_bill_t pb
+                    left join ole_dlvr_ptrn_bill_fee_typ_t ft on pb.ptrn_bill_id = ft.ptrn_bill_id
+                        where ole_ptrn_id = :id';
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(array(':id' => $patron['id']));
+
+            while ($row = $stmt->fetch()) {
+                $finesData[$row['ptrn_bill_id']]['pay_status_id'] = $row['pay_status_id'];
+            }
+        }
+        catch (Exception $e){
+            throw new ILSException($e->getMessage());
+        }
+
         foreach($fines as $fine) {
-            //var_dump($fine);
             $processRow = $this->processMyFinesData($fine, $patron);
-            //var_dump($processRow);
-            
+
+            // Add variable by checking the database against the api :-(
+            $processRow['suspended'] = $finesData[$processRow['patronBillId']]['pay_status_id'] == '55';
+
             if($processRow['id']) {
                 foreach($transList as $trans) {
                     if ($this->bibPrefix . $trans['id'] == $processRow['id']) {
@@ -530,7 +555,6 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             }
             $fineList[] = $processRow;
         }
-
 
         return $fineList;
 
@@ -558,6 +582,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                  'billdate' => (string)$itemXml->billDate,
                  'createdate' => (string)$itemXml->dateCharged,
                  'title' => (string)$itemXml->title,
+                 'patronBillId' => (string)$itemXml->patronBillId,
                  'checkout' => '',
                  'duedate' => '',
                  'id' => $recordId
@@ -808,6 +833,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'duesoon' => $itemDueStatus['duesoon'],
             'loanTypeCode' => $row['itm_typ_cd'],
             'loanType' => $row['itm_typ_desc'] != '' ? $row['itm_typ_desc'] : "ZZZ",
+            'claimsReturned' => true ? strtolower($row['claims_returned']) == 'y' : false,
+            'isLost' => true ? $row['item_status_id'] == 14 : false,
+            'proxyBorrower' => $row['ole_proxy_borrower_nm'],
+            'recalled' => $row['ole_rqst_typ_id'] == 2 
         ];
         $renewData = $this->checkRenewalsUpFront
             ? $this->isRenewable($patron['id'], $transactions['item_id'])
