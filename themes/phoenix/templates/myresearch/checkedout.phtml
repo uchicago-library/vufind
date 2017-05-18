@@ -33,8 +33,6 @@
     <? if ($this->claimsReturned): ?>
         <?=$this->BootstrapAlert()->makeAlert('info', 'You have item(s) claimed as returned.', ''); ?>
     <? endif; ?>
-    <? $warnMsg = 'Please do not click renew twice-renewals can take up to a minute.<br/>For help, <a href="https://www.lib.uchicago.edu/about/directory/?view=department&query=circulation" target="_blank" class="external">Call us</a> or use our <a href="https://www.lib.uchicago.edu/borrow/borrowing/contact-circulation/" target="_blank" class="external">online form</a> and Library staff will help you.'; ?>
-    <?=$this->BootstrapAlert()->makeAlert('warning', $warnMsg, ''); ?>
     <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
 
     <? if (!empty($this->transactions)): ?>
@@ -237,17 +235,18 @@
           <? /* UChicago custom code */ ?>
           <? if ($ilsDetails['overdue']): ?>
             <div class="col-xs-12 col-sm-10 alert alert-danger">Overdue </div>
-          <? elseif ($ilsDetails['duesoon']): ?>
-            <div class="col-xs-12 col-sm-10 alert alert-warning">Due Soon </div>
-          <? endif; ?>
-          <? if ($ilsDetails['claimsReturned']): ?>
-            <div class="col-xs-12 col-sm-10 alert alert-info">Claimed as returned</div>
           <? endif; ?>
           <? if ($ilsDetails['isLost']): ?>
             <div class="col-xs-12 col-sm-10 alert alert-danger">Billed as Lost</div>
           <? endif; ?>
           <? if ($ilsDetails['recalled']): ?>
-            <div class="col-xs-12 col-sm-10 alert alert-danger">This item has been recalled </div>
+            <div class="col-xs-12 col-sm-10 alert alert-danger">Recalled</div>
+          <? endif; ?>
+          <? if (!$ilsDetails['overdue'] && !$ilsDetails['isLost'] && $ilsDetails['duesoon']): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-warning">Due Soon </div>
+          <? endif; ?>
+          <? if ($ilsDetails['claimsReturned']): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-info">Claimed as returned</div>
           <? endif; ?>
           </div><? /* end row */ ?>
           </div>

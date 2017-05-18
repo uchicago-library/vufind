@@ -520,7 +520,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
         // Make a request to the database because the OLE circ API is insufficient  
         $finesData = [];
-        $sql = 'select pb.ole_ptrn_id, pb.ptrn_bill_id, ft.pay_status_id
+        $sql = 'select pb.ole_ptrn_id, pb.ptrn_bill_id, ft.pay_status_id,
+                ft.due_dt_time, ft.check_in_dt_time_ovr_rd
                 from ole_dlvr_ptrn_bill_t pb
                     left join ole_dlvr_ptrn_bill_fee_typ_t ft on pb.ptrn_bill_id = ft.ptrn_bill_id
                         where ole_ptrn_id = :id';
@@ -530,6 +531,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
             while ($row = $stmt->fetch()) {
                 $finesData[$row['ptrn_bill_id']]['pay_status_id'] = $row['pay_status_id'];
+                $finesData[$row['ptrn_bill_id']]['duedate'] = $row['due_dt_time'];
+                $finesData[$row['ptrn_bill_id']]['returndate'] = $row['check_in_dt_time_ovr_rd'];
             }
         }
         catch (Exception $e){
@@ -539,14 +542,16 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         foreach($fines as $fine) {
             $processRow = $this->processMyFinesData($fine, $patron);
 
-            // Add variable by checking the database against the api :-(
+            // Add variables by checking the database against the api :-(
             $processRow['suspended'] = $finesData[$processRow['patronBillId']]['pay_status_id'] == '55';
+            $processRow['duedate'] = $finesData[$processRow['patronBillId']]['duedate'];
+            $processRow['returndate'] = $finesData[$processRow['patronBillId']]['returndate'];
 
             if($processRow['id']) {
                 foreach($transList as $trans) {
                     if ($this->bibPrefix . $trans['id'] == $processRow['id']) {
                         $processRow['checkout'] = $trans['loanedDate'];
-                        $processRow['duedate'] = $trans['duedate'];
+                        //$processRow['duedate'] = $trans['duedate'];
                         $processRow['title'] = $trans['title'];
                         $processRow['locationName'] = $trans['locationName'];
                         break;

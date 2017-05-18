@@ -9,9 +9,21 @@
   <h2><?=$this->transEsc('Your Fines')?></h2>
   <?=$this->flashmessages()?>
 
+  <? $badLevel = 0; ?>
+  <? foreach ($this->fines as $fail): ?>
+    <? if ($fail['balance'] > 0): ?>
+       <? $badLevel += $fail['balance']; ?>
+       <? if ($badLevel >= 50): ?>
+          <div class="alert alert-danger" role="alert">
+            Your account has an outstanding balance of $50 or more. As a result, your borrowing and renewing privileges have been temporarily suspended.
+          </div>
+          <? break; ?>
+       <? endif; ?>
+    <? endif; ?>
+  <? endforeach; ?>
+
   <div class="alert alert-info" role="alert">
-    Fines and loan period information can be found at 
-    <a href="https://www.lib.uchicago.edu/borrow/borrowing/due-dates-and-loan-periods/" target="_blank" class="external">Due Dates &amp; Loan Periods</a>.
+    See <a href="https://www.lib.uchicago.edu/borrow/borrowing/fines-and-lost-items/" target="_blank" class="external">Fines &amp; Lost Items</a> for payment options and other information. 
   </div>
 
 <?
@@ -91,15 +103,13 @@
           ?>
         </td>
         <td><?=isset($record['duedate']) ? $this->escapeHtml($record['duedate']) : ''?></td>
-        <td></td>
+        <td><?=isset($record['returndate']) ? $this->escapeHtml($record['returndate']) : ''?></td>
         <td><?=isset($record['fine']) ?  $this->escapeHtml($record['billdate']) : ''?></td>
+        <td><?=isset($record['fine']) ?  $this->escapeHtml($record['fine']) : ''?></td>
+        <td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount']/100.00) : ''?></td>
         <? if ($record['suspended']): ?>
-          <td><?=isset($record['fine']) ?  $this->escapeHtml('Suspended') : ''?></td>
-          <td><?=isset($record['amount']) ? $this->safeMoneyFormat(0.00) : ''?></td>
-          <td><?=isset($record['balance']) ? $this->safeMoneyFormat(0.00) : ''?></td>
+          <td><?=isset($record['balance']) ? $this->escapeHtml('Suspended') : ''?></td>
         <? else: ?>
-          <td><?=isset($record['fine']) ?  $this->escapeHtml($record['fine']) : ''?></td>
-          <td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount']/100.00) : ''?></td>
           <td><?=isset($record['balance']) ? $this->safeMoneyFormat($record['balance']/100.00) : ''?></td>
         <? endif; ?>
       </tr>
