@@ -521,7 +521,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         // Make a request to the database because the OLE circ API is insufficient  
         $finesData = [];
         $sql = 'select pb.ole_ptrn_id, pb.ptrn_bill_id, ft.pay_status_id,
-                ft.due_dt_time, ft.check_in_dt_time_ovr_rd
+                ft.due_dt_time, ft.check_in_dt_time_ovr_rd, ft.check_in_dt_time
                 from ole_dlvr_ptrn_bill_t pb
                     left join ole_dlvr_ptrn_bill_fee_typ_t ft on pb.ptrn_bill_id = ft.ptrn_bill_id
                         where ole_ptrn_id = :id';
@@ -532,7 +532,12 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             while ($row = $stmt->fetch()) {
                 $finesData[$row['ptrn_bill_id']]['pay_status_id'] = $row['pay_status_id'];
                 $finesData[$row['ptrn_bill_id']]['duedate'] = $row['due_dt_time'];
-                $finesData[$row['ptrn_bill_id']]['returndate'] = $row['check_in_dt_time_ovr_rd'];
+                if ($row['check_in_dt_time_ovr_rd']) { 
+                    $finesData[$row['ptrn_bill_id']]['returndate'] = $row['check_in_dt_time_ovr_rd'];
+                }
+                else {
+                    $finesData[$row['ptrn_bill_id']]['returndate'] = $row['check_in_dt_time'];
+                }
             }
         }
         catch (Exception $e){
