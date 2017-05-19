@@ -118,7 +118,7 @@
         <? $totalDue += $record['balance']; ?>
       <? endif; ?>
     <? endforeach; ?>
-      <tr style="font-weight:bold"><td colspan="6"><?=$this->transEsc('Total Balance Due')?></td><td><?=$this->safeMoneyFormat($totalDue/100.00) ?></td></tr>
+      <tr style="font-weight:bold"><td colspan="6"><?=$this->transEsc('Total Balance Due: ')?></td><td><?=$this->safeMoneyFormat($totalDue/100.00) ?></td></tr>
     </table>
   <? endif; ?>
 </div>
