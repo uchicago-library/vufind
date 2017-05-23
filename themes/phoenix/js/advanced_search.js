@@ -115,7 +115,7 @@ $.fn.addSearch = function(term, field)
     { value: 'CallNumber', text: 'Call Number' },
     { value: 'StandardNumbers', text: 'ISBN, ISSN, etc.' },
     { value: 'Publisher', text: 'Publisher'},
-    { value: 'publication_place', text: 'Publication Place' },
+    { value: 'Publication Place', text: 'Publication Place' },
     { value: 'Series', text: 'Series' },
     { value: 'year', text: 'Year of Publication' },
     { value: 'toc', text: 'Table of Contents' },
