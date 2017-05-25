@@ -407,7 +407,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     l.ITM_ID AS item_id, i.HOLDINGS_ID AS holdings_id, h.BIB_ID AS bib_num, i.CURRENT_BORROWER AS borrower,
                     i.DUE_DATE_TIME AS duedate, l.CRTE_DT_TIME AS loaned_date, i.ITEM_STATUS_ID AS item_status_id,
                     l.NUM_OVERDUE_NOTICES_SENT AS overdue_notices_count, i.COPY_NUMBER AS copy_number, i.ENUMERATION AS enumeration,
-                    i.CHRONOLOGY AS chronology, h.CALL_NUMBER_PREFIX AS call_number_prefix, h.CALL_NUMBER AS call_number, 
+                    i.CHRONOLOGY AS chronology, h.CALL_NUMBER_PREFIX AS call_number_prefix, h.CALL_NUMBER AS call_number,
                     h.IMPRINT AS imprint, bib.CONTENT AS bib_data, i.BARCODE AS barcode,
                     loc.LOCN_NAME AS location_name,
                     l.NUM_RENEWALS AS number_of_renewals,
@@ -415,16 +415,17 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     it.itm_typ_cd, it.itm_typ_desc,
                     i.claims_returned,
                     r.loan_tran_id,
-                    r.ole_rqst_typ_id
+                    r.ole_rqst_typ_id,
+                    i.item_type_id, i.temp_item_type_id
                 FROM uc_people p
                 JOIN ole_dlvr_loan_t l ON p.id = l.OLE_PTRN_ID
                 JOIN ole_ds_item_t i ON i.BARCODE = l.ITM_ID
                 JOIN ole_ds_holdings_t h ON i.HOLDINGS_ID = h.HOLDINGS_ID
                 JOIN ole_ds_bib_t bib ON bib.BIB_ID = h.BIB_ID
                 LEFT JOIN ole_dlvr_rqst_t r on r.loan_tran_id = l.loan_tran_id
-                LEFT JOIN ole_cat_itm_typ_t it ON it.itm_typ_cd_id = i.item_type_id
+                LEFT JOIN ole_cat_itm_typ_t it ON it.itm_typ_cd_id = coalesce(i.temp_item_type_id, i.item_type_id)
                 LEFT JOIN ole_locn_t loc on loc.LOCN_CD = SUBSTRING_INDEX(h.LOCATION, \'/\', -1)
-                    WHERE p.library_id = :barcode 
+                    WHERE p.library_id = :barcode
                         AND i.CURRENT_BORROWER = p.id';
          try {
             /*Query the database*/
