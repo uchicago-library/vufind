@@ -13,7 +13,7 @@
   <? foreach ($this->fines as $fail): ?>
     <? if ($fail['balance'] > 0): ?>
        <? $badLevel += $fail['balance']; ?>
-       <? if ($badLevel >= 50): ?>
+       <? if ($badLevel / 100 >= 50): ?>
           <div class="alert alert-danger" role="alert">
             Your account has an outstanding balance of $50 or more. As a result, your borrowing and renewing privileges have been temporarily suspended.
           </div>
