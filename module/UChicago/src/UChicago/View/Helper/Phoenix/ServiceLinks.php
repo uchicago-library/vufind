@@ -275,6 +275,7 @@ class ServiceLinks extends AbstractHelper {
                              'INTRANSIT-FOR-HOLD',
                              'LOANED',
                              'LOST',
+                             'LOST-AND-PAID',
                              'MISSING',
                              'MISSING-FROM-MANSUETO',
                              'ONHOLD',
@@ -293,6 +294,7 @@ class ServiceLinks extends AbstractHelper {
                              'INTRANSIT-FOR-HOLD',
                              'LOANED',
                              'LOST',
+                             'LOST-AND-PAID',
                              'MISSING',
                              'MISSING-FROM-MANSUETO', 
                              'ONHOLD',
@@ -310,6 +312,7 @@ class ServiceLinks extends AbstractHelper {
                              'INTRANSIT-FOR-HOLD',
                              'LOANED',
                              'LOST',
+                             'LOST-AND-PAID',
                              'MISSING',
                              'MISSING-FROM-MANSUETO', 
                              'ONHOLD',
@@ -340,6 +343,7 @@ class ServiceLinks extends AbstractHelper {
                              'INPROCESS-MANSUETO',
                              'INTRANSITFORHOLD', //temp
                              'LOST',
+                             'LOST-AND-PAID',
                              'MISSING',
                              'MISSING-FROM-MANSUETO',
                              'ONHOLD', //temp
