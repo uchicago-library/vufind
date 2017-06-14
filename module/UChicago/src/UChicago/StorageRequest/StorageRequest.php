@@ -127,9 +127,21 @@ class StorageRequest
         $s = "<placeASRRequest/>";
         $xml = new SimpleXMLElement($s);
 
-        $xml->addChild('itemBarcode', $item['barcode']);
-        $xml->addChild('patronBarcode', $this->patron_barcode);
-        $xml->addChild('operatorId', $this->config['Catalog']['place_asr_request_operator_id']);
+        $itemBarcode = $item['barcode'];
+        $patronBarcode = $this->patron_barcode;
+        $operatorId = $this->config['Catalog']['place_asr_request_operator_id'];
+
+        // Test to see that we have all necessary components in hand
+        // This is a temporary test to see if vufind ever sends incomplete
+        // information to OLE, causing requests to back up in the queue and fail
+        if (!$itemBarcode || !$patronBarcode || !$operatorId || !$location) { 
+            $msg = sprintf('Item barcode: %s, Patron barcode: %s, Operator ID: %s, Location: %s', $itemBarcode, $patronBarcode, $operatorId, $location);
+            error_log($msg);
+        }
+
+        $xml->addChild('itemBarcode', $itemBarcode);
+        $xml->addChild('patronBarcode', $patronBarcode);
+        $xml->addChild('operatorId', $operatorId);
         $xml->addChild('pickUpLocation', $location);
 
 		$request = new Request();
