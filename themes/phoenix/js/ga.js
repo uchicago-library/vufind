@@ -464,6 +464,16 @@ $(document).ready(function() {
             var text = $(this).text();
             cataloglinkclick('send', 'event', 'useInstead', text, $(this), e);
         });
+
+		/**************************************** 
+		 ************ MISCELLANEOUS *************
+		 ****************************************/
+
+        /* WorldCat Links */
+        $('a.mini-worldcat-link').on('click', function(e) {
+            var query_string = $(this).attr('href').replace(/^.*\?/, '');
+            cataloglinkclick('send', 'event', 'worldCatSearch', query_string, $(this), e);
+        });
 	
 		/**************************************** 
 		 ************* RECORD VIEW **************
