@@ -1,3 +1,10 @@
+/* Add the startswWith method to IE11 */
+if (!String.prototype.startsWith) {
+    String.prototype.startsWith = function(searchString, position){
+      position = position || 0;
+      return this.substr(position, searchString.length) === searchString;
+  };
+}
 function getAlert(){
     var api = 'https://www.lib.uchicago.edu/api/v1/pages/?type=alerts.AlertPage&fields=title,banner_message,more_info,alert_level,url&format=json';
     json = $.getJSON(api, function(data) {
