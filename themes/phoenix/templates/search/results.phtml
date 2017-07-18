@@ -112,6 +112,7 @@
         <? else: ?>
           <? $this->layout()->srmessage = $this->transEsc('nohit_prefix') . ' - ' . $this->escapeHtml($lookfor) . ' - ' . $this->transEsc('nohit_suffix'); ?>
           <?=$this->layout()->srmessage ?>
+          <br/><br/><a class="btn btn-primary" href="http://forms2.lib.uchicago.edu/lib/worldcatlookup/?<?php echo $_SERVER['QUERY_STRING']; ?>">Repeat search in WorldCat</a><br/><br/>
         <? endif; ?>
       </p>
       <? if (isset($this->parseError)): ?>
