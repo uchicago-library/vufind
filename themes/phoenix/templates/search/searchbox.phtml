@@ -76,7 +76,7 @@
       <a href="#" class="btn btn-link mini-box-toggle browse"><?=$this->transEsc("Browse")?></a> | <a href="<?=$this->url($advSearch)?>" class="btn btn-link mini-adv-link"><?=$this->transEsc("Advanced")?></a>
     <? endif; ?>
     |
-    <a class="mini-worldcat-link" href="http://forms2.lib.uchicago.edu/lib/worldcatlookup/?<?php echo $_SERVER['QUERY_STRING']; ?>">Repeat search in WorldCat</a>
+    <a class="mini-worldcat-link btn btn-link" href="http://forms2.lib.uchicago.edu/lib/worldcatlookup/?<?php echo $_SERVER['QUERY_STRING']; ?>">Repeat search in WorldCat</a>
 
     <? $shards = $options->getShards(); if ($options->showShardCheckboxes() && !empty($shards)): ?>
       <?
