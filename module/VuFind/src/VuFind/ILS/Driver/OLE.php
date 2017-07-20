@@ -1078,8 +1078,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['location'] = (!empty($itemLocation) ? $itemLocation : $holdingLocation);
                 $item['reserve'] = '';
                 $item['callnumbertypeid'] = $itemCallNumTypeId;
-                $item['callnumber'] = (!empty($itemCallNum) ? $itemCallNum : $holdingCallNum);
-                $item['duedate'] = (isset($row['DUE_DATE_TIME']) ? $row['DUE_DATE_TIME'] : 'Indefinite') ;
+                $item['callnumber'] = $holdingCallNum;
+                $item['duedate'] = (isset($row['DUE_DATE_TIME']) ? $row['DUE_DATE_TIME'] : 'Indefinite');
                 $item['returnDate'] = '';
                 $item['number'] = $copyNum . ' : ' . $enumeration;
                 $item['requests_placed'] = '';
@@ -1093,7 +1093,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['sort'] = preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
                 $item['itemTypeCode'] = $row['itype_code'];
                 $item['itemTypeName'] = $itemTypeName;
-                $item['callnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : $holdingCallNumDisplay);
+                $item['callnumberDisplay'] = $holdingCallNumDisplay;
+                $item['itemCallnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : null);
                 $item['locationCodes'] = (!empty($itemLocCodes) ? $itemLocCodes : $holdingLocCodes);
     
                 $items[] = $item;
@@ -1411,7 +1412,6 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 //print_r($row);
 
                 /*Convenience variables.*/
-                $shelvingLocation = $row['locn_name'];
                 $holdingCallNumTypeId = trim($row['call_number_type_id']);
                 $holdingCallNum = trim($row['call_number']);
                 $holdingCallNumDisplay = trim($row['call_number_prefix'] . ' ' . $row['call_number']);
@@ -1424,6 +1424,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $hasUnboundItems = intval($row['ser_rcv_rec_count']) > 0;
                 $holdingId = $row['holdings_id'];
                 $locationCodes = $row['location'];
+                $shelvingLocation = $row['locn_name'] . ' - ' . $holdingId;
 
                 /*Get e-holdings if they exist*/
                 /*if ($hasEholdings) {

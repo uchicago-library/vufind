@@ -105,6 +105,7 @@
 
 <h3>
   <? $locationText = $this->transEsc('location_' . $holding['location'], [], $holding['location']); ?>
+  <? $locationText = strpos($locationText, '-') ? substr($locationText, 0, strpos($locationText, '-')) : $locationText; ?>
   <? if (isset($holding['locationhref']) && $holding['locationhref']): ?>
     <a href="<?=$holding['locationhref']?>" target="_blank"><?=$locationText?></a>
   <? else: ?>
@@ -246,6 +247,14 @@
                   <? endforeach; ?>
                 </ul>
               </div>
+            <? endif; ?>
+            <? if (isset($row['itemCallnumberDisplay'])): ?>
+              <br/>
+              <span class="location-change">
+                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                <strong>Shelved as:</strong>
+                <?=$row['itemCallnumberDisplay']?>
+              </span>
             <? endif; ?>
           <? endif; ?>
           <? /* Embed item structured data: library, barcode, call number */ ?>
