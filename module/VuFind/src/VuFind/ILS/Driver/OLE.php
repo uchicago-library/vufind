@@ -1318,7 +1318,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $unboundLocCodes = $row['unbound_loc_codes'];
 
                 $item['id'] = $id;
-                $item['location'] = (!empty($unboundLocation) ? $unboundLocation : $holdingLocation);
+                $item['location'] = $holdingLocation;
                 $item['locationCodes'] = $unboundLocCodes;
                 $item['availability'] = true;
                 $item['status'] = 'AVAILABLE';
