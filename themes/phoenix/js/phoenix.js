@@ -205,7 +205,7 @@ $(document).ready(function() {
     var hideSummaryText = 'Hide holdings <i class="fa fa-arrow-circle-down"></i>'; 
 
     // Links to display for various states
-    var viewItems = '<a href="#" class="itemsToggle text-success">' + viewItemsText + '</a>';
+    var viewItems = '<tr><td colspan="3"><a href="#" class="itemsToggle text-success">' + viewItemsText + '</a></td></tr>';
     var hideItems = '<a href="#" class="itemsToggle text-success">' + hideItemsText + '</a>';
     var viewSummary = '<a href="#" class="summaryToggle text-success">' + viewSummaryText + '</a>';
     var hideSummary = '<a href="#" class="summaryToggle text-success">' + hideSummaryText + '</a>';
@@ -235,9 +235,9 @@ $(document).ready(function() {
                 // Show the view link if possible
                 //$(this).parent().parent().parent().find('.itemsToggle').removeClass('hide');
 
-                // If there isn't already a link 
+                // If there isn't already a link
                 if(!hasLink > 0 ){
-                    $(this).parent().find('.itemsToggleTarget td').append(viewItems);
+                    $(this).parent().find('.itemsToggleTarget').after(viewItems);
                     hasLink = true;
                 }
             }
@@ -245,7 +245,7 @@ $(document).ready(function() {
         });
 
         // Loop over holdings_text_fields (summary holdings)
-        $(this).find('td').each(function(){
+        /*$(this).find('td').each(function(){
             hasLink = false;
             var i = 1;
             $(this).find('[typeof="Enumeration"]').each(function(){
@@ -269,8 +269,7 @@ $(document).ready(function() {
                 }
                 i++;
             });
-        });
-
+        });*/
 
     });
 
