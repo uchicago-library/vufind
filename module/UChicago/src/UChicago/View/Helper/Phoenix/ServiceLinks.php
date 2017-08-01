@@ -560,7 +560,7 @@ class ServiceLinks extends AbstractHelper {
     public function maps($bib, $barcode) {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/maplookup/maplookup.php?bib=' .  $bib . '&amp;barcode=' . $barcode;
         $serviceLink = $this->getLinkConfig('maps', $defaultUrl); 
-        $displayText = '(Map/guide)';
+        $displayText = '<i class="fa fa-map-marker" aria-hidden="true"></i> Map/guide';
         if ($serviceLink and !empty($barcode)) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }

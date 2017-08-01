@@ -1081,7 +1081,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['callnumber'] = $holdingCallNum;
                 $item['duedate'] = (isset($row['DUE_DATE_TIME']) ? $row['DUE_DATE_TIME'] : 'Indefinite');
                 $item['returnDate'] = '';
-                $item['number'] = $copyNum . ' : ' . $enumeration;
+                $item['number'] = $enumeration;
                 $item['requests_placed'] = '';
                 $item['barcode'] = $row['barcode'];
                 $item['item_id'] = $row['item_id'];
@@ -1093,7 +1093,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['sort'] = preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
                 $item['itemTypeCode'] = $row['itype_code'];
                 $item['itemTypeName'] = $itemTypeName;
-                $item['callnumberDisplay'] = $holdingCallNumDisplay;
+                $item['callnumberDisplay'] = $holdingCallNumDisplay . ' ' . $copyNum;
                 $item['itemCallnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : null);
                 $item['locationCodes'] = (!empty($itemLocCodes) ? $itemLocCodes : $holdingLocCodes);
     
@@ -1199,7 +1199,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     $summary['location'] = $location;
                     //$summary['notes'] = array($summary->note[0]->value);
                     //$summary['summary'] = array($summary->textualHoldings);
-                    $summary['library has'] = ($summaryType == 'Basic Bibliographic Unit' ? array($row['TEXT'] . ' ' . $row['note']) : null);
+                    $summary['issues'] = ($summaryType == 'Basic Bibliographic Unit' ? array($row['TEXT'] . ' ' . $row['note']) : null);
                     $summary['indexes'] =  ($summaryType == 'Indexes' ? array($row['TEXT'] . ' ' . $row['note']) : null);
                     $summary['supplements'] = ($summaryType == 'Supplementary Material' ? array($row['TEXT'] . ' ' .$row['note']) : null);
                     $summary['availability'] = true;
@@ -1318,7 +1318,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $unboundLocCodes = $row['unbound_loc_codes'];
 
                 $item['id'] = $id;
-                $item['location'] = $holdingLocation;
+                $item['location'] = $holdingLocation . ' - unbound';
                 $item['locationCodes'] = $unboundLocCodes;
                 $item['availability'] = true;
                 $item['status'] = 'AVAILABLE';
@@ -1329,13 +1329,13 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 /*Filter out summary holdings. These will be returned
                 along with the getSummaryHoldings method.*/
                 if (!in_array($row['RCV_REC_TYP'], $summaryTypes)) {
-                    $item['unbound'] = $row['enum'] . $row['chron'];
+                    $item['unbound issues'] = $row['enum'] . $row['chron'];
                 }
                 $item['note'] = $row['note'];
 
                 /*Append the proper types for summary holdings*/
                 $item['indexes'] = ($type == 'Index' ? array($row['enum'] . ' ' . $row['chron'],  '') : null);
-                $item['supplements'] = ($type == 'Supplementary' ? array($row['enum'] . ' ' . $row['chron'],  '') : null);
+                $item['unbound supplements'] = ($type == 'Supplementary' ? array($row['enum'] . ' ' . $row['chron'],  '') : null);
 
                 if (!empty($item)) {
                     $items[] = $item;
@@ -1433,6 +1433,14 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                         $items[] = $eHolding;
                     }
                 }*/
+
+                /*Get serials receiving data*/
+                if ($hasUnboundItems) {
+                    $unboundSerials = $this->getSerialReceiving($id, $holdingId, $shelvingLocation, $holdingCallNum, $holdingCallNumDisplay);
+                    foreach($unboundSerials as $unboundItem) {
+                        $items[] = $unboundItem;
+                    }
+                }
                 
                 /*Build a mock item for each of the holdings if no items exist*/
                 if(((!$hasItems or $hasHoldingNote) and (!empty($shelvingLocation))) and !$hasEholdings) { 
@@ -1474,13 +1482,6 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     $items[] = $oleItem;
                 }
 
-                /*Get serials receiving data*/
-                if ($hasUnboundItems) {
-                    $unboundSerials = $this->getSerialReceiving($id, $holdingId, $shelvingLocation, $holdingCallNum, $holdingCallNumDisplay);
-                    foreach($unboundSerials as $unboundItem) {
-                        $items[] = $unboundItem;
-                    }
-                }
             }
 
         }
@@ -1553,7 +1554,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['callnumber'] = (!empty($itemCallNum) ? $itemCallNum : $holdingCallNum);
                 $item['duedate'] = (isset($row['DUE_DATE_TIME']) ? $row['DUE_DATE_TIME'] : 'Indefinite') ;
                 $item['returnDate'] = '';
-                $item['number'] = $copyNum . ' : ' . $enumeration;
+                $item['number'] = $enumeration;
                 $item['requests_placed'] = '';
                 $item['barcode'] = $row['BARCODE'];
                 $item['item_id'] = $row['ITEM_ID'];
