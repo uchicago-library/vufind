@@ -248,7 +248,7 @@
               <? if ($row['status'] == 'ANAL'): ?>
                  To check availability
                  <? $c = array_shift(explode(' ', $this->driver->getCallNumber())); ?>
-                 <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc">consult the series record</a>.
+                 <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc&consult=true">consult the series record</a>.
               <? else: ?>
               <span class="text-danger"><?=$this->transEsc($row['status_name'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
               <? if (isset($row['returnDate']) && $row['returnDate']): ?>&ndash; <span class="small"><?=$this->escapeHtml($row['returnDate'])?></span><? endif; ?>
