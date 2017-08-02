@@ -1093,7 +1093,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['sort'] = preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
                 $item['itemTypeCode'] = $row['itype_code'];
                 $item['itemTypeName'] = $itemTypeName;
-                $item['callnumberDisplay'] = $holdingCallNumDisplay . ' ' . $copyNum;
+                $item['callnumberDisplay'] = $holdingCallNumDisplay;
                 $item['itemCallnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : null);
                 $item['locationCodes'] = (!empty($itemLocCodes) ? $itemLocCodes : $holdingLocCodes);
     
@@ -1412,9 +1412,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 //print_r($row);
 
                 /*Convenience variables.*/
+                $copyNum = trim($row['copy_number']);
                 $holdingCallNumTypeId = trim($row['call_number_type_id']);
                 $holdingCallNum = trim($row['call_number']);
-                $holdingCallNumDisplay = trim($row['call_number_prefix'] . ' ' . $row['call_number']);
+                $holdingCallNumDisplay = trim($row['call_number_prefix'] . ' ' . $row['call_number'] . ' ' . $copyNum);
                 $holdingNotes = explode('::|::', $row['note']);
                 $hasAnalytics = isset($row['analytic_count']) ? intval($row['analytic_count']) > 0 : null;
                 $hasExtOwnership = intval($row['ext_ownership_count']) > 0;
