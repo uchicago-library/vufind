@@ -223,7 +223,7 @@
           <? else: ?>
             <? if ($row['availability']): ?>
               <? /* Begin Available Items (Holds) */ ?>
-               <? if (isset($row['itemTypeCode']) && $row['itemTypeCode'] != "stks"):?>
+               <? if (isset($row['itemTypeCode'])):?>
                   <span>Loan period: <?=$row['itemTypeName']?>&nbsp;</span>
                <?endif;?>
 

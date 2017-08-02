@@ -1024,7 +1024,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         /*Get items by holding id*/
         $sql = 'SELECT i.ITEM_ID AS item_id, i.HOLDINGS_ID AS holdings_id, i.BARCODE AS barcode, i.URI AS uri, 
                     i.ITEM_TYPE_ID AS item_type_id, i.TEMP_ITEM_TYPE_ID as temp_item_type_id, 
-                    itype.ITM_TYP_CD AS itype_code, itype.ITM_TYP_NM AS itype_name, 
+                    itype.ITM_TYP_CD AS itype_code, itype.ITM_TYP_DESC AS itype_desc, 
                     istat.ITEM_AVAIL_STAT_CD AS status_code, istat.ITEM_AVAIL_STAT_NM AS status_name,
                     i.LOCATION AS location, loc.LOCN_NAME AS locn_name,
                     i.CALL_NUMBER_TYPE_ID, i.CALL_NUMBER_PREFIX, i.CALL_NUMBER, i.ENUMERATION, i.CHRONOLOGY, i.COPY_NUMBER, 
@@ -1065,8 +1065,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $itemCallNumDisplay = (!empty($row['CALL_NUMBER_PREFIX']) ? trim($row['CALL_NUMBER_PREFIX']) . ' ' . $callnumber : null);
                 $itemCallNum = (isset($row['CALL_NUMBER']) ? trim($row['CALL_NUMBER']) : null);
                 $holdtype = ($available == true) ? "hold":"recall";
-                $itemTypeArray = ($row['itype_name'] ? explode('-', $row['itype_name']) : array());
-                $itemTypeName = trim($itemTypeArray[1]);
+                $itemTypeName = trim($row['itype_desc']);
                 $itemLocation = $row['locn_name'];
                 $itemLocCodes = $row['location'];
                               
