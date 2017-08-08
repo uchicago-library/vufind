@@ -1089,7 +1089,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['holdtype'] = $holdtype;
                 /*UChicago specific?*/
                 $item['claimsReturned'] = ($row['CLAIMS_RETURNED'] == 'Y' ? true : false);
-                $item['sort'] = preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
+                $item['sort'] = $enumeration;
                 $item['itemTypeCode'] = $row['itype_code'];
                 $item['itemTypeName'] = $itemTypeName;
                 $item['callnumberDisplay'] = $holdingCallNumDisplay;
@@ -1117,29 +1117,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         }
 
         /*Sort numerically by copy/volume number.*/
-        usort($items, function($a, $b) { return OLE::cmp($a['sort'], $b['sort']); });
+        usort($items, function($a, $b) { return strnatcasecmp($a['sort'], $b['sort']); });
         return $items;
     }
 
-    /**
-     * A trivial helper method used in getItems as a comparison 
-     * callback for usort in ordering item lists by a definied 
-     * sort key. This should be removed, along with usort and 
-     * the $item['sort'] key in getItems once the DB is returning 
-     * things in the proper order.
-     *
-     * @param $a string, formatted copy/volume numbers in the 
-     * $item['sort'] key for each item in he items array.
-     * @param $b same as $a
-     *
-     * returns -1, 0, or 1
-     */
-    public function cmp($a, $b) {
-        if ($a == $b) {
-            return 0;
-        }
-        return ($a < $b) ? -1 : 1;
-    }
 
     /**
      * Get Summary of Holdings
@@ -1317,7 +1298,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $unboundLocCodes = $row['unbound_loc_codes'];
 
                 $item['id'] = $id;
-                $item['location'] = $holdingLocation . ' - unbound';
+                $item['location'] = $holdingLocation;
                 $item['locationCodes'] = $unboundLocCodes;
                 $item['availability'] = true;
                 $item['status'] = 'AVAILABLE';
@@ -1563,7 +1544,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['holdtype'] = $holdtype;
                 /*UChicago specific?*/
                 $item['claimsReturned'] = ($row['CLAIMS_RETURNED'] == 'Y' ? true : false);
-                $item['sort'] = preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
+                $item['sort'] = $item['sort'] = preg_replace("/[^A-Za-z0-9]/", '', $copyNum . $enumeration); //preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
                 $item['itemTypeCode'] = $row['ITM_TYP_CD'];
                 $item['itemTypeName'] = $itemTypeName;
                 $item['callnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : $holdingCallNumDisplay);
