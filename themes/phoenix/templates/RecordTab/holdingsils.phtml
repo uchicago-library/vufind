@@ -112,7 +112,6 @@
   <? // Break it into component parts and use it for different purposes ?>
   <? $rawLocationText = $this->transEsc('location_' . $holding['location'], [], $holding['location']); ?>
   <? $lTextArray = explode('-', $rawLocationText); ?>
-  <? $isUnbound = (trim(end($lTextArray)) == 'unbound'); ?>
   <? $locationText = $lTextArray[0]; ?>
   <? if (isset($holding['locationhref']) && $holding['locationhref']): ?>
     <a href="<?=$holding['locationhref']?>" target="_blank"><?=$locationText?></a>
@@ -147,43 +146,52 @@
 
 
   <? if (isset($holding['textfields'])): ?>
-    <? if ($isUnbound): ?>
-      <h5>Availability:</h5>
-      <? foreach ($holding['textfields'] as $textFieldName => $textFields): ?>
-        <table class="holdings-table table unbound" data-display="<?=$this->tab->getDisplayNumber()?>">
-          <thead><tr><th colspan="3"><h6><?=$this->transEsc(ucfirst($textFieldName))?></h6></th></tr></thead>
-          <tbody>
-            <? foreach ($textFields as $current): ?>
-              <tr vocab="http://schema.org/" typeof="Offer">
-                <th><?=$this->escapeHtml($current)?></th>
-                <td>
-                  Check shelf for availability
-                  <link property="availability" href="http://schema.org/InStock"/>
-                  <span class="loan-period">Unbound, non-renewable</span>
-                </td>
-              </tr>
-            <? endforeach;?>
-          </tbody>
-        </table>
-      <? endforeach;?> 
-    <? else: ?>
+      <? $unboundIssues = []; ?>
       <div class="section row libraryhas">
         <h5>Library has:</h5>
         <? foreach ($holding['textfields'] as $textFieldName => $textFields): ?>
-        <? // Translation for summary is a special case for backwards-compatibility ?>
-        <div class="col-sm-4">
-          <h6><?=$textFieldName == 'summary' ? $this->transEsc("Volume Holdings") : $this->transEsc(ucfirst($textFieldName))?></h6>
-          <ul>
-          <? foreach ($textFields as $current): ?>
-            <li typeof="Enumeration"><?=$this->escapeHtml($current)?></li>
-          <? endforeach; ?>
-          </ul>
-        </div>
-        <? endforeach;?> 
+          <? $isUnbound = $textFieldName == 'unbound supplements' || $textFieldName == 'unbound issues'; ?>
+          <? if (!$isUnbound): ?>
+            <? // Translation for summary is a special case for backwards-compatibility ?>
+            <div class="col-sm-4">
+              <h6><?=$textFieldName == 'summary' ? $this->transEsc("Volume Holdings") : $this->transEsc(ucfirst($textFieldName))?></h6>
+              <ul>
+              <? foreach ($textFields as $current): ?>
+                <li typeof="Enumeration"><?=$this->escapeHtml($current)?></li>
+              <? endforeach; ?>
+              </ul>
+            </div>
+          <? else: ?>
+            <? $unboundIssues['textfields'] = [$textFieldName => $textFields]; ?>
+          <? endif; ?>
+        <? endforeach;?>
       </div>
-    <? endif; ?>
+
+      <? if ($unboundIssues): ?>
+        <? foreach ($unboundIssues['textfields'] as $textFieldName => $textFields): ?>
+          <table class="holdings-table table unbound" data-display="<?=$this->tab->getDisplayNumber()?>">
+            <thead><tr><th colspan="3"><h5><?=$this->transEsc(ucfirst($textFieldName))?></h5></th></tr></thead>
+            <tbody>
+              <? foreach ($textFields as $current): ?>
+                <tr vocab="http://schema.org/" typeof="Offer">
+                  <th><?=$this->escapeHtml($current)?></th>
+                  <td>
+                    Check shelf for availability
+                    <link property="availability" href="http://schema.org/InStock"/>
+                    <span class="loan-period">Unbound, non-renewable</span>
+                  </td>
+                </tr>
+              <? endforeach;?>
+            </tbody>
+          </table>
+        <? endforeach;?>
+      <? endif; ?>
+ 
   <? endif; ?>
 
+<? if ($holding['items']): ?>
+    <h5>Availability:</h5>
+<? endif; ?>
 <table class="holdings-table table" data-display="<?=$this->tab->getDisplayNumber()?>">
   <caption><?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?></caption>
   <!--<tr>
