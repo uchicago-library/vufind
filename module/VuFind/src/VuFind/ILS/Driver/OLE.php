@@ -446,11 +446,11 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         switch ($sort) {
             case 'dueDate':
                 /*By duedate*/
-                uasort($transList, function($a, $b) { return OLE::cmp(OLE::sortDate($a['duedate']), OLE::sortDate($b['duedate'])); });
+                uasort($transList, function($a, $b) { return strnatcasecmp($a['duedate'], $b['duedate']); });
                 break;
             case 'loanedDate' :
                 /*By date checked out*/
-                uasort($transList, function($a, $b) { return OLE::cmp(OLE::sortDate($a['loanedDate']), OLE::sortDate($b['loanedDate'])); });
+                uasort($transList, function($a, $b) { return strnatcasecmp($a['loanedDate'], $b['loanedDate']); });
                 break;
             case 'author':
                 /*Alphabetical by author*/
@@ -1558,7 +1558,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         }
 
         /*Sort numerically by copy/volume number.*/
-        usort($items, function($a, $b) { return OLE::cmp($a['sort'], $b['sort']); });
+        usort($items, function($a, $b) { return strnatcasecmp($a['sort'], $b['sort']); });
         return $items;
     }
 
