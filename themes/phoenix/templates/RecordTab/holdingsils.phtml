@@ -287,14 +287,9 @@
               <? /* Begin Items that are either Available or Unavailable */ ?>
                 <?=$this->ServiceLinks()->aeon($row)?>
                 <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib, $row)?>
-            <? if (isset($row['item_notes'])): ?>
+            <? if (isset($row['itemNotes'])): ?>
               <div class="item-notes">
-                <b><?=$this->transEsc("Item Notes")?>:</b>
-                <ul>
-                  <? foreach ($row['item_notes'] as $item_note): ?>
-                    <li><?=$this->escapeHtml($item_note) ?></li>
-                  <? endforeach; ?>
-                </ul>
+                <?=$row['itemNotes']?>
               </div>
             <? endif; ?>
             <? if (isset($row['itemCallnumberDisplay'])): ?>
