@@ -133,7 +133,6 @@
    <a href="<?= $this->url('home')?>alphabrowse/Home?source=<?=$source?>&amp;from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
       class="ablink"><?=$callNumDisplayText?></a><br/>
  <? endforeach; ?>
-  
 </div><!--/.locpanel-heading-->
 
 <div class="holdings-unit">
@@ -255,7 +254,12 @@
               <? /* Begin Unavailable Items (Recalls) */ ?>
               <? if ($row['status'] == 'ANAL'): ?>
                  To check availability
-                 <? $c = array_shift(explode(' ', $this->driver->getCallNumber())); ?>
+                 <? $callNumBreak = strstr($callNos['sort'][$numKey], ' ', true); ?>
+                 <? if ($callNumBreak): ?>
+                   <? $c = $callNumBreak; ?>
+                 <? else: ?>
+                   <? $c = $callNos['sort'][$numKey]; ?>
+                 <? endif; ?>
                  <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc&consult=true">consult the series record</a>.
               <? else: ?>
               <span class="text-danger"><?=$this->transEsc($row['status_name'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
