@@ -1,0 +1,422 @@
+a {
+  color: #437e9b;
+  &:hover {
+    color: #47B5FF;
+  }
+}
+
+h1 {
+  font-size:2em;
+  margin-bottom: 0;
+}
+
+h2 {
+  font-size: 17px;
+  line-height: 17px;
+  margin: 0.5em 0;
+}
+h3  {
+  font-size: 1.3em;
+}
+
+h4 {
+  //margin-left: 0.5em;
+  font-weight: 600;
+  color: #4c3b3a;
+}
+
+h5 {
+  font-size: 1.2em;
+  color: #670000;
+  margin: 1em 0 0 0.35em;
+  font-style: italic;
+  & + h6 {
+    margin-top: 0.5em;
+  }
+}
+
+h6 {
+  font-size: 1.3em;
+  margin: 1.3em 0 0.5em 0;
+  border-bottom: 1px solid #eee;
+}
+
+@media (max-width: 767px) {
+  .navbar > ul { // compile override
+    display: inline;
+    float: none;
+    a {
+      font-size: 1.2em;
+    }
+  }
+}
+
+span.author {
+  font-size: 0.65em;
+  display: block;
+  padding: 0.25em 0 0.75em;
+}
+
+.text-center img {
+  padding-top: 1.5em;
+  max-height: 20em;
+}
+
+.bookplate {
+  margin: 0.75em 1em;
+  img {
+    max-height: 10em;
+    margin-bottom: 0.5em;
+    display: block;
+  }
+}
+
+dl {
+  font-size: 1.1em;
+  padding-top: 1em;
+  color: #5F574F;
+  dt, dd {
+    line-height: 2em;
+  }
+}
+
+.holdings-cover {
+  padding-left: 0;
+  padding-bottom: 1em;
+}
+
+.holdings-availpanel {
+  padding: 1.5em;
+  //border: 1px solid #8A9045;
+  //border-radius: 1em;
+  .availpanel-heading {
+    font-size: 1.5em;
+    font-weight: 600;
+    &.yes {
+      color: #616530;
+    }
+    &.no {
+      color: #7c0000;
+    }
+  }
+  .label {
+    color: #5F574F;
+    font-size: 1.5em;
+    font-weight: 300;
+    float: left;
+    padding: 0;
+    margin: 0.5em 1.5em 0.5em 0;
+    .value {
+      font-weight: 600;
+    }
+  }
+}
+
+.includes {
+  font-style: italic;
+}
+
+.btn-request {
+  background-color: #e7e8d9;
+  border-color: #ddd;
+  margin: 1em 0;
+  & + & {
+    margin-left: 1em;
+  }
+}
+
+.btn-browse {
+  .btn-request;
+  background-color: #e3dfd5;
+}
+
+.holdings-locpanel {
+  padding: 0;
+  border: 1px solid #ddd;
+  margin-bottom: 1em;
+  .locpanel-heading {
+    background: #d0d2b4;
+    padding: 0.05em 1em;
+    margin-bottom: 0;
+    h2 {
+      display:inline-block;
+      font-size: 1.1em;
+    }
+    h3 {
+      font-size: 1.35em;
+      font-weight: 600;
+      margin: 0 0 0.5em!important; //compiled override
+      display: inline-block!important; //compiled override
+      span {
+        font-weight: normal;
+      }
+    }
+    a {
+      color: #155f83;
+      text-decoration: underline;
+      margin-left:0.75em;
+    }
+    &.online {
+      background-color: #d9e7e8;
+    }
+  }
+}
+
+.holdings-unit {
+  padding: 0em 1em 1em; //compiled override
+  border-bottom: none;
+  border-top: 1px dashed #ddd;
+  &:nth-child(even) { //compiled override
+    background: none;
+  }
+  .btn-info {
+    font-size: 0.75em;
+    padding: 6px;
+    margin-bottom: 0.75em;
+    margin-left: 0.5em;
+  }
+}
+
+.dl-horizontal {
+  dt {
+    width: 150px;
+  }
+  dd {
+    margin-left: 160px;
+  }
+}
+
+.notes, .location-change {
+  display: block;
+}
+
+.loan-period {
+  margin-left: 2em;
+  color: #000;
+}
+
+.text-success, .text-danger, {
+  font-size: 1.1em;
+  padding-right: 1.2em;
+  display: block;
+}
+
+.text-unknown {
+  color: #b77512;
+  font-size: 1.1em;
+  display: block;
+}
+
+.item-loc {
+  display: block;
+  font-style: italic;
+  line-height: 2em;
+}
+
+.location-change {
+  color: maroon;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+a.location-maplink {
+  text-decoration: underline;
+  margin-left: 1em;
+  &:after {
+    content: none;
+  }
+}
+
+.holdings-notes {
+  text-decoration: italic;
+  margin: 0.75em 0.5em 0.5em;
+}
+
+a.summaryToggle {
+  font-size: 1.05em;
+  margin-top: 0.25em;
+}
+
+ a.itemsToggle {
+  font-size: 1em;
+//     margin-top: 1em;
+//     padding-top: 0.5em;
+//     border-top: 1px dashed;
+ }
+
+a.eLink {
+  font-size: 1.2em;
+  padding-top: 7px;
+  display: block;
+}
+
+.explore-list {
+  padding-left: 0;
+  list-style: none;
+  li {
+    margin: 0.7em 0;
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
+a.service.external, a.service {
+  padding-right: 15px;
+  white-space: nowrap;
+  margin: 0;
+}
+
+a.bibToggle { //custom override
+    margin-top: 0;
+}
+
+.template-name-view span { //custom override
+    font-weight: inherit;
+}
+
+/***** TABLES ******/
+
+
+table {
+  background: transparent;
+  width: 100%;
+  padding: 1em 0 0; 
+  line-height: 1.5em;
+  table-layout: auto !important;
+  word-wrap: normal;
+  thead h6 {
+    margin-top: 0;
+  }
+  .notes {
+    //line-height: 0.2em;
+    font-style: italic;
+  }
+  & th {
+    padding-left: 1em;
+    padding-bottom: 0.3em;
+    width: 155px;
+  }
+  & tr {
+    line-height: 1.5em;
+    // &:first-child {
+    //   & td {
+    //     padding-top: 0;
+    //   }
+    // }
+    &[typeof="Offer"] {
+      th {
+        width: 10%;
+        white-space: nowrap;
+      }
+      &:nth-child(even) {
+        background-color: #eee;
+      }
+    }
+  }
+  & td {
+    padding: 0.8em;   
+    &:last-child {
+      vertical-align: top;
+    }
+  }
+  & + table { //sibling tables
+    border-top: 1px solid #ddd;
+    th {
+      padding-top: 1em!important;
+    }
+  }
+  .call-header {
+    border-bottom: 1px solid #ddd;
+  }
+}
+
+table.holdins-unit tr.section div {
+  line-height: 1.55em;
+}
+
+.libraryhas {
+  margin: 1em auto;
+  padding-bottom: 0;
+  background-color: #f3f3ec;
+  border: 1px solid #dbddc7;
+  ul {
+    list-style: none;
+    list-style-type: none;
+    padding-left: 1em;
+    text-indent: -1em;
+  }
+  h5 {
+    padding-left: 0.75em;
+  }
+  h6 {
+    font-size: 1.1em;
+    border-bottom: 1px solid #642822;
+    margin-top: 0.25em;
+  }
+}
+
+#holdings-tab table tr  { //compiled override
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+}
+
+#holdings-tab table th, #holdings-tab table td { //compiled override
+  padding-top: 0;
+  padding-bottom: 0;
+  @media(min-width: 544px) {
+    padding-top: 0.45em;
+    padding-bottom: 0.45em;
+  }
+}
+
+.holdings-table tbody > tr > th {
+  border-top: none;
+   @media(min-width: 544px) {
+    padding-left: 1.5em;
+  }
+}
+
+table.holdings-table+table.holdings-table {
+  thead>tr>th {
+    padding-top: 2em!important;
+  }
+}
+
+// Bullshit to overide all the base styles
+.table > tbody > tr > td {
+  border-top: none;
+}
+
+
+/* responsive table */
+@media screen and (max-width: 480px) {
+  table, tbody {
+      display: block;
+      width: 100%;
+  }
+
+  table {
+    tr, th, td {
+      display: block;
+      padding: 0;
+      text-align: left;
+      white-space: normal;
+      width: 100%;
+    }
+  }
+
+  tr[typeof="Offer"] th,
+  #holdings-tab .holdings-table th,
+  div[resource="#record"] .table > tbody > tr > th,
+  div[resource="#record"] .table > tbody > tr > td {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+
+
+
+
+
