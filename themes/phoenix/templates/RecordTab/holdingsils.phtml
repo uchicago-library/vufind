@@ -120,6 +120,24 @@
   <? endif; ?>
 </h2>
 
+<? /* Loop over textual (summary) holdings and separate them for later use */?>
+<? if (isset($holding['textfields'])): ?>
+  <? $unboundIssues = []; ?>
+  <? $holdingsNotes = []; ?>
+  <? $otherTextualHoldings = []; ?>
+    <? foreach ($holding['textfields'] as $textFieldName => $textFields): ?>
+      <? $isUnbound = $textFieldName == 'unbound supplements' || $textFieldName == 'unbound issues'; ?>
+      <? $isHoldingsNotes = $textFieldName == 'holdings notes'; ?>
+      <? if ($isHoldingsNotes): ?>
+        <? $holdingsNotes['textfields'] = [$textFieldName => $textFields]; ?>
+      <? elseif ($isUnbound): ?>
+        <? $unboundIssues['textfields'] = [$textFieldName => $textFields]; ?>
+      <? else: ?>
+        <? $otherTextualHoldings['textfields'] = [$textFieldName => $textFields]; ?>
+      <? endif; ?>
+    <? endforeach; ?>
+<? endif; ?>
+
 <?/*Get the first barcode to pass to the map links*/
   $firstBarcode = $this->tab->getFirstBarcode($holding);?>
 <?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $firstBarcode)?>
@@ -143,28 +161,32 @@
   <br/><strong><?=$this->transEsc("Related Links:")?></strong>
 <? endif; ?>
 
-
+  <? /* Use the stored and separated textual (summary) holdings */?>
   <? if (isset($holding['textfields'])): ?>
-      <? $unboundIssues = []; ?>
-      <div class="section row libraryhas">
-        <h5>Library has:</h5>
-        <? foreach ($holding['textfields'] as $textFieldName => $textFields): ?>
-          <? $isUnbound = $textFieldName == 'unbound supplements' || $textFieldName == 'unbound issues'; ?>
-          <? if (!$isUnbound): ?>
-            <? // Translation for summary is a special case for backwards-compatibility ?>
-            <div class="col-sm-4">
-              <h6><?=$textFieldName == 'summary' ? $this->transEsc("Volume Holdings") : $this->transEsc(ucfirst($textFieldName))?></h6>
-              <ul>
-              <? foreach ($textFields as $current): ?>
-                <li typeof="Enumeration"><?=$this->escapeHtml($current)?></li>
-              <? endforeach; ?>
-              </ul>
-            </div>
-          <? else: ?>
-            <? $unboundIssues['textfields'] = [$textFieldName => $textFields]; ?>
-          <? endif; ?>
-        <? endforeach;?>
-      </div>
+      <? if ($holdingsNotes): ?>
+        <p class="holdings-notes"><strong>Holdings notes: </strong> 
+          <? foreach ($holdingsNotes['textfields']['holdings notes'] as $holdingNote): ?>
+            <?=$holdingNote?>
+          <? endforeach; ?>
+        </p>
+      <? endif; ?>
+
+      <? if ($otherTextualHoldings): ?>
+        <div class="section row libraryhas">
+          <h5>Library has:</h5>
+          <? foreach ($otherTextualHoldings['textfields'] as $textFieldName => $textFields): ?>
+              <? // Translation for summary is a special case for backwards-compatibility ?>
+              <div class="col-sm-4">
+                <h6><?=$textFieldName == 'summary' ? $this->transEsc("Volume Holdings") : $this->transEsc(ucfirst($textFieldName))?></h6>
+                <ul>
+                <? foreach ($textFields as $current): ?>
+                  <li typeof="Enumeration"><?=$this->escapeHtml($current)?></li>
+                <? endforeach; ?>
+                </ul>
+              </div>
+          <? endforeach;?>
+        </div>
+      <? endif; ?>
 
       <? if ($unboundIssues): ?>
         <? foreach ($unboundIssues['textfields'] as $textFieldName => $textFields): ?>
