@@ -172,11 +172,14 @@
       <? endif; ?>
 
       <? if ($otherTextualHoldings): ?>
+        <? /* The number of ownership types*/?>
+        <? $numTextHoldings = count($otherTextualHoldings['textfields']); ?>
+        <? $summDivClass = ($numTextHoldings > 2 ? 'col-sm-4' : 'col-sm-6') ;?>
         <div class="section row libraryhas">
           <h5>Library has:</h5>
           <? foreach ($otherTextualHoldings['textfields'] as $textFieldName => $textFields): ?>
               <? // Translation for summary is a special case for backwards-compatibility ?>
-              <div class="col-sm-4">
+              <div class="<?=$summDivClass?>">
                 <h6><?=$textFieldName == 'summary' ? $this->transEsc("Volume Holdings") : $this->transEsc(ucfirst($textFieldName))?></h6>
                 <ul>
                 <? foreach ($textFields as $current): ?>
