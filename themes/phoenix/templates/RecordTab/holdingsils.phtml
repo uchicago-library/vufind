@@ -125,6 +125,7 @@
   <? $unboundIssues = []; ?>
   <? $holdingsNotes = []; ?>
   <? $otherTextualHoldings = []; ?>
+<? //print_r($holding['textfields'])?>
     <? foreach ($holding['textfields'] as $textFieldName => $textFields): ?>
       <? $isUnbound = $textFieldName == 'unbound supplements' || $textFieldName == 'unbound issues'; ?>
       <? $isHoldingsNotes = $textFieldName == 'holdings notes'; ?>
@@ -133,7 +134,7 @@
       <? elseif ($isUnbound): ?>
         <? $unboundIssues['textfields'] = [$textFieldName => $textFields]; ?>
       <? else: ?>
-        <? $otherTextualHoldings['textfields'] = [$textFieldName => $textFields]; ?>
+        <? $otherTextualHoldings[$textFieldName] = ['textfields' => $textFields]; ?>
       <? endif; ?>
     <? endforeach; ?>
 <? endif; ?>
@@ -173,16 +174,16 @@
 
       <? if ($otherTextualHoldings): ?>
         <? /* The number of ownership types*/?>
-        <? $numTextHoldings = count($otherTextualHoldings['textfields']); ?>
+        <? $numTextHoldings = count($otherTextualHoldings); ?>
         <? $summDivClass = ($numTextHoldings > 2 ? 'col-sm-4' : 'col-sm-6') ;?>
         <div class="section row libraryhas">
           <h5>Library has:</h5>
-          <? foreach ($otherTextualHoldings['textfields'] as $textFieldName => $textFields): ?>
+          <? foreach ($otherTextualHoldings as $textFieldName => $textFieldArray): ?>
               <? // Translation for summary is a special case for backwards-compatibility ?>
-              <div class="<?=$summDivClass?>">
+              <div class="summary-holdings <?=$summDivClass?>" data-display="<?=$this->tab->getDisplayNumber()?>">
                 <h6><?=$textFieldName == 'summary' ? $this->transEsc("Volume Holdings") : $this->transEsc(ucfirst($textFieldName))?></h6>
                 <ul>
-                <? foreach ($textFields as $current): ?>
+                <? foreach ($textFieldArray['textfields'] as $current): ?>
                   <li typeof="Enumeration"><?=$this->escapeHtml($current)?></li>
                 <? endforeach; ?>
                 </ul>
