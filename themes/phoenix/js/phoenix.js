@@ -207,8 +207,41 @@ $(document).ready(function() {
     // Links to display for various states
     var viewItems = '<tr><td colspan="3"><a href="#" class="itemsToggle text-success">' + viewItemsText + '</a></td></tr>';
     var hideItems = '<a href="#" class="itemsToggle text-success">' + hideItemsText + '</a>';
-    var viewSummary = '<a href="#" class="summaryToggle text-success">' + viewSummaryText + '</a>';
-    var hideSummary = '<a href="#" class="summaryToggle text-success">' + hideSummaryText + '</a>';
+    var viewSummary = '<li><a href="#" class="summaryToggle text-success">' + viewSummaryText + '</a></li>';
+    var hideSummary = '<li><a href="#" class="summaryToggle text-success">' + hideSummaryText + '</a></li>';
+
+
+    // Loop over holdings_text_fields (summary holdings)
+    $('.summary-holdings').each(function(){
+        // Number of things to display by default
+        var displayNum = $(this).data('display');
+
+        hasLink = false;
+        var i = 1;
+        $(this).find('li').each(function(){
+            // Provide a target for the items toggle link.
+            // We'll append a link here if we need one.
+            if (i == displayNum) {
+                $(this).addClass('summaryToggleTarget');
+            }
+            // Hide items and append a class when there are more than the allowed quantity
+            if (i > displayNum) {
+                $(this).hide();
+                $(this).addClass('toToggle');
+                // Show the view link if possible
+                $(this).parent().find('.summaryToggle').removeClass('hide');
+
+                // If there isn't already a link
+                if(!hasLink){
+                    $(this).parent().find('.summaryToggleTarget').after(viewSummary);
+                    hasLink = true;
+                }
+            }
+            i++;
+        });
+    });
+
+
 
     $('.holdings-unit table').each(function(){
         // Number of things to display by default
@@ -243,34 +276,6 @@ $(document).ready(function() {
             }
             i++;
         });
-
-        // Loop over holdings_text_fields (summary holdings)
-        /*$(this).find('td').each(function(){
-            hasLink = false;
-            var i = 1;
-            $(this).find('[typeof="Enumeration"]').each(function(){
-                // Provide a target for the items toggle link.
-                // We'll append a link here if we need one.
-                if (i == displayNum) {
-                    $(this).addClass('summaryToggleTarget');
-                }
-                // Hide items and append a class when there are more than the allowed quantity
-                if (i > displayNum) {
-                    $(this).hide();
-                    $(this).addClass('toToggle');
-                    // Show the view link if possible
-                    $(this).parent().find('.summaryToggle').removeClass('hide');
-
-                    // If there isn't already a link
-                    if(!hasLink){
-                        $(this).parent().find('.summaryToggleTarget').append(viewSummary);
-                        hasLink = true;
-                    }
-                }
-                i++;
-            });
-        });*/
-
     });
 
     //prevent links from making the page jump
@@ -324,7 +329,7 @@ $(document).ready(function() {
         $(this).html(text);
 
         // Show/hide summary holdings text fields
-        $(this).parent().parent().find('div.toToggle').toggle();
+        $(this).parent().parent().find('.toToggle').toggle();
     });
 
     // Toggle the mini-search box and keep search box terms between windows
