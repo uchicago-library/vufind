@@ -1550,7 +1550,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['holdtype'] = $holdtype;
                 /*UChicago specific?*/
                 $item['claimsReturned'] = ($row['CLAIMS_RETURNED'] == 'Y' ? true : false);
-                $item['sort'] = $item['sort'] = preg_replace("/[^A-Za-z0-9]/", '', $copyNum . $enumeration); //preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
+                $item['sort'] = $enumeration; //preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
                 $item['itemTypeCode'] = $row['ITM_TYP_CD'];
                 $item['itemTypeName'] = $itemTypeName;
                 $item['callnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : $holdingCallNumDisplay);
