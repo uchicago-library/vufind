@@ -1019,7 +1019,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     /**
      *
      */
-    protected function getItems($id, $holdingId, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay) {
+    protected function getItems($id, $holdingId, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay, $isSerial) {
 
         /*Get items by holding id*/
         $sql = 'SELECT i.ITEM_ID AS item_id, i.HOLDINGS_ID AS holdings_id, i.BARCODE AS barcode, i.URI AS uri, 
@@ -1118,7 +1118,12 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
         /*Sort numerically by copy/volume number.*/
         usort($items, function($a, $b) { return strnatcasecmp($a['sort'], $b['sort']); });
-        return $items;
+        if ($isSerial) {
+            return array_reverse($items);
+        }
+        else {
+            return $items;
+        }
     }
 
 
@@ -1351,7 +1356,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 location, loc.LOCN_NAME AS locn_name,
                        h.CALL_NUMBER_TYPE_ID AS call_number_type_id,
                        h.CALL_NUMBER_PREFIX AS call_number_prefix, h.CALL_NUMBER AS
-                call_number, h.COPY_NUMBER AS copy_number,
+                call_number, h.COPY_NUMBER AS copy_number, bib.type, bib.level,
                        (SELECT GROUP_CONCAT(note.NOTE SEPARATOR "::|::")
                         FROM ole_ds_holdings_note_t note
                         WHERE note.HOLDINGS_ID = h.HOLDINGS_ID
@@ -1374,8 +1379,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                         WHERE itm.HOLDINGS_ID = h.HOLDINGS_ID
                         ) AS item_count
                     FROM ole_ds_holdings_t h
-                    LEFT JOIN ole_locn_t loc on loc.LOCN_CD = SUBSTRING_INDEX(h.LOCATION, \'/\',
-                -1)
+                    LEFT JOIN ole_locn_t loc on loc.LOCN_CD = SUBSTRING_INDEX(h.LOCATION, \'/\', -1)
+                    LEFT JOIN uc_bib_ext bib on bib.id = :id
                     WHERE h.STAFF_ONLY = "N"
                     AND h.BIB_ID =  :id';
 
@@ -1406,6 +1411,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $holdingId = $row['holdings_id'];
                 $locationCodes = $row['location'];
                 $shelvingLocation = $row['locn_name'] . ' - ' . $holdingId;
+                $isSerial = (strtolower($row['type']) == 'a' && in_array(strtolower($row['level']), ['b','i','s']));
 
                 /*Get e-holdings if they exist*/
                 /*if ($hasEholdings) {
@@ -1450,7 +1456,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 } 
 
                 /*Get individual item data*/           
-                $oleItems = $this->getItems($id, $holdingId, $shelvingLocation, $locationCodes, $holdingCallNum, $holdingCallNumDisplay);
+                $oleItems = $this->getItems($id, $holdingId, $shelvingLocation, $locationCodes, $holdingCallNum, $holdingCallNumDisplay, $isSerial);
                 foreach($oleItems as $oleItem) {
                     /* Rather than pass the call number type of the
                      * holding to getItems(), I add the call number type id here.
