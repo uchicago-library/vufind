@@ -420,7 +420,7 @@ class ServiceLinks extends AbstractHelper {
 
             $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/aon/aeon-array_OLE.php?genre=' . $genre . '&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
             $serviceLink = $this->getLinkConfig('aeon', $defaultUrl);
-            $displayText = 'Request from SCRC';
+            $displayText = '<i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Request from SCRC';
 
             if ($serviceLink) {
                 return $this->getServiceLinkTemplate($serviceLink, $displayText);
@@ -438,7 +438,7 @@ class ServiceLinks extends AbstractHelper {
     public function asr($row) {
         $defaultUrl = '/vufind/MyResearch/Storagerequest?bib=' .  $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;action=add';
         $serviceLink = $this->getLinkConfig('mansueto', $defaultUrl); 
-        $displayText = 'Request from Mansueto Library';
+        $displayText = '<i class="fa fa-fw fa-shopping-cart" aria-hidden="true"></i> Request from Mansueto Library';
         $blacklist = array_map('strtolower', $this->lookupLocation['scrcInMansueto']);
         if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['asr']) and $this->getLocation($row['locationCodes'], 'library') != 'spcl') and 
             (!in_array(strtolower($this->getLocation($row['locationCodes'], 'shelving')), $blacklist))) {
@@ -472,7 +472,7 @@ class ServiceLinks extends AbstractHelper {
     public function cantFindIt($row) {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/cant-find-it-OLE.php?barcode=' . $row['barcode'] . '&amp;bib=' . $row['id'];
         $serviceLink = $this->getLinkConfig('cantFindIt', $defaultUrl);
-        $displayText = 'Can\'t find it?';
+        $displayText = '<i class="fa fa-search-plus" aria-hidden="true"></i> Can\'t find it?';
         $shelvingLocations = array_map('strtolower', $this->lookupLocation['cantFindIt']); 
         if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['cantFindIt'])) and 
             (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
@@ -599,7 +599,7 @@ class ServiceLinks extends AbstractHelper {
         $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
         //$serviceLink = 'http://forms2.lib.uchicago.edu/lib/searchform/recall-template.php?barcode=' . $row['barcode'] . '&bib=' . $row['id'];
         $serviceLink = $this->fillPlaceholders($this->getLinkConfig('recall', $defaultUrl), $row);
-        $displayText = 'Recall This';
+        $displayText = '<i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Recall This';
 
         /*Combined statuses and locations to make a blacklist*/
         $blacklist = array_map('strtolower', array_merge($this->lookupStatus['recall'], $this->lookupLocation['recall']));
@@ -634,7 +634,7 @@ class ServiceLinks extends AbstractHelper {
     public function scanAndDeliver($row) {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/sandd_OLE.php?database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('scanAndDeliver', $defaultUrl); 
-        $displayText = 'Scan and Deliver';
+        $displayText = '<i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Scan and Deliver';
         $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
         if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
             (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
