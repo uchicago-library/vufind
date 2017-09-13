@@ -125,7 +125,6 @@
   <? $unboundIssues = []; ?>
   <? $holdingsNotes = []; ?>
   <? $otherTextualHoldings = []; ?>
-<? //print_r($holding['textfields'])?>
     <? foreach ($holding['textfields'] as $textFieldName => $textFields): ?>
       <? $isUnbound = $textFieldName == 'unbound supplements' || $textFieldName == 'unbound issues'; ?>
       <? $isHoldingsNotes = $textFieldName == 'holdings notes'; ?>
@@ -193,13 +192,23 @@
       <? endif; ?>
 
       <? if ($unboundIssues): ?>
+        <? $splitChar = '^'; ?>
+        <? $unboundLocation = explode($splitChar, $unboundIssues['textfields']['unbound issues'][0])[1]; ?>
         <? foreach ($unboundIssues['textfields'] as $textFieldName => $textFields): ?>
           <table class="holdings-table table unbound" data-display="<?=$this->tab->getDisplayNumber()?>">
-            <thead><tr><th colspan="3"><h5><?=$this->transEsc(ucfirst($textFieldName))?></h5></th></tr></thead>
+            <thead>
+              <tr>
+                <th colspan="3">
+                    <h5><?=$this->transEsc(ucfirst($textFieldName))?>:</h5>
+                    <span class="unbound-location"><?=$unboundLocation?></span>
+                </th>
+              </tr>
+            </thead>
             <tbody>
               <? foreach ($textFields as $current): ?>
+                <? $arr = explode($splitChar, $current); ?>
                 <tr vocab="http://schema.org/" typeof="Offer">
-                  <th><?=$this->escapeHtml($current)?></th>
+                  <th><?=$this->escapeHtml($arr[0])?></th>
                   <td>
                     Check shelf for availability
                     <link property="availability" href="http://schema.org/InStock"/>
@@ -211,12 +220,22 @@
           </table>
         <? endforeach;?>
       <? endif; ?>
- 
   <? endif; ?>
 
-<? if ($holding['items']): ?>
+<? // Create a boolean to see if holding has items ?>
+<? $hasItems = false; ?>
+<? foreach ($holding['items'] as $item): ?>
+  <? if (array_key_exists('holdtype', $item)): ?>
+    <? $hasItems = true; break; ?>
+  <? endif; ?>
+<? endforeach; ?>
+
+<? // Only display availability heading if holding has items ?>
+<? if ($hasItems): ?>
     <h5>Availability:</h5>
+    <span class="holding-location"><?=$locationText?></span>
 <? endif; ?>
+
 <table class="holdings-table table" data-display="<?=$this->tab->getDisplayNumber()?>">
   <caption><?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?></caption>
   <!--<tr>

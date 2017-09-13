@@ -1299,11 +1299,11 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             while ($row = $stmt->fetch()) {
 
                 $item = array();
-                $unboundLocation = $row['unbound_loc_name'] . ' - ' . $holdingId;;
+                $unboundLocation = $row['unbound_loc_name'];
                 $unboundLocCodes = $row['unbound_loc_codes'];
 
                 $item['id'] = $id;
-                $item['location'] = $unboundLocation;
+                $item['location'] = $holdingLocation;
                 $item['locationCodes'] = $unboundLocCodes;
                 $item['availability'] = true;
                 $item['status'] = 'AVAILABLE';
@@ -1314,7 +1314,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 /*Filter out summary holdings. These will be returned
                 along with the getSummaryHoldings method.*/
                 if (!in_array($row['RCV_REC_TYP'], $summaryTypes)) {
-                    $item['unbound issues'] = $row['enum'] . $row['chron'];
+                    $item['unbound issues'] = $row['enum'] . $row['chron'] . '^' . $unboundLocation;
                 }
                 $item['note'] = $row['note'];
 
@@ -1330,7 +1330,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
-        return $items;
+        return array_reverse($items);
     }
 
 
