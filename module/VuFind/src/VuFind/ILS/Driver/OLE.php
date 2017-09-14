@@ -1080,7 +1080,15 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['callnumber'] = $holdingCallNum;
                 $item['duedate'] = (isset($row['DUE_DATE_TIME']) ? $row['DUE_DATE_TIME'] : 'Indefinite');
                 $item['returnDate'] = '';
-                $item['number'] = $enumeration;
+                if ($copyNum && $enumeration) {
+                    $item['number'] = $copyNum . ' : ' . $enumeration;
+                }
+                elseif ($copyNum) {
+                    $item['number'] = $copyNum;
+                }
+                else {
+                    $item['number'] = $enumeration;
+                }
                 $item['requests_placed'] = '';
                 $item['barcode'] = $row['barcode'];
                 $item['item_id'] = $row['item_id'];
