@@ -123,15 +123,19 @@
 <? /* Loop over textual (summary) holdings and separate them for later use */?>
 <? if (isset($holding['textfields'])): ?>
   <? $unboundIssues = []; ?>
+  <? $unboundSupplements = []; ?>
   <? $holdingsNotes = []; ?>
   <? $otherTextualHoldings = []; ?>
     <? foreach ($holding['textfields'] as $textFieldName => $textFields): ?>
-      <? $isUnbound = $textFieldName == 'unbound supplements' || $textFieldName == 'unbound issues'; ?>
+      <? $isUnboundIssues = $textFieldName == 'unbound issues'; ?>
+      <? $isUnboundSupplements = $textFieldName == 'unbound supplements'; ?>
       <? $isHoldingsNotes = $textFieldName == 'holdings notes'; ?>
       <? if ($isHoldingsNotes): ?>
         <? $holdingsNotes['textfields'] = [$textFieldName => $textFields]; ?>
-      <? elseif ($isUnbound): ?>
+      <? elseif ($isUnboundIssues): ?>
         <? $unboundIssues['textfields'] = [$textFieldName => $textFields]; ?>
+      <? elseif ($isUnboundSupplements): ?>
+        <? $unboundSupplements['textfields'] = [$textFieldName => $textFields]; ?>
       <? else: ?>
         <? $otherTextualHoldings[$textFieldName] = ['textfields' => $textFields]; ?>
       <? endif; ?>
@@ -203,8 +207,10 @@
         </div>
       <? endif; ?>
 
+      <? /*Unbound issues and unbound supplements*/ ?>
+      <? $splitChar = '^'; ?>
+      <? /*Unbound Suplements*/?>
       <? if ($unboundIssues): ?>
-        <? $splitChar = '^'; ?>
         <? $unboundLocation = explode($splitChar, $unboundIssues['textfields']['unbound issues'][0])[1]; ?>
         <? foreach ($unboundIssues['textfields'] as $textFieldName => $textFields): ?>
           <table class="holdings-table table unbound" data-display="<?=$this->tab->getDisplayNumber()?>">
@@ -234,6 +240,39 @@
           </table>
         <? endforeach;?>
       <? endif; ?>
+
+      <? /*Unbound supplements*/ ?>
+      <? if ($unboundSupplements): ?>
+        <? $unboundLocation = explode($splitChar, $unboundSupplements['textfields']['unbound supplements'][0])[1]; ?>
+        <? foreach ($unboundSupplements['textfields'] as $textFieldName => $textFields): ?>
+          <table class="holdings-table table unbound" data-display="<?=$this->tab->getDisplayNumber()?>">
+            <thead>
+              <tr>
+                <th colspan="3">
+                    <h5><?=$this->transEsc(ucfirst($textFieldName))?>:</h5>
+                    <span class="unbound-location"><?=$unboundLocation?></span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <? foreach ($textFields as $current): ?>
+                <? $arr = explode($splitChar, $current); ?>
+                <? if (!empty(trim($arr[0]))): ?>
+                  <tr vocab="http://schema.org/" typeof="Offer">
+                    <th><?=$this->escapeHtml($arr[0])?></th>
+                    <td>
+                      Check shelf for availability
+                      <link property="availability" href="http://schema.org/InStock"/>
+                      <span class="loan-period">Building use only</span>
+                    </td>
+                  </tr>
+                <? endif; ?>
+              <? endforeach;?>
+            </tbody>
+          </table>
+        <? endforeach;?>
+      <? endif; ?>
+
   <? endif; ?>
 
 <? // Create a boolean to see if holding has items ?>

@@ -1322,13 +1322,13 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 /*Filter out summary holdings. These will be returned
                 along with the getSummaryHoldings method.*/
                 if (!in_array($row['RCV_REC_TYP'], $summaryTypes)) {
-                    $item['unbound issues'] = $row['enum'] . $row['chron'] . '^' . $unboundLocation;
+                    $item['unbound issues'] = $row['enum'] . ' ' . $row['chron'] . '^' . $unboundLocation;
                 }
                 $item['note'] = $row['note'];
 
                 /*Append the proper types for summary holdings*/
                 $item['indexes'] = ($type == 'Index' ? array($row['enum'] . ' ' . $row['chron'],  '') : null);
-                $item['unbound supplements'] = ($type == 'Supplementary' ? array($row['enum'] . ' ' . $row['chron'],  '') : null);
+                $item['unbound supplements'] = ($type == 'Supplementary' ? array($row['enum'] . ' ' . $row['chron'] . '^' . $unboundLocation,  '') : null);
 
                 if (!empty($item)) {
                     $items[] = $item;
