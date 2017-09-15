@@ -109,17 +109,12 @@
               <br />
             <? endif; ?>
 
-            <? if (isset($ilsDetails['available']) && $ilsDetails['available'] == true): ?>
+            <? if (isset($ilsDetails['available']) && $ilsDetails['available'] == true && (!(isset($ilsDetails['position']) && $ilsDetails['position'] > 1))): ?>
               <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc("hold_available") ?></div>
-            <? elseif (isset($ilsDetails['in_transit']) && $ilsDetails['in_transit']): ?>
-              <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc('request_in_transit') . (is_string($ilsDetails['in_transit']) ? ': ' . $this->transEsc('institution_' . $ilsDetails['in_transit'], [], $ilsDetails['in_transit']) : '') ?></div>
-            <? elseif (isset($ilsDetails['position'])): ?>
+            <? else: ?>
               <div class="text-danger"><strong>Item Status:</strong> Not Yet Available</div>
-              <? $qp = (int)$ilsDetails['position']; ?>
-              <? if ($qp > 1): ?>
-                <div class="text-danger"><strong><?=$this->transEsc("hold_queue_position") ?>:</strong> <?=$this->escapeHtml($ilsDetails['position']) ?></div>
-              <? endif; ?>
             <? endif; ?>
+            <div><?=$this->transEsc("hold_queue_position") ?>: <?=$this->escapeHtml($ilsDetails['position']) ?></div>
 
             </div>
             <div class="col-sm-4 col-xs-12">
