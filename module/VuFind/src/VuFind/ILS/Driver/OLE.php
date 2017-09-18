@@ -1074,7 +1074,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['availability'] = $available;
                 $item['status'] = $status;
                 $item['status_name'] = $statusName; /* This alters the signature of the getHolding method, see https://vufind.org/wiki/development:plugins:ils_drivers#getholding. It's too painful to do this any other way. */
-                $item['location'] = (!empty($itemLocation) ? $itemLocation : $holdingLocation);
+                $item['location'] = $holdingLocation;
                 $item['reserve'] = '';
                 $item['callnumbertypeid'] = $itemCallNumTypeId;
                 $item['callnumber'] = $holdingCallNum;
@@ -1103,6 +1103,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['callnumberDisplay'] = $holdingCallNumDisplay;
                 $item['itemCallnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : null);
                 $item['locationCodes'] = (!empty($itemLocCodes) ? $itemLocCodes : $holdingLocCodes);
+                $item['itemLocation'] = (!empty($itemLocation) ? $itemLocation : null);
     
                 $items[] = $item;
             }

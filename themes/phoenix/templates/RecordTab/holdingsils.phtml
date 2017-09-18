@@ -406,6 +406,14 @@
                 <?=$row['itemCallnumberDisplay']?>
               </span>
             <? endif; ?>
+            <? if (isset($row['itemLocation'])): ?>
+              <br/>
+              <span class="location-change">
+                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                <strong>Shelved in:</strong>
+                <?=$row['itemLocation']?>
+              </span>
+            <? endif; ?>
           <? endif; ?>
           <? /* Embed item structured data: library, barcode, call number */ ?>
           <? if ($row['location']): ?>
