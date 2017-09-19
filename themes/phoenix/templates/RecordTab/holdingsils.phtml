@@ -356,9 +356,9 @@
               <? /* Begin Unavailable Items (Recalls) */ ?>
               <? if ($row['status'] == 'ANAL'): ?>
                  To check availability
-                 <? $callNumBreak = strstr($callNos['sort'][$numKey], ' ', true); ?>
+                 <? $callNumBreak = preg_split("/\s[a-zA-Z0-9]+\./", $callNos['sort'][$numKey]); ?>
                  <? if ($callNumBreak): ?>
-                   <? $c = $callNumBreak; ?>
+                   <? $c = $callNumBreak[0]; ?>
                  <? else: ?>
                    <? $c = $callNos['sort'][$numKey]; ?>
                  <? endif; ?>
