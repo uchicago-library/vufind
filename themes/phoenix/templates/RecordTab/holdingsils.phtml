@@ -58,7 +58,7 @@
   <a class="placehold" data-lightbox title="<?=$this->transEsc('request_place_text')?>" href="<?=$this->recordLink()->getRequestUrl($holdingTitleHold)?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc('title_hold_place')?></a>
 <? endif; ?>
 <? if (!empty($urls) || $openUrlActive || $hathiLink): ?>
-  <div id="e-links" class="holdings-locpanel">
+  <div class="holdings-locpanel">
   <div class="locpanel-heading online">
   <h2><?=$this->transEsc("Online")?></h2><br/>
   <? if (!empty($urls)): ?>
@@ -67,8 +67,10 @@
         <h3><span><?=$this->transEsc($callNumLabel)?> </span><?=$urls[0]['callnumber']?></h3> <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&amp;from=<?=$this->escapeHtml($urls[0]['callnumber'])?>"
            class="ablink"><?=$callNumDisplayText?></a><br/>
       <?endif;?>
+  <? endif; ?>
   </div><!--/.locpanel-heading online-->
   <div id="e-links" class="holdings-unit">
+  <? if (!empty($urls)): ?>
     <? foreach ($urls as $current): ?>
       <? $linkText = (!empty($current['text']) ? ': '.$current['text'] : ''); ?>
       <div>
