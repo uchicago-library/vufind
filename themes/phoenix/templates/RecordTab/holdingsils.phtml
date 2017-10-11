@@ -370,7 +370,7 @@
               <? if (isset($row['returnDate']) && $row['returnDate']): ?>&ndash; <span class="small"><?=$this->escapeHtml($row['returnDate'])?></span><? endif; ?>
               <? if (isset($row['duedate']) && $row['duedate']): ?>
                 <?/*Only display duedates for loaned items*/?>
-                <? $duedate = ($row['status'] == 'LOANED' ? $this->tab->getDuedate($row) : '');?>
+                <? $duedate = ($row['status'] == 'LOANED' ? $this->tab->getDueDate($row) : '');?>
                 <? if ($duedate == 'no due date unless recalled'): ?>
                 <? $dueHtml = '&ndash; <span class="small">no due date unless recalled</span>'; ?>
                 <? else: ?>

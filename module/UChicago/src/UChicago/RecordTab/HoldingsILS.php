@@ -121,10 +121,11 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
      */
     public function getDueDate($row)
     {
+        $location = ($row['itemLocation'] ? $row['itemLocation'] : $row['location']);
         if ($row['duedate'] == 'Indefinite') {
             $due = 'no due date unless recalled';
         } else {
-            if (strpos($row['location'], 'Reserve') !== false || strpos($row['location'], 'TECHB@R') !== false) {
+            if (strpos($location, 'Reserve') !== false || strpos($location, 'TECHB@R') !== false  || stripos($location, 'Techbar') !== false) {
                $due = date("F j, g:ia", strtotime($row['duedate']));
             } else {
                $due = date("F j, Y", strtotime($row['duedate']));
