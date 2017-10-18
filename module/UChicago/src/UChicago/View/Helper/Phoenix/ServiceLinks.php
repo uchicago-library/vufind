@@ -107,6 +107,22 @@ class ServiceLinks extends AbstractHelper {
                              'rege',
                              'rosen',
                              'UCPress'],
+                        /*Whitelist*/
+                        'borrowDirect' => 
+                             ['ArtResA',
+                             'EckRes',
+                             'JRLRES',
+                             'LawRes',
+                             'LawResC',
+                             'LawResP',
+                             'Res',
+                             'Resup',
+                             'ResupC',
+                             'ResupD',
+                             'ResupE',
+                             'ResupS',
+                             'SSAdRes',
+                             'SciRes'],
                         'cantFindIt' =>
                             ['Art420',
                              'ArtResA',
@@ -246,6 +262,22 @@ class ServiceLinks extends AbstractHelper {
                              'LawAnxN'],
                         'recall' => 
                             ['Art420',
+                             'EckRes',
+                             'JRLRES',
+                             'LawRes',
+                             'LawResC',
+                             'LawResP',
+                             'Res',
+                             'Resup',
+                             'ResupC',
+                             'ResupD',
+                             'ResupE',
+                             'ResupS',
+                             'SSAdRes',
+                             'SciRes'],
+                        /*Whitelist*/
+                        'uBorrow' => 
+                             ['ArtResA',
                              'EckRes',
                              'JRLRES',
                              'LawRes',
@@ -465,8 +497,11 @@ class ServiceLinks extends AbstractHelper {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/borrowdirect_OLE.php?format=php&amp;database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('borrowDirect', $defaultUrl); 
         $displayText = 'BorrowDirect';
-        if (($serviceLink) and in_array($row['status'], $this->lookupStatus['borrowDirect'])) {
-            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        $shelvingLocations =  array_map('strtolower', $this->lookupLocation['borrowDirect']);
+        if ($serviceLink) {
+            if (in_array($row['status'], $this->lookupStatus['borrowDirect']) || in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations)) {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText);
+            }
         }
     }
 
@@ -684,8 +719,11 @@ class ServiceLinks extends AbstractHelper {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/relais_OLE.php?format=php&database=production&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('uBorrow', $defaultUrl);
         $displayText = 'UBorrow';
-        if (($serviceLink) and in_array($row['status'], $this->lookupStatus['uBorrow'])) {
-            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        $shelvingLocations =  array_map('strtolower', $this->lookupLocation['uBorrow']);
+        if ($serviceLink) {
+            if (in_array($row['status'], $this->lookupStatus['uBorrow']) || in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations)) {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText);
+            }
         }
     }
 

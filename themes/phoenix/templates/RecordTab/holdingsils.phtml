@@ -383,9 +383,7 @@
               <? endif; ?>
               <? endif; //end if/else for row['status'] == 'ANAL'?>
               <?=$this->ServiceLinks()->asr($row)?>
-              <?=$this->ServiceLinks()->borrowDirect($row)?>
               <?=$this->ServiceLinks()->getIt($row)?>
-              <?=$this->ServiceLinks()->uBorrow($row)?>
               <?=$this->ServiceLinks()->debugging($row)?>
               <?=$this->ServiceLinks()->request($row)?>
               <? if (isset($row['link']) && $row['link'] && !$row['claimsReturned']): ?>
@@ -396,6 +394,8 @@
               <? /* Begin Items that are either Available or Unavailable */ ?>
                 <?=$this->ServiceLinks()->aeon($row)?>
                 <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib, $row)?>
+                <?=$this->ServiceLinks()->borrowDirect($row)?>
+                <?=$this->ServiceLinks()->uBorrow($row)?>
             <? if (isset($row['itemNotes'])): ?>
               <div class="item-notes">
                 <?=$row['itemNotes']?>
