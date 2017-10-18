@@ -113,8 +113,7 @@
   <? // Get the raw location text. This contains the holdings id # and other such things ?>
   <? // Break it into component parts and use it for different purposes ?>
   <? $rawLocationText = $this->transEsc('location_' . $holding['location'], [], $holding['location']); ?>
-  <? $lTextArray = explode('-', $rawLocationText); ?>
-  <? $locationText = $lTextArray[0]; ?>
+  <? $locationText = implode('-', explode('-', $rawLocationText, -1)); ?>
   <? if (isset($holding['locationhref']) && $holding['locationhref']): ?>
     <a href="<?=$holding['locationhref']?>" target="_blank"><?=$locationText?></a>
   <? else: ?>
@@ -294,7 +293,7 @@
 <? endif; ?>
 
 <table class="holdings-table table" data-display="<?=$this->tab->getDisplayNumber()?>">
-  <caption><?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?></caption>
+  <caption><?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($locationText)?></caption>
   <!--<tr>
     <th><?=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></th>
     <td>
