@@ -1064,11 +1064,16 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $itemCallNumTypeId = (!empty($row['CALL_NUMBER_TYPE_ID']) ? trim($row['CALL_NUMBER_TYPE_ID']) : null);
                 $itemCallNumDisplay = (!empty($row['CALL_NUMBER_PREFIX']) ? trim($row['CALL_NUMBER_PREFIX']) . ' ' . $callnumber : null);
                 $itemCallNum = (isset($row['CALL_NUMBER']) ? trim($row['CALL_NUMBER']) : null);
-                $holdtype = ($available == true) ? "hold":"recall";
                 $itemTypeName = trim($row['itype_desc']);
                 $itemLocation = $row['locn_name'];
                 $itemLocCodes = $row['location'];
-                              
+
+                /* Set hold types */
+                $holdtype = 'recall';
+                if ($status == 'ONORDER' || $status =='INPROCESS') {
+                    $holdtype = 'hold';
+                }
+
                 /*Build the items*/ 
                 $item['id'] = $id;
                 $item['availability'] = $available;
@@ -1677,17 +1682,22 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         //Copy Request              //Copy Request
         //In Transit Request        //In Transit Request
         //ASR Request               //ASR Request
-        
+
         $patron = $holdDetails['patron'];
         $patronId = $patron['id'];
         $service = 'placeRequest';
-        $requestType = ($holdDetails['holdtype'] == "recall") ? urlencode('Recall/Hold Request'):urlencode('Hold/Delivery Request');
         $bibId = $holdDetails['id'];
         $itemBarcode = $holdDetails['barcode'];
         $patronBarcode = $patron['barcode'];
         $pickupLocation = $holdDetails['pickUpLocation'];
+        $itemId = $holdDetails['item_id'];
 
-        $uri = $this->circService .  "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcode}&requestType={$requestType}&pickupLocation={$pickupLocation}";
+        $requestType = urlencode('Recall/Hold Request');
+        if ($holdDetails['holdtype'] == 'hold') {
+            $requestType = urlencode('Hold/Hold Request');
+        }
+
+        $uri = $this->circService .  "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemId={$itemId}&requestType={$requestType}&pickupLocation={$pickupLocation}";
         
         $request = new Request();
         $request->setMethod(Request::METHOD_POST);

@@ -338,12 +338,17 @@ class ServiceLinks extends AbstractHelper {
                              'RECENTLY-RETURNED'], 
                         'asr' =>
                             ['AVAILABLE-AT-MANSUETO'],
+                        /*Whitelist*/
+                        'hold' =>
+                            ['INPROCESS',
+                             'ONORDER'],
                         /*Blacklist*/
                         'recall' => 
                             ['ANAL',
                              'AVAILABLE',
                              'DECLARED-LOST',
                              'FLAGGED-FOR-RESERVE',
+                             'INPROCESS',
                              'INPROCESS-MANSUETO',
                              'INTRANSITFORHOLD', //temp
                              'LOST',
@@ -351,6 +356,7 @@ class ServiceLinks extends AbstractHelper {
                              'MISSING',
                              'MISSING-FROM-MANSUETO',
                              'ONHOLD', //temp
+                             'ONORDER',
                              'RECENTLY-RETURNED',
                              'RETRIEVING-FROM-MANSUETO',
                              'UNAVAILABLE']]; 
@@ -608,6 +614,29 @@ class ServiceLinks extends AbstractHelper {
 
         if (($serviceLink) && (!empty($row['status'])) && (!in_array(strtolower($row['status']), $blacklist)) && (!in_array($this->getLocation($row['locationCodes'], 'shelving'), $blacklist)) 
             && !empty($row['barcode'])) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+    }
+
+   /**
+     * Method creates a request link for items IN PROCESS or ON ORDER.
+     *
+     * @param row, array of holdings and item information
+     *
+     * @return html string
+     */
+    public function request($row) {
+        $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
+        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('request', $defaultUrl), $row);
+        $displayText = '<i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Request when available';
+
+        /*Locations blacklist*/
+        $blacklist = $this->lookupLocation['recall'];
+
+        /*Status whitelist*/
+        $whitelist = $this->lookupStatus['hold'];
+
+        if (($serviceLink) && (!empty($row['status'])) && (in_array($row['status'], $whitelist)) && (!in_array($this->getLocation($row['locationCodes'], 'shelving'), $blacklist))) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }

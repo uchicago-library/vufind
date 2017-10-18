@@ -387,6 +387,7 @@
               <?=$this->ServiceLinks()->getIt($row)?>
               <?=$this->ServiceLinks()->uBorrow($row)?>
               <?=$this->ServiceLinks()->debugging($row)?>
+              <?=$this->ServiceLinks()->request($row)?>
               <? if (isset($row['link']) && $row['link'] && !$row['claimsReturned']): ?>
                 <!--<a class="<?//=$check ? 'checkRequest' : ''?> modal-link inlineblock placehold" href="<?//=$this->recordLink()->getRequestUrl($row['link'])?>"><i class="fa fa-flag"></i>&nbsp;<?//=$this->transEsc($check ? "Check Recall" : "Recall This")?></a>-->
                 <?=$this->ServiceLinks()->recall($row)?>
