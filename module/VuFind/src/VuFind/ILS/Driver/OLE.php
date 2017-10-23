@@ -678,49 +678,34 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         // Did the API change to return a string instead of date? (DL)
         $available = ((string) $itemXml->availableStatus == 'ONHOLD') ?  true:false;
 
-        // Get a human-readable description for the pickup location. 
-        $sql = "SELECT OLE_CRCL_DSK_PUB_NAME " .
-               "FROM $this->dbName.ole_crcl_dsk_t " .
-               "WHERE ole_crcl_dsk_id = :deskid";
-
-        $location = '';
- 
-        try {
-            $sqlStmt = $this->db->prepare($sql);
-            $sqlStmt->bindParam(
-                ':deskid', strtolower(utf8_decode($itemXml->pickupLocation)), PDO::PARAM_STR
-            );
-            $sqlStmt->execute();
-            $row = $sqlStmt->fetch(PDO::FETCH_ASSOC);
-            if (isset($row['OLE_CRCL_DSK_PUB_NAME']) && ($row['OLE_CRCL_DSK_PUB_NAME'] != '')) {
-                $location = $row['OLE_CRCL_DSK_PUB_NAME'];
-            }
-        } catch (PDOException $e) {
-            throw new ILSException($e->getMessage());
-        }
-
-        // Temporary (we hope) hack to get the "hold until date" from the DB
-        // Should be deleted when this is returned by the OLE Driver via circ api
-        try {
-            $query = "select hold_exp_date from $this->dbName.ole_dlvr_rqst_t where ole_rqst_id = :requestid";
-            $stmt = $this->db->prepare($query);
-            $stmt->execute([':requestid' => $itemXml->requestId]);
-            while ($row = $stmt->fetch()) {
-                $hold_until_date = $row['hold_exp_date'];
-            }
-        } catch (PDOException $e) {
-            throw new ILSException($e->getMessage());
-        }
-
-        /* Temporary, this should come from the circ api */
-        $sql = 'select itm_typ_desc from ole_cat_itm_typ_t where itm_typ_cd = :code';
+        /* Get stuff from the DB that we should be getting from the
+           circ API but can't */
+        $sql = "select r.item_uuid, r.hold_exp_date, r.uc_item_id, i.item_id, i.holdings_id,
+                i.temp_item_type_id, i.item_type_id, loc.locn_name as item_location, h.staff_only,
+                hl.locn_name as holdings_location, ityp.itm_typ_desc, cd.ole_crcl_dsk_pub_name
+                    from ole_dlvr_rqst_t r
+                    left join ole_ds_item_t i on i.item_id = r.uc_item_id
+                    left join ole_ds_holdings_t h on h.holdings_id = i.holdings_id
+                    left join ole_locn_t loc on loc.locn_cd = SUBSTRING_INDEX(i.location, '/', -1)
+                    left join ole_locn_t hl on hl.locn_cd = SUBSTRING_INDEX(h.location, '/', -1)
+                    left join ole_cat_itm_typ_t ityp on ityp.itm_typ_cd_id = coalesce(i.temp_item_type_id, i.item_type_id)
+                    left join ole_crcl_dsk_t cd on ole_crcl_dsk_id = :deskid
+                        where ole_rqst_id = :requestid";
         try {
             /*Query the database*/
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(array(':code' => $itemXml->itemType));
+            $stmt->execute([':requestid' => $itemXml->requestId,
+                            ':deskid' => strtolower(utf8_decode($itemXml->pickupLocation))]);
 
             while ($row = $stmt->fetch()) {
+                $pickupLoc = $row['ole_crcl_dsk_pub_name'];
+                $itemLoc = $row['item_location'];
                 $loanType = $row['itm_typ_desc'];
+                $hold_until_date = $row['hold_exp_date'];
+                $shelvingLoc = $row['holdings_location'];
+                if ($itemLoc) {
+                    $shelvingLoc = $itemLoc;
+                }
             }
         }
         catch (Exception $e){
@@ -731,7 +716,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'id' => substr((string) $itemXml->catalogueId, strpos((string) $itemXml->catalogueId, '-')+1),
             'item_id' => (string) $itemXml->itemId,
             'type' => (string) $itemXml->requestType,
-            'location' => (string) $location,
+            'location' => (string) $pickupLoc,
+            'shelvingLocation' => $shelvingLoc,
             'expire' => (string) $itemXml->expiryDate,
             'create' => (string) $itemXml->createDate,
             'position' => (string) $itemXml->priority,

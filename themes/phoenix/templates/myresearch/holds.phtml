@@ -109,6 +109,17 @@
               <br />
             <? endif; ?>
 
+            <? if (!empty($ilsDetails['shelvingLocation'])): ?>
+              <strong><?=$this->transEsc('Shelving Location') ?>:</strong>
+              <?=$this->escapeHtml($ilsDetails['shelvingLocation'])?>
+              <br />
+            <? endif; ?>
+
+            <? if (!empty($ilsDetails['loan_type'])): ?>
+              <span class="item-type"><?=$this->escapeHtml($ilsDetails['loan_type'])?></span>
+              <br />
+            <? endif; ?>
+
             <? if (isset($ilsDetails['available']) && $ilsDetails['available'] == true && (!(isset($ilsDetails['position']) && $ilsDetails['position'] > 1))): ?>
               <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc("hold_available") ?></div>
             <? else: ?>
@@ -123,11 +134,10 @@
                 <strong><?=$this->transEsc('Call Number') ?>:</strong>
                 <?=$callNumbers[0]; ?><br/>
             <? endif; ?>
-            <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
+            <? if ($ilsDetails['item_id']): ?>
+                <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
+            <? endif; ?>
 
-              <? if ($ilsDetails['loan_type']): ?>
-                <span class="item-type"><?=$ilsDetails['loan_type']?></span><br/>
-              <? endif; ?>
             <? if (!empty($ilsDetails['expire']) && $ilsDetails['status'] != 'ONHOLD'): ?>
               <strong>Request expires:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
             <? elseif (!empty($ilsDetails['hold_until_date'])): ?>
