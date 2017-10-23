@@ -69,12 +69,7 @@
                   // Last resort -- indicate that no title could be found.
                   echo $this->transEsc('Title not available');
                 }
-              ?><br/>
-  
-              <? if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
-                <strong><?=$this->transEsc('Volume')?>:</strong> <?=$this->escapeHtml($ilsDetails['volume'])?>
-                <br />
-              <? endif; ?>
+              ?><br/> 
   
               <? if (isset($ilsDetails['publication_year']) && !empty($ilsDetails['publication_year'])): ?>
                 <strong><?=$this->transEsc('Year of Publication')?>:</strong> <?=$this->escapeHtml($ilsDetails['publication_year'])?>
@@ -84,6 +79,16 @@
               <? $listAuthors = $resource->getPrimaryAuthors(); if (!empty($listAuthors)): ?>
                 <?=$this->transEsc('by')?>:
                 <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><? if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><? endif; ?><br/>
+              <? endif; ?>
+
+            <? if (!empty($ilsDetails['shelvingLocation'])): ?>
+              <?=$this->escapeHtml($ilsDetails['shelvingLocation'])?>
+              <br />
+            <? endif; ?>
+
+              <? if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
+                <strong><?=$this->transEsc('Volume')?>:</strong> <?=$this->escapeHtml($ilsDetails['volume'])?>
+                <br />
               <? endif; ?>
 
             <? /* Depending on the ILS driver, the "location" value may be a string or an ID; figure out the best
@@ -104,19 +109,8 @@
               <? endif; ?>
             <? endif; ?>
             <? if (!empty($pickupDisplay)): ?>
-              <strong><?=$this->transEsc('pick_up_location') ?>:</strong>
-              <?=$pickupTranslate ? $this->transEsc('location_' . $pickupDisplay, null, $pickupDisplay) : $this->escapeHtml($pickupDisplay)?>
-              <br />
-            <? endif; ?>
-
-            <? if (!empty($ilsDetails['shelvingLocation'])): ?>
-              <strong><?=$this->transEsc('Shelving Location') ?>:</strong>
-              <?=$this->escapeHtml($ilsDetails['shelvingLocation'])?>
-              <br />
-            <? endif; ?>
-
-            <? if (!empty($ilsDetails['loan_type'])): ?>
-              <span class="item-type"><?=$this->escapeHtml($ilsDetails['loan_type'])?></span>
+              <?=$this->transEsc('pick_up_location') ?>:
+              <strong><?=$pickupTranslate ? $this->transEsc('location_' . $pickupDisplay, null, $pickupDisplay) : $this->escapeHtml($pickupDisplay)?></strong>
               <br />
             <? endif; ?>
 
@@ -131,17 +125,22 @@
             <div class="col-sm-4 col-xs-12">
             <? $callNumbers = $resource->getCallNumbers(); ?>
             <? if (!empty($callNumbers)): ?>
-                <strong><?=$this->transEsc('Call Number') ?>:</strong>
-                <?=$callNumbers[0]; ?><br/>
+                <?=$this->transEsc('Call Number') ?>:
+                <strong><?=$callNumbers[0]; ?></strong><br/>
             <? endif; ?>
             <? if ($ilsDetails['item_id']): ?>
-                <strong>Barcode:</strong> <?=$ilsDetails['item_id']?><br/>
+                Barcode: <strong><?=$ilsDetails['item_id']?></strong><br/>
             <? endif; ?>
 
             <? if (!empty($ilsDetails['expire']) && $ilsDetails['status'] != 'ONHOLD'): ?>
               <strong>Request expires:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
             <? elseif (!empty($ilsDetails['hold_until_date'])): ?>
                <strong>On Hold Until:</strong> <?=$this->escapeHtml($ilsDetails['hold_until_date']) ?><br/>
+            <? endif; ?>
+
+            <? if (!empty($ilsDetails['loan_type'])): ?>
+              <span class="item-type"><?=$this->escapeHtml($ilsDetails['loan_type'])?></span>
+              <br />
             <? endif; ?>
           </div>
         </div>
