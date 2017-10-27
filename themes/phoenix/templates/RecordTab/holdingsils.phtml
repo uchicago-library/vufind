@@ -197,7 +197,15 @@
           <? foreach ($otherTextualHoldings as $textFieldName => $textFieldArray): ?>
               <? // Translation for summary is a special case for backwards-compatibility ?>
               <div class="summary-holdings <?=$summDivClass?>" data-display="<?=$this->tab->getDisplayNumber()?>">
-                <h6><?=$textFieldName == 'summary' ? $this->transEsc("Volume Holdings") : $this->transEsc(ucfirst($textFieldName))?></h6>
+                <h6>
+                    <? if ($textFieldName == 'summary'): ?>
+                        <?=$this->transEsc("Volume Holdings")?>
+                    <? elseif ($textFieldName == 'issues'): ?>
+                        <?=$this->transEsc("Issues/Volumes")?>
+                    <? else: ?>
+                        <?=$this->transEsc(ucfirst($textFieldName))?>
+                    <? endif; ?>
+                </h6>
                 <ul>
                 <? foreach ($textFieldArray['textfields'] as $current): ?>
                   <li typeof="Enumeration"><?=$this->escapeHtml($current)?></li>
