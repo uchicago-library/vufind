@@ -346,6 +346,7 @@
                       <span class="loan-period">Loan period: <?=$row['itemTypeName']?>&nbsp;</span>
                    <?endif;?>
                </span>
+               <span class="service-links">
                <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                <?=$this->ServiceLinks()->asr($row)?>
                <?=$this->ServiceLinks()->dllStorage($row)?>
@@ -389,6 +390,7 @@
                 <span><?=$this->transEsc("Requests")?>: <?=$this->escapeHtml($row['requests_placed'])?></span>
               <? endif; ?>
               <? endif; //end if/else for row['status'] == 'ANAL'?>
+              <span class="service-links">
               <?=$this->ServiceLinks()->asr($row)?>
               <?=$this->ServiceLinks()->getIt($row)?>
               <?=$this->ServiceLinks()->debugging($row)?>
@@ -403,6 +405,7 @@
                 <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib, $row)?>
                 <?=$this->ServiceLinks()->borrowDirect($row)?>
                 <?=$this->ServiceLinks()->uBorrow($row)?>
+                </span><? /* END .service-links */?>
             <? if (isset($row['itemNotes'])): ?>
               <div class="item-notes">
                 <?=$row['itemNotes']?>
