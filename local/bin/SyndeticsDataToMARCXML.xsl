@@ -53,5 +53,12 @@
         </datafield>
 
     </xsl:template>
-        
+    <xsl:template match="trlntocs" >
+        <collection><xsl:apply-templates select="@*|node()"/></collection>
+    </xsl:template>    
+    <xsl:template match="summarys" >
+        <collection><xsl:apply-templates select="@*|node()"/></collection>
+    </xsl:template>    
+    <xsl:template match="Leader" >
+    </xsl:template>    
 </xsl:stylesheet>

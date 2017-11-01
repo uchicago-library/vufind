@@ -7,7 +7,7 @@ E_BADARGS=65
 
 scriptdir=$( (cd -P $(dirname $0) && pwd) )
 solrmarcdir=$( (cd -P $(dirname $0)/.. && pwd) )
-if ! [ -e $solrmarcdir/SolrMarc.jar ]
+if ! [ -e $solrmarcdir/OldSolrMarc.jar ]
 then
   solrmarcdir=$( (cd -P $(dirname $0)/../../import && pwd) )
 fi
@@ -73,9 +73,9 @@ fi
 
 if [ "$url" == "" ]
 then
-    java -Dsolrmarc.main.class="org.solrmarc.marc.SolrReIndexer" -jar $solrmarcdir/SolrMarc.jar $config "$query" $field 2> /dev/null
+    java -Dsolrmarc.main.class="org.solrmarc.marc.SolrReIndexer" -jar $solrmarcdir/OldSolrMarc.jar $config "$query" $field 2> /dev/null
 else
-    java -Dsolrmarc.main.class="org.solrmarc.solr.RemoteSolrSearcher" -jar $solrmarcdir/SolrMarc.jar $flag $url "$query" $field 
+    java -Dsolrmarc.main.class="org.solrmarc.solr.RemoteSolrSearcher" -jar $solrmarcdir/OldSolrMarc.jar $flag $url "$query" $field 
 fi
 
 exit 0

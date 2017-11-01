@@ -2,7 +2,7 @@
 
 scriptdir=$( (cd -P $(dirname $0) && pwd) )
 solrmarcdir=$( (cd -P $(dirname $0)/.. && pwd) )
-if ! [ -e $solrmarcdir/SolrMarc.jar ]
+if ! [ -e $solrmarcdir/solrmarc_core.jar ]
 then
   solrmarcdir=$( (cd -P $(dirname $0)/../../import && pwd) )
 fi
@@ -36,6 +36,6 @@ do
 done > $outputtmpdir/$marc_update_file
 
 echo "Indexing extracted records back into the biblio core"
-$scriptdir/indexfile $configdir/import_ole_syn.properties $outputtmpdir/$marc_update_file
+$scriptdir/indexfile $configdir/import_ole_syn.properties $outputtmpdir/$marc_update_file 
 
 echo "Done processing summary update file $summ_fname"

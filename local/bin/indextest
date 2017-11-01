@@ -8,7 +8,7 @@ E_BADARGS=65
 
 scriptdir=$( (cd -P $(dirname $0) && pwd) )
 solrmarcdir=$( (cd -P $(dirname $0)/.. && pwd) )
-if ! [ -e $solrmarcdir/SolrMarc.jar ]
+if ! [ -e $solrmarcdir/OldSolrMarc.jar ]
 then
   solrmarcdir=$( (cd -P $(dirname $0)/../../import && pwd) )
 fi
@@ -24,7 +24,7 @@ then
   fi
 fi
 
-java -Dsolrmarc.main.class="org.solrmarc.marc.MarcPrinter" -jar $solrmarcdir/SolrMarc.jar index $1 $2 $3 $4 $5 $6
+java -Dsolrmarc.main.class="org.solrmarc.marc.MarcPrinter" -jar $solrmarcdir/OldSolrMarc.jar index $1 $2 $3 $4 $5 $6
 
 exit 0
 

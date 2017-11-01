@@ -7,7 +7,7 @@ E_BADARGS=65
 
 scriptdir=$( (cd -P $(dirname $0) && pwd) )
 solrmarcdir=$( (cd -P $(dirname $0)/.. && pwd) )
-if ! [ -e $solrmarcdir/SolrMarc.jar ]
+if ! [ -e $solrmarcdir/solrmarc_core.jar ]
 then
   solrmarcdir=$( (cd -P $(dirname $0)/../../import && pwd) )
 fi
@@ -28,7 +28,8 @@ then
     SOLRMARC_MEM_ARGS='-Xms512m -Xmx512m'
 fi
 
-java $SOLRMARC_MEM_ARGS -jar $solrmarcdir/SolrMarc.jar $1 $2 $3
+#java $SOLRMARC_MEM_ARGS -jar $solrmarcdir/solrmarc_core.jar $1 $2 $3
+java $SOLRMARC_MEM_ARGS -jar $solrmarcdir/solrmarc_core.jar $1 -solrj $VUFIND_HOME/solr/vendor/dist/solrj-lib $2 $3
 
 exit 0
 

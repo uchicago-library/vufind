@@ -7,7 +7,7 @@ E_BADARGS=65
 
 scriptdir=$( (cd -P $(dirname $0) && pwd) )
 solrmarcdir=$( (cd -P $(dirname $0)/.. && pwd) )
-if ! [ -e $solrmarcdir/SolrMarc.jar ]
+if ! [ -e $solrmarcdir/OldSolrMarc.jar ]
 then
   solrmarcdir=$( (cd -P $(dirname $0)/../../import && pwd) )
 fi
@@ -32,7 +32,7 @@ else
   arg4=$3
 fi
 
-java -Dsolrmarc.main.class="org.solrmarc.marc.RawRecordReader" -jar $solrmarcdir/SolrMarc.jar $arg1 $arg2 $arg3 $arg4
+java -Dsolrmarc.main.class="org.solrmarc.marc.RawRecordReader" -jar $solrmarcdir/OldSolrMarc.jar $arg1 $arg2 $arg3 $arg4
 
 exit 0
 
