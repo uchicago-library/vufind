@@ -373,6 +373,7 @@ class ServiceLinks extends AbstractHelper {
                         /*Whitelist*/
                         'hold' =>
                             ['INPROCESS',
+                             'INTRANSIT',
                              'ONORDER'],
                         /*Blacklist*/
                         'recall' => 
@@ -382,12 +383,11 @@ class ServiceLinks extends AbstractHelper {
                              'FLAGGED-FOR-RESERVE',
                              'INPROCESS',
                              'INPROCESS-MANSUETO',
-                             'INTRANSITFORHOLD', //temp
+                             'INTRANSIT',
                              'LOST',
                              'LOST-AND-PAID',
                              'MISSING',
                              'MISSING-FROM-MANSUETO',
-                             'ONHOLD', //temp
                              'ONORDER',
                              'RECENTLY-RETURNED',
                              'RETRIEVING-FROM-MANSUETO',
@@ -663,7 +663,7 @@ class ServiceLinks extends AbstractHelper {
     public function request($row) {
         $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
         $serviceLink = $this->fillPlaceholders($this->getLinkConfig('request', $defaultUrl), $row);
-        $displayText = '<i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Request when available';
+        $displayText = '<i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Place Hold';
 
         /*Locations blacklist*/
         $blacklist = $this->lookupLocation['recall'];
