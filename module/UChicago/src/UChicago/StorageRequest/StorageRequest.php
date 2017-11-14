@@ -12,6 +12,10 @@ class StorageRequest
 
     protected $patron_barcode;
 
+    public $failures = [];
+
+    public $victories = [];
+
     public function __construct($config, $patron_barcode) 
     {
         $this->config = $config;
@@ -22,6 +26,26 @@ class StorageRequest
         if (!array_key_exists('asr', $_SESSION)) {
             $_SESSION['asr'] = [];
         }
+    }
+
+    public function setFail($failure)
+    {
+        $this->failures[] = $failure;
+    }
+
+    public function setVictory($success)
+    {
+        $this->victories[] = $success;
+    }
+
+    public function getFailures()
+    {
+        return $this->failures;
+    }
+
+    public function getVictories()
+    {
+        return $this->victories;
     }
 
     public function getRequests() 
@@ -119,7 +143,7 @@ class StorageRequest
             $this->placeIndividualRequest($item, $location);
         }
 
-        $this->removeAllRequests();
+        //$this->removeAllRequests();
     }
 
     public function placeIndividualRequest($item, $location)
@@ -167,11 +191,16 @@ class StorageRequest
 
             $nl = $responseXML->xpath('/asrResponse/message');
             $message = (string)($nl[0]);
-            // figure out how to throw exceptions correctly here. 
-            if ($code != '001') {
-                echo $code;
-                echo $message;
+            $successCodes = ['001'];
+
+            if (!in_array($code, $successCodes)) {
+                $this->setFail([$code, 'Request for http://pi.lib.uchicago.edu/1001/cat/bib/' . $item['bib'] . ' failed. '. $message]);
             }
+            else {
+                $this->setVictory([$code, 'Request for http://pi.lib.uchicago.edu/1001/cat/bib/' . $item['bib'] . ' succeeded. '. $message]);
+                $this->removeRequest($item['bib'], $item['barcode']);
+            }
+
 		} catch (Exception $e) {
 		    throw new ILSException($e->getMessage());
 		}

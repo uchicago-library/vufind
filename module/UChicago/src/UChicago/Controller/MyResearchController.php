@@ -138,12 +138,17 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 }
                 printf("%s\n", $config->PickupLocations->defaultLocationDescription);
                 */
+
 	            if ($this->params()->fromPost('location') == '') {
 	                $this->flashMessenger()->setNamespace('error')->addMessage('Please select a pickup location from the pulldown below.');
 	            } else {
 	                $storagerequest->placeRequest($this->params()->fromPost('barcode'), $this->params()->fromPost('bib'), $this->params()->fromPost('location')); 
 	                $pickup_info = '';
-    
+
+                    // Must be defined after placeRequest is called
+                    $failures = $storagerequest->getFailures();
+                    $victories = $storagerequest->getVictories();
+
 	                switch ($this->params()->fromPost('location')) {
 	                    case 'CRERAR':
 	                        $pickup_info = 'Crerar within 1 business day';
@@ -161,7 +166,20 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 	                        $pickup_info = 'Mansueto within 15 min during open hours';
 	                        break;
 	                }
-                $this->flashMessenger()->setNamespace('info')->addMessage('Your request is being processed. Your materials will be available for pickup at (' . $pickup_info . ') and held for you for 7 days.');
+
+                    if ($failures) {
+                        if ($victories) {
+                            $this->flashMessenger()->setNamespace('fail')->addMessage('Some of your requests could not be processed. Please see above.', 'info');
+                        }
+                        foreach ($failures as $failure) {
+                            $this->flashMessenger()->setNamespace('fail')->addMessage($failure[1], 'error');
+                        }
+                    }
+                    if ($victories && !$failures) {
+                        foreach ($victories as $victory) {
+                            $this->flashMessenger()->setNamespace('info')->addMessage('Your request is being processed and will be available for pickup at (' . $pickup_info . ') and held for you for 7 days.', 'success');
+                        }
+                    }
                 }
                 break;
         }

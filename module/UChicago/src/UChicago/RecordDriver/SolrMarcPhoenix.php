@@ -301,10 +301,6 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
              'values' => ['041|abde', '008']], //the 008 field will blow up the crosswalk function. Instead we return languages outside of the loop with the getLanguages function
             ['label'  => 'Series',
              'values' => ['440|anpvx','490|avx','800|abcdefghklmnopqrstuv','810|abcdefghklmnoprstuv','811|acdefghklnpqstuv','830|adfghklmnoprstv']],
-            ['label'  => 'Preceding Entry',
-             'values' => ['780|abcdghikmnorstuxyz']],
-            ['label'  => 'Succeeding Entry',
-             'values' => ['785|abcdghikmnorstuxyz']],
             ['label'  => 'Subject',
              'values' => ['600|abcdefgklmnopqrstuvxyz','610|abcdefgklmnoprstuvxyz','611|acdefgklnpqstuvxyz','630|adfgklmnoprstvxyz','650|abcdevxyz','651|avxyz','654|abcvyz','655|abcvxyz']],
             ['label'  => 'Cartographic data',

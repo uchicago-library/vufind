@@ -58,18 +58,23 @@
   <a class="placehold" data-lightbox title="<?=$this->transEsc('request_place_text')?>" href="<?=$this->recordLink()->getRequestUrl($holdingTitleHold)?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc('title_hold_place')?></a>
 <? endif; ?>
 <? if (!empty($urls) || $openUrlActive || $hathiLink): ?>
-  <div id="e-links" class="holdings-unit">
-  <h3><?=$this->transEsc("Internet")?></h3>
+  <div class="holdings-locpanel">
+  <div class="locpanel-heading online">
+  <h2><?=$this->transEsc("Online")?></h2><br/>
   <? if (!empty($urls)): ?>
       <?/*For now, only display a browse link if the first e-holding has a callnumber - Fix later*/?>
       <? if (isset($urls[0]['callnumber'])):?>
-        <h4><span><?=$this->transEsc($callNumLabel)?> </span><?=$urls[0]['callnumber']?></h4> <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&amp;from=<?=$this->escapeHtml($urls[0]['callnumber'])?>"
+        <h3><span><?=$this->transEsc($callNumLabel)?> </span><?=$urls[0]['callnumber']?></h3> <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&amp;from=<?=$this->escapeHtml($urls[0]['callnumber'])?>"
            class="ablink"><?=$callNumDisplayText?></a><br/>
       <?endif;?>
+  <? endif; ?>
+  </div><!--/.locpanel-heading online-->
+  <div id="e-links" class="holdings-unit">
+  <? if (!empty($urls)): ?>
     <? foreach ($urls as $current): ?>
       <? $linkText = (!empty($current['text']) ? ': '.$current['text'] : ''); ?>
       <div>
-        <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="eLink text-success"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']) . $linkText)?></a> <?=$current['desc']?><br/>
+        <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="eLink"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']) . $linkText)?></a> <?=$current['desc']?><br/>
       </div>
     <? endforeach; ?>
   <? endif; ?>
@@ -81,14 +86,13 @@
   <? endif; ?>
   <?=$this->record($this->driver)->getPreviewLink()?>
   <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib)?>
-  </div>
+  </div><!--/#e-links-->
+  </div><!--/.holdings-locpanel-->
 <? endif; ?>
 <? foreach ($holdings['holdings'] as $holding): ?>
 <?/*Convenience variable for e-resources*/?>
 <?$isFullTextOnline = $holding['location'] == 'FullText'?>
 <?$isRelatedTextOnline = $holding['location'] == 'Related'?>
-
-<div class="holdings-unit">
 
 <?//Bound-withs?>
 <? if (!empty($holding['items'][0]['boundwiths'])): ?>
@@ -103,16 +107,70 @@
 <? endif; ?>
 <?//End Bound-withs?>
 
-<h3>
-  <? $locationText = $this->transEsc('location_' . $holding['location'], [], $holding['location']); ?>
-  <? $locationText = strpos($locationText, '-') ? substr($locationText, 0, strpos($locationText, '-')) : $locationText; ?>
+<div class="holdings-locpanel">
+<div class="locpanel-heading">
+<h2>
+  <? // Get the raw location text. This contains the holdings id # and other such things ?>
+  <? // Break it into component parts and use it for different purposes ?>
+  <? $rawLocationText = $this->transEsc('location_' . $holding['location'], [], $holding['location']); ?>
+  <? $locationText = implode('-', explode('-', $rawLocationText, -1)); ?>
   <? if (isset($holding['locationhref']) && $holding['locationhref']): ?>
     <a href="<?=$holding['locationhref']?>" target="_blank"><?=$locationText?></a>
   <? else: ?>
     <?=$locationText?>
   <? endif; ?>
-</h3>
+</h2>
 
+<? /* Loop over textual (summary) holdings and separate them for later use */?>
+<? if (isset($holding['textfields'])): ?>
+  <? $unboundIssues = []; ?>
+  <? $unboundSupplements = []; ?>
+  <? $holdingsNotes = []; ?>
+  <? $otherTextualHoldings = []; ?>
+    <? foreach ($holding['textfields'] as $textFieldName => $textFields): ?>
+      <? $isUnboundIssues = $textFieldName == 'unbound issues'; ?>
+      <? $isUnboundSupplements = $textFieldName == 'unbound supplements'; ?>
+      <? $isHoldingsNotes = $textFieldName == 'holdings notes'; ?>
+      <? if ($isHoldingsNotes): ?>
+        <? $holdingsNotes['textfields'] = [$textFieldName => $textFields]; ?>
+      <? elseif ($isUnboundIssues): ?>
+        <? $unboundIssues['textfields'] = [$textFieldName => $textFields]; ?>
+      <? elseif ($isUnboundSupplements): ?>
+        <? $unboundSupplements['textfields'] = [$textFieldName => $textFields]; ?>
+      <? else: ?>
+        <? $otherTextualHoldings[$textFieldName] = ['textfields' => $textFields]; ?>
+      <? endif; ?>
+    <? endforeach; ?>
+<? endif; ?>
+
+<? /* Variables for checking the status of Library Has*/?>
+<? $flatLibHas = call_user_func_array('array_merge', $otherTextualHoldings['issues']); ?>
+<? $libHasCount = count($flatLibHas); ?>
+<? $emptyLibHas = empty(trim($flatLibHas[0])); ?>
+<? $doesNotHaveLibraryhas = ($libHasCount <= 1 && $emptyLibHas); ?>
+
+<? /* Variables for checking the status of holdings notes*/?>
+<? $flatHoldingsNotes = call_user_func_array('array_merge', $holdingsNotes['textfields']); ?>
+<? $holdingNotesCount = count($flatHoldingsNotes); ?>
+<? $emptyHoldingNotes = empty(trim($flatHoldingsNotes[0])); ?>
+<? $noHoldingsNotes = ($holdingNotesCount <= 1 && $emptyHoldingNotes); ?>
+
+<?/*Get the first barcode to pass to the map links*/ ?>
+<? $firstBarcode = $this->tab->getFirstBarcode($holding);?>
+<?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $firstBarcode)?>
+
+<?/*Callnumbers*/?>
+<? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
+<? $hasCallNos = !empty($callNos['display']); ?>
+<?foreach ($callNos['display'] as $numKey => $callNo): ?>
+   <br/><h3><span><?=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></span> <?=$this->escapeHtml($callNo)?></h3>
+   <? $source = ($callNos['typeid'][$numKey] == '3') ? 'dewey' : 'lcc'; ?>
+   <a href="<?= $this->url('home')?>alphabrowse/Home?source=<?=$source?>&amp;from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
+      class="ablink"><?=$callNumDisplayText?></a><br/>
+ <? endforeach; ?>
+</div><!--/.locpanel-heading-->
+
+<div class="holdings-unit">
 <? if ($isFullTextOnline):?>
   <strong><?=$this->transEsc("Available via:")?></strong>
 <? endif; ?>
@@ -120,22 +178,130 @@
   <br/><strong><?=$this->transEsc("Related Links:")?></strong>
 <? endif; ?>
 
-<?/*Get the first barcode to pass to the map links*/
-  $firstBarcode = $this->tab->getFirstBarcode($holding);?>
-<span class="maplink"><?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $firstBarcode)?></span>
+  <? /* Use the stored and separated textual (summary) holdings */?>
+  <? if (isset($holding['textfields'])): ?>
+      <? if (!$noHoldingsNotes): ?>
+        <p class="holdings-notes"><strong>Holdings notes: </strong> 
+          <? foreach ($holdingsNotes['textfields']['holdings notes'] as $holdingNote): ?>
+            <?=$holdingNote?>
+          <? endforeach; ?>
+        </p>
+      <? endif; ?>
 
-<?/*Callnumbers*/?>
-<? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
-<? $hasCallNos = !empty($callNos['display']); ?>
-<?foreach ($callNos['display'] as $numKey => $callNo): ?>
-   <br/><h4><span><?=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></span> <?=$this->escapeHtml($callNo)?></h4>
-   <? $source = ($callNos['typeid'][$numKey] == '3') ? 'dewey' : 'lcc'; ?>
-   <a href="<?= $this->url('home')?>alphabrowse/Home?source=<?=$source?>&amp;from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
-      class="ablink"><?=$callNumDisplayText?></a><br/>
- <? endforeach; ?>
+      <? if (!$doesNotHaveLibraryhas): ?>
+        <? /* The number of ownership types*/?>
+        <? $numTextHoldings = count($otherTextualHoldings); ?>
+        <? $summDivClass = ($numTextHoldings > 2 ? 'col-sm-4' : 'col-sm-6') ;?>
+        <div class="section row libraryhas">
+          <h5>Library has:</h5>
+          <? foreach ($otherTextualHoldings as $textFieldName => $textFieldArray): ?>
+              <? // Translation for summary is a special case for backwards-compatibility ?>
+              <div class="summary-holdings <?=$summDivClass?>" data-display="<?=$this->tab->getDisplayNumber()?>">
+                <h6>
+                    <? if ($textFieldName == 'summary'): ?>
+                        <?=$this->transEsc("Volume Holdings")?>
+                    <? elseif ($textFieldName == 'issues'): ?>
+                        <?=$this->transEsc("Issues/Volumes")?>
+                    <? else: ?>
+                        <?=$this->transEsc(ucfirst($textFieldName))?>
+                    <? endif; ?>
+                </h6>
+                <ul>
+                <? foreach ($textFieldArray['textfields'] as $current): ?>
+                  <li typeof="Enumeration"><?=$this->escapeHtml($current)?></li>
+                <? endforeach; ?>
+                </ul>
+              </div>
+          <? endforeach;?>
+        </div>
+      <? endif; ?>
+
+      <? /*Unbound issues and unbound supplements*/ ?>
+      <? $splitChar = '^'; ?>
+      <? /*Unbound Suplements*/?>
+      <? if ($unboundIssues): ?>
+        <? $unboundLocation = explode($splitChar, $unboundIssues['textfields']['unbound issues'][0])[1]; ?>
+        <? foreach ($unboundIssues['textfields'] as $textFieldName => $textFields): ?>
+          <table class="holdings-table table unbound" data-display="<?=$this->tab->getDisplayNumber()?>">
+            <thead>
+              <tr>
+                <th colspan="3">
+                    <h5><?=$this->transEsc(ucfirst($textFieldName))?>:</h5>
+                    <span class="unbound-location"><?=$unboundLocation?></span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <? foreach ($textFields as $current): ?>
+                <? $arr = explode($splitChar, $current); ?>
+                <? if (!empty(trim($arr[0]))): ?>
+                  <tr vocab="http://schema.org/" typeof="Offer">
+                    <th><?=$this->escapeHtml($arr[0])?></th>
+                    <td>
+                      Check shelf for availability
+                      <link property="availability" href="http://schema.org/InStock"/>
+                      <span class="loan-period">Building use only</span>
+                    </td>
+                  </tr>
+                <? endif; ?>
+              <? endforeach;?>
+            </tbody>
+          </table>
+        <? endforeach;?>
+      <? endif; ?>
+
+      <? /*Unbound supplements*/ ?>
+      <? if ($unboundSupplements): ?>
+        <? $unboundLocation = explode($splitChar, $unboundSupplements['textfields']['unbound supplements'][0])[1]; ?>
+        <? foreach ($unboundSupplements['textfields'] as $textFieldName => $textFields): ?>
+          <table class="holdings-table table unbound" data-display="<?=$this->tab->getDisplayNumber()?>">
+            <thead>
+              <tr>
+                <th colspan="3">
+                    <h5><?=$this->transEsc(ucfirst($textFieldName))?>:</h5>
+                    <span class="unbound-location"><?=$unboundLocation?></span>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <? foreach ($textFields as $current): ?>
+                <? $arr = explode($splitChar, $current); ?>
+                <? if (!empty(trim($arr[0]))): ?>
+                  <tr vocab="http://schema.org/" typeof="Offer">
+                    <th><?=$this->escapeHtml($arr[0])?></th>
+                    <td>
+                      Check shelf for availability
+                      <link property="availability" href="http://schema.org/InStock"/>
+                      <span class="loan-period">Building use only</span>
+                    </td>
+                  </tr>
+                <? endif; ?>
+              <? endforeach;?>
+            </tbody>
+          </table>
+        <? endforeach;?>
+      <? endif; ?>
+
+  <? endif; ?>
+
+<? // Create a boolean to see if holding has items ?>
+<? $hasItems = false; ?>
+<? foreach ($holding['items'] as $item): ?>
+  <? if (array_key_exists('holdtype', $item)): ?>
+    <? $hasItems = true; break; ?>
+  <? endif; ?>
+<? endforeach; ?>
+
+<? // Only display availability heading if holding has items ?>
+<? if ($hasItems): ?>
+    <h5>Availability:</h5>
+    <? if($unboundIssues || !$doesNotHaveLibraryhas): ?>
+      <span class="holding-location"><?=$locationText?></span>
+    <? endif; ?>
+<? endif; ?>
 
 <table class="holdings-table table" data-display="<?=$this->tab->getDisplayNumber()?>">
-  <caption><?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($holding['location'])?></caption>
+  <caption><?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($locationText)?></caption>
   <!--<tr>
     <th><?=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></th>
     <td>
@@ -147,21 +313,10 @@
     </td>
   </tr>-->
   <? endif; ?>
-  <? if (isset($holding['textfields'])): foreach ($holding['textfields'] as $textFieldName => $textFields): ?>
-    <tr class="section">
-      <? // Translation for summary is a special case for backwards-compatibility ?>
-      <th><?=$textFieldName == 'summary' ? $this->transEsc("Volume Holdings") : $this->transEsc(ucfirst($textFieldName))?>:</th>
-      <td>
-        <? foreach ($textFields as $current): ?>
-          <div typeof="Enumeration"><?=$this->escapeHtml($current)?></div>
-        <? endforeach; ?>
-      </td>
-    </tr>
-  <? endforeach; endif; ?>
   <? foreach ($holding['items'] as $row): ?>
     <?/*E-holding links if they exist*/?>
     <? if (isset($row['eHolding']['uri'])):?>
-        <br/><a href="<?=$this->proxyUrl($row['eHolding']['uri'])?>" class="fulltext eLink text-success"><?=$this->transEsc("Full text online")?></a>
+        <br/><a href="<?=$this->proxyUrl($row['eHolding']['uri'])?>" class="fulltext eLink"><?=$this->transEsc("Full text online")?></a>
     <? endif; ?>
     <?
       // AJAX Check record?
@@ -171,7 +326,9 @@
     ?>
     <? if (isset($row['barcode']) && $row['barcode'] != "" || (in_array($row['status'], $itemStatusWhitelist))): ?>
       <tr vocab="http://schema.org/" typeof="Offer">
-        <th><?=$this->transEsc("Copy")?> <?=$this->escapeHtml($row['number'])?></th>
+        <? if ($row['number']):?>
+        <th><?=$this->escapeHtml($row['number'])?></th>
+        <? endif; ?>
         <td>
           <? if ($row['reserve'] == "Y"): ?>
             <link property="availability" href="http://schema.org/InStoreOnly" />
@@ -182,11 +339,14 @@
           <? else: ?>
             <? if ($row['availability']): ?>
               <? /* Begin Available Items (Holds) */ ?>
-               <? if (isset($row['itemTypeCode']) && $row['itemTypeCode'] != "stks"):?>
-                  <span>Loan period: <?=$row['itemTypeName']?>&nbsp;</span>
-               <?endif;?>
 
-               <span class="text-success"><?=$this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'Available' : $row['status_name'])?><link property="availability" href="http://schema.org/InStock" /></span>
+               <span class="text-success">
+                   <?=$this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'Available' : $row['status_name'])?><link property="availability" href="http://schema.org/InStock" />
+                   <? if (isset($row['itemTypeCode']) && !empty($row['itemTypeName'])):?>
+                      <span class="loan-period">Loan period: <?=$row['itemTypeName']?>&nbsp;</span>
+                   <?endif;?>
+               </span>
+               <span class="service-links">
                <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                <?=$this->ServiceLinks()->asr($row)?>
                <?=$this->ServiceLinks()->dllStorage($row)?>
@@ -206,14 +366,19 @@
               <? /* Begin Unavailable Items (Recalls) */ ?>
               <? if ($row['status'] == 'ANAL'): ?>
                  To check availability
-                 <? $c = array_shift(explode(' ', $this->driver->getCallNumber())); ?>
-                 <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc">consult the series record</a>.
+                 <? $callNumBreak = preg_split("/\s[a-zA-Z0-9]+\./", $callNos['sort'][$numKey]); ?>
+                 <? if ($callNumBreak): ?>
+                   <? $c = $callNumBreak[0]; ?>
+                 <? else: ?>
+                   <? $c = $callNos['sort'][$numKey]; ?>
+                 <? endif; ?>
+                 <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc&consult=true">consult the series record</a>.
               <? else: ?>
               <span class="text-danger"><?=$this->transEsc($row['status_name'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
               <? if (isset($row['returnDate']) && $row['returnDate']): ?>&ndash; <span class="small"><?=$this->escapeHtml($row['returnDate'])?></span><? endif; ?>
               <? if (isset($row['duedate']) && $row['duedate']): ?>
                 <?/*Only display duedates for loaned items*/?>
-                <? $duedate = ($row['status'] == 'LOANED' ? $this->tab->getDuedate($row) : '');?>
+                <? $duedate = ($row['status'] == 'LOANED' ? $this->tab->getDueDate($row) : '');?>
                 <? if ($duedate == 'no due date unless recalled'): ?>
                 <? $dueHtml = '&ndash; <span class="small">no due date unless recalled</span>'; ?>
                 <? else: ?>
@@ -225,11 +390,11 @@
                 <span><?=$this->transEsc("Requests")?>: <?=$this->escapeHtml($row['requests_placed'])?></span>
               <? endif; ?>
               <? endif; //end if/else for row['status'] == 'ANAL'?>
+              <span class="service-links">
               <?=$this->ServiceLinks()->asr($row)?>
-              <?=$this->ServiceLinks()->borrowDirect($row)?>
               <?=$this->ServiceLinks()->getIt($row)?>
-              <?=$this->ServiceLinks()->uBorrow($row)?>
               <?=$this->ServiceLinks()->debugging($row)?>
+              <?=$this->ServiceLinks()->request($row)?>
               <? if (isset($row['link']) && $row['link'] && !$row['claimsReturned']): ?>
                 <!--<a class="<?//=$check ? 'checkRequest' : ''?> modal-link inlineblock placehold" href="<?//=$this->recordLink()->getRequestUrl($row['link'])?>"><i class="fa fa-flag"></i>&nbsp;<?//=$this->transEsc($check ? "Check Recall" : "Recall This")?></a>-->
                 <?=$this->ServiceLinks()->recall($row)?>
@@ -238,14 +403,12 @@
               <? /* Begin Items that are either Available or Unavailable */ ?>
                 <?=$this->ServiceLinks()->aeon($row)?>
                 <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib, $row)?>
-            <? if (isset($row['item_notes'])): ?>
+                <?=$this->ServiceLinks()->borrowDirect($row)?>
+                <?=$this->ServiceLinks()->uBorrow($row)?>
+                </span><? /* END .service-links */?>
+            <? if (isset($row['itemNotes'])): ?>
               <div class="item-notes">
-                <b><?=$this->transEsc("Item Notes")?>:</b>
-                <ul>
-                  <? foreach ($row['item_notes'] as $item_note): ?>
-                    <li><?=$this->escapeHtml($item_note) ?></li>
-                  <? endforeach; ?>
-                </ul>
+                <?=$row['itemNotes']?>
               </div>
             <? endif; ?>
             <? if (isset($row['itemCallnumberDisplay'])): ?>
@@ -254,6 +417,14 @@
                 <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
                 <strong>Shelved as:</strong>
                 <?=$row['itemCallnumberDisplay']?>
+              </span>
+            <? endif; ?>
+            <? if (isset($row['itemLocation'])): ?>
+              <br/>
+              <span class="location-change">
+                <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+                <strong>Shelved in:</strong>
+                <?=$row['itemLocation']?>
               </span>
             <? endif; ?>
           <? endif; ?>
@@ -271,6 +442,7 @@
             <link property="businessFunction" href="http://purl.org/goodrelations/v1#LeaseOut" />
             <link property="itemOffered" href="#record" />
         </td>
+        <td width="2"></td>
       </tr>
     <? endif; ?>
   <? endforeach; ?>
@@ -286,6 +458,7 @@
   <? endif; ?>
 </table>
 </div><!--/.holdings-unit-->
+</div><!--/.holdings-locpanel-->
 <? endforeach; ?>
 
 <? $history = $this->driver->getRealTimeHistory(); ?>

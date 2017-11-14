@@ -2,6 +2,14 @@
   $this->headTitle($this->translate('Browse the Collection Alphabetically'));
   //$this->layout()->breadcrumbs = '<a href="' . $this->url('alphabrowse-home') . '">' . $this->transEsc('Browse Alphabetically') . '</a>';
   $baseQuery = ['source' => $this->source, 'from' => $this->from];
+
+  // If coming from a "consult the series record" link, 
+  // send the user directly to the first record and bypass the browse.
+  if ($_GET['consult']) {
+    $seriesRecordUrl = $this->alphabrowse()->getUrl($this->source, $this->result['Browse']['items'][0]);
+    header("Location: $seriesRecordUrl");
+    exit();
+  }
 ?>
 
 <? /* LOAD THE LINK INFORMATION INTO $pageLinks, similar to smarty's {capture} */ ?>

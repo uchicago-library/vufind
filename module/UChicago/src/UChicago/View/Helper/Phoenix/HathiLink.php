@@ -112,7 +112,7 @@ class HathiLink extends AbstractHelper
 
         if ($this->isHathi()) {
             $oclcNumber = $this->getOCLCNumbers();
-            $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . $oclcNumber . '" class="hathi eLink text-success">HathiTrust Digital Library</a></div>';
+            $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . $oclcNumber . '" class="hathi eLink">HathiTrust Digital Library</a></div>';
         }
         return $hathiLink;
     }

@@ -107,6 +107,22 @@ class ServiceLinks extends AbstractHelper {
                              'rege',
                              'rosen',
                              'UCPress'],
+                        /*Whitelist*/
+                        'borrowDirect' => 
+                             ['ArtResA',
+                             'EckRes',
+                             'JRLRES',
+                             'LawRes',
+                             'LawResC',
+                             'LawResP',
+                             'Res',
+                             'Resup',
+                             'ResupC',
+                             'ResupD',
+                             'ResupE',
+                             'ResupS',
+                             'SSAdRes',
+                             'SciRes'],
                         'cantFindIt' =>
                             ['Art420',
                              'ArtResA',
@@ -132,6 +148,7 @@ class ServiceLinks extends AbstractHelper {
                              'MapRef',
                              'Mic',
                              'MidEMic',
+                             'Pam',
                              'PerBio',
                              'PerPhy',
                              'RR',
@@ -202,6 +219,7 @@ class ServiceLinks extends AbstractHelper {
                              'LawStor',
                              'LawSupr',
                              'Mansueto',
+                             'Pam',
                              'PerBio',
                              'PerPhy',
                              'RR',
@@ -244,6 +262,22 @@ class ServiceLinks extends AbstractHelper {
                              'LawAnxN'],
                         'recall' => 
                             ['Art420',
+                             'EckRes',
+                             'JRLRES',
+                             'LawRes',
+                             'LawResC',
+                             'LawResP',
+                             'Res',
+                             'Resup',
+                             'ResupC',
+                             'ResupD',
+                             'ResupE',
+                             'ResupS',
+                             'SSAdRes',
+                             'SciRes'],
+                        /*Whitelist*/
+                        'uBorrow' => 
+                             ['ArtResA',
                              'EckRes',
                              'JRLRES',
                              'LawRes',
@@ -336,19 +370,25 @@ class ServiceLinks extends AbstractHelper {
                              'RECENTLY-RETURNED'], 
                         'asr' =>
                             ['AVAILABLE-AT-MANSUETO'],
+                        /*Whitelist*/
+                        'hold' =>
+                            ['INPROCESS',
+                             'INTRANSIT',
+                             'ONORDER'],
                         /*Blacklist*/
                         'recall' => 
                             ['ANAL',
                              'AVAILABLE',
                              'DECLARED-LOST',
                              'FLAGGED-FOR-RESERVE',
+                             'INPROCESS',
                              'INPROCESS-MANSUETO',
-                             'INTRANSITFORHOLD', //temp
+                             'INTRANSIT',
                              'LOST',
                              'LOST-AND-PAID',
                              'MISSING',
                              'MISSING-FROM-MANSUETO',
-                             'ONHOLD', //temp
+                             'ONORDER',
                              'RECENTLY-RETURNED',
                              'RETRIEVING-FROM-MANSUETO',
                              'UNAVAILABLE']]; 
@@ -420,7 +460,7 @@ class ServiceLinks extends AbstractHelper {
 
             $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/aon/aeon-array_OLE.php?genre=' . $genre . '&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
             $serviceLink = $this->getLinkConfig('aeon', $defaultUrl);
-            $displayText = 'Request from SCRC';
+            $displayText = '<i class="fa fa-fw fa-folder-open" aria-hidden="true"></i> Request from SCRC';
 
             if ($serviceLink) {
                 return $this->getServiceLinkTemplate($serviceLink, $displayText);
@@ -438,7 +478,7 @@ class ServiceLinks extends AbstractHelper {
     public function asr($row) {
         $defaultUrl = '/vufind/MyResearch/Storagerequest?bib=' .  $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;action=add';
         $serviceLink = $this->getLinkConfig('mansueto', $defaultUrl); 
-        $displayText = 'Request from Mansueto Library';
+        $displayText = '<i class="fa fa-fw fa-shopping-basket" aria-hidden="true"></i> Request from Mansueto Library';
         $blacklist = array_map('strtolower', $this->lookupLocation['scrcInMansueto']);
         if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['asr']) and $this->getLocation($row['locationCodes'], 'library') != 'spcl') and 
             (!in_array(strtolower($this->getLocation($row['locationCodes'], 'shelving')), $blacklist))) {
@@ -457,8 +497,11 @@ class ServiceLinks extends AbstractHelper {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/borrowdirect_OLE.php?format=php&amp;database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('borrowDirect', $defaultUrl); 
         $displayText = 'BorrowDirect';
-        if (($serviceLink) and in_array($row['status'], $this->lookupStatus['borrowDirect'])) {
-            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        $shelvingLocations =  array_map('strtolower', $this->lookupLocation['borrowDirect']);
+        if ($serviceLink) {
+            if (in_array($row['status'], $this->lookupStatus['borrowDirect']) || in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations)) {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText);
+            }
         }
     }
 
@@ -472,7 +515,7 @@ class ServiceLinks extends AbstractHelper {
     public function cantFindIt($row) {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/cant-find-it-OLE.php?barcode=' . $row['barcode'] . '&amp;bib=' . $row['id'];
         $serviceLink = $this->getLinkConfig('cantFindIt', $defaultUrl);
-        $displayText = 'Can\'t find it?';
+        $displayText = '<i class="fa fa-search-plus" aria-hidden="true"></i> Can\'t find it?';
         $shelvingLocations = array_map('strtolower', $this->lookupLocation['cantFindIt']); 
         if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['cantFindIt'])) and 
             (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
@@ -560,7 +603,7 @@ class ServiceLinks extends AbstractHelper {
     public function maps($bib, $barcode) {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/maplookup/maplookup.php?bib=' .  $bib . '&amp;barcode=' . $barcode;
         $serviceLink = $this->getLinkConfig('maps', $defaultUrl); 
-        $displayText = '(Map/guide)';
+        $displayText = '<i class="fa fa-map-marker" aria-hidden="true"></i> Map/guide';
         if ($serviceLink and !empty($barcode)) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
@@ -599,13 +642,36 @@ class ServiceLinks extends AbstractHelper {
         $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
         //$serviceLink = 'http://forms2.lib.uchicago.edu/lib/searchform/recall-template.php?barcode=' . $row['barcode'] . '&bib=' . $row['id'];
         $serviceLink = $this->fillPlaceholders($this->getLinkConfig('recall', $defaultUrl), $row);
-        $displayText = 'Recall This';
+        $displayText = '<i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Recall This';
 
         /*Combined statuses and locations to make a blacklist*/
         $blacklist = array_map('strtolower', array_merge($this->lookupStatus['recall'], $this->lookupLocation['recall']));
 
         if (($serviceLink) && (!empty($row['status'])) && (!in_array(strtolower($row['status']), $blacklist)) && (!in_array($this->getLocation($row['locationCodes'], 'shelving'), $blacklist)) 
             && !empty($row['barcode'])) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+    }
+
+   /**
+     * Method creates a request link for items IN PROCESS or ON ORDER.
+     *
+     * @param row, array of holdings and item information
+     *
+     * @return html string
+     */
+    public function request($row) {
+        $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
+        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('request', $defaultUrl), $row);
+        $displayText = '<i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Place Hold';
+
+        /*Locations blacklist*/
+        $blacklist = $this->lookupLocation['recall'];
+
+        /*Status whitelist*/
+        $whitelist = $this->lookupStatus['hold'];
+
+        if (($serviceLink) && (!empty($row['status'])) && (in_array($row['status'], $whitelist)) && (!in_array($this->getLocation($row['locationCodes'], 'shelving'), $blacklist))) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
@@ -634,7 +700,7 @@ class ServiceLinks extends AbstractHelper {
     public function scanAndDeliver($row) {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/sandd_OLE.php?database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('scanAndDeliver', $defaultUrl); 
-        $displayText = 'Scan and Deliver';
+        $displayText = '<i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Scan and Deliver';
         $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
         if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
             (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
@@ -653,8 +719,11 @@ class ServiceLinks extends AbstractHelper {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/relais_OLE.php?format=php&database=production&bib=' . $row['id'] . '&barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('uBorrow', $defaultUrl);
         $displayText = 'UBorrow';
-        if (($serviceLink) and in_array($row['status'], $this->lookupStatus['uBorrow'])) {
-            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        $shelvingLocations =  array_map('strtolower', $this->lookupLocation['uBorrow']);
+        if ($serviceLink) {
+            if (in_array($row['status'], $this->lookupStatus['uBorrow']) || in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations)) {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText);
+            }
         }
     }
 
