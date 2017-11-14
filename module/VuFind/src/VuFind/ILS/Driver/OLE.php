@@ -1037,7 +1037,6 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             $items = array();
             while ($row = $stmt->fetch()) {
                 $item = array();
-                //print_r($row);
         
                 $callnumber = (!empty($row['CALL_NUMBER']) ? $row['CALL_NUMBER'] : $holdingCallNum);
 
@@ -1048,7 +1047,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $copyNum = $row['COPY_NUMBER'];
                 $enumeration = $row['ENUMERATION'];
                 $itemCallNumTypeId = (!empty($row['CALL_NUMBER_TYPE_ID']) ? trim($row['CALL_NUMBER_TYPE_ID']) : null);
-                $itemCallNumDisplay = (!empty($row['CALL_NUMBER_PREFIX']) ? trim($row['CALL_NUMBER_PREFIX']) . ' ' . $callnumber : null);
+                $itemCallNumDisplay = null;
+                if ($row['CALL_NUMBER_PREFIX'] || $row['CALL_NUMBER']) {
+                    $itemCallNumDisplay = trim($row['CALL_NUMBER_PREFIX']) . ' ' . $callnumber;
+                }
                 $itemCallNum = (isset($row['CALL_NUMBER']) ? trim($row['CALL_NUMBER']) : null);
                 $itemTypeName = trim($row['itype_desc']);
                 $itemLocation = $row['locn_name'];
@@ -1056,7 +1058,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
                 /* Set hold types */
                 $holdtype = 'recall';
-                if ($status == 'ONORDER' || $status =='INPROCESS') {
+                if ($status == 'ONORDER' || $status =='INPROCESS' || $status =='INTRANSIT') {
                     $holdtype = 'hold';
                 }
 

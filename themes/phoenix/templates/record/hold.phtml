@@ -6,19 +6,44 @@
     $this->layout()->breadcrumbs = '<li>' . $this->searchMemory()->getLastSearchLink($this->transEsc('Search'), '', '</li> ')
         . '<li>' . $this->recordLink()->getBreadcrumb($this->driver) . '</li> '
         . '<li class="active">' . $this->transEsc('request_place_text') . '</li>';
+
+    $isHold = $this->gatheredDetails['holdtype'] == 'hold';
 ?>
-<h2><?=$this->transEsc('request_place_text')?></h2>
+<h2>
+  <? if ($isHold):?>
+    <?=$this->transEsc('hold_place_text')?>
+  <? else: ?>
+    <?=$this->transEsc('request_place_text')?>
+  <? endif; ?>
+</h2>
 <? if ($this->helpText): ?>
 <p class="helptext"><?=$this->helpText?></p>
 <? endif; ?>
 
 <div class="hold-form">
-  <form class="form-horizontal" method="post" name="placeHold">
-    <?=$this->flashmessages()?>
+  <? if ($isHold):?>
+    <ul>
+      <li>Placing a hold request on an item will cause the item to be held for pickup for you as soon as it is available.</li>
+      <li><strong>In Transit</strong> items will typically be available within <strong>2-3 days</strong>.</li>
+      <li><strong>In Process</strong> items will typically be available within <strong>7-10 days</strong>.</li>
+      <li><strong>On Order</strong> items will typically be available for pickup within <strong>30-60 days</strong>, though some may take longer. <br/>Items ordered from outside North America and Europe may take as long as three to six months to arrive.</li>
+      <li>Multiple requests for the same item are fulfilled in the order in which they are received.</li>
+      <li>You will receive an email notice when the item is available for pickup.</li>
+    </ul>
+  <? else: ?>
+    <ul>
+      <li>Recalling a <strong>loaned</strong> item from another user will cause the item to be due <strong>7 days after the date it is recalled</strong>.</li>
+      <li>Recalling an item that is <strong>on hold</strong> or <strong>in transit for hold</strong> will cause the item to be due <strong>7 days after the date the prior user borrows the item</strong>.</li>
+      <li>Multiple requests for the same item are fulfilled in the order in which they are received.</li>
+      <li>You will receive an email notice when the item is available for pickup.</li>
+    </ul>
+  <? endif; ?>
     <div class="alert alert-info">
     <p>Requests can take sixty seconds to process. Please be patient when
     submitting this form.</p>
     </div>
+  <form class="form-horizontal" method="post" name="placeHold">
+    <?=$this->flashmessages()?>
     <label class="col-sm-3 control-label"><?=$this->transEsc('Title')?></label>
     <div class="col-sm-9">
       <p class="form-control-static"><?=$this->driver->getBreadcrumb() ?></p>
