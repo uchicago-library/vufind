@@ -6,9 +6,9 @@ if (!String.prototype.startsWith) {
   };
 }
 function getAlert(){
-    var api = 'https://www.lib.uchicago.edu/api/v1/pages/?type=alerts.AlertPage&fields=title,banner_message,more_info,alert_level,url&format=json';
+    var api = 'https://www.lib.uchicago.edu/api/v2/pages/?type=alerts.AlertPage&fields=title,banner_message,more_info,alert_level,url&format=json';
     json = $.getJSON(api, function(data) {
-        var pages = data.pages;
+        var pages = data.items;
         $.each(pages, function(key){
             var page = pages[key];
             var level = page.alert_level;
@@ -16,8 +16,8 @@ function getAlert(){
             var url = page.url;
             var html = '';
             var link = '';
-            if (page.more_info.length) {
-                link = ' | <a href="' + url + '">More info...</a>';
+            if (page.more_info.replace( /<.*?>/g, '' )) {
+                link = '<a href="' + url + '">More info...</a>';
             }
             if (level == 'alert-high') {
                 html += '<div id="alert" class="container">' + msg + link + ' </div>';
