@@ -1685,7 +1685,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             $requestType = urlencode('Hold/Hold Request');
         }
 
-        $uri = $this->circService .  "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemId={$itemId}&requestType={$requestType}&pickupLocation={$pickupLocation}";
+        $uri = $this->circService . "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemId={$itemId}&requestType={$requestType}&pickupLocation={$pickupLocation}";
+        if ($itemBarcode) {
+            $uri = $this->circService . "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcode}&requestType={$requestType}&pickupLocation={$pickupLocation}";
+        }
         
         $request = new Request();
         $request->setMethod(Request::METHOD_POST);
