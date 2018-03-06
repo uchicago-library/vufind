@@ -4,6 +4,19 @@
 
     // Set up breadcrumbs:
     $this->layout()->breadcrumbs = '<li><a href="' . $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') . '</a></li> <li class="active">' . $this->transEsc('Checked Out Items') . '</li>';
+
+    // UChicago customization
+    // Since the OLE api returns incomplete data, we must create a test for "patron level"
+    // renewal failures and capture the data for display purposes. This wouldn't be needed
+    // if the OLE api returned something that made sense in these cases.
+    $patronFail = false;
+    if (isset($this->renewResult) && count($this->renewResult)) {
+        $isMissingBarcode = array_key_exists('', $this->renewResult);
+        if($isMissingBarcode && $this->renewResult['']['success'] == false && $this->renewResult['']['new_date'] == '' && $this->renewResult['']['item_id'] == '' && $this->renewResult['']['code'] == '' ) {
+            $patronFail = true;
+            $patronFailMsg = $this->renewResult['']['sysMessage'];
+        }
+    }
 ?>
 
 <div class="row">
@@ -216,7 +229,7 @@
                 <? $showStatus = false; ?>
                 <div class="col-xs-12 col-sm-10 alert alert-success"><?=$this->transEsc('renew_success')?></div>
               <? else: ?>
-                <div class="col-xs-12 col-sm-10 alert alert-danger"><?=$this->transEsc('renew_fail')?><? if (isset($renewDetails['sysMessage'])): ?>: <?=$this->escapeHtml($renewDetails['sysMessage'])?><? endif; ?></div>
+                <div class="col-xs-12 col-sm-10 alert alert-danger"><?=$this->transEsc('renew_fail')?><? if (isset($renewDetails['sysMessage'])): ?>: <?=$renewDetails['sysMessage']?><? endif; ?></div>
               <? endif; ?>
            <? endif; ?>
 
@@ -238,6 +251,9 @@
           <? endif; ?>
           <? if ($ilsDetails['isLost']): ?>
             <div class="col-xs-12 col-sm-10 alert alert-danger">Billed as Lost</div>
+          <? endif; ?>
+          <? if ($patronFail): ?>
+            <div class="col-xs-12 col-sm-10 alert alert-danger"><?=$patronFailMsg?></div>
           <? endif; ?>
           <? if ($ilsDetails['recalled']): ?>
             <div class="col-xs-12 col-sm-10 alert alert-danger">Recalled</div>
