@@ -465,6 +465,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['title']), preg_replace('/[^ \w]+/', '', $b['title'])); });
                 break;
         }
+
         return $transList;
     }
 
@@ -1810,10 +1811,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
      */
     public function getRenewDetails($checkOutDetails)
     {
-      //var_dump($checkOutDetails);
       $renewDetails = $checkOutDetails['item_id'] . ',' . $checkOutDetails['id'];
-    //$renewDetails['item_id'] = $checkOutDetails['id'];
-        return $renewDetails;
+      //$renewDetails['item_id'] = $checkOutDetails['id'];
+      return $renewDetails;
     }
     
     /**
@@ -1826,7 +1826,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
      * including the Patron ID and an array of renewal IDS
      *
      * @throws ILSException - TODO
-     * @return array              An array of renewal information keyed by item ID
+     * @return array of renewal information keyed by item ID
      */
      /* TODO: implement error messages from OLE once status codes are returned correctly
      HTTP/1.1 200 OK
@@ -1903,6 +1903,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                                 "new_date" => $newDate,
                                 "item_id" => $itemBarcode,
                                 "sysMessage" => (string)$msg,
+                                "code" => $code
                                 );
             $i++;
         }
