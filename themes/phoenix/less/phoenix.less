@@ -1372,3 +1372,26 @@ a.tool:hover .arrow-left {
         color:#0F425C;
     }
 }
+
+/* SFX Deduping Service */
+.deduped-eholdings,
+#e-links {
+    .toggle {
+        font-weight: 200;
+        padding-top: 0.5em;
+        border-bottom: none;
+        cursor: pointer;
+        font-size: 1.1em;
+        font-family: 'ProximaNova-Regular', "Arial", sans-serif;
+        color: #767676;
+    }
+    .toggle:before {
+        font-family: FontAwesome;
+        color: #acacac;
+        content: "\f107";
+        padding-right: 0.2em;
+    }
+    .toggle.open:before {
+        content: "\f106";
+    }
+}

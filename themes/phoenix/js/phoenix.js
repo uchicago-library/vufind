@@ -27,7 +27,28 @@ function getAlert(){
         }); 
     });
 }
+
+function getDedupedEholdings(issns, target) {
+  $.get( VuFind.path + '/AJAX/JSON?method=dedupedEholdings', 'issns=' + issns, function(data, status, xhr) {
+    var response = JSON.parse(data);
+    target.append(response.data);
+
+    $(target).children('.toggle').click(function() {
+        $(this).toggleClass('open');
+        $(this).parent().children('.e-list').toggleClass('hide');
+    });
+
+  }, 'html');
+}
+
 $(document).ready(function() {
+
+    /*** Deduped eholdings instead of sfx ***/
+    $('[data-issns]').each(function() {
+        var issns = $(this).data('issns');
+        getDedupedEholdings(issns, $(this));
+    });
+
     getAlert();
 
     /*** Brief View / Detailed View Toggle***/
