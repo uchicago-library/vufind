@@ -564,9 +564,9 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function getIt($row) {
-        $defaultUrl = '#?format=php&amp;database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/requestFromILL.php?database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('getIt', $defaultUrl); 
-        $displayText = 'GetIt';
+        $displayText = 'Request via Interlibrary Loan';
         if (($serviceLink) and in_array($row['status'], $this->lookupStatus['getIt'])) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
