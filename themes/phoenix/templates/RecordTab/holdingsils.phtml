@@ -348,7 +348,6 @@
                    <?endif;?>
                </span>
                <span class="service-links">
-               <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                <?=$this->ServiceLinks()->asr($row)?>
                <?=$this->ServiceLinks()->dllStorage($row)?>
                <?=$this->ServiceLinks()->cantFindIt($row)?>
@@ -395,7 +394,6 @@
               <?=$this->ServiceLinks()->asr($row)?>
               <?=$this->ServiceLinks()->getIt($row)?>
               <?=$this->ServiceLinks()->debugging($row)?>
-              <?=$this->ServiceLinks()->request($row)?>
               <? if (isset($row['link']) && $row['link'] && !$row['claimsReturned']): ?>
                 <!--<a class="<?//=$check ? 'checkRequest' : ''?> modal-link inlineblock placehold" href="<?//=$this->recordLink()->getRequestUrl($row['link'])?>"><i class="fa fa-flag"></i>&nbsp;<?//=$this->transEsc($check ? "Check Recall" : "Recall This")?></a>-->
                 <?=$this->ServiceLinks()->recall($row)?>
@@ -406,6 +404,8 @@
                 <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib, $row)?>
                 <?=$this->ServiceLinks()->borrowDirect($row)?>
                 <?=$this->ServiceLinks()->uBorrow($row)?>
+                <?=$this->ServiceLinks()->request($row)?>
+                <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                 </span><? /* END .service-links */?>
             <? if (isset($row['itemNotes'])): ?>
               <div class="item-notes">

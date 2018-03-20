@@ -181,6 +181,10 @@ class ServiceLinks extends AbstractHelper {
                              'SSAdX',
                              'W',
                              'WCJK'],
+                        /* Whitelist */
+                        'hold' =>
+                            ['XClosedCJK',
+                             'XClosedGen'],
                         'inProcessAtMansueto' =>
                             ['SciASR'],
                         'scanAndDeliver' => 
@@ -251,7 +255,9 @@ class ServiceLinks extends AbstractHelper {
                              'SSAdX',
                              'Stor',
                              'W',
-                             'WCJK'],
+                             'WCJK',
+                             'XClosedCJK',
+                             'XClosedGen'],
                         'dllStorage' => 
                             ['LawA',
                              'LawAnxS',
@@ -566,7 +572,7 @@ class ServiceLinks extends AbstractHelper {
     public function getIt($row) {
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/requestFromILL.php?database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('getIt', $defaultUrl); 
-        $displayText = 'Request via Interlibrary Loan';
+        $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request via Interlibrary Loan';
         if (($serviceLink) and in_array($row['status'], $this->lookupStatus['getIt'])) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
@@ -665,14 +671,30 @@ class ServiceLinks extends AbstractHelper {
         $serviceLink = $this->fillPlaceholders($this->getLinkConfig('request', $defaultUrl), $row);
         $displayText = '<i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Place Hold';
 
+        $location = $this->getLocation($row['locationCodes'], 'shelving');
+
         /*Locations blacklist*/
         $blacklist = $this->lookupLocation['recall'];
 
         /*Status whitelist*/
-        $whitelist = $this->lookupStatus['hold'];
+        $whitelist = $this->lookupStatus['hold']; // Unavailable
+        $location_whitelist = array_map('strtolower', $this->lookupLocation['hold']);
 
-        if (($serviceLink) && (!empty($row['status'])) && (in_array($row['status'], $whitelist)) && (!in_array($this->getLocation($row['locationCodes'], 'shelving'), $blacklist))) {
+        /*Normal Place Hold logic*/
+        if (($serviceLink) && (!empty($row['status'])) && (in_array($row['status'], $whitelist)) && (!in_array($location, $blacklist))) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+        /*For XClosedGen and XClosedCJK*/
+        elseif (in_array(strtolower($location), $location_whitelist)) {
+            // Whitelist becomes blacklist. While normally the "Place Hold" link
+            // is only displayed for certain *unavailable* statuses, we show it
+            // for XClosedGen and XClosedCJK when the item staus is *Available* or
+            // *Recently Returned* (also Available from VuFind's perspective). 
+            // That's why the whitelist becomes a blacklist.
+            $item_status_blacklist = $whitelist;
+            if (!in_array($row['status'], $item_status_blacklist)) {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText);
+            }
         }
     }
 

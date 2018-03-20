@@ -1059,7 +1059,13 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
                 /* Set hold types */
                 $holdtype = 'recall';
-                if ($status == 'ONORDER' || $status =='INPROCESS' || $status =='INTRANSIT') {
+                $hold_stat = ['AVAILABLE',
+                              'ONHOLD',
+                              'ONORDER',
+                              'INPROCESS',
+                              'INTRANSIT',
+                              'RECENTLY-RETURNED'];
+                if (in_array($status, $hold_stat)) {
                     $holdtype = 'hold';
                 }
 
