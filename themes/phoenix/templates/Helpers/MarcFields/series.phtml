@@ -1,13 +1,13 @@
 <!--series.phtml-->
 <? /*If it's a 490 field don't link it, otherwise link to a series browse*/
            if($data['currentField'] == 490) : ?>
-               <? echo implode(' ', $data['subfieldData']) ?><br/>
+               <? echo strip_tags(implode(' ', $data['subfieldData'])) ?><br/>
                <? if (!empty($data['vernacularData'])) :
-                      echo implode(' ', $data['vernacularData']);?><br />
+                      echo strip_tags(implode(' ', $data['vernacularData']));?><br />
                <? endif; ?>
            <? else: ?>
                <? 
-                  $marcValue = implode(' ', $data['subfieldData']) ;
+                  $marcValue = strip_tags(implode(' ', $data['subfieldData'])) ;
 
                   /*Get rid of subfield v only for the link (we still display it)*/
                   $v = $this->findKey('/^v/',$data['subfieldData']);

@@ -26,7 +26,7 @@
  * @link     https://vufind.org/wiki/development:plugins:controllers Wiki
  */
 namespace UChicago\Controller;
-use VuFind\Exception\Auth as AuthException;
+use VuFind\Exception\Auth as AuthException, Zend\Http\Client, Zend\Http\Request;
 
 /**
  * READ - This controller overrides the VuFind AjaxController only to hide status for analyitc 
@@ -40,6 +40,83 @@ use VuFind\Exception\Auth as AuthException;
  */
 class AjaxController extends \VuFind\Controller\AjaxController
 {
+
+    /**
+     * Helper function for decoding jsonp
+     *
+     */
+    private function jsonp_decode($jsonp, $assoc = false) {
+        if($jsonp[0] !== '[' && $jsonp[0] !== '{') { // we have JSONP
+            $jsonp = substr($jsonp, strpos($jsonp, '('));
+        }
+        return json_decode(trim($jsonp,'();'), $assoc);
+    }
+
+    /**
+     * Get deduped e-holdings from Keith's e-holding deduping service.
+     * More info: http://www2.lib.uchicago.edu/keith/tmp/dldc/kw/holdings.html
+     *
+     * @param string, $issns, comma separated issn numbers.
+     *
+     * @return array
+     */
+    public function getDedupedEholdings($issns) {
+        $config = $this->getConfig();
+        $code = $config['DedupedEholdings']['code'];
+        $function = $config['DedupedEholdings']['function'];
+        $url = $config['DedupedEholdings']['url'] . '?code=' . $code . '&function=' . $function . '&callback=vufind' . '&issns=' . $issns;
+
+        $request = new Request();
+        $request->setMethod(Request::METHOD_GET);
+        $request->setUri($url);
+
+        $client = new Client();
+        $client->setOptions(array('timeout' => 6));
+
+        $response = $client->dispatch($request);
+        $content = $response->getBody();
+
+        return $this->jsonp_decode($content, true);
+    }
+
+    /**
+     * Convert deduped e-holdings from Keith's e-holding deduping service to HTML.
+     *
+     * @param array, $issns, issn numbers.
+     *
+     * @return string, html
+     */
+    public function getDedupedEholdingsHtml($issns) {
+        $config = $this->getConfig();
+        $dedupedEholdings = $this->getDedupedEholdings($issns);
+        $coverageLabel = $config['DedupedEholdings']['coverage_label'];
+        $format = '<a href="%s" class="eLink external">%s</a> %s %s<br/>';
+        $retval = '';
+        if ($dedupedEholdings) {
+            $deduped = $dedupedEholdings['deduped'];
+            $complete = $dedupedEholdings['complete'];
+            foreach($deduped as $deh) {
+                $retval .= sprintf($format, $deh['url'], $deh['name'], $coverageLabel, $deh['coverageString']);
+            }
+            if ($complete) {
+                if (count($deduped) < count($complete)) {
+                    $retval .= '<div class="toggle">View all available e-resources for this title</div>';
+                    $retval .= '<div class="e-list hide">';
+                    foreach($complete as $ch) {
+                        $retval .= sprintf($format, $ch['url'], $ch['name'], $coverageLabel, $ch['coverageString']);
+                    }
+                    $retval .= '</div>';
+                }
+            }
+        }
+        return $retval;
+    }
+
+    protected function dedupedEholdingsAjax() {
+        $issns = $_GET['issns'];
+        $html = $this->getDedupedEholdingsHtml($issns);
+        return $this->output($html, self::STATUS_OK);
+    }
 
     /**
      * Support method for getItemStatuses() -- process a single bibliographic record
