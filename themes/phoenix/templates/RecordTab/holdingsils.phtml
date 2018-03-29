@@ -18,7 +18,8 @@
         $offlineMode = 'ils-offline';
     }
 
-    $bib = $this->driver->getUniqueID(); 
+    $bib = $this->driver->getUniqueID();
+    $isSfxStub = strtolower(substr($bib, 0, 3)) == 'sfx'; 
 
     // E-resource links
     $hathiLink = $this->HathiLink()->getHathiLink();
@@ -57,7 +58,7 @@
 <? $holdingTitleHold = $this->driver->tryMethod('getRealTimeTitleHold'); if (!empty($holdingTitleHold)): ?>
   <a class="placehold" data-lightbox title="<?=$this->transEsc('request_place_text')?>" href="<?=$this->recordLink()->getRequestUrl($holdingTitleHold)?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc('title_hold_place')?></a>
 <? endif; ?>
-<? if (!empty($urls) || $openUrlActive || $hathiLink): ?>
+<? if (!empty($urls) || $openUrlActive || $hathiLink || $isSfxStub): ?>
   <div class="holdings-locpanel">
   <div class="locpanel-heading online">
   <h2><?=$this->transEsc("Online")?></h2><br/>
