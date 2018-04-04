@@ -353,6 +353,7 @@
                <?=$this->ServiceLinks()->dllStorage($row)?>
                <?=$this->ServiceLinks()->cantFindIt($row)?>
                <?=$this->ServiceLinks()->inProcessAtMansueto($row)?>
+               <?=$this->ServiceLinks()->request($row)?>
                <?=$this->ServiceLinks()->debugging($row)?>
               <? if (isset($row['link']) && $row['link']): ?>
                 <!--<a class="<?=$check ? 'checkRequest ' : ''?>placehold" data-lightbox href="<?=$this->recordLink()->getRequestUrl($row['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>-->
@@ -405,7 +406,6 @@
                 <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib, $row)?>
                 <?=$this->ServiceLinks()->borrowDirect($row)?>
                 <?=$this->ServiceLinks()->uBorrow($row)?>
-                <?=$this->ServiceLinks()->request($row)?>
                 <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                 </span><? /* END .service-links */?>
             <? if (isset($row['itemNotes'])): ?>
