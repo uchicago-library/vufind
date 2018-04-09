@@ -34,7 +34,7 @@ public Set getHznCallNumber(Record record, String mode)
 	System.out.println(" I'm HORIZON");
 	
     Set result = new LinkedHashSet();
-    List items  = record.getVariableFields("099"); 
+    List items  = record.getVariableFields("0929"); 
     String [] res = new String[2];
     
     
@@ -45,8 +45,8 @@ public Set getHznCallNumber(Record record, String mode)
     	    "; allowed values are 'display' or 'sort'");
     }
  
-    // pull 099a sublield from each record
-    Set callNos = indexer.getFieldList(record, "099a");
+    // pull 929a sublield from each record
+    Set callNos = indexer.getFieldList(record, "929a");
     
     for (String call : callNos) 
     {
@@ -72,32 +72,32 @@ public Set getHznCall_LC_Number(Record record)
 public Set getHznCall_LC_Number(Record record, String mode)
 {
      Set result = new LinkedHashSet();
-     List fld099List  = record.getVariableFields("099");
+     List fld929List  = record.getVariableFields("929");
      
-      if (fld099List.isEmpty())
+      if (fld929List.isEmpty())
      {
      	     return result;
      }
      
-     Iterator iter = fld099List.iterator();
-     DataField fld099;
+     Iterator iter = fld929List.iterator();
+     DataField fld929;
      while (iter.hasNext())
      {
-    	  fld099 = (DataField) iter.next();
+    	  fld929 = (DataField) iter.next();
     	  
           // Reject only DDC and SuDoc call numbers
-    	  if(fld099.getSubfield('t') != null) 
+    	  if(fld929.getSubfield('t') != null) 
     	  {
-               String str_t = fld099.getSubfield('t').getData().trim();
+               String str_t = fld929.getSubfield('t').getData().trim();
 
     	       if ( str_t.equals("DDC") || str_t.equals("SuDoc"))
     	           continue;
     	  }   
     	    	    
-    	  if(fld099.getSubfield('a') != null) 
+    	  if(fld929.getSubfield('a') != null) 
     	  {
-    	       // pull 099a sublield from each record
-               Set str_a = indexer.getFieldList(record, "099a");
+    	       // pull 929a sublield from each record
+               Set str_a = indexer.getFieldList(record, "929a");
     	       for (String call : str_a) 
                     {	                      
                     	       String [] rest = splitHznPrefixCallnum(call);
@@ -178,24 +178,24 @@ public static String[] splitHznPrefixCallnum(callNum)
 }
 
 
- // dewey-raw: in 099 field look for subfield "t" with "DDC" in that subfield. if there is a subfield  with DDC, use subfield "a" to populate and 
+ // dewey-raw: in 929 field look for subfield "t" with "DDC" in that subfield. if there is a subfield  with DDC, use subfield "a" to populate and 
  //trim any possible #0018 and #0019"deweyRaw" in alphabetical browse.
 public Set getHznDeweyRaw (Record record)
 {
-   List fld099List = record.getVariableFields("099");
-   Iterator iter = fld099List.iterator();
+   List fld929List = record.getVariableFields("929");
+   Iterator iter = fld929List.iterator();
    Set result = new LinkedHashSet();
 
-    DataField fld099;
+    DataField fld929;
    
     while (iter.hasNext())
     {
-            fld099 = (DataField) iter.next();
+            fld929 = (DataField) iter.next();
             
-            if(fld099.getSubfield('t') != null && 
-            fld099.getSubfield('t').getData().toUpperCase().contains("DDC")) 
+            if(fld929.getSubfield('t') != null && 
+            fld929.getSubfield('t').getData().toUpperCase().contains("DDC")) 
             {  	    
-                  String deweyRaw = fld099.getSubfield('a').getData();
+                  String deweyRaw = fld929.getSubfield('a').getData();
                   result.add(deweyRaw);
             } 
     }
@@ -205,20 +205,20 @@ public Set getHznDeweyRaw (Record record)
 public Set getHznDeweySort (Record record)
 
 {
-   List fld099List = record.getVariableFields("099");
-   Iterator iter = fld099List.iterator();
+   List fld929List = record.getVariableFields("929");
+   Iterator iter = fld929List.iterator();
    Set result = new LinkedHashSet();
 
-    DataField fld099;
+    DataField fld929;
     while (iter.hasNext())
     {
 
-            fld099 = (DataField) iter.next();
+            fld929 = (DataField) iter.next();
             
-            if(fld099.getSubfield('t') != null && 
-            fld099.getSubfield('t').getData().toUpperCase().contains("DDC")) 
+            if(fld929.getSubfield('t') != null && 
+            fld929.getSubfield('t').getData().toUpperCase().contains("DDC")) 
             { 
-                  String deweySort = CallNumberTrim(fld099.getSubfield('a').getData());
+                  String deweySort = CallNumberTrim(fld929.getSubfield('a').getData());
                   result.add(deweySort); 
             } 
     }

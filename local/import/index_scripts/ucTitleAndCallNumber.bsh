@@ -35,7 +35,7 @@ public Set getHznTitleAndCallNumber(Record record)
 public Set getHznTitleAndCallNumber(Record record, String mode)
 {
     Set result = new LinkedHashSet();
-    List items  = record.getVariableFields("099"); 
+    List items  = record.getVariableFields("929"); 
     
     char sep = '\t';
     
@@ -51,8 +51,8 @@ public Set getHznTitleAndCallNumber(Record record, String mode)
     //NB: indexer is a magic reference to the current SolrIndexer instance
     String title = indexer.getTitle(record);
  
-    // pull 099a sublield from each record
-    Set callNos = indexer.getFieldList(record, "099a");
+    // pull 929a sublield from each record
+    Set callNos = indexer.getFieldList(record, "929a");
     
     for (String call : callNos) 
     {

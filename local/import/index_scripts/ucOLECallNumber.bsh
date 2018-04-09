@@ -34,7 +34,7 @@ public Set getOLEcallNumber(Record record, String mode)
 {
 	
     Set result = new LinkedHashSet();
-    List items  = record.getVariableFields("099"); 
+    List items  = record.getVariableFields("929"); 
     String [] res = new String[2];
     
  
@@ -48,12 +48,12 @@ public Set getOLEcallNumber(Record record, String mode)
     }
  
     // pull 099a sublield from each record
-    Set callNos = indexer.getFieldList(record, "099a");
+    Set callNos = indexer.getFieldList(record, "929a");
     if (callNos.isEmpty())
     {
-    	    Set callNos = indexer.getFieldList(record, "098a");
+    	    Set callNos = indexer.getFieldList(record, "928a");
     	    
-    	    List items098  = record.getVariableFields("098"); 
+    	    List items098  = record.getVariableFields("928"); 
     	    Iterator iter = items098.iterator();
             DataField fld098;
             while (iter.hasNext())
@@ -85,17 +85,17 @@ public Set getOLEcallNumber(Record record, String mode)
      } 
 
     
-    List items099  = record.getVariableFields("099"); 
-    Iterator iter = items099.iterator();
-    DataField fld099;
+    List items099  = record.getVariableFields("929"); 
+    Iterator iter = items929.iterator();
+    DataField fld929;
     while (iter.hasNext())
     {
     	    fld099 = (DataField) iter.next();
     	  
     	    // Reject only DDC and SuDoc call numbers
-    	    if(fld099.getSubfield('t') != null) 
+    	    if(fld929.getSubfield('t') != null) 
     	    {
-    	    	    String str_t = fld099.getSubfield('t').getData().trim();
+    	    	    String str_t = fld929.getSubfield('t').getData().trim();
 
         	    if ( str_t.equals("DDC") || str_t.equals("SuDoc"))
       	    	    continue;
@@ -125,20 +125,20 @@ public Set getOLEcallNumber(Record record, String mode)
  //trim any possible #0018 and #0019"deweyRaw" in alphabetical browse.
 public Set getOLEdeweyRaw (Record record)
 {
-   List fld099List = record.getVariableFields("099");
-   Iterator iter = fld099List.iterator();
+   List fld929List = record.getVariableFields("929");
+   Iterator iter = fld929List.iterator();
    Set result = new LinkedHashSet();
 
-    DataField fld099;
+    DataField fld929;
    
     while (iter.hasNext())
     {
-            fld099 = (DataField) iter.next();
+            fld929 = (DataField) iter.next();
             
-            if(fld099.getSubfield('t') != null && 
-            fld099.getSubfield('t').getData().toUpperCase().contains("DDC")) 
+            if(fld929.getSubfield('t') != null && 
+            fld929.getSubfield('t').getData().toUpperCase().contains("DDC")) 
             {  	    
-                  String deweyRaw = fld099.getSubfield('a').getData();
+                  String deweyRaw = fld929.getSubfield('a').getData();
                   result.add(deweyRaw);
             } 
     }
@@ -148,20 +148,20 @@ public Set getOLEdeweyRaw (Record record)
 public Set getOLEdeweySort (Record record)
 
 {
-   List fld099List = record.getVariableFields("099");
-   Iterator iter = fld099List.iterator();
+   List fld929List = record.getVariableFields("929");
+   Iterator iter = fld929List.iterator();
    Set result = new LinkedHashSet();
 
-    DataField fld099;
+    DataField fld929;
     while (iter.hasNext())
     {
 
             fld099 = (DataField) iter.next();
             
-            if(fld099.getSubfield('t') != null && 
+            if(fld929.getSubfield('t') != null && 
             fld099.getSubfield('t').getData().toUpperCase().contains("DDC")) 
             { 
-		result.add(new DeweyCallNumber(fld099.getSubfield('a').getData()).getShelfKey());
+		result.add(new DeweyCallNumber(fld929.getSubfield('a').getData()).getShelfKey());
             } 
     }
     return result;

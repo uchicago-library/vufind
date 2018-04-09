@@ -18,7 +18,7 @@ public Set getFormat(Record record)
     String leader = record.getLeader().toString();
     char leaderBit;
     ControlField fixedField = (ControlField) record.getVariableField("008");
-    List items  = record.getVariableFields("099");
+    List items  = record.getVariableFields("929");
     List df856List  = record.getVariableFields("856");  
     List df300List  = record.getVariableFields("300");
     List df336List  = record.getVariableFields("336");
@@ -29,7 +29,7 @@ public Set getFormat(Record record)
     List df502List  = record.getVariableFields("502"); 
     List df538List  = record.getVariableFields("538"); 
     List df903List  = record.getVariableFields("903");
-    List df099List  = record.getVariableFields("099");
+    List df929List  = record.getVariableFields("929");
     
     
     String formatString;
@@ -43,17 +43,17 @@ public Set getFormat(Record record)
     //   http://marc4j.tigris.org/doc/apidoc/index.html
     
     
-    // 099 $b is the prefix, which is separate in OLE. It has been moved from 099 field #0018 #0019 control field to 099$b just in OLE records 
-    Iterator iter = df099List.iterator();
+    // 929 $b is the prefix, which is separate in OLE. It has been moved from 929 field #0018 #0019 control field to 929$b just in OLE records 
+    Iterator iter = df929List.iterator();
     {
-    	    DataField fld099;
+    	    DataField fld929;
     	    while (iter.hasNext())
     	    {
-    	    	    fld099 = (DataField) iter.next();
+    	    	    fld929 = (DataField) iter.next();
     	    	        	    	   
-    	    	    if(fld099.getSubfield('b') != null) 
+    	    	    if(fld929.getSubfield('b') != null) 
     	    	    {
-    	    	    	    String str = fld099.getSubfield('b').getData();
+    	    	    	    String str = fld929.getSubfield('b').getData();
     	    	    	   
                    		if (str.equals("DVD"))
                    	    	{

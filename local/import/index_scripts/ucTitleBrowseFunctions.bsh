@@ -347,7 +347,8 @@ public static List titleBrowse(Record record, String tagStr)
     while (iter.hasNext())
     {
     	    f = (String) iter.next();
-	    String trimmed = org.solrmarc.tools.Utils.removeTrailingChar(f, "([,/;:.])*");
+	    String trimmed = org.solrmarc.tools.Utils.removeTrailingChar(f, "([,/;:.])*");  System.out.println();
+            System.out.println("  trimmed field:  " + trimmed);
 	    result.add(trimmed);
     }
     return result;

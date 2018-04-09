@@ -10,12 +10,12 @@ import org.marc4j.marc.VariableField;
  *
 	 * @param  Record          record
 	 * @return Set  "collections" of record
-	 * Indexes on  "099 c" and "099 l" to look for all collection and checks with the local/import/traslation_map.properties for all the possible collections that we want to display
+	 * Indexes on  "929 c" and "929 l" to look for all collection and checks with the local/import/traslation_map.properties for all the possible collections that we want to display
 	 */
 public Set getCollection(Record record)
 {
     Set result = new LinkedHashSet(); 
-    List items  = record.getVariableFields("099");
+    List items  = record.getVariableFields("929");
     
     for (DataField item : items)     
     {
