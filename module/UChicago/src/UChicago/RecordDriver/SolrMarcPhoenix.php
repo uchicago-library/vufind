@@ -243,14 +243,15 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
     }
 
     /**
-     * Gets bookplate 097 abnd 098 fields from the MARC record.
+     * Gets bookplate 927 abnd 928 fields from the MARC record.
+     * Previously this code parsed 097 and 098 fields.
      *
      * @returns string
      */
     public function getBookPlate()
     {
         $output = [];
-        foreach (array('097', '098') as $field) {
+        foreach (array('927', '928') as $field) {
             $donor_codes = $this->getFieldArray($field, ['e'], false);
             $donor = $this->getFieldArray($field, ['d'], false);
 
@@ -461,7 +462,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
          */
         'eHoldings' => [
             ['label'  => 'urls',
-             'values' => ['098|uclapz']],
+             'values' => ['928|uclapz']],
         ],
         /**
          * Array of marc fields to display for 

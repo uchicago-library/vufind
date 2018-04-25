@@ -146,7 +146,7 @@
           $openUrl = $this->openUrl($this->driver, 'results');
           $openUrlActive = $openUrl->isActive();
           // Account for replace_other_urls setting
-          $urls = $this->Eholdings()->getEholdingLinks();//Replace default 856 urls with e-holdings from the 098 fields?>
+          $urls = $this->Eholdings()->getEholdingLinks();//Replace default 856 urls with e-holdings from the 928 fields (previously 098s) ?>
           <? if (!$openUrlActive && empty($urls) && $this->driver->supportsAjaxStatus()): ?>
             <span class="status ajax-availability hidden holdings-info">
               <span><?=$this->transEsc('Loading')?>...</span>

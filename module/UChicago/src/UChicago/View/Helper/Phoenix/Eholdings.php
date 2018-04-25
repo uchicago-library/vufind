@@ -15,9 +15,11 @@ class Eholdings extends AbstractHelper
 {
 
     /**
-     * Determine if the MARC data for 098s is
+     * Determine if the MARC data for 928s is
      * using the old style export (bad = true)
-     * or the new style (bad = false)
+     * or the new style (bad = false).
+     *
+     * This code previously parsed 098s.
      */
     public function isBad($array) {
         $keys = array_keys($array);
@@ -109,9 +111,9 @@ class Eholdings extends AbstractHelper
                 $i++;
             }
 
-            // If the 098s use the old style of export,
+            // If the 928s use the old style of export,
             // break out of the loop because we already
-            // have them all
+            // have them all (previously used on 098s)
             if ($this->isBad($urlData['subfieldData'])) {
                 break;
             }

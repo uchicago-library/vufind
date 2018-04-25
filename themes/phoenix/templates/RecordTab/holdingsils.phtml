@@ -9,7 +9,7 @@
     $callNumLabel = 'Call Number:';
     // Account for replace_other_urls setting
     //$urls = $this->record($this->driver)->getLinkDetails($openUrlActive);
-    $urls = $this->Eholdings()->getEholdingLinks();//Replace default 856 urls with e-holdings from the 098 fields
+    $urls = $this->Eholdings()->getEholdingLinks();//Replace default 856 urls with e-holdings from the 928 fields (previously 098)
     $offlineMode = $this->ils()->getOfflineMode();
     try {
         $holdings = $this->driver->getRealTimeHoldings();
