@@ -43,7 +43,8 @@
       </analyzer>
     </fieldType>
     <!-- Text Field without Stemming and Synonyms -->
-    <fieldType name="textProper" class="solr.TextField" positionIncrementGap="100">
+    <fieldType name="textProper" class="solr.TextField">
+    <!-- positionIncrementGap="0"-->
       <analyzer type="index">
          <charFilter class="solr.PatternReplaceCharFilterFactory"
         pattern="[\u02BB\u02B9\u2018\u2019\u02BF]" replacement="'" />       
