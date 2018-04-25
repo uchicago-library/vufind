@@ -58,12 +58,12 @@
         <input id="checked_out_items_sort_field" type="hidden" name="sort" value="<?=$this->sort; ?>"/>
         <div class="toolbar">
           <div class="checkbox">
-             <label>
+             <!--<label>
                <input type="checkbox" class="checkbox-select-all" name="selectAll" id="<?=$this->idPrefix?>addFormCheckboxSelectAll"/>
                <span>Select all</span>
-             </label>
+             </label>-->
+            <input type="submit" class="btn btn-primary <?=$disabled?>" id="renewAll" name="renewAll" value="<?=$this->transEsc('renew_all')?>" />
             <input type="submit" class="btn btn-default <?=$disabled?>" id="renewSelected" name="renewSelected" value="<?=$this->transEsc("renew_selected")?>" />
-            <input type="submit" class="btn btn-default <?=$disabled?>" id="renewAll" name="renewAll" value="<?=$this->transEsc('renew_all')?>" />
           </div>
         </div>
       <? endif; ?>

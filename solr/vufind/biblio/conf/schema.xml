@@ -43,7 +43,8 @@
       </analyzer>
     </fieldType>
     <!-- Text Field without Stemming and Synonyms -->
-    <fieldType name="textProper" class="solr.TextField" positionIncrementGap="100">
+    <fieldType name="textProper" class="solr.TextField">
+    <!-- positionIncrementGap="0"-->
       <analyzer type="index">
         <charFilter class="solr.PatternReplaceCharFilterFactory"
         pattern="[\u02BB\u02B9\u2018\u2019\u02BF]" replacement="'" />
@@ -284,6 +285,7 @@
    <field name="item_collection" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="series_facet" type="textFacet" indexed="true" stored="true" multiValued="true"/>
    <field name="barcode" type="string" indexed="true" stored="true" multiValued="true"/>
+   <field name="import_time" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
    <!-- UChicago fields for exactish matching -->
    <field name="title_short_exact" type="text_lr" indexed="true" stored="true"/>
    <field name="title_alt_exact" type="text_lr" indexed="true" stored="true" multiValued="true"/>

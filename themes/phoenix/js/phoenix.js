@@ -702,7 +702,7 @@ $(document).ready(function() {
         html = html + '<li><a class="checked_out_items_sort" data-sort="loanType">Loan Type</a></li>';
         html = html + '</ul>';
         html = html + '</span>';
-        $('#renewAll').after(html);
+        $('#renewSelected').after(html);
 
         // submit the form when the sort pulldown has changed. 
         $('.checked_out_items_sort').click(function() {
@@ -722,7 +722,7 @@ $(document).ready(function() {
         html = html + '<li><a class="checked_out_items_export" data-export-format="BiBTeX">BibTex</a></li>';
         html = html + '</ul>';
         html = html + '</span>';
-        $('#renewAll').after(html);
+        $('#renewSelected').after(html);
     }
 
     // when an export link is clicked, dynamically create and submit a
