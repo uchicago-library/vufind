@@ -1006,7 +1006,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     /**
      *
      */
-    protected function getItems($id, $holdingId, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay, $isSerial) {
+    protected function getItems($id, $holdingId, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay, $isSerial, $holdingCallNumPrefix) {
 
         /*Get items by holding id*/
         $sql = 'SELECT i.ITEM_ID AS item_id, i.HOLDINGS_ID AS holdings_id, i.BARCODE AS barcode, i.URI AS uri, 
@@ -1101,6 +1101,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['itemTypeCode'] = $row['itype_code'];
                 $item['itemTypeName'] = $itemTypeName;
                 $item['callnumberDisplay'] = $holdingCallNumDisplay;
+                $item['holdingCallNumPrefix'] = $holdingCallNumPrefix;
                 $item['itemCallnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : null);
                 $item['locationCodes'] = (!empty($itemLocCodes) ? $itemLocCodes : $holdingLocCodes);
                 $item['itemLocation'] = (!empty($itemLocation) ? $itemLocation : null);
@@ -1410,6 +1411,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $holdingCallNumTypeId = trim($row['call_number_type_id']);
                 $holdingCallNum = trim($row['call_number']);
                 $holdingCallNumDisplay = trim($row['call_number_prefix'] . ' ' . $row['call_number'] . ' ' . $copyNum);
+                $holdingCallNumPrefix = trim($row['call_number_prefix']);
                 $holdingNotes = explode('::|::', $row['note']);
                 $hasAnalytics = isset($row['analytic_count']) ? intval($row['analytic_count']) > 0 : null;
                 $hasExtOwnership = intval($row['ext_ownership_count']) > 0;
@@ -1465,7 +1467,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 } 
 
                 /*Get individual item data*/           
-                $oleItems = $this->getItems($id, $holdingId, $shelvingLocation, $locationCodes, $holdingCallNum, $holdingCallNumDisplay, $isSerial);
+                $oleItems = $this->getItems($id, $holdingId, $shelvingLocation, $locationCodes, $holdingCallNum, $holdingCallNumDisplay, $isSerial, $holdingCallNumPrefix);
                 foreach($oleItems as $oleItem) {
                     /* Rather than pass the call number type of the
                      * holding to getItems(), I add the call number type id here.
