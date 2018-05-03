@@ -615,7 +615,7 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function maps($location, $callnum, $prefix) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/maplookup/maplookup2.php?location=' . $location . '&amp;callnum=' . $callnum . '&amp;callnumPrefix=' . $prefix;
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/maplookup/maplookup.php?location=' . $location . '&amp;callnum=' . $callnum . '&amp;callnumPrefix=' . $prefix;
         $serviceLink = $this->getLinkConfig('maps', $defaultUrl); 
         $displayText = '<i class="fa fa-spinner fa-pulse fa-fw"></i> Loading map link';
         if ($serviceLink) {
