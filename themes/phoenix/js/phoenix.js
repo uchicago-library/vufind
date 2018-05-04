@@ -44,8 +44,12 @@ function getDedupedEholdings(issns, target) {
 function getMapLink(loc, callnum, prefix, target) {
   $.get( VuFind.path + '/AJAX/JSON?method=mapLink', 'location=' + loc + '&callnum=' + callnum + '&prefix=' + prefix, function(data, status, xhr) {
     var response = JSON.parse(data);
-    target.html('<i class="fa fa-map-marker" aria-hidden="true"></i> ' + response.data.location);
-    target.attr("href", response.data.url);
+    if(response.data == null) {
+        $(target).addClass('hide');
+    } else {
+        target.html('<i class="fa fa-map-marker" aria-hidden="true"></i> ' + response.data.location);
+        target.attr("href", response.data.url);
+    }
   }, 'html');
 }
 
