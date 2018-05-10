@@ -31,6 +31,9 @@
 
     // Set page title.
     $this->headTitle($this->translate('Holdings') . ': ' . $this->driver->getBreadcrumb());
+
+    // Item locations that are off site storage
+    $OFFSITE = ['btaaspr'];
 ?>
 
 <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
@@ -377,7 +380,8 @@
                  <? endif; ?>
                  <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc&consult=true">consult the series record</a>.
               <? else: ?>
-              <span class="text-danger"><?=$this->transEsc($row['status'] == 'MISSING-FROM-MANSUETO' ? 'Missing' : $row['status_name'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
+              <? $statusClass = in_array(strtolower($row['status']), $OFFSITE) ? 'text-unknown' : 'text-danger' ?>
+              <span class=<?=$statusClass?>><?=$this->transEsc($row['status'] == 'MISSING-FROM-MANSUETO' ? 'Missing' : $row['status_name'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
               <? if (isset($row['returnDate']) && $row['returnDate']): ?>&ndash; <span class="small"><?=$this->escapeHtml($row['returnDate'])?></span><? endif; ?>
               <? if (isset($row['duedate']) && $row['duedate']): ?>
                 <?/*Only display duedates for loaned items*/?>
@@ -408,6 +412,7 @@
                 <?=$this->ServiceLinks()->borrowDirect($row)?>
                 <?=$this->ServiceLinks()->uBorrow($row)?>
                 <?=$this->ServiceLinks()->scanAndDeliver($row)?>
+                <?=$this->ServiceLinks()->offsite($row)?>
                 </span><? /* END .service-links */?>
             <? if (isset($row['itemNotes'])): ?>
               <div class="item-notes">
