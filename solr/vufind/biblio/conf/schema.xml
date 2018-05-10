@@ -273,7 +273,7 @@
    <field name="title_browse" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="title_browse_sort" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="title_contents" type="text" indexed="true" stored="true" multiValued="true"/>
-   <field name="author_contents" type="text" indexed="true" stored="true" multiValued="true"/>
+   <field name="author_contents" type="textProper" indexed="true" stored="true" multiValued="true"/>
    <field name="author_LNK" type="textProper" indexed="true" stored="true" multiValued="true"/>
    <field name="lccn" type="isn" indexed="true" stored="true" multiValued="true"/>
    <field name="performer" type="text" indexed="true" stored="true" multiValued="true"/>
