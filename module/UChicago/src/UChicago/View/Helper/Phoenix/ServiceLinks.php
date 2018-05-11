@@ -25,8 +25,14 @@ class ServiceLinks extends AbstractHelper {
      *        	
      * @return html string
      */
-    protected function getServiceLinkTemplate($link, $text, $classes=array()) {
-        return '<a href="' . $link . '" class="' . (empty($classes) ? 'service' : '') . implode(' ', $classes) . '">' . $text . '</a>';
+    protected function getServiceLinkTemplate($link, $text, $classes=[], $dataAttributes=[]) {
+        $da = '';
+        if ($dataAttributes) {
+            foreach ($dataAttributes as $a => $v) {
+                $da .= 'data-' . $a . '="' . $v . '"';
+            }
+        }
+        return '<a href="' . $link . '" class="' . (empty($classes) ? 'service' : '') . implode(' ', $classes) . '" ' . $da . '>' . $text . '</a>';
     }
 
     /**
@@ -126,6 +132,7 @@ class ServiceLinks extends AbstractHelper {
                         'cantFindIt' =>
                             ['Art420',
                              'ArtResA',
+                             'CDEV',
                              'CJK',
                              'CJKRef',
                              'CJKRfHY',
@@ -189,6 +196,7 @@ class ServiceLinks extends AbstractHelper {
                             ['SciASR'],
                         'scanAndDeliver' => 
                             ['ArtResA',
+                             'CDEV',
                              'CJK',
                              'CJKRar',
                              'CJKRef',
@@ -598,20 +606,20 @@ class ServiceLinks extends AbstractHelper {
     }
 
     /**
-     * Method creates a link to the maps lookup service as long as a barcode is present.
-     * If a barcode isn't provided nothing happens.
+     * Method creates a link to the maps lookup service.
      *
-     * @param $bib, string record bib number
-     * @param @barcode, the first barcode found in a record.
+     * @param @location, string
+     * @param @callnum, string
+     * @param @prefix, string
      *
-     * @ return html string
+     * @return html string
      */
-    public function maps($bib, $barcode) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/maplookup/maplookup.php?bib=' .  $bib . '&amp;barcode=' . $barcode;
+    public function maps($location, $callnum, $prefix) {
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/maplookup/maplookup.php?location=' . $location . '&amp;callnum=' . $callnum . '&amp;callnumPrefix=' . $prefix;
         $serviceLink = $this->getLinkConfig('maps', $defaultUrl); 
-        $displayText = '<i class="fa fa-map-marker" aria-hidden="true"></i> Map/guide';
-        if ($serviceLink and !empty($barcode)) {
-            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        $displayText = '<i class="fa fa-spinner fa-pulse fa-fw"></i> Loading map link';
+        if ($serviceLink) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText, ['maplookup service'], ['location' => $location, 'callnum' => $callnum, 'prefix' => $prefix]);
         }
     }
 

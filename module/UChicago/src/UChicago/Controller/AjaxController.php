@@ -42,6 +42,41 @@ class AjaxController extends \VuFind\Controller\AjaxController
 {
 
     /**
+     * Get the url to a map and link text to display for a given holding or item.
+     * Uses the maplookup service in formms2.
+     *
+     * @param string, $location
+     *
+     * @param string, $callnum
+     * 
+     * @param string, $prefix (callnumber)
+     *
+     * @return array
+     */
+    public function getMapLink($location, $callnum, $prefix) {
+        $config = $this->getConfig();
+        $url = $config['MapLookupService']['url'] . '&location=' . urlencode($location) . '&callnum=' . urlencode($callnum) . '&callnumPrefix=' . urlencode($prefix);
+
+        $request = new Request();
+        $request->setMethod(Request::METHOD_GET);
+        $request->setUri($url);
+
+        $client = new Client();
+        $client->setOptions(array('timeout' => 6));
+
+        $response = $client->dispatch($request);
+        $content = $response->getBody();
+
+        return json_decode($content, true);
+    }
+
+    protected function mapLinkAjax() {
+        $json = $this->getMapLink($_GET['location'], $_GET['callnum'], $_GET['callnumPrefix']);
+        return $this->output($json, self::STATUS_OK);
+    }
+
+
+    /**
      * Helper function for decoding jsonp
      *
      */

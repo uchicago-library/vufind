@@ -41,12 +41,32 @@ function getDedupedEholdings(issns, target) {
   }, 'html');
 }
 
+function getMapLink(loc, callnum, prefix, target) {
+  $.get( VuFind.path + '/AJAX/JSON?method=mapLink', 'location=' + loc + '&callnum=' + callnum + '&prefix=' + prefix, function(data, status, xhr) {
+    var response = JSON.parse(data);
+    if(response.data == null) {
+        $(target).addClass('hide');
+    } else {
+        target.html('<i class="fa fa-map-marker" aria-hidden="true"></i> ' + response.data.location);
+        target.attr("href", response.data.url);
+    }
+  }, 'html');
+}
+
 $(document).ready(function() {
 
     /*** Deduped eholdings instead of sfx ***/
     $('[data-issns]').each(function() {
         var issns = $(this).data('issns');
         getDedupedEholdings(issns, $(this));
+    });
+    
+    /*** Maplookup service link ***/
+    $('.maplookup').each(function() {
+        var loc = $(this).data('location');
+        var callnum = $(this).data('callnum');
+        var prefix = $(this).data('prefix');
+        getMapLink(loc, callnum, prefix, $(this));
     });
 
     getAlert();

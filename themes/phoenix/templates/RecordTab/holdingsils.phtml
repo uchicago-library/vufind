@@ -159,12 +159,13 @@
 
 <?/*Get the first barcode to pass to the map links*/ ?>
 <? $firstBarcode = $this->tab->getFirstBarcode($holding);?>
-<?=$this->ServiceLinks()->maps($this->driver->getUniqueID(), $firstBarcode)?>
 
 <?/*Callnumbers*/?>
 <? $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
+
 <? $hasCallNos = !empty($callNos['display']); ?>
 <?foreach ($callNos['display'] as $numKey => $callNo): ?>
+   <?=$this->ServiceLinks()->maps(trim($locationText), $this->escapeHtml(trim($callNos['sort'][$numKey])), trim($callNos['prefix']))?>
    <br/><h3><span><?=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></span> <?=$this->escapeHtml($callNo)?></h3>
    <? $source = ($callNos['typeid'][$numKey] == '3') ? 'dewey' : 'lcc'; ?>
    <a href="<?= $this->url('home')?>alphabrowse/Home?source=<?=$source?>&amp;from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
