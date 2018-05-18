@@ -395,6 +395,7 @@ class ServiceLinks extends AbstractHelper {
                         'recall' => 
                             ['ANAL',
                              'AVAILABLE',
+                             'BTAASPR',
                              'DECLARED-LOST',
                              'FLAGGED-FOR-RESERVE',
                              'INPROCESS',
