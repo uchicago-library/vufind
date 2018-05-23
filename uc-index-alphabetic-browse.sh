@@ -109,4 +109,4 @@ build_browse "topic" "topic_browse" 0 "-Dbrowse.normalizer=org.vufind.util.NACON
 build_browse "author" "author_browse" 0 "-Dbrowse.normalizer=org.vufind.util.NACONormalizer"
 build_browse "series" "series_browse" 1 "-Dbrowse.normalizer=org.vufind.util.NACONormalizer"
 build_browse "lcc" "callnumber-raw" 1 "-Dbrowse.normalizer=org.vufind.util.LCCallNormalizer"
-build_browse "dewey" "dewey-raw" 1 "-Dbrowse.normalizer=org.vufind.util.DeweyCallNormalizer"
+#build_browse "dewey" "dewey-raw" 1 "-Dbrowse.normalizer=org.vufind.util.DeweyCallNormalizer"
