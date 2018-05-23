@@ -163,7 +163,7 @@
               foreach ($urls as $current): ?>
               <? $linkText = (!empty($current['text']) ? ': '.$current['text'] : ''); ?>
               <div class="e-holdings">
-                <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext eLink text-success" target="new">
+                <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext eLink" target="new">
                     <?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']) . $linkText)?>
                 </a> <?=$current['desc']?>
               </div>

@@ -194,6 +194,8 @@ class ServiceLinks extends AbstractHelper {
                              'XClosedGen'],
                         'inProcessAtMansueto' =>
                             ['SciASR'],
+                        'offsite' =>
+                            ['btaaspr'],
                         'scanAndDeliver' => 
                             ['ArtResA',
                              'CDEV',
@@ -393,6 +395,7 @@ class ServiceLinks extends AbstractHelper {
                         'recall' => 
                             ['ANAL',
                              'AVAILABLE',
+                             'BTAASPR',
                              'DECLARED-LOST',
                              'FLAGGED-FOR-RESERVE',
                              'INPROCESS',
@@ -641,6 +644,27 @@ class ServiceLinks extends AbstractHelper {
             }
             else {
                 return $this->getServiceLinkTemplate($serviceLink, $displayText, ['account']);
+            }
+        }
+    }
+
+    /**
+     * Creates a link to the Relais service for offsite materials
+     *
+     * @param row, array of holdings and item information
+     *
+     * @return html string
+     */
+    public function offsite($row) {
+        $location = strtolower($this->getLocation($row['locationCodes'], 'shelving'));
+        if (in_array($location, $this->lookupLocation['offsite'])) {
+            $sids = ['btaaspr' => 'SPR',];
+            $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/requestFromILL.php?database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
+            $defaultUrl .= '&amp;sid=' . $sids[$location];
+            $serviceLink = $this->getLinkConfig('offsite', $defaultUrl);
+            $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request via Interlibrary Loan';
+            if ($serviceLink) {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText);
             }
         }
     }
