@@ -162,7 +162,7 @@
             if(!$this->driver->isCollection()):
               foreach ($urls as $current): ?>
               <? $linkText = (!empty($current['text']) ? ': '.$current['text'] : ''); ?>
-              <div class="e-holdings">
+              <div class="e-holdings local-eholding">
                 <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="fulltext eLink" target="new">
                     <?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']) . $linkText)?>
                 </a> <?=$current['desc']?>

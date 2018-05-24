@@ -33,6 +33,10 @@ function getDedupedEholdings(issns, target) {
     var response = JSON.parse(data);
     target.append(response.data);
 
+    if (response.data != '' && response.status == 'OK') {
+        target.parent().find('.local-eholding').hide();
+    }
+
     $(target).children('.toggle').click(function() {
         $(this).toggleClass('open');
         $(this).parent().children('.e-list').toggleClass('hide');

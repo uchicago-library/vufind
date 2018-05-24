@@ -77,7 +77,7 @@
   <? if (!empty($urls)): ?>
     <? foreach ($urls as $current): ?>
       <? $linkText = (!empty($current['text']) ? ': '.$current['text'] : ''); ?>
-      <div>
+      <div class="local-eholding">
         <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>" class="eLink"><?=$this->escapeHtml($this->Eholdings()->getEholdingsLinkText($current['type']) . $linkText)?></a> <?=$current['desc']?><br/>
       </div>
     <? endforeach; ?>
