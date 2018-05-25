@@ -723,7 +723,7 @@ class ServiceLinks extends AbstractHelper {
             // for XClosedGen and XClosedCJK when the item staus is *Available* or
             // *Recently Returned* (also Available from VuFind's perspective). 
             // That's why the whitelist becomes a blacklist.
-            $item_status_blacklist = $whitelist;
+            $item_status_blacklist = array_merge($whitelist, ['LOANED']);
             if (!in_array($row['status'], $item_status_blacklist)) {
                 return $this->getServiceLinkTemplate($serviceLink, $displayText);
             }
