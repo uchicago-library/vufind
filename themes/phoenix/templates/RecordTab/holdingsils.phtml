@@ -171,7 +171,7 @@
    <?=$this->ServiceLinks()->maps(trim($locationText), $this->escapeHtml(trim($callNos['sort'][$numKey])), trim($callNos['prefix']))?>
    <br/><h3><span><?=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></span> <?=$this->escapeHtml($callNo)?></h3>
    <? $source = ($callNos['typeid'][$numKey] == '3') ? 'dewey' : 'lcc'; ?>
-   <a href="<?= $this->url('home')?>alphabrowse/Home?source=<?=$source?>&amp;from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
+   <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&amp;from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
       class="ablink"><?=$callNumDisplayText?></a><br/>
  <? endforeach; ?>
 </div><!--/.locpanel-heading-->
