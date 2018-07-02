@@ -92,8 +92,11 @@ class RecordDataFormatterTest extends \VuFindTest\Unit\ViewHelperTestCase
     protected function getDriver($overrides = [])
     {
         // "Mock out" tag functionality to avoid database access:
+        $methods = [
+            'getBuilding', 'getDeduplicatedAuthors', 'getContainerTitle', 'getTags'
+        ];
         $record = $this->getMockBuilder('VuFind\RecordDriver\SolrDefault')
-            ->setMethods(['getBuilding', 'getContainerTitle', 'getTags'])
+            ->setMethods($methods)
             ->getMock();
         $record->expects($this->any())->method('getTags')
             ->will($this->returnValue([]));
@@ -103,6 +106,15 @@ class RecordDataFormatterTest extends \VuFindTest\Unit\ViewHelperTestCase
             ->will($this->returnValue(0));
         $record->expects($this->any())->method('getContainerTitle')
             ->will($this->returnValue('0'));
+        // Expect only one call to getDeduplicatedAuthors to confirm that caching
+        // works correctly (we need this data more than once, but should only pull
+        // it from the driver once).
+        $authors = [
+            'primary' => ['Vico, Giambattista, 1668-1744.' => []],
+            'secondary' => ['Pandolfi, Claudia.' => []],
+        ];
+        $record->expects($this->once())->method('getDeduplicatedAuthors')
+            ->will($this->returnValue($authors));
 
         // Load record data from fixture file:
         $fixture = json_decode(
@@ -136,7 +148,7 @@ class RecordDataFormatterTest extends \VuFindTest\Unit\ViewHelperTestCase
         $match = new \Zend\Mvc\Router\RouteMatch([]);
         $match->setMatchedRouteName('foo');
         $view->plugin('url')
-            ->setRouter($this->getMock('Zend\Mvc\Router\RouteStackInterface'))
+            ->setRouter($this->createMock('Zend\Mvc\Router\RouteStackInterface'))
             ->setRouteMatch($match);
 
         // Inject the view object into all of the helpers:
@@ -157,10 +169,13 @@ class RecordDataFormatterTest extends \VuFindTest\Unit\ViewHelperTestCase
     {
         $formatter = $this->getFormatter();
         $spec = $formatter->getDefaults('core');
-        $spec['Building'] = ['dataMethod' => 'getBuilding', 'pos' => 0];
+        $spec['Building'] = [
+            'dataMethod' => 'getBuilding', 'pos' => 0, 'context' => ['foo' => 1],
+            'translationTextDomain' => 'prefix_'
+        ];
 
         $expected = [
-            'Building' => '0',
+            'Building' => 'prefix_0',
             'Published in' => '0',
             'Main Author' => 'Vico, Giambattista, 1668-1744.',
             'Other Authors' => 'Pandolfi, Claudia.',
@@ -182,11 +197,15 @@ class RecordDataFormatterTest extends \VuFindTest\Unit\ViewHelperTestCase
         // Check for expected text (with markup stripped)
         foreach ($expected as $key => $value) {
             $this->assertEquals(
-                $value, trim(preg_replace('/\s+/', ' ', strip_tags($results[$key])))
+                $value,
+                trim(preg_replace('/\s+/', ' ', strip_tags($results[$key]['value'])))
             );
         }
 
         // Check for exact markup in representative example:
-        $this->assertEquals('Italian<br />Latin', $results['Language']);
+        $this->assertEquals('Italian<br />Latin', $results['Language']['value']);
+
+        // Check for context in Building:
+        $this->assertEquals(['foo' => 1], $results['Building']['context']);
     }
 }

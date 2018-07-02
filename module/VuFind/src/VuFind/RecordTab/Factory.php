@@ -180,9 +180,7 @@ class Factory
         $mapType = isset($config->Content->recordMap)
             ? $config->Content->recordMap : null;
         $options = [];
-        $optionFields = [
-            'displayCoords', 'mapLabels', 'googleMapApiKey'
-        ];
+        $optionFields = ['displayCoords', 'mapLabels', 'graticule'];
         foreach ($optionFields as $field) {
             if (isset($config->Content->$field)) {
                 $options[$field] = $config->Content->$field;
@@ -305,7 +303,7 @@ class Factory
         $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
         $useRecaptcha = isset($config->Captcha) && isset($config->Captcha->forms)
             && (trim($config->Captcha->forms) === '*'
-            || strpos($config->Captcha->forms, 'userComments'));
+            || strpos($config->Captcha->forms, 'userComments') !== false);
         return new UserComments(
             'enabled' === $capabilities->getCommentSetting(),
             $useRecaptcha

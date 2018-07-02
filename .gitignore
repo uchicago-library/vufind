@@ -9,9 +9,10 @@ TAGS
 /solr/vendor
 /vendor
 composer.phar
-import/solrmarc.log
+import/solrmarc.log*
 node_modules
 public/swagger-ui
+.vagrant
 
 ### UChicago changes ###
 nohup.out

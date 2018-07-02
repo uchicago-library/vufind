@@ -116,6 +116,13 @@ class KohaILSDI extends \VuFind\ILS\Driver\AbstractBase implements
     protected $dateConverter;
 
     /**
+     * Should validate passwords against Koha system?
+     *
+     * @var boolean
+     */
+    protected $validatePasswords;
+
+    /**
      * Constructor
      *
      * @param \VuFind\Date\Converter $dateConverter Date converter object
@@ -162,11 +169,45 @@ class KohaILSDI extends \VuFind\ILS\Driver\AbstractBase implements
             = isset($this->config['Other']['availableLocations'])
             ? $this->config['Other']['availableLocations'] : [];
 
+        // If we are using SAML/Shibboleth for authentication for both ourselves
+        // and Koha then we can't validate the patrons passwords against Koha as
+        // they won't have one. (Double negative logic used so that if the config
+        // option isn't present in KohaILSDI.ini then ILS passwords will be
+        // validated)
+        $this->validatePasswords
+            = empty($this->config['Catalog']['dontValidatePasswords']);
+
         $this->debug("Config Summary:");
         $this->debug("DB Host: " . $this->host);
         $this->debug("ILS URL: " . $this->ilsBaseUrl);
         $this->debug("Locations: " . $this->locations);
         $this->debug("Default Location: " . $this->defaultLocation);
+
+        // Set our default terms for block types
+        $this->blockTerms = [
+            'SUSPENSION' => 'Account Suspended',
+            'OVERDUES' => 'Account Blocked (Overdue Items)',
+            'MANUAL' => 'Account Blocked',
+            'DISCHARGE' => 'Account Blocked for Discharge',
+        ];
+
+        // Now override the default with any defined in the `KohaILSDI.ini` config
+        // file
+        foreach (['SUSPENSION','OVERDUES','MANUAL','DISCHARGE'] as $blockType) {
+            if (!empty($this->config['Blocks'][$blockType])) {
+                $this->blockTerms[$blockType] = $this->config['Blocks'][$blockType];
+            }
+        }
+
+        // Allow the users to set if an account block's comments should be included
+        // by setting the block type to true or false () in the `KohaILSDI.ini`
+        // config file (defaults to false if not present)
+        $this->showBlockComments = [];
+
+        foreach (['SUSPENSION','OVERDUES','MANUAL','DISCHARGE'] as $blockType) {
+            $this->showBlockComments[$blockType]
+                = !empty($this->config['Show_Block_Comments'][$blockType]);
+        }
     }
 
     /**
@@ -203,10 +244,62 @@ class KohaILSDI extends \VuFind\ILS\Driver\AbstractBase implements
             $this->db->exec("SET NAMES utf8");
         } catch (PDOException $e) {
             $this->debug('Connection failed: ' . $e->getMessage());
-            throw new ILSException($e->getMessage);
+            throw new ILSException($e->getMessage());
         }
 
         $this->debug('Connected to DB');
+    }
+
+    /**
+     * Check if a table exists in the current database.
+     *
+     * @param string $table Table to search for.
+     *
+     * @return bool
+     */
+    protected function tableExists($table)
+    {
+        $cacheKey = "kohailsdi-tables-$table";
+        $cachedValue = $this->getCachedData($cacheKey);
+        if ($cachedValue !== null) {
+            return $cachedValue;
+        }
+
+        if (!$this->db) {
+            $this->initDb();
+        }
+
+        $returnValue = false;
+
+        // Try a select statement against the table
+        // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.
+        try {
+            $result = $this->db->query("SELECT 1 FROM $table LIMIT 1");
+            // Result is FALSE (no table found) or PDOStatement Object (table found)
+            $returnValue = $result !== false;
+        } catch (PDOException $e) {
+            // We got an exception == table not found
+            $returnValue = false;
+        }
+
+        $this->putCachedData($cacheKey, $returnValue);
+        return $returnValue;
+    }
+
+    /**
+     * Koha ILS-DI driver specific override of method to ensure uniform cache keys
+     * for cached VuFind objects.
+     *
+     * @param string|null $suffix Optional suffix that will get appended to the
+     * object class name calling getCacheKey()
+     *
+     * @return string
+     */
+    protected function getCacheKey($suffix = null)
+    {
+        return \VuFind\ILS\Driver\AbstractBase::getCacheKey(
+            md5($this->ilsBaseUrl) . $suffix
+        );
     }
 
     /**
@@ -558,7 +651,7 @@ class KohaILSDI extends \VuFind\ILS\Driver\AbstractBase implements
             ];
         }
 
-        $this->debug("patron: " . $patron);
+        $this->debug("patron: " . print_r($patron, true));
         $this->debug("patron_id: " . $patron_id);
         $this->debug("request_location: " . $request_location);
         $this->debug("item_id: " . $item_id);
@@ -687,10 +780,16 @@ class KohaILSDI extends \VuFind\ILS\Driver\AbstractBase implements
             . "WHERE biblionumber = :id AND found IS NULL";
         $sqlWaitingReserve = "select count(*) as WAITING from reserves "
             . "WHERE itemnumber = :item_id and found = 'W'";
-        $sqlHoldings = "SELECT ExtractValue(( SELECT marcxml FROM biblioitems "
-            . "WHERE biblionumber = :id), "
-            . "'//datafield[@tag=\"866\"]/subfield[@code=\"a\"]') AS MFHD;";
-
+        if ($this->tableExists("biblio_metadata")) {
+            $sqlHoldings = "SELECT "
+                . "ExtractValue(( SELECT metadata FROM biblio_metadata "
+                . "WHERE biblionumber = :id AND format='marcxml'), "
+                . "'//datafield[@tag=\"866\"]/subfield[@code=\"a\"]') AS MFHD;";
+        } else {
+            $sqlHoldings = "SELECT ExtractValue(( SELECT marcxml FROM biblioitems "
+                . "WHERE biblionumber = :id), "
+               . "'//datafield[@tag=\"866\"]/subfield[@code=\"a\"]') AS MFHD;";
+        }
         if (!$this->db) {
             $this->initDb();
         }
@@ -1212,6 +1311,53 @@ class KohaILSDI extends \VuFind\ILS\Driver\AbstractBase implements
     }
 
     /**
+     * Check whether the patron has any blocks on their account.
+     *
+     * @param array $patron Patron data from patronLogin
+     *
+     * @throws ILSException
+     *
+     * @return mixed A boolean false if no blocks are in place and an array
+     * of block reasons if blocks are in place
+     */
+    public function getAccountBlocks($patron)
+    {
+        $blocks = [];
+
+        try {
+            if (!$this->db) {
+                $this->initDb();
+            }
+            $id = $patron['id'];
+            $sql = "select type as TYPE, comment as COMMENT " .
+                "from borrower_debarments " .
+                "where (expiration is null or expiration >= NOW()) " .
+                "and borrowernumber = :id";
+            $sqlStmt = $this->db->prepare($sql);
+            $sqlStmt->execute([':id' => $id]);
+
+            foreach ($sqlStmt->fetchAll() as $row) {
+                $block = empty($this->blockTerms[$row['TYPE']])
+                    ? [$row['TYPE']]
+                    : [$this->blockTerms[$row['TYPE']]];
+
+                if (!empty($this->showBlockComments[$row['TYPE']])
+                    && !empty($row['COMMENT'])
+                ) {
+                    $block[] = $row['COMMENT'];
+                }
+
+                $blocks[] = implode(' - ', $block);
+            }
+        }
+        catch (PDOException $e) {
+            throw new ILSException($e->getMessage());
+        }
+
+        return count($blocks) ? $blocks : false;
+    }
+
+    /**
      * Get Patron Transactions
      *
      * This is responsible for retrieving all transactions (i.e. checked out items)
@@ -1426,12 +1572,23 @@ class KohaILSDI extends \VuFind\ILS\Driver\AbstractBase implements
             if (!$this->db) {
                 $this->initDb();
             }
-            $sql = "SELECT biblio.biblionumber AS biblionumber
+
+            if ($this->tableExists("biblio_metadata")) {
+                $sql = "SELECT biblio.biblionumber AS biblionumber
+                      FROM biblio
+                      JOIN biblio_metadata USING (biblionumber)
+                      WHERE ExtractValue(
+                        metadata, '//datafield[@tag=\"942\"]/subfield[@code=\"n\"]' )
+                        IN ('Y', '1')
+                      AND biblio_metadata.format = 'marcxml'";
+            } else {
+                $sql = "SELECT biblio.biblionumber AS biblionumber
                       FROM biblioitems
                       JOIN biblio USING (biblionumber)
                       WHERE ExtractValue(
-                         marcxml, '//datafield[@tag=\"942\"]/subfield[@code=\"n\"]' )
-                      IN ('Y', '1')";
+                        marcxml, '//datafield[@tag=\"942\"]/subfield[@code=\"n\"]' )
+                        IN ('Y', '1')";
+            }
             $sqlStmt = $this->db->prepare($sql);
             $sqlStmt->execute();
             $result = [];
@@ -1608,14 +1765,15 @@ class KohaILSDI extends \VuFind\ILS\Driver\AbstractBase implements
      */
     public function patronLogin($username, $password)
     {
-        //       $idObj = $this->makeRequest(
-        //         "AuthenticatePatron" . "&username=" . $username
-        //       . "&password=" . $password
-        // );
-        $idObj = $this->makeRequest(
-            "LookupPatron" . "&id=" . urlencode($username)
-            . "&id_type=userid"
-        );
+        $request = "LookupPatron" . "&id=" . urlencode($username)
+            . "&id_type=userid";
+
+        if ($this->validatePasswords) {
+            $request = "AuthenticatePatron" . "&username="
+                . urlencode($username) . "&password=" . $password;
+        }
+
+        $idObj = $this->makeRequest($request);
 
         $this->debug("username: " . $username);
         $this->debug("Code: " . $idObj->{'code'});
@@ -1629,7 +1787,7 @@ class KohaILSDI extends \VuFind\ILS\Driver\AbstractBase implements
             $profile = [
                 'id'           => $this->getField($idObj->{'id'}),
                 'firstname'    => $this->getField($rsp->{'firstname'}),
-                'lastname'     => $this->getField($rsp->{'lastname'}),
+                'lastname'     => $this->getField($rsp->{'surname'}),
                 'cat_username' => $username,
                 'cat_password' => $password,
                 'email'        => $this->getField($rsp->{'email'}),

@@ -215,9 +215,11 @@ class MultiBackend extends AbstractBase implements \Zend\Log\LoggerAwareInterfac
         $source = $this->getSource($id);
         $driver = $this->getDriver($source);
         if ($driver) {
-            // Don't pass on patron information belonging to another source
+            // If the patron belongs to another source, just pass on an empty array
+            // to indicate that the patron has logged in but is not available for the
+            // current catalog.
             if ($patron && $this->getSource($patron['cat_username']) !== $source) {
-                $patron = null;
+                $patron = [];
             }
             $holdings = $driver->getHolding(
                 $this->getLocalId($id),
@@ -582,7 +584,9 @@ class MultiBackend extends AbstractBase implements \Zend\Log\LoggerAwareInterfac
      * @param array  $data   An Array of item data
      * @param patron $patron An array of patron data
      *
-     * @return bool True if request is valid, false if not
+     * @return mixed An array of data on the request including
+     * whether or not it is valid and a status message. Alternatively a boolean
+     * true if request is valid, false if not.
      */
     public function checkRequestIsValid($id, $data, $patron)
     {
@@ -613,7 +617,9 @@ class MultiBackend extends AbstractBase implements \Zend\Log\LoggerAwareInterfac
      * @param array  $data   An Array of item data
      * @param patron $patron An array of patron data
      *
-     * @return bool True if request is valid, false if not
+     * @return mixed An array of data on the request including
+     * whether or not it is valid and a status message. Alternatively a boolean
+     * true if request is valid, false if not.
      */
     public function checkStorageRetrievalRequestIsValid($id, $data, $patron)
     {
@@ -958,7 +964,9 @@ class MultiBackend extends AbstractBase implements \Zend\Log\LoggerAwareInterfac
      * @param array  $data   An Array of item data
      * @param patron $patron An array of patron data
      *
-     * @return bool True if request is valid, false if not
+     * @return mixed An array of data on the request including
+     * whether or not it is valid and a status message. Alternatively a boolean
+     * true if request is valid, false if not.
      */
     public function checkILLRequestIsValid($id, $data, $patron)
     {
@@ -1323,7 +1331,7 @@ class MultiBackend extends AbstractBase implements \Zend\Log\LoggerAwareInterfac
      *
      * @param string $id The id to be split
      *
-     * @return string  Source
+     * @return string Source
      */
     protected function getSource($id)
     {
@@ -1332,7 +1340,6 @@ class MultiBackend extends AbstractBase implements \Zend\Log\LoggerAwareInterfac
             return substr($id, 0, $pos);
         }
 
-        $this->debug("Could not find source id in '$id'");
         return '';
     }
 
@@ -1365,9 +1372,6 @@ class MultiBackend extends AbstractBase implements \Zend\Log\LoggerAwareInterfac
                 return $source;
             }
         }
-        $this->debug(
-            'Could not find source id in params: ' . print_r($params, true)
-        );
         return '';
     }
 

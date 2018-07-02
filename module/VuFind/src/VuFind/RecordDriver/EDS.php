@@ -269,7 +269,7 @@ class EDS extends SolrDefault
     {
         if (isset($this->fields['FullText']['Links'])) {
             foreach ($this->fields['FullText']['Links'] as $link) {
-                if (isset($link['Type'])
+                if (!empty($link['Type']) && !empty($link['Url'])
                     && in_array($link['Type'], $this->pdfTypes)
                 ) {
                     return $link['Url']; // return PDF link
@@ -408,10 +408,10 @@ class EDS extends SolrDefault
     {
         $linkedString = preg_replace_callback(
             "/\b(https?):\/\/([-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|]*)\b/i",
-            create_function(
-                '$matches',
-                'return "<a href=\'".($matches[0])."\'>".($matches[0])."</a>";'
-            ),
+            function ($matches) {
+                return "<a href='" . $matches[0] . "'>"
+                    . htmlentities($matches[0]) . "</a>";
+            },
             $string
         );
         return $linkedString;
