@@ -1,6 +1,5 @@
 //cat ./local/import/index_scripts/uc_format.bsh
 
-
 package org.vufind.index;
 
 import java.util.*;
@@ -475,11 +474,8 @@ public class ucFormat
 				case 'A':
 				case 'C':
 				case 'D':	
-				case 'M':
 				case 'P':
-				case 'S':
 				case 'T':
-
 					switch(formatCode6)
 					{
 					case 'A':
@@ -508,12 +504,12 @@ public class ucFormat
 					result.add("Audio");
 					break;
 				}
+
 				switch(formatCode){
 				case 'E':
 				case 'F':
 					result.add("Map");  // ch
 					break;
-
 				}
 
 				switch(formatCode){
@@ -532,12 +528,7 @@ public class ucFormat
 				}
 				}
 
-				switch(formatCode)
-				{
-				case 'K':
-					result.add("Image"); //ch
-					break;
-
+				switch(formatCode){
 				case 'G':
 					switch(formatCode16)
 					{
@@ -555,8 +546,6 @@ public class ucFormat
 				}
 			}
 		}
-
-
 
 
 		// check the 007 - this is a repeating field
@@ -625,6 +614,18 @@ public class ucFormat
 						result.add("Video");
 						break;
 					}
+					//007/01=f, g, h, v
+					switch(formatCode1) { 
+					case 'F':
+					case 'G':
+					case 'H':
+					case 'V':
+						CharAt6 = Character.toUpperCase(leader.charAt(6));						
+						if(CharAt6 == 'K')
+							result.add("Photo"); //Photo  // ch
+						System.out.println("PHOTO");System.out.println();
+						break;
+					}
 
 					switch(formatCode4) {
 					case 'G':
@@ -678,7 +679,6 @@ public class ucFormat
 				}
 
 				switch(formatCode29){
-
 				case 'D': 
 				case 'R':
 				case ' ':
@@ -697,7 +697,6 @@ public class ucFormat
 
 				}
 
-
 				switch(formatCode23){
 				case ' ':
 				case 'D': 
@@ -712,8 +711,8 @@ public class ucFormat
 				case 'B':
 				case 'C':
 					CharAt6 = Character.toUpperCase(leader.charAt(6));
-					if(CharAt6 == 'A' || CharAt6 == 'C' || CharAt6 == 'D' || CharAt6 == 'M' ||
-							CharAt6 == 'P' || CharAt6 == 'S' || CharAt6 == 'T')
+					if(CharAt6 == 'A' || CharAt6 == 'C' || CharAt6 == 'D' ||
+							CharAt6 == 'P' || CharAt6 == 'T')
 						result.add("Microform");  // ch
 					break; 
 				}
@@ -740,9 +739,7 @@ public class ucFormat
 
 		// check the Leader at position 6
 		leaderBit6 = leader.charAt(6);
-		switch (Character.toUpperCase(leaderBit6)) 
-		{
-
+		switch (Character.toUpperCase(leaderBit6)) {
 		case 'A':
 			formatCode = Character.toUpperCase(leader.charAt(7));
 			if (formatCode == 'A' || formatCode == 'C' || formatCode == 'D' || formatCode == 'M')
@@ -766,9 +763,6 @@ public class ucFormat
 			result.add("Music");    //Music recording  // ch
 			result.add("Audio");
 			break;
-		case 'K':
-			result.add("Image");  // ch
-			break;
 		case 'O':
 			result.add("Kit");  // ch
 			break;
@@ -778,20 +772,6 @@ public class ucFormat
 
 
 		}
-
-		/*		// check the Leader at position 7
-		leaderBit7 = leader.charAt(7);
-		switch (Character.toUpperCase(leaderBit7)) 
-		{
-
-		case 'B':
-		case 'I':
-		case 'S':
-			result.add("Journals"); // Serial  // ch
-			break;
-
-		}
-		 */
 
 		// Nothing worked!
 		if (result.isEmpty()) {
