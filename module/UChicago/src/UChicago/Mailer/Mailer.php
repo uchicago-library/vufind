@@ -27,7 +27,7 @@ class Mailer extends \VuFind\Mailer\Mailer
         $cc = null
     ) {
         if (null === $subject) {
-            $subject = $record->getBreadcrumb();
+            $subject = $this->getDefaultRecordSubject($record);
         }
         $body = $view->partial(
             'Email/record.phtml',

@@ -213,9 +213,9 @@ class AjaxController extends \VuFind\Controller\AjaxController
         if (!empty($services)) {
             $availability_message = $this->reduceServices($services);
         } else {
-        $availability_message = $use_unknown_status
-            ? $messages['unknown']
-            : $messages[$available ? 'available' : 'unavailable'];
+            $availability_message = $use_unknown_status
+                ? $messages['unknown']
+                : $messages[$available ? 'available' : 'unavailable'];
         }
 
         // Has the effect of hiding the status for analyitc records 

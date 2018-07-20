@@ -83,10 +83,12 @@ class HathiLink extends AbstractHelper
     private function getOCLCNumbers() {
         $rawMarcData = $this->view->driver->crosswalk('hathiLink');
         $oclcNumbers = [];
-        foreach($rawMarcData['oclcNumber'] as $data) {
-            $num = implode($data['subfieldData']);
-            if (preg_match('/\(OCoLC\)/i', $num)) {
-                $oclcNumbers[] = $num;
+        if ($rawMarcData) {
+            foreach($rawMarcData['oclcNumber'] as $data) {
+                $num = implode($data['subfieldData']);
+                if (preg_match('/\(OCoLC\)/i', $num)) {
+                    $oclcNumbers[] = $num;
+                }
             }
         }
         // We don't use getCleanOCLCNum() or getOCLC() because both of these only return 1 oclc number, we need all of them

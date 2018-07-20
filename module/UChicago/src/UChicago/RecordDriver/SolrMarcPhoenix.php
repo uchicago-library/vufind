@@ -2,9 +2,9 @@
 /**
  * Model for MARC records in Solr.
  *
- * PHP version 5 
+ * PHP version 5
  *
- * Copyright (C) Villanova University 2010. 
+ * Copyright (C) Villanova University 2010.
  * Copyright (C) The National Library of Finland 2015.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -173,7 +173,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
         $fieldsToCheck = ['856'];
 
         foreach ($fieldsToCheck as $field) {
-            $urls = $this->marcRecord->getFields($field);
+            $urls = $this->getMarcRecord()->getFields($field);
             if ($urls) {
                 foreach ($urls as $url) {
                     $linktext = [];
@@ -265,6 +265,51 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             $output[] = $donor_pairs;
         }
         return $output;
+    }
+
+    /**
+     * Get a LCCN, normalised according to info:lccn
+     * UChicago override because we get call numbers in an array
+     * instead of a string like it's supposed to be
+     *
+     * @return string
+     */
+    public function getLCCN()
+    {
+        // Get LCCN from Index
+        $raw = isset($this->fields['lccn']) ? $this->fields['lccn'] : '';
+
+        // UChicago - ONLY CHANGE - get the first
+        // if given an array instead of a string
+        if (is_array($raw)) {
+          $raw = $raw[0];
+        }
+
+        // Remove all blanks.
+        $raw = preg_replace('{[ \t]+}', '', $raw);
+
+        // If there is a forward slash (/) in the string, remove it, and remove all
+        // characters to the right of the forward slash.
+        if (strpos($raw, '/') > 0) {
+            $tmpArray = explode("/", $raw);
+            $raw = $tmpArray[0];
+        }
+        /* If there is a hyphen in the string:
+            a. Remove it.
+            b. Inspect the substring following (to the right of) the (removed)
+               hyphen. Then (and assuming that steps 1 and 2 have been carried out):
+                    i.  All these characters should be digits, and there should be
+                    six or less.
+                    ii. If the length of the substring is less than 6, left-fill the
+                    substring with zeros until  the length is six.
+        */
+        if (strpos($raw, '-') > 0) {
+            // haven't checked for i. above. If they aren't all digits, there is
+            // nothing that can be done, so might as well leave it.
+            $tmpArray = explode("-", $raw);
+            $raw = $tmpArray[0] . str_pad($tmpArray[1], 6, "0", STR_PAD_LEFT);
+        }
+        return $raw;
     }
     
 
@@ -558,7 +603,12 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
     protected function getVernacularData()
     {
         /*Get all of the vernacular data for the record: returns the File_MARC_Data_Field Object*/
-        $vernacularData = $this->marcRecord->getFields('880');
+        
+        $data = $this->getMarcRecord();
+        $vernacularData = [];
+        if ($data) {
+            $vernacularData = $data->getFields('880');
+        }
 
         /*Loop over the vernacular data and stash it into an array*/
         $v = [];
@@ -712,7 +762,11 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             $configLabel = $data[2];
  
             /*Get the File_MARC_Data_Field Object*/ 
-            $results = $this->marcRecord->getFields($configField);
+            $record = $this->getMarcRecord();
+            $results = [];
+            if ($record) {
+                $results = $record->getFields($configField);
+            }
 
             /*Add subfield data values to our master array*/
             foreach ($results as $result) {
