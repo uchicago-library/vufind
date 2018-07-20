@@ -842,7 +842,9 @@ class ServiceLinks extends AbstractHelper {
     protected function getServerVars($config) {
         $retval = [];
         foreach ($config as $key => $value) {
-            $retval[$config[$key]] = $_SERVER[$value];
+            if (isset($_SERVER[$value])) { 
+                $retval[$config[$key]] = $_SERVER[$value];
+            }
         }
         return $retval;
     }

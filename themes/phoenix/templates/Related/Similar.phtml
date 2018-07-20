@@ -2,7 +2,7 @@
 <h4><?=$this->transEsc('Similar Items')?></h4>
 <? $similarRecords = $this->related->getResults(); ?>
 <? if (!empty($similarRecords)): ?>
-  <ul class="list-group similar">
+  <ul class="list-group">
     <? foreach ($similarRecords as $data): ?>
       <li class="list-group-item">
         <? $formats = $data->getFormats(); ?>

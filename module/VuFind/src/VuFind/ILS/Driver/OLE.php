@@ -442,28 +442,30 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         }
 
         /*Set the default sort order for checked out items.*/
-        $sort = $_POST['sort'] ? $_POST['sort'] : $this->coiSort;
-        switch ($sort) {
-            case 'dueDate':
-                /*By duedate*/
-                uasort($transList, function($a, $b) { return strnatcasecmp($a['duedate'], $b['duedate']); });
-                break;
-            case 'loanedDate' :
-                /*By date checked out*/
-                uasort($transList, function($a, $b) { return strnatcasecmp($a['loanedDate'], $b['loanedDate']); });
-                break;
-            case 'author':
-                /*Alphabetical by author*/
-                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['author']), preg_replace('/[^ \w]+/', '', $b['author'])); });
-                break;
-            case 'loanType':
-                /*Alphabetical by item (loan) type*/
-                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['loanType']), preg_replace('/[^ \w]+/', '', $b['loanType'])); });
-                break;
-            default:
-                /*Alphabetical*/
-                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['title']), preg_replace('/[^ \w]+/', '', $b['title'])); });
-                break;
+        if(isset($_POST['sort'])) {
+            $sort = $_POST['sort'] ? $_POST['sort'] : $this->coiSort;
+            switch ($sort) {
+                case 'dueDate':
+                    /*By duedate*/
+                    uasort($transList, function($a, $b) { return strnatcasecmp($a['duedate'], $b['duedate']); });
+                    break;
+                case 'loanedDate' :
+                    /*By date checked out*/
+                    uasort($transList, function($a, $b) { return strnatcasecmp($a['loanedDate'], $b['loanedDate']); });
+                    break;
+                case 'author':
+                    /*Alphabetical by author*/
+                    usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['author']), preg_replace('/[^ \w]+/', '', $b['author'])); });
+                    break;
+                case 'loanType':
+                    /*Alphabetical by item (loan) type*/
+                    usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['loanType']), preg_replace('/[^ \w]+/', '', $b['loanType'])); });
+                    break;
+                default:
+                    /*Alphabetical*/
+                    usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['title']), preg_replace('/[^ \w]+/', '', $b['title'])); });
+                    break;
+            }
         }
 
         return $transList;
@@ -647,9 +649,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         //var_dump($code);
         //var_dump($xml);
 
+        $holdsList = [];
         if ($code == '000') {
             $holdItems = $xml->xpath('//hold');
-            $holdsList = array();
             
             foreach($holdItems as $item) {
                 //var_dump($item);

@@ -2,6 +2,7 @@
 <html lang="<?=$this->layout()->userLang?>">
   <head>
     <?$this->headThemeResources()?>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
     <meta name="google-site-verification" content="MVKdj1ykLrwrN01_2Y85qg78KiUxrdRYTSFc6TyBkNY"/>
@@ -34,6 +35,16 @@
             'bulk_noitems_advice' => 'bulk_noitems_advice',
             'bulk_save_success' => 'bulk_save_success',
             'close' => 'close',
+            'collection_empty' => 'collection_empty',
+            'error_occurred' => 'An error has occurred',
+            'go_to_list' => 'go_to_list',
+            'libphonenumber_invalid' => 'libphonenumber_invalid',
+            'libphonenumber_invalidcountry' => 'libphonenumber_invalidcountry',
+            'libphonenumber_invalidregion' => 'libphonenumber_invalidregion',
+            'libphonenumber_notanumber' => 'libphonenumber_notanumber',
+            'libphonenumber_toolong' => 'libphonenumber_toolong',
+            'libphonenumber_tooshort' => 'libphonenumber_tooshort',
+            'libphonenumber_tooshortidd' => 'libphonenumber_tooshortidd',
             'loading' => 'Loading',
             'more' => 'more',
             'number_thousands_separator' => [
@@ -111,7 +122,7 @@ JS;
     ?>
     <?=$this->headScript()?>
   </head>
-  <body class="phoenix <?=$this->layoutClass('offcanvas-row')?><? if ($this->layout()->rtl): ?> rtl<? endif; ?>">
+  <body class="phoenix template-dir-<?=$this->templateDir?> template-name-<?=$this->templateName?> <?=$this->layoutClass('offcanvas-row')?><? if ($this->layout()->rtl): ?> rtl<? endif; ?>">
     <? // Set up the search box -- there are three possible cases:
       // 1. No search box was set; we should default to the normal box
       // 2. It was set to false; we should display nothing
@@ -169,14 +180,9 @@ JS;
         <?=$this->Alert()->getAlert()?>
       </div>
     </div>
-    <footer class="hidden-print">
-      <div class="container">
-        <?=$this->render('footer.phtml')?>
-        <?=$this->layout()->poweredBy ?>
-      </div>
-    </footer>
+    <?=$this->render('footer.phtml')?>
     <!-- MODAL IN CASE WE NEED ONE -->
-    <div id="modal" class="modal fade hidden-print" tabindex="-1" role="dialog" aria-hidden="true">
+    <div id="modal" class="modal fade hidden-print" tabindex="-1" role="dialog" aria-labelledby="modalTitle" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

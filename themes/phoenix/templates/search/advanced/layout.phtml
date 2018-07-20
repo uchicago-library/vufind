@@ -36,14 +36,13 @@
     $hiddenFilters = $this->searchtabs()->getHiddenFilters($this->searchClassId, true);
   }
 
-  // Set up Javascript:
+  // Step 1: Load the javascript
   // Step 1: Define our search arrays so they are usuable in the javascript
   $this->headScript()->appendScript($this->render('search/advanced/globals.phtml'));
-  // Step 2: Call the javascript to make use of the above
   $this->headScript()->appendFile(
     isset($this->advancedSearchJsOverride) ? $this->advancedSearchJsOverride : 'advanced_search.js'
   );
-  // Step 3: Build the page (if an override is necessary) 
+  // Step 2: Build the page
   if ($this->buildPageOverride) {
     $this->headScript()->appendScript(
       $this->partial(

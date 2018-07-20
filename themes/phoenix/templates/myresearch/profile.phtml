@@ -11,15 +11,14 @@
     // Template for use by the renderArray helper:
     $arrTemplate = '<tr><th>%%LABEL%%:</th><td> %%VALUE%%</td></tr>';
 ?>
-
 <div class="row">
   <div class="<?=$this->layoutClass('mainbody')?>">
     <h2><?=$this->transEsc('Your Profile')?></h2>
     <?=$this->flashmessages();?>
 
-    <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
+  <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
 
-    <table class="table table-striped">
+  <table class="table table-striped">
       <?
         echo $this->renderArray(
           $arrTemplate, $this->profile,
@@ -63,7 +62,7 @@
     <p><a href="https://www.lib.uchicago.edu/borrow/access-privileges/library-cards-and-account-information/" target="_blank" class="external">Keeping contact information current</a></p>
   </div>
 
-  <div class="<?=$this->layoutClass('sidebar')?>">
-    <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'profile'])?>
-  </div>
+<div class="<?=$this->layoutClass('sidebar')?>">
+  <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'profile'])?>
+</div>
 </div>

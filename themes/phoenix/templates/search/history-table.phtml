@@ -5,7 +5,7 @@
     <th><?=$this->transEsc("history_search")?></th>
     <th><?=$this->transEsc("history_limits")?></th>
     <th><?=$this->transEsc("history_results")?></th>
-    <? if ($saveSupported): ?><th><?=$this->transEsc($this->showSaved ? "history_delete" : "history_save")?></th><? endif; ?>
+    <? if (isset($saveSupported)): ?><th><?=$this->transEsc($this->showSaved ? "history_delete" : "history_save")?></th><? endif; ?>
   </tr>
   </thead>
   <tbody>
@@ -33,7 +33,7 @@
         <? endforeach; ?>
       </td>
       <td><?=$this->escapeHtml($this->localizedNumber($info->getResultTotal()))?></td>
-      <? if ($saveSupported): ?>
+      <? if (isset($saveSupported)): ?>
         <td>
           <? if ($this->showSaved): ?>
             <a href="<?=$this->url('myresearch-savesearch')?>?delete=<?=urlencode($info->getSearchId())?>&amp;mode=history"><i class="fa fa-remove" aria-hidden="true"></i> <?=$this->transEsc("history_delete_link")?></a>

@@ -24,7 +24,7 @@
     <h2><?=$this->transEsc('Checked Out Items')?> <small>(<?=count($this->transactions)?>)</small></h2>
 
     <?=$this->flashmessages()?>
-    <? if ($_POST['renewSelected'] || $_POST['renewAll']): ?>
+    <? if (isset($_POST['renewSelected']) || isset($_POST['renewAll'])): ?>
         <? if ($failure): ?>
             <?=$this->BootstrapAlert()->makeAlert('danger', 'Some items could not be renewed. Please see below.', ''); ?>
         <? else: ?>
@@ -51,7 +51,7 @@
     <? if (!empty($this->transactions)): ?>
       <? if ($this->renewForm): ?>
       <? $disabled = ''; ?>
-      <? if ($_POST['renewSelected'] || $_POST['renewAll']): ?>
+      <? if (isset($_POST['renewSelected']) || isset($_POST['renewAll'])): ?>
         <? $disabled = 'disabled'; ?>
       <? endif; ?>
       <form name="renewals" method="post" id="renewals">

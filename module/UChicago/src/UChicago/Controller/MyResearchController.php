@@ -28,10 +28,14 @@
 namespace UChicago\Controller;
 
 use VuFind\Exception\Auth as AuthException,
+    VuFind\Exception\Forbidden as ForbiddenException,
+    VuFind\Exception\ILS as ILSException,
+    VuFind\Exception\Mail as MailException,
     VuFind\Exception\ListPermission as ListPermissionException,
     VuFind\Exception\RecordMissing as RecordMissingException,
     UChicago\StorageRequest\StorageRequest,
-    Zend\Stdlib\Parameters;
+    VuFind\Search\RecommendListener, Zend\Stdlib\Parameters,
+    Zend\View\Model\ViewModel;
 
 /**
  * Controller for the user account area.
@@ -63,7 +67,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         ) {
             $msg = 'authentication_error_loggedout';
         }
-        $this->flashMessenger()->setNamespace('error')->addMessage($msg);
+        $this->flashMessenger()->addMessage($msg, 'error');
     }
 
     /*
@@ -73,7 +77,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
      * altering something. 
      */
 
-    public function storagerequestAction() 
+    public function storageRequestAction() 
     {
         $config = $this->getConfig();
 
@@ -191,7 +195,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
 
     /**
-     * Send list of checked out books to view. 
+     * Send list of checked out books to view
      * Overriding VuFind core so we can return a flag for detecting
      * if any of the renewal requests failed. This allows us to display
      * the appropriate message at the top of the page and saves us an 
@@ -478,7 +482,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 }
                 $source = isset($row['source'])
                     ? $row['source'] : DEFAULT_SEARCH_BACKEND;
-                $row['driver'] = $this->getServiceLocator()
+                $row['driver'] = $this->serviceLocator
                     ->get('VuFind\RecordLoader')->load($row['id'], $source);
                 $row['title'] = $row['driver']->getShortTitle();
             } catch (\Exception $e) {
