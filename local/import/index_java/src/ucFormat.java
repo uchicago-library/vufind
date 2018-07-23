@@ -1,5 +1,3 @@
-//cat ./local/import/index_scripts/uc_format.bsh
-
 package org.vufind.index;
 
 import java.util.*;
@@ -623,7 +621,6 @@ public class ucFormat
 						CharAt6 = Character.toUpperCase(leader.charAt(6));						
 						if(CharAt6 == 'K')
 							result.add("Photo"); //Photo  // ch
-						System.out.println("PHOTO");System.out.println();
 						break;
 					}
 
