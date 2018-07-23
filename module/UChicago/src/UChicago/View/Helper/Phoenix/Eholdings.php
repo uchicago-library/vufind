@@ -90,6 +90,9 @@ class Eholdings extends AbstractHelper
                 
                 /* Build human readable text for the link as a fallback */
                 $descriptionArray = parse_url($url);
+                if (!isset($descriptionArray['host'])) {
+                    break;
+                }
                 $host = $descriptionArray['host'];
                 $hasFilter = (substr($host, 0, 4) == $filter);
                 $description = $hasFilter ? substr($host, strlen($filter)) : $host;
