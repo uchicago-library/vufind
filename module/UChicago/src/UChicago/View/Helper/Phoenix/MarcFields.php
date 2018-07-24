@@ -282,11 +282,14 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
                 include('themes/phoenix/templates/Helpers/MarcFields/atlasDefault.phtml');
             }
             elseif ($pos == 'results') {
-                if ($marcData[0]['currentField'] == 245) {
+                if (isset($marcData[0]['currentField']) && $marcData[0]['currentField'] == 245) {
                      include('themes/phoenix/templates/Helpers/MarcFields/resultsTitle.phtml');               
                 }
                 else { 
-                    foreach($marcData as $data){
+                    foreach($marcData as $data) {
+                        if (!isset($data['currentField'])) {
+                            break;
+                        }
                         /*100, 110, 111 (Author), 700, 710, 711, 790, 791, 
                         792 (Other authors/contributors - Other uniform titles together): get special template*/
                         if (($data['currentField'] == 100) || ($data['currentField'] == 110) || ($data['currentField'] == 111) || ($data['currentField'] == 700) || 
