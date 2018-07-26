@@ -1,11 +1,11 @@
 <!--author.phtml-->
 <? /*Display a link and the vernacular if there's data*/
    if(isset($data['subfieldData'])):
-       $displayUrl = implode(' ', $data['subfieldData']);
+       $displayUrl = htmlentities(implode(' ', $data['subfieldData']));
        $link = $this->getAuthorBrowseLink($data['subfieldData']);
 ?>
        <a href="<?='/vufind/alphabrowse'.'/Home?source=author&amp;from='.urlencode(strip_tags(trim($link, ' ')))?>"><?=$displayUrl ?></a><br/>
        <? if (!empty($data['vernacularData'])) :
-           echo implode(' ', $data['vernacularData']);?><br />
+           echo htmlentities(implode(' ', $data['vernacularData']));?><br />
        <? endif; ?>
 <? endif; ?>

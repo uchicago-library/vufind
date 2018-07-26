@@ -1,9 +1,9 @@
 <!--541.phtml-->
 <? if(($data['indicator1'] != "0")) {
-       echo implode(' ', $data['subfieldData']).'<br/>';
+       echo htmlentities(implode(' ', $data['subfieldData'])).'<br/>';
    }
         
    if (!empty($data['vernacularData'])) :
-       echo implode(' ', $data['vernacularData']);?><br />
+       echo htmlentities(implode(' ', $data['vernacularData']));?><br />
 <? endif; ?>
 

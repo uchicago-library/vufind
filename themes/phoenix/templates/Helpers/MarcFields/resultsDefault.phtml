@@ -1,11 +1,11 @@
 <!--resultsDefault.phtml-->
 <div class="<?=strtolower($data['label'])?>">
     <? if (!empty($data['subfieldData'])) : 
-       echo strip_tags(implode(' ', $data['subfieldData'])) ?>
+       echo strip_tags(htmlentities(implode(' ', $data['subfieldData']))) ?>
     <? endif; ?>   
     <? if (!empty($data['vernacularData'])) :
         echo '<br />';
-        echo strip_tags(implode(' ', $data['vernacularData']));
+        echo strip_tags(htmlentities(implode(' ', $data['vernacularData'])));
         echo '<br />';
     ?>
     <? endif; ?>   

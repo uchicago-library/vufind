@@ -33,5 +33,5 @@ if (!empty($data['subfieldData'])) {
 ?>   
 
 <? if (!empty($data['vernacularData'])) :
-       echo implode(' ', $data['vernacularData']);?><br />
+       echo htmlentities(implode(' ', $data['vernacularData']));?><br />
 <? endif; ?>   

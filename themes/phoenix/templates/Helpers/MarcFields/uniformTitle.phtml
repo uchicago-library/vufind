@@ -1,5 +1,5 @@
 <!--uniformTitle.phtml-->
-<a href="<? echo '/vufind/alphabrowse'.'/home?source=title&from='.urlencode(strip_tags(trim(implode(' ', $data['subfieldData']), ' ')))?>"><? echo implode(' ', $data['subfieldData']) ?></a><br/>
+<a href="<? echo '/vufind/alphabrowse'.'/home?source=title&from='.urlencode(strip_tags(trim(implode(' ', $data['subfieldData']), ' ')))?>"><? echo htmlentities(implode(' ', $data['subfieldData'])) ?></a><br/>
 <? if (!empty($data['vernacularData'])) :
-       echo implode(' ', $data['vernacularData']);?><br />
+       echo htmlentities(implode(' ', $data['vernacularData']));?><br />
 <? endif; ?>

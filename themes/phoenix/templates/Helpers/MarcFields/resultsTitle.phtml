@@ -1,9 +1,9 @@
 <!--resultsTitle.phtml-->
 <? foreach($marcData as $data) : ?>
   <a href="<?=$this->getRecordLink()?>" class="<?=$marcData[0]['label']?>">
-    <?=implode(' ', $data['subfieldData']) ?>
+    <?=htmlentities(implode(' ', $data['subfieldData'])) ?>
   </a><br/>
   <? if (!empty($data['vernacularData'])) : ?> 
-        <?=implode(' ', $data['vernacularData']);?><br/>
+        <?=htmlentities(implode(' ', $data['vernacularData']));?><br/>
   <? endif; ?>
 <? endforeach; ?>
