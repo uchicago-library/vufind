@@ -1595,9 +1595,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                    (select holdings_id from ole_ds_bib_holdings_t where bib_id = '" . $bibid . "')";
 
         try {
+            $strToLower= strtolower(utf8_decode($bibid));
             $sqlStmt = $this->db->prepare($sql);
             $sqlStmt->bindParam(
-                ':bibid', strtolower(utf8_decode($bibid)), PDO::PARAM_STR
+                ':bibid', $strToLower, PDO::PARAM_STR
             );
             $sqlStmt->execute();
             $check = $sqlStmt->fetchAll(PDO::FETCH_ASSOC);

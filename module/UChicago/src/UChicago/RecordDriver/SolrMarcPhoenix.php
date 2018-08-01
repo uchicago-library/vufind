@@ -561,10 +561,12 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
 
             foreach ($the_marc_fields as $the_marc_fields) {
 
-                $field = array_shift(explode("|", $the_marc_fields));
+                $fields = explode("|", $the_marc_fields);
+                $field = array_shift($fields);
 
                 /*Get an array of subfields for this marc field */
-                $subfields = array_pop(explode("|", $the_marc_fields));
+                $temp = explode("|", $the_marc_fields);
+                $subfields = array_pop($temp);
                 $output[] = [$field, $subfields, $html_id];
             }
         }
@@ -618,7 +620,8 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
 
             $s6 = $vernacularFields->getSubfield('6');
             if ($s6) {
-                $subfield6 = array_shift(explode('-', $s6->getData()));
+                $explode = explode('-', $s6->getData());
+                $subfield6 = array_shift($explode);
             } else {
                 $subfield6 = '';
             }

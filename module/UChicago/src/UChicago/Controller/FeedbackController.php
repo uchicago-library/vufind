@@ -108,8 +108,10 @@ class FeedbackController extends \VuFind\Controller\FeedbackController
         $successPage = $config['KnowledgeTracker']['success_page'];
 
         // Create the view
-        return $this->createViewModel(array('pageUrl' => $this->getPageUrl(), 'refUrl' => $this->getRefUrl(), 'libId' => $libId, 
-            'formUrl' => $formUrl, 'abineguid' => $abineguid, 'successPage' => $successPage ));
+        $arr = ['pageUrl' => $this->getPageUrl(), 'refUrl' => $this->getRefUrl(), 'libId' => $libId,
+            'formUrl' => $formUrl, 'abineguid' => $abineguid, 'successPage' => $successPage];
+
+        return $this->createViewModel($arr);
     }
 
 

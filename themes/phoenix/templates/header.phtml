@@ -36,9 +36,9 @@
       <ul class="nav navbar-nav navbar-left" role="menu">
         <? // This is throwing a warning on production. We might need to bring this back in a different way.  
            //$currentUrl = $_SERVER['SCRIPT_URI'] . '?' . $_SERVER['QUERY_STRING'];?>
-        <? if ($this->knowledgeTracker()->tabEnabled()): ?>
-          <li><a id="knowledgeTrackerLink" class="modal-link" href="<?=$this->url('feedback-knowledgetracker') ?>"><i class="fa fa-envelope"></i> <?=$this->transEsc("Feedback")?></a></li>
-        <? endif; ?>
+        <? //if ($this->knowledgeTracker()->tabEnabled()): ?>
+          <!--<li><a id="knowledgeTrackerLink" class="modal-link" href="<?//=$this->url('feedback-knowledgetracker') ?>"><i class="fa fa-envelope"></i> <?//=$this->transEsc("Feedback")?></a></li>-->
+        <? //endif; ?>
       </ul>
       <ul role="menu" class="nav navbar-nav navbar-right">
         <? if ($this->feedback()->tabEnabled()): ?>
