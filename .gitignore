@@ -3,6 +3,7 @@
 ChangeLog
 \#*
 .\#*
+.php_cs_cache
 TAGS
 *~
 /downloads
@@ -13,6 +14,7 @@ import/solrmarc.log*
 node_modules
 public/swagger-ui
 .vagrant
+lessphp_*.list
 
 ### UChicago changes ###
 nohup.out

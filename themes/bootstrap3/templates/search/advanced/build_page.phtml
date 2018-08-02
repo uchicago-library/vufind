@@ -11,31 +11,19 @@ $(document).ready(function() {
   $('#new_group_template .adv-search').remove();
   $('#advSearchForm .no-js').remove();
   // Build page
-  <? if (isset($this->searchDetails) && is_object($this->searchDetails)): ?>
-    <? foreach ($this->searchDetails->getQueries() as $searchGroup): ?>
-      <? $i = 0; foreach ($searchGroup->getQueries() as $search): ?>
-        <? if (++$i == 1): ?>
+  <?php if (isset($this->searchDetails) && is_object($this->searchDetails)): ?>
+    <?php foreach ($this->searchDetails->getQueries() as $searchGroup): ?>
+      <?php $i = 0; foreach ($searchGroup->getQueries() as $search): ?>
+        <?php if (++$i == 1): ?>
           var new_group = addGroup('<?=addslashes($search->getString())?>', '<?=addslashes($search->getHandler())?>', '<?=$searchGroup->isNegated() ? 'NOT' : $searchGroup->getOperator()?>');
-        <? else: ?>
+        <?php else: ?>
           addSearch(new_group, {term:'<?=addslashes($search->getString())?>', field:'<?=addslashes($search->getHandler())?>'});
-        <? endif; ?>
-      <? endforeach; ?>
-    <? endforeach; ?>
-  <? else: ?>
+        <?php endif; ?>
+      <?php endforeach; ?>
+    <?php endforeach; ?>
+  <?php else: ?>
     var group = addGroup();
-
-    //hide limits when the page loads.
-    $('fieldset').has('legend:contains("Limit To")').hide();
-
-    //hide results per page on page load. 
-    $('fieldset').has('legend:contains("Results per page")').hide();
-
-    //hide year of publication on page load. 
-    $('fieldset').has('legend:contains("Year of Publication")').hide();
-
-    //hide boolean on page load. 
-    $('input.btn-primary').eq(0).hide();
-    $('label[for="search_bool0"]').hide();
-    $('select#search_bool0').hide();
-  <? endif; ?>
+    addSearch(group);
+    addSearch(group);
+  <?php endif; ?>
 });

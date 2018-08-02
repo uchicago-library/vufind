@@ -2,9 +2,9 @@
 /**
  * Syndetics Summaries content loader.
  *
- * PHP version 5
+ * PHP version 7
  *
- * Copyright (C) Villanova University 2010.
+ * Copyright (C) The University of Chicago 2017.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -21,7 +21,7 @@
  *
  * @category VuFind2
  * @package  Content
- * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   John Jung <jej@uchicago.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
  */
@@ -32,7 +32,7 @@ namespace VuFind\Content\Summaries;
  *
  * @category VuFind2
  * @package  Content
- * @author   Demian Katz <demian.katz@villanova.edu>
+ * @author   John Jung <jej@uchicago.edu>
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     http://vufind.org/wiki/vufind2:developer_manual Wiki
  */
@@ -43,49 +43,45 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
      *
      * @var array
      */
-    protected $sourceList = array(
-        'AVSUMMARY' => array(
+    protected $sourceList = [
+        'AVSUMMARY' => [
             'title' => 'Summaries',
             'file' => 'AVSUMMARY.XML',
-            'div' => '<div id="syn_summaries"></div>'
-        ),
-        'SUMMARY' => array(
+            'div' => '<div id="syn_avsummary"></div>'
+        ],
+        'SUMMARY' => [
             'title' => 'Summaries',
             'file' => 'SUMMARY.XML',
-            'div' => '<div id="syn_summaries"></div>'
-        ),
-    );
+            'div' => '<div id="syn_summary"></div>'
+        ],
+    ];
 
     /**
-     * This method is responsible for connecting to Syndetics for tables
-     * of contents.
+     * This method is responsible for connecting to Syndetics for summaries.
      *
-     * It first queries the master url for the ISBN entry seeking an excerpt URL.
-     * If an excerpt URL is found, the script will then use HTTP request to
-     * retrieve the script. The script will then parse the excerpt according to
-     * US MARC (I believe). It will provide a link to the URL master HTML page
-     * for more information.
+     * It first queries the master url for the ISBN entry seeking a summary URL.
+     * If a summary URL is found, the script will then use HTTP request to
+     * retrieve summaries.
      * Configuration:  Sources are processed in order - refer to $sourceList above.
      *
      * @param string           $key     API key
      * @param \VuFindCode\ISBN $isbnObj ISBN object
      *
      * @throws \Exception
-     * @return array     Returns array with excerpt data.
-     * @author Joel Timothy Norman <joel.t.norman@wmich.edu>
-     * @author Andrew Nagy <vufind-tech@lists.sourceforge.net>
+     * @return array     Returns array with summary data.
+     * @author John Jung <jej@uchicago.edu>
      */
     public function loadByIsbn($key, \VuFindCode\ISBN $isbnObj)
     {
         // Initialize return value:
-        $summaries = array();
+        $summaries = [];
 
-        // Find out if there are any excerpts
+        // Find out if there are any summaries
         $isbn = $this->getIsbn10($isbnObj);
         $url = $this->getIsbnUrl($isbn, $key);
         $result = $this->getHttpClient($url)->send();
         if (!$result->isSuccess()) {
-            return $excerpt;
+            return $summaries;
         }
 
         // Test XML Response
@@ -93,11 +89,10 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
             throw new \Exception('Invalid XML');
         }
 
-        $i = 0;
         foreach ($this->sourceList as $source => $sourceInfo) {
             $nodes = $xmldoc->getElementsByTagName($source);
             if ($nodes->length) {
-                // Load toc
+                // Load summary
                 $url = $this->getIsbnUrl($isbn, $key, $sourceInfo['file']);
                 $result2 = $this->getHttpClient($url)->send();
                 if (!$result2->isSuccess()) {
@@ -113,29 +108,20 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
                 // If we have syndetics plus, we don't actually want the content
                 // we'll just stick in the relevant div
                 if ($this->usePlus) {
-                    $toc[$i]['Content'] = $sourceInfo['div'];
+                    $summaries[] = $sourceInfo['div'];
                 } else {
                     // Get the marc field for summaries. (520)
                     $nodes = $xmldoc2->GetElementsbyTagName("Fld520");
-
-                    $summaries[$i]['Content'] = array();
                     foreach ($nodes as $node) {
-                        $summaries[$i]['Content'][] = preg_replace(
+                        $summaries[] = preg_replace(
                             '/<a>|<a [^>]*>|<\/a>/', '',
                             html_entity_decode($node->nodeValue)
                         );
                     }
                 }
-
-                //change the xml to actual title:
-                $summaries[$i]['Source'] = $sourceInfo['title'];
-
-                $summaries[$i]['ISBN'] = $isbn;
-
-                $i++;
             }
         }
-    
+
         return $summaries;
     }
 }
