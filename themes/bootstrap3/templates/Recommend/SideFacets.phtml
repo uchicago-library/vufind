@@ -26,13 +26,34 @@
 <?php endif; ?>
 <?php $extraFilters = isset($this->extraSideFacetFilters) ? $this->extraSideFacetFilters : []; ?>
 <?php $collapsedFacets = $this->recommend->getCollapsedFacets() ?>
-<?php $filterList = array_merge($results->getParams()->getFilterList(true), $extraFilters); ?>
-<?php if (!empty($filterList)): ?>
-  <?=$this->context($this)->renderInContext('Recommend/SideFacets/filter-list.phtml', [
-    'collapsedFacets' => $collapsedFacets,
-    'extraFilters' => $extraFilters,
-    'filterList' => $filterList,
-  ]); ?>
+<?php $hierarchicalFacetSortOptions = $this->recommend->getHierarchicalFacetSortOptions() ?>
+<?php $hierarchicalFacets = $this->recommend->getHierarchicalFacets() ?>
+<?php $filterList = array_merge($results->getParams()->getFilterList(true), $extraFilters); if (!empty($filterList)): ?>
+  <ul class="list-group filters">
+    <li class="list-group-item title"><?=$this->transEsc('Remove Filters')?> <span class="pull-right gray hidden-sm">[Remove]</span></li>
+    <?php foreach ($filterList as $field => $filters): ?>
+      <?php foreach ($filters as $i => $filter): ?>
+        <?
+          $index = isset($filter['field']) ? array_search($filter['field'], $collapsedFacets) : false;
+          if ($index !== false) {
+              unset($collapsedFacets[$index]); // Open if we have a match
+          }
+          if (isset($filter['specialType']) && $filter['specialType'] == 'keyword') {
+            $removeLink = $this->currentPath().$results->getUrlQuery()->replaceTerm($filter['value'], '');
+          } else {
+            $removeLink = $this->currentPath().$results->getUrlQuery()->removeFacet($filter['field'], $filter['value'], $filter['operator']);
+          }
+          if ($filter['displayText'] == '[* TO *]') {
+            $filter['displayText'] = $this->translate('filter_wildcard');
+          }
+        ?>
+        <a class="list-group-item active" href="<?=$removeLink?>" title="<?=$this->transEsc('clear_tag_filter') ?>">
+          <span class="pull-right flip"><i class="fa fa-times" aria-hidden="true"></i></span>
+          <?php if ($filter['operator'] == 'NOT') echo $this->transEsc('NOT') . ' '; if ($filter['operator'] == 'OR' && $i > 0) echo $this->transEsc('OR') . ' '; ?><?=$this->transEsc($field)?>: <?=$this->escapeHtml($filter['displayText'])?>
+        </a>
+      <?php endforeach; ?>
+    <?php endforeach; ?>
+  </ul>
 <?php endif; ?>
 <?= isset($this->sideFacetExtraControls) ? $this->sideFacetExtraControls : '' ?>
 <?php $sideFacetSet = $this->recommend->getFacetSet(); $rangeFacets = $this->recommend->getAllRangeFacets(); ?>

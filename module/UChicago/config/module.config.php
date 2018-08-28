@@ -51,11 +51,15 @@ $config = array(
                 ),
             ),//content_toc
             'recorddriver' => array(
-                'factories' => array(
+                'factories' => [
+                    'UChicago\RecordDriver\SolrMarc\SolrMarc' => 'UChicago\RecordDriver\Factory::getSolrMarc',
                     'solrmarc' => 'UChicago\RecordDriver\Factory::getSolrMarc',
                     'solrsfx' => 'UChicago\RecordDriver\Factory::getSolrSfx',
                     'solrhathi' => 'UChicago\RecordDriver\Factory::getSolrHathi',
-                ),
+                ],
+                'aliases' => [
+                    'solrmarc' => 'UChicago\RecordDriver\SolrMarc\SolrMarc',
+                ],
             ),//recorddriver
             'recordtab' => array(
                 'factories' => array(
@@ -107,19 +111,8 @@ $staticRoutes = [
 ];
     
 // Build static routes
-foreach ($staticRoutes as $route) {
-    list($controller, $action) = explode('/', $route);
-    $routeName = str_replace('/', '-', strtolower($route));
-    $config['router']['routes'][$routeName] = [
-        'type' => 'Zend\Mvc\Router\Http\Literal',
-        'options' => [
-            'route'    => '/' . $route,
-            'defaults' => [
-                'controller' => $controller,
-                'action'     => $action,
-            ]
-        ]
-    ];
-}
+$routeGenerator = new \VuFind\Route\RouteGenerator();
+$routeGenerator->addStaticRoutes($config, $staticRoutes);
+
 
 return $config;

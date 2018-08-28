@@ -26,6 +26,7 @@
  * @link     https://vufind.org/wiki/development Wiki
  */
 namespace UChicago\Content;
+
 use Zend\ServiceManager\ServiceManager;
 
 /**
@@ -50,9 +51,8 @@ class Factory extends \VuFind\Content\Factory
      */
     public static function getSummaries(ServiceManager $sm)
     {
-        $loader = $sm->getServiceLocator()
-            ->get('VuFind\ContentSummariesPluginManager');
-        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+        $loader = $sm->get('VuFind\Content\Summaries\PluginManager');
+        $config = $sm->get('VuFind\Config\PluginManager')->get('config');
         $providers = isset($config->Content->summaries)
             ? $config->Content->summaries : '';
         return new Loader($loader, $providers);
@@ -67,11 +67,10 @@ class Factory extends \VuFind\Content\Factory
      */
     public static function getTOC(ServiceManager $sm)
     {
-        $loader = $sm->getServiceLocator()
-            ->get('VuFind\ContentTOCPluginManager');
-        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+        $loader = $sm->get('VuFind\Content\TOC\PluginManager');
+        $config = $sm->get('VuFind\Config\PluginManager')->get('config');
         $providers = isset($config->Content->toc)
             ? $config->Content->toc : '';
-        return new \VuFind\Content\Loader($loader, $providers);
+        return new Loader($loader, $providers);
     }
 }

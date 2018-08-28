@@ -25,7 +25,7 @@
                         // Exit loop in this situation.
                         $useBackupLocation = false;
                         break 2;
-                    } else if (!$backupLocation) {
+                    } elseif (!$backupLocation) {
                         // Save first "available" location without call # as backup
                         // (better than an unavailable location if no call #'s found)
                         $backupLocation = $location;
@@ -40,10 +40,10 @@
         }
 
         if ($callno) {
-            echo trim($callno) . "\n";
+            echo $this->translate('callnumber_abbrev') . ': ' . trim($callno) . "\n";
         }
         if ($location) {
-            echo trim($location) . "\n";
+            echo $this->translate('Location') . ': ' . trim($location) . "\n";
         }
         echo $this->driver->getBreadcrumb() . "\n";
         echo $this->serverUrl($this->recordLink()->getUrl($this->driver)) . "\n";

@@ -1,5 +1,5 @@
-<? // This is a text-only email template; do not include HTML! ?>
-<? $pubDetails = $this->driver->tryMethod('getPublicationDetails');
+<?php // This is a text-only email template; do not include HTML! ?>
+<?php $pubDetails = $this->driver->tryMethod('getPublicationDetails');
    $edition = $this->driver->tryMethod('getEdition');
    if (is_array($edition)) {
       $edition = implode(" ", $edition);
@@ -9,44 +9,44 @@
 ?>
 <?=$this->driver->getTitle() . ' ' . $this->driver->getTitleStatement()?>
 <?=$imprint . "\n"?>
-<? foreach ($holdings['holdings'] as $location => $holding): ?><? if (($location == 'Full Text' || $location == 'FullText') && !array_key_exists('eHolding', $holding['items'][0])): continue; endif; ?>
+<?php foreach ($holdings['holdings'] as $location => $holding): ?><?php if (($location == 'Full Text' || $location == 'FullText') && !array_key_exists('eHolding', $holding['items'][0])): continue; endif; ?>
 <?=$location . "\n"; ?>
-<? $callnumbers = array();
+<?php $callnumbers = array();
    foreach ($holding['items'] as $item):
      if (array_key_exists('callnumberDisplay', $item) && !empty($item['callnumberDisplay'])):
        $callnumbers[$item['callnumberDisplay']] = true;
      endif;
    endforeach;
    $callnumbers = implode(", ", array_keys($callnumbers)); ?>
-<? if(!empty($callnumbers)): ?>
+<?php if(!empty($callnumbers)): ?>
 <?=$callnumbers . "\n";?>
-<? endif; ?>
-<? $eholdings = array();
+<?php endif; ?>
+<?php $eholdings = array();
    foreach ($holding['items'] as $item):
      if (array_key_exists('eHolding', $item) && !empty($item['eHolding'])):
        $eholdings[$item['eHolding']['uri']] = true;
      endif;
    endforeach;
    $eholdings = implode(", ", array_keys($eholdings)); ?>
-<? if (!empty($eholdings)): ?>
+<?php if (!empty($eholdings)): ?>
 <?=$eholdings;?>
-<? endif; ?>
+<?php endif; ?>
 
-<? if (isset($holding['library has']) && count($holding['library has']) > 0): ?>
-<? foreach($holding['library has'] as $libraryHas): ?>
-<? echo $libraryHas . "\n"; ?>
-<? endforeach; ?>
-<? endif; ?>
-<? if (isset($holding['indexes']) && count($holding['indexes']) > 0): ?>
-<? echo "Indexes\n"; ?>
-<? foreach($holding['indexes'] as $index): ?>
-<? echo $index . "\n"; ?>
-<? endforeach; ?>
-<? endif; ?>
+<?php if (isset($holding['library has']) && count($holding['library has']) > 0): ?>
+<?php foreach($holding['library has'] as $libraryHas): ?>
+<?php echo $libraryHas . "\n"; ?>
+<?php endforeach; ?>
+<?php endif; ?>
+<?php if (isset($holding['indexes']) && count($holding['indexes']) > 0): ?>
+<?php echo "Indexes\n"; ?>
+<?php foreach($holding['indexes'] as $index): ?>
+<?php echo $index . "\n"; ?>
+<?php endforeach; ?>
+<?php endif; ?>
 
-<? endforeach; ?><?=$this->serverUrl($this->recordLink()->getUrl($this->driver))."\n\n"?>
+<?php endforeach; ?><?=$this->serverUrl($this->recordLink()->getUrl($this->driver))."\n\n"?>
 
-<? if (!empty($this->message)): ?><?="\n"?><?=$this->translate("Message From Sender")?>:<?="\n"?>
+<?php if (!empty($this->message)): ?><?="\n"?><?=$this->translate("Message From Sender")?>:<?="\n"?>
 
 <?=$this->message?>
-<? endif; ?>
+<?php endif; ?>

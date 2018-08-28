@@ -1,7 +1,8 @@
 <?php
 
 namespace UChicago\View\Helper\Phoenix;
-use Zend\View\Helper\AbstractHelper;
+use Zend\View\Helper\AbstractHelper; 
+use Zend\ServiceManager\ServiceLocatorInterface;
 
 /**
  * Helper class that finds the search context for 
@@ -23,7 +24,10 @@ class SearchContext extends AbstractHelper
     /**
      * Constructor, adds configurations.
      */
+    #public function __construct(ServiceLocatorInterface $sm) {
     public function __construct($config) {
+        #$this->setServiceLocator($sm);
+        #$config = $this->serviceLocator->get('VuFind\Config')->get('config');
         $configArray = [];
         foreach ($config as $key => $val) {
            $configArray[$key] = $val; 

@@ -2,7 +2,7 @@
 /**
  * Book Bag / Bulk Action Controller
  *
- * PHP version 5
+ * PHP version 7
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -26,8 +26,11 @@
  * @link     https://vufind.org Main Site
  */
 namespace UChicago\Controller;
-use VuFind\Exception\Mail as MailException,
-    Zend\Session\Container as SessionContainer;
+
+use VuFind\Exception\Forbidden as ForbiddenException;
+use VuFind\Exception\Mail as MailException;
+use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\Session\Container;
 
 /**
  * Book Bag / Bulk Action Controller
@@ -48,7 +51,7 @@ class CartController extends \VuFind\Controller\CartController
     public function emailAction()
     {
         // Retrieve ID list:
-        $ids = is_null($this->params()->fromPost('selectAll'))
+        $ids = null === $this->params()->fromPost('selectAll')
             ? $this->params()->fromPost('ids')
             : $this->params()->fromPost('idsAll');
 

@@ -1,4 +1,4 @@
-<?
+<?php
   // Set up page title:
   $this->headTitle($this->translate('Requested Items'));
 
@@ -13,7 +13,7 @@
 
     <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
 
-    <? if (!empty($this->recordList)): ?>
+    <?php if (!empty($this->recordList)): ?>
       <form>
         <div class="toolbar">
           <?
@@ -38,22 +38,22 @@
         </div>
         <input type="hidden" id="submitType" name="cancelSelected" value="1"/>
 
-    <? $iteration = 0; ?>
-    <? foreach ($this->recordList as $resource): ?>
-      <? $iteration++; ?>
-      <? $ilsDetails = $resource->getExtraDetail('ils_details'); ?>
+    <?php $iteration = 0; ?>
+    <?php foreach ($this->recordList as $resource): ?>
+      <?php $iteration++; ?>
+      <?php $ilsDetails = $resource->getExtraDetail('ils_details'); ?>
       <div id="record<?=$this->escapeHtmlAttr($resource->getUniqueId()) ?>" class="result">
-        <? if ($this->cancelForm && isset($ilsDetails['cancel_details'])): ?>
-          <? $safeId = preg_replace('/[^a-zA-Z0-9]/', '', $resource->getUniqueId()); ?>
+        <?php if ($this->cancelForm && isset($ilsDetails['cancel_details'])): ?>
+          <?php $safeId = preg_replace('/[^a-zA-Z0-9]/', '', $resource->getUniqueId()); ?>
           <input type="hidden" name="cancelAllIDS[]" value="<?=$this->escapeHtmlAttr($ilsDetails['cancel_details']) ?>" />
           <div class="checkbox">
             <label>
               <input type="checkbox" name="cancelSelectedIDS[]" value="<?=$this->escapeHtmlAttr($ilsDetails['cancel_details']) ?>" id="checkbox_<?=$safeId?>" data-record-id="<?=$this->escapeHtmlAttr($resource->getSourceIdentifier() . '|' . $resource->getUniqueId());?>" />
             </label>
           </div>
-        <? endif; ?>
+        <?php endif; ?>
 
-        <?
+        <?php
           $coverDetails = $this->record($resource)->getCoverDetails('holds', 'small', $this->recordLink()->getUrl($resource));
           $cover = $coverDetails['html'];
           $thumbnail = false;
@@ -63,22 +63,22 @@
             <div class="media-<?=$thumbnailAlignment ?> <?=$this->escapeHtmlAttr($coverDetails['size'])?>">
               <?=$cover ?>
             </div>
-            <? $thumbnail = ob_get_contents(); ?>
-          <? ob_end_clean(); ?>
-        <? endif; ?>
+            <?php $thumbnail = ob_get_contents(); ?>
+          <?php ob_end_clean(); ?>
+        <?php endif; ?>
         <div class="media">
-          <? if ($thumbnail && $thumbnailAlignment == 'left'): ?>
+          <?php if ($thumbnail && $thumbnailAlignment == 'left'): ?>
             <?=$thumbnail ?>
-          <? endif ?>
+          <?php endif ?>
           <div class="media-body">
-            <?
+            <?php
               // If this is a non-missing Solr record, we should display a link:
               if (is_a($resource, 'VuFind\\RecordDriver\\SolrDefault') && !is_a($resource, 'VuFind\\RecordDriver\\Missing')) {
                 $title = $resource->getTitle();
                 $title = empty($title) ? $this->transEsc('Title not available') : $this->escapeHtml($title);
                 echo '<a href="' . $this->recordLink()->getUrl($resource)
                   . '" class="title">' . $title . '</a>';
-              } else if (isset($ilsDetails['title']) && !empty($ilsDetails['title'])){
+              } elseif (isset($ilsDetails['title']) && !empty($ilsDetails['title'])){
                 // If the record is not available in Solr, perhaps the ILS driver sent us a title we can show...
                 echo '<span class="title">' . $this->escapeHtml($ilsDetails['title']) . '</span>';
               } else {
@@ -86,93 +86,93 @@
                 echo $this->transEsc('Title not available');
               }
             ?><br/>
-            <? $listAuthors = $resource->getPrimaryAuthors(); if (!empty($listAuthors)): ?>
+            <?php $listAuthors = $resource->getPrimaryAuthors(); if (!empty($listAuthors)): ?>
               <?=$this->transEsc('by')?>:
-              <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><? if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><? endif; ?><br/>
-            <? endif; ?>
+              <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><?php if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><?php endif; ?><br/>
+            <?php endif; ?>
 
-            <? if (count($resource->getFormats()) > 0): ?>
+            <?php if (count($resource->getFormats()) > 0): ?>
               <?=$this->record($resource)->getFormatList() ?>
               <br/>
-            <? endif; ?>
-            <? if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
+            <?php endif; ?>
+            <?php if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
               <strong><?=$this->transEsc('Volume')?>:</strong> <?=$this->escapeHtml($ilsDetails['volume'])?>
               <br />
-            <? endif; ?>
+            <?php endif; ?>
 
-            <? if (!empty($ilsDetails['shelvingLocation'])): ?>
+            <?php if (!empty($ilsDetails['shelvingLocation'])): ?>
               <?=$this->escapeHtml($ilsDetails['shelvingLocation'])?>
               <br />
-            <? endif; ?>
+            <?php endif; ?>
 
-              <? if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
+              <?php if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
                 <strong><?=$this->transEsc('Volume')?>:</strong> <?=$this->escapeHtml($ilsDetails['volume'])?>
                 <br />
-              <? endif; ?>
+              <?php endif; ?>
 
-            <? /* Depending on the ILS driver, the "location" value may be a string or an ID; figure out the best
+            <?php /* Depending on the ILS driver, the "location" value may be a string or an ID; figure out the best
                value to display... */ ?>
-            <? $pickupDisplay = ''; ?>
-            <? $pickupTranslate = false; ?>
-            <? if (isset($ilsDetails['location'])): ?>
-              <? if ($this->pickup): ?>
-                <? foreach ($this->pickup as $library): ?>
-                  <? if ($library['locationID'] == $ilsDetails['location']): ?>
-                    <? $pickupDisplay = $library['locationDisplay']; ?>
-                    <? $pickupTranslate = true; ?>
-                  <? endif; ?>
-                <? endforeach; ?>
-              <? endif; ?>
-              <? if (empty($pickupDisplay)): ?>
-                <? $pickupDisplay = $ilsDetails['location']; ?>
-              <? endif; ?>
-            <? endif; ?>
-            <? if (!empty($pickupDisplay)): ?>
+            <?php $pickupDisplay = ''; ?>
+            <?php $pickupTranslate = false; ?>
+            <?php if (isset($ilsDetails['location'])): ?>
+              <?php if ($this->pickup): ?>
+                <?php foreach ($this->pickup as $library): ?>
+                  <?php if ($library['locationID'] == $ilsDetails['location']): ?>
+                    <?php $pickupDisplay = $library['locationDisplay']; ?>
+                    <?php $pickupTranslate = true; ?>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              <?php endif; ?>
+              <?php if (empty($pickupDisplay)): ?>
+                <?php $pickupDisplay = $ilsDetails['location']; ?>
+              <?php endif; ?>
+            <?php endif; ?>
+            <?php if (!empty($pickupDisplay)): ?>
               <?=$this->transEsc('pick_up_location') ?>:
               <strong><?=$pickupTranslate ? $this->transEsc('location_' . $pickupDisplay, null, $pickupDisplay) : $this->escapeHtml($pickupDisplay)?></strong>
               <br />
-            <? endif; ?>
+            <?php endif; ?>
 
-            <? if (isset($ilsDetails['available']) && $ilsDetails['available'] == true && (!(isset($ilsDetails['position']) && $ilsDetails['position'] > 1))): ?>
+            <?php if (isset($ilsDetails['available']) && $ilsDetails['available'] == true && (!(isset($ilsDetails['position']) && $ilsDetails['position'] > 1))): ?>
               <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc("hold_available") ?></div>
-            <? else: ?>
+            <?php else: ?>
               <div class="text-danger"><strong>Item Status:</strong> Not Yet Available</div>
-            <? endif; ?>
+            <?php endif; ?>
             <div><?=$this->transEsc("hold_queue_position") ?>: <?=$this->escapeHtml($ilsDetails['position']) ?></div>
 
             </div>
             <div class="col-sm-4 col-xs-12">
-            <? $callNumbers = $resource->getCallNumbers(); ?>
-            <? if (!empty($callNumbers)): ?>
+            <?php $callNumbers = $resource->getCallNumbers(); ?>
+            <?php if (!empty($callNumbers)): ?>
                 <?=$this->transEsc('Call Number') ?>:
                 <strong><?=$callNumbers[0]; ?></strong><br/>
-            <? endif; ?>
-            <? if ($ilsDetails['item_id']): ?>
+            <?php endif; ?>
+            <?php if ($ilsDetails['item_id']): ?>
                 Barcode: <strong><?=$ilsDetails['item_id']?></strong><br/>
-            <? endif; ?>
+            <?php endif; ?>
 
-            <? if (!empty($ilsDetails['expire']) && $ilsDetails['status'] != 'ONHOLD'): ?>
+            <?php if (!empty($ilsDetails['expire']) && $ilsDetails['status'] != 'ONHOLD'): ?>
               <strong>Request expires:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
-            <? elseif (!empty($ilsDetails['hold_until_date'])): ?>
+            <?php elseif (!empty($ilsDetails['hold_until_date'])): ?>
                <strong>On Hold Until:</strong> <?=$this->escapeHtml($ilsDetails['hold_until_date']) ?><br/>
-            <? endif; ?>
+            <?php endif; ?>
 
-            <? if (!empty($ilsDetails['loan_type'])): ?>
+            <?php if (!empty($ilsDetails['loan_type'])): ?>
               <span class="item-type"><?=$this->escapeHtml($ilsDetails['loan_type'])?></span>
               <br />
-            <? endif; ?>
+            <?php endif; ?>
           </div>
-          <? if ($thumbnail && $thumbnailAlignment == 'right'): ?>
+          <?php if ($thumbnail && $thumbnailAlignment == 'right'): ?>
             <?=$thumbnail ?>
-          <? endif ?>
+          <?php endif ?>
         </div>
         <?=$resource->tryMethod('supportsCoinsOpenUrl')?'<span class="Z3988" title="'.$this->escapeHtmlAttr($resource->getCoinsOpenUrl()).'"></span>':''?>
       </div>
-    <? endforeach; ?>
-    <? if ($this->cancelForm): ?></form><? endif; ?>
-  <? else: ?>
+    <?php endforeach; ?>
+    <?php if ($this->cancelForm): ?></form><?php endif; ?>
+  <?php else: ?>
     <?=$this->transEsc('You have no outstanding requests') ?>.
-  <? endif; ?>
+  <?php endif; ?>
 </div>
 
 <div class="<?=$this->layoutClass('sidebar')?>">

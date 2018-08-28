@@ -27,6 +27,7 @@
  */
 namespace UChicago\RecordDriver;
 use Zend\ServiceManager\ServiceManager;
+use Interop\Container\ContainerInterface;
 
 /**
  * Record Driver Factory Class
@@ -41,6 +42,17 @@ use Zend\ServiceManager\ServiceManager;
  */
 class Factory
 {
+
+    /**
+     * Constructor
+     *
+     * @param ServiceLocatorInterface $sm Service locator
+     */
+    public function __construct(ServiceLocatorInterface $sm)
+    {
+        $this->setServiceLocator($sm);
+    }
+
     /**
      * Factory for SolrMarc record driver.
      *
@@ -48,19 +60,19 @@ class Factory
      *
      * @return SolrMarcPhoenix
      */
-    public static function getSolrMarc(ServiceManager $sm)
+    public static function getSolrMarc(ContainerInterface $container, $requestedName)
     {
         $driver = new \UChicago\RecordDriver\SolrMarcPhoenix(
-            $sm->getServiceLocator()->get('VuFind\Config')->get('config'),
+            $container->get('VuFind\Config')->get('config'),
             null,
-            $sm->getServiceLocator()->get('VuFind\Config')->get('searches')
+            $container->get('VuFind\Config')->get('searches')
         );
         $driver->attachILS(
-            $sm->getServiceLocator()->get('VuFind\ILSConnection'),
-            $sm->getServiceLocator()->get('VuFind\ILSHoldLogic'),
-            $sm->getServiceLocator()->get('VuFind\ILSTitleHoldLogic')
+            $container->get('VuFind\ILSConnection'),
+            $container->get('VuFind\ILSHoldLogic'),
+            $container->get('VuFind\ILSTitleHoldLogic')
         );
-        $driver->attachSearchService($sm->getServiceLocator()->get('VuFind\Search'));
+        $driver->attachSearchService($container->get('VuFind\Search'));
         return $driver;
     }
 
@@ -71,12 +83,12 @@ class Factory
      *
      * @return SolrMarcPhoenix
      */
-    public static function getSolrHathi(ServiceManager $sm)
+    public static function getSolrHathi(ContainerInterface $container, $requestedName)
     {
         $driver = new \UChicago\RecordDriver\SolrMarcPhoenix(
-            $sm->getServiceLocator()->get('VuFind\Config')->get('config'),
+            $container->get('VuFind\Config')->get('config'),
             null,
-            $sm->getServiceLocator()->get('VuFind\Config')->get('searches')
+            $container->get('VuFind\Config')->get('searches')
         );
         return $driver;
     }
@@ -88,12 +100,12 @@ class Factory
      *
      * @return SolrMarcPhoenix
      */
-    public static function getSolrSfx(ServiceManager $sm)
+    public static function getSolrSfx(ContainerInterface $container, $requestedName)
     { 
         $driver = new \UChicago\RecordDriver\SolrMarcPhoenix(
-            $sm->getServiceLocator()->get('VuFind\Config')->get('config'),
+            $container->get('VuFind\Config')->get('config'),
             null,
-            $sm->getServiceLocator()->get('VuFind\Config')->get('searches')
+            $container->get('VuFind\Config')->get('searches')
         );
         return $driver;
     }

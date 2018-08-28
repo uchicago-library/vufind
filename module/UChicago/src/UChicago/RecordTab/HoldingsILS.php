@@ -2,7 +2,7 @@
 /**
  * Holdings (ILS) tab
  *
- * PHP version 5
+ * PHP version 7
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -39,9 +39,9 @@ namespace UChicago\RecordTab;
 class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
 {
     /**
-     * ILS connection (or false if not applicable)
+     * ILS connection (or null if not applicable)
      *
-     * @param \VuFind\ILS\Connection|bool
+     * @param Connection
      */
     protected $catalog;
 
@@ -56,16 +56,16 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
     /**
      * Constructor
      *
-     * @param \VuFind\ILS\Connection|bool $catalog ILS connection to use to check
-     * for holdings before displaying the tab; set to false if no check is needed
+     * @param \VuFind\ILS\Connection|bool $catalog  ILS connection to use to check
+     * for holdings before displaying the tab; set to null if no check is needed
+     * @param string                      $template Holdings template to use
      *
      * @param $displayNum, integer or blank string, the number of items to display
      */
-    public function __construct($catalog, $displayNum)
+    public function __construct(Connection $catalog = null, $template = null, $displayNum)
     {
-        $this->catalog = ($catalog && $catalog instanceof \VuFind\ILS\Connection)
-            ? $catalog : false;
-
+        $this->catalog = $catalog;
+        $this->template = $template ?? 'standard';
         $this->displayNum = $displayNum;
     }
 

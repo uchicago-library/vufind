@@ -2,7 +2,7 @@
 /**
  * Ajax Controller Module
  *
- * PHP version 5
+ * PHP version 7
  *
  * Copyright (C) Villanova University 2010.
  *
@@ -27,6 +27,9 @@
  */
 namespace UChicago\Controller;
 use VuFind\Exception\Auth as AuthException, Zend\Http\Client, Zend\Http\Request;
+use VuFind\AjaxHandler\PluginManager;
+use VuFind\I18n\Translator\TranslatorAwareInterface;
+use Zend\Mvc\Controller\AbstractActionController;
 
 /**
  * READ - This controller overrides the VuFind AjaxController only to hide status for analyitc 
@@ -39,7 +42,22 @@ use VuFind\Exception\Auth as AuthException, Zend\Http\Client, Zend\Http\Request;
  * @link     https://vufind.org/wiki/development:plugins:controllers Wiki
  */
 class AjaxController extends \VuFind\Controller\AjaxController
+    implements TranslatorAwareInterface
 {
+    use AjaxResponseTrait;
+    use \VuFind\I18n\Translator\TranslatorAwareTrait;
+
+    /**
+     * Constructor
+     *
+     * @param PluginManager $am AJAX Handler Plugin Manager
+     */
+    public function __construct(PluginManager $am)
+    {
+        // Add notices to a key in the output
+        set_error_handler([static::class, 'storeError']);
+        $this->ajaxManager = $am;
+    }
 
     /**
      * Get the url to a map and link text to display for a given holding or item.

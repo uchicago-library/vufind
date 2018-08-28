@@ -1,4 +1,4 @@
-<?=$this->doctype('HTML5')?><!--<? $hostname = gethostname(); echo substr($hostname, 0, strpos($hostname, '.'));?>-->
+<?=$this->doctype('HTML5')?><!--<?php $hostname = gethostname(); echo substr($hostname, 0, strpos($hostname, '.'));?>-->
 <html lang="<?=$this->layout()->userLang?>">
   <head>
     <?$this->headThemeResources()?>
@@ -8,7 +8,7 @@
     <meta name="google-site-verification" content="MVKdj1ykLrwrN01_2Y85qg78KiUxrdRYTSFc6TyBkNY"/>
     <?=$this->headMeta()?>
     <?=$this->headTitle()?>
-    <?
+    <?php
       // Set up OpenSearch link:
       $this->headLink(
         [
@@ -20,12 +20,12 @@
       );
     ?>
     <!-- RTL styling -->
-    <? if ($this->layout()->rtl) {
+    <?php if ($this->layout()->rtl) {
       $this->headLink()->appendStylesheet('vendor/bootstrap-rtl.min.css');
     } ?>
     <?=$this->headLink()?>
     <?=$this->headStyle()?>
-    <?
+    <?php
       if (!isset($this->renderingError)) {
         // Add translation strings
         $this->jsTranslations()->addStrings(
@@ -103,13 +103,13 @@
       }
 
       // Session keep-alive
-      if ($this->KeepAlive()) {
+      if ($this->keepAlive()) {
           $this->headScript()->appendScript('var keepAliveInterval = '
-            . $this->KeepAlive());
+            . $this->keepAlive());
           $this->headScript()->appendFile("keep_alive.js");
       }
     ?>
-    <?
+    <?php
       $root = rtrim($this->url('home'), '/');
       $translations = $this->jsTranslations()->getJSON();
       $dsb = DEFAULT_SEARCH_BACKEND;
@@ -122,8 +122,8 @@ JS;
     ?>
     <?=$this->headScript()?>
   </head>
-  <body class="phoenix template-dir-<?=$this->templateDir?> template-name-<?=$this->templateName?> <?=$this->layoutClass('offcanvas-row')?><? if ($this->layout()->rtl): ?> rtl<? endif; ?>">
-    <? // Set up the search box -- there are three possible cases:
+  <body class="phoenix template-dir-<?=$this->templateDir?> template-name-<?=$this->templateName?> <?=$this->layoutClass('offcanvas-row')?><?php if ($this->layout()->rtl): ?> rtl<?php endif; ?>">
+    <?php // Set up the search box -- there are three possible cases:
       // 1. No search box was set; we should default to the normal box
       // 2. It was set to false; we should display nothing
       // 3. It is set to a custom string; we should display the provided version
@@ -135,43 +135,43 @@ JS;
     ?>
     <header class="hidden-print">
       <div class="container navbar">
-        <? if (isset($this->layout()->srmessage)): // message for benefit of screen-reader users ?>
+        <?php if (isset($this->layout()->srmessage)): // message for benefit of screen-reader users ?>
           <span class="sr-only"><?=$this->layout()->srmessage ?></span>
-        <? endif; ?>
+        <?php endif; ?>
         <a class="sr-only" href="#content"><?=$this->transEsc('Skip to content') ?></a>
         <?=$this->render('header.phtml')?>
       </div>
       <div class="container">
-        <? //This code chunk is responsible for some validation errors - brad 
+        <?php //This code chunk is responsible for some validation errors - brad 
            if ($this->layout()->searchbox != false): ?>
           <nav class="nav searchbox hidden-lg hidden-print">
             <?=$this->render('search/searchbox.phtml')?>
             <?=$this->layout()->searchbox ?>
           </nav>
-        <? endif; ?>
-        <? if((!isset($this->layout()->showBreadcrumbs) || $this->layout()->showBreadcrumbs == true)
+        <?php endif; ?>
+        <?php if((!isset($this->layout()->showBreadcrumbs) || $this->layout()->showBreadcrumbs == true)
           && !empty($this->layout()->breadcrumbs)
           && $this->layout()->breadcrumbs !== false
         ): ?>
           <ul class="breadcrumb hidden-print">
-            <? if(is_array($this->layout()->breadcrumbs)): ?>
-              <? if(count($this->layout()->breadcrumbs) > 1): ?>
+            <?php if(is_array($this->layout()->breadcrumbs)): ?>
+              <?php if(count($this->layout()->breadcrumbs) > 1): ?>
                 <?=$this->render('breadcrumbs/multi.phtml', [
                     'parents' => $this->layout()->breadcrumbs,
                     'title'   => $this->layout()->title,
                     'from'    => $this->layout()->from
                   ]) ?>
-              <? else: ?>
+              <?php else: ?>
                 <?=$this->render('breadcrumbs/default.phtml', [
                     'parents' => $this->layout()->breadcrumbs,
                     'title'   => $this->layout()->title
                   ]) ?>
-              <? endif; ?>
-            <? else: ?>
+              <?php endif; ?>
+            <?php else: ?>
               <?=$this->layout()->breadcrumbs ?>
-            <? endif; ?>
+            <?php endif; ?>
           </ul>
-        <? endif; ?>
+        <?php endif; ?>
       </div>
     </header>
     <div role="main" class="main template-dir-<?=$this->templateDir?> template-name-<?=$this->templateName?>">
@@ -194,8 +194,8 @@ JS;
     <div class="offcanvas-overlay" data-toggle="offcanvas"></div>
     <?=$this->googleanalytics()?>
     <?=$this->piwik()?>
-    <? if ($this->recaptcha()->active()): ?>
+    <?php if ($this->recaptcha()->active()): ?>
       <?=$this->inlineScript(\Zend\View\Helper\HeadScript::FILE, "https://www.google.com/recaptcha/api.js?onload=recaptchaOnLoad&render=explicit&hl=" . $this->layout()->userLang, 'SET')?>
-    <? endif; ?>
+    <?php endif; ?>
   </body>
 </html>

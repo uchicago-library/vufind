@@ -20,11 +20,14 @@ class Alert extends AbstractHelper
      * @param array $alertMsg an array of strings to be displayed.
      * Each string represents a paragraph.
      */
-    public function __construct($alertLabel, $alertMsg, $alertHtml)
+    public function __construct($config)
     {
-        $this->alertMsg = $alertMsg;
-        $this->alertLabel = $alertLabel ? $alertLabel . ' ' : '';
-        $this->alertHtml = $alertHtml;
+        $this->alertMsg = !isset($config->Alert->label)
+            ? false : $config->Alert->label;
+        $this->alertMsg = !isset($config->Alert->paragraph)
+            ? false : $config->Alert->paragraph;
+        $this->alertHtml = !isset($config->Alert->html)
+            ? false : $config->Alert->html;
     }
 
 

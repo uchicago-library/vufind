@@ -2,9 +2,9 @@
 /**
  * Syndetics TOC content loader.
  *
- * PHP version 5
+ * PHP version 7
  *
- * Copyright (C) Villanova University 2010.
+ * Copyright (C) The University of Chicago 2017.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -48,8 +48,8 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
             'title' => 'TOC',
             'file' => 'TOC.XML',
             'div' => '<div id="syn_toc"></div>'
-        )
-    );
+        ]
+    ];
 
     /**
      * This method is responsible for connecting to Syndetics for tables
@@ -66,21 +66,20 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
      * @param \VuFindCode\ISBN $isbnObj ISBN object
      *
      * @throws \Exception
-     * @return array     Returns array with excerpt data.
-     * @author Joel Timothy Norman <joel.t.norman@wmich.edu>
-     * @author Andrew Nagy <vufind-tech@lists.sourceforge.net>
+     * @return array     returns array with table of contents data.
+     * @author john jung <jej@uchicago.edu>
      */
     public function loadByIsbn($key, \VuFindCode\ISBN $isbnObj)
     {
         // Initialize return value:
-        $toc = array();
+        $toc = [];
 
-        // Find out if there are any excerpts
+        // Find out if there are any tables of contents
         $isbn = $this->getIsbn10($isbnObj);
         $url = $this->getIsbnUrl($isbn, $key);
         $result = $this->getHttpClient($url)->send();
         if (!$result->isSuccess()) {
-            return $excerpt;
+            return $toc;
         }
 
         // Test XML Response
@@ -122,15 +121,7 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
                             $li .= sprintf("%s. ", $nodeList->item(0)->nodeValue);
                         }
 
-                        // Page number.
-                        /*
-                        $nodeList = $node->getElementsByTagName('p');
-                        if ($nodeList->length > 0) {
-                            $li .= sprintf("%s. ", $nodeList->item(0)->nodeValue);
-                        }
-                        */
-
-                        // Chapter title. 
+                        // Chapter title.
                         $nodeList = $node->getElementsByTagName('t');
                         if ($nodeList->length > 0) {
                             $li .= $nodeList->item(0)->nodeValue;
@@ -145,7 +136,7 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
                 $i++;
             }
         }
-   
+
         return $toc;
     }
 }

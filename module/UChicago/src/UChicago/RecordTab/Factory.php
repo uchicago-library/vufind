@@ -2,7 +2,7 @@
 /**
  * Record Tab Factory Class
  *
- * PHP version 5
+ * PHP version 7
  *
  * Copyright (C) Villanova University 2014.
  *
@@ -54,19 +54,18 @@ class Factory extends \VuFind\RecordTab\Factory
         // If VuFind is configured to suppress the holdings tab when the
         // ILS driver specifies no holdings, we need to pass in a connection
         // object:
-        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+        $config = $sm->get('VuFind\Config\PluginManager')->get('config');
+        $catalog = ($config->Site->hideHoldingsTabWhenEmpty ?? false)
+            ? $sm->get('VuFind\ILS\Connection') : null;
 
         // The number of items and holdings_text_fields to display before collapsing them.
         $displayNum = isset($config['Catalog']['items_display_number']) ? $config['Catalog']['items_display_number'] : '';
 
-        if (isset($config->Site->hideHoldingsTabWhenEmpty)
-            && $config->Site->hideHoldingsTabWhenEmpty
-        ) {
-            $catalog = $sm->getServiceLocator()->get('VuFind\ILSConnection');
-        } else {
-            $catalog = false;
-        }
-        return new \UChicago\RecordTab\HoldingsILS($catalog, $displayNum);
+        return new \UChicago\RecordTab\HoldingsILS(
+            $catalog,
+            (string)($config->Site->holdingsTemplate ?? 'standard'),
+            $displayNum
+        );
     }
 
     /**
@@ -74,14 +73,14 @@ class Factory extends \VuFind\RecordTab\Factory
      *
      * @param ServiceManager $sm Service manager.
      *
-     * @return Reviews
+     * @return TablesOfContents
      */
     public static function getTOC(ServiceManager $sm)
     {
-        $config = $sm->getServiceLocator()->get('VuFind\Config')->get('config');
+        $config = $sm->get('VuFind\Config\PluginManager')->get('config');
         // Only instantiate the loader if the feature is enabled:
         if (isset($config->Content->toc)) {
-            $loader = $sm->getServiceLocator()->get('VuFind\ContentPluginManager')
+            $loader = $sm->get('VuFind\Content\PluginManager')
                 ->get('toc');
         } else {
             $loader = null;
