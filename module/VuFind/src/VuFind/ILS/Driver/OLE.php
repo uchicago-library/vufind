@@ -279,12 +279,16 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
         
         try {
+            $decoLogin = utf8_decode($login);
+            $decoBarcode = utf8_decode($barcode);
+            $lowercaseLogin = strtolower($decoLogin);
+            $lowercaseBarcode = strtolower($decoBarcode);
             $sqlStmt = $this->db->prepare($sql);
             $sqlStmt->bindParam(
-                ':login', strtolower(utf8_decode($login)), PDO::PARAM_STR
+                ':login', $lowercaseLogin, PDO::PARAM_STR
             );
             $sqlStmt->bindParam(
-                ':barcode', strtolower(utf8_decode($barcode)), PDO::PARAM_STR
+                ':barcode', $lowercaseBarcode, PDO::PARAM_STR
             );
             //var_dump($sqlStmt);
             $sqlStmt->execute();
@@ -332,7 +336,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         
         try {
             $response = $client->dispatch($request);
-        } catch (Exception $e) { 
+        } catch (Exception $e) {
             throw new ILSException($e->getMessage());
         }
         
@@ -490,7 +494,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
         try {
             $response = $client->dispatch($request);
-        } catch (Exception $e) { 
+        } catch (Exception $e) {
             throw new ILSException($e->getMessage());
         }
         
@@ -577,7 +581,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             
         try {
             $response = $client->dispatch($request);
-        } catch (Exception $e) { 
+        } catch (Exception $e) {
             throw new ILSException($e->getMessage());
         }
         // TODO: reimplement something like this when the API starts returning the proper http status code
@@ -795,8 +799,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
                 $items[] = $item; 
             }
-        }
-        catch (Exception $e){
+        } catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
         return $items;
@@ -875,8 +878,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     break;
                 }
             }
-        }
-        catch (Exception $e){
+        } catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
         return $retval;
@@ -908,7 +910,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                             AND i.HOLDINGS_ID = :holdingId';
 
 
-        //try {
+        try {
             /*Query the database*/
             $stmt = $this->db->prepare($sql);
             $stmt->execute(array(':holdingId' => $holdingId));
@@ -966,10 +968,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     
                 $items[] = $item;
             }
-        //}
-        //catch (Exception $e){
-        //    throw new ILSException($e->getMessage());
-        //}
+        }
+        catch (Exception $e){
+            throw new ILSException($e->getMessage());
+        }
         
         /* See if the current holding is an eholding*/ 
         $eholdings = $this->getEholdings($id, $holdingId, $holdingLocation, $holdingCallNum, $holdingCallNumDisplay);
@@ -1036,7 +1038,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     WHERE h.STAFF_ONLY = "N"
                         AND h.BIB_ID = :id ORDER BY own.HOLDINGS_ID, ot.TYPE_OWNERSHIP_ID, own.ORD';
 
-         //try {
+         try {
             /*Query the database*/
             $stmt = $this->db->prepare($sql);
             $stmt->execute(array(':id' => $id));
@@ -1077,10 +1079,10 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     $summaryHoldings[] = $summary;
                 }
             }
-        //}
-        //catch (Exception $e){
-        //    throw new ILSException($e->getMessage());
-        //}
+        }
+        catch (Exception $e){
+            throw new ILSException($e->getMessage());
+        }
 
         //var_dump($summaryHoldings);
         return $summaryHoldings;
@@ -1103,7 +1105,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     FROM ole_ds_holdings_uri_t u
                         WHERE u.HOLDINGS_ID = :holdingId';
 
-         //try {
+         try {
             /*Query the database*/
             $stmt = $this->db->prepare($sql);
             $stmt->execute(array(':holdingId' => $holdingId));
@@ -1128,10 +1130,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     $eHoldings[] = $item;
                 }
             }
-        //}
-        //catch (Exception $e){
-        //    throw new ILSException($e->getMessage());
-        //}
+        } catch (Exception $e){
+            throw new ILSException($e->getMessage());
+        }
         return $eHoldings;
     }
 
@@ -1173,7 +1174,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         /*Return array*/
         $items = array();
 
-        //try {
+        try {
             /*Query the database*/
             $stmt = $this->db->prepare($sql);
             $stmt->execute(array(':holdingId' => $this->holdingPrefix . $holdingId, ':type' => $type));
@@ -1208,10 +1209,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     $items[] = $item;
                 }
             }
-        //}
-        //catch (Exception $e){
-        //    throw new ILSException($e->getMessage());
-        //}
+        } catch (Exception $e){
+            throw new ILSException($e->getMessage());
+        }
         return $items;
     }
 
@@ -1266,7 +1266,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     WHERE h.STAFF_ONLY = "N"
                     AND h.BIB_ID =  :id';
 
-        //try {
+        try {
             /*Query the database*/
             $stmt = $this->db->prepare($sql);
             $stmt->execute(array(':id' => $id));
@@ -1350,14 +1350,13 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 }
             }
 
-        //}
-        //catch (Exception $e){
+        } catch (Exception $e){
             //var_dump(get_class_methods($e));
             //var_dump($e->getLine());
-        //    var_dump($e->getMessage());
-        //    print($e->getTraceAsString());
-        //    throw new ILSException($e->getMessage());
-        //}
+            //var_dump($e->getMessage());
+            //print($e->getTraceAsString());
+            throw new ILSException($e->getMessage());
+        }
 
         // Get bound-withs
         if ($stmt->fetch()===false) {
@@ -1441,8 +1440,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     
                 $items[] = $item;
             }
-        }
-        catch (Exception $e){
+        } catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
 
