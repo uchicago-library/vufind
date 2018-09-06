@@ -36,6 +36,8 @@
         'fine' => 'Fee Type',
         'amount' => 'Fine Amount'
     ];
+
+    $sort = 'title';
 ?>
 
   <div class="toolbar">
@@ -107,14 +109,14 @@
         <td><?=isset($record['fine']) ?  $this->escapeHtml($record['billdate']) : ''?></td>
         <td><?=isset($record['fine']) ?  $this->escapeHtml($record['fine']) : ''?></td>
         <td><?=isset($record['amount']) ? $this->safeMoneyFormat($record['amount'] / 100.00) : ''?></td>
-        <?php if ($record['suspended']): ?>
+        <?php if (isset($record['suspended']) && $record['suspended']): ?>
           <td><?=isset($record['balance']) ? $this->escapeHtml('Suspended') : ''?></td>
         <?php else: ?>
           <td><?=isset($record['balance']) ? $this->safeMoneyFormat($record['balance']/100.00) : ''?></td>
         <?php endif; ?>
       </tr>
       <?php endif; ?>
-      <?php if (!$record['suspended']): ?>
+      <?php if (!isset($record['suspended']) /*&& !$record['suspended'] - broke post 5.0 merge - brad */): ?>
         <?php $totalDue += $record['balance']; ?>
       <?php endif; ?>
     <?php endforeach; ?>
