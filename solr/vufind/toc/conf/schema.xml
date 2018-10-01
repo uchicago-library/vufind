@@ -41,10 +41,10 @@
   </fields>
 	
   <uniqueKey>id</uniqueKey>
-  <defaultSearchField>isbn_text</defaultSearchField>
+ <!-- <defaultSearchField>isbn_text</defaultSearchField> -->
+
   
-  
-  <solrQueryParser defaultOperator="OR"/>
+ <!-- <solrQueryParser defaultOperator="OR"/> -->
   
 </schema>
 

@@ -22,8 +22,9 @@ for isbn in `cat $summary_update_file | $scriptdir/syn2marc - |
                $scriptdir/printrecord $scriptdir/syn_config.properties 020  |  
                sed -e 's/020   $a//' | sort | uniq`
 do
-    curl -s "http://localhost:8080/solr/biblio/select?q=isbn%3a$isbn&fl=id" | 
-        xmllint --format - | egrep '"id"' | 
+  #  curl -s "http://localhost:8080/solr/biblio/select?q=isbn%3a$isbn&fl=id" |    # This line is for vufind3 ans Solr 5.5 
+     curl -s "http://localhost:8080/solr/biblio/select?fl=id&q=isbn&wt=xml" | 
+    xmllint --format - | egrep '"id"' | 
         sed -e 's/.*"id">\([0-9]*\)<.*/\1/' 
 done  |  sort | uniq >  $outputtmpdir/$marc_update_file_ids
 
