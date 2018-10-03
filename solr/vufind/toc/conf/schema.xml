@@ -8,15 +8,15 @@
   <types>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="false"/>
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
-    <fieldType name="integer" class="solr.TrieIntField" omitNorms="true"/>
-    <fieldType name="long" class="solr.TrieLongField" omitNorms="true"/>
-    <fieldType name="float" class="solr.TrieFloatField" omitNorms="true"/>
-    <fieldType name="double" class="solr.TrieDoubleField" omitNorms="true"/>
-    <fieldType name="date" class="solr.TrieDateField" sortMissingLast="true" omitNorms="false"/>
-    <fieldType name="sint" class="solr.TrieIntField" sortMissingLast="true" omitNorms="true"/>
-    <fieldType name="slong" class="solr.TrieLongField" sortMissingLast="true" omitNorms="true"/>
-    <fieldType name="sfloat" class="solr.TrieFloatField" sortMissingLast="true" omitNorms="true"/>
-    <fieldType name="sdouble" class="solr.TrieDoubleField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="integer" class="solr.IntPointField" omitNorms="true"/>
+    <fieldType name="long" class="solr.LongPointField" omitNorms="true"/>
+    <fieldType name="float" class="solr.FloatPointField" omitNorms="true"/>
+    <fieldType name="double" class="solr.DoublePointField" omitNorms="true"/>
+    <fieldType name="date" class="solr.DatePointField" sortMissingLast="true" omitNorms="false"/>
+    <fieldType name="sint" class="solr.IntPointField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="slong" class="solr.LongPointField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="sfloat" class="solr.FloatPointField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="sdouble" class="solr.DoublePointField" sortMissingLast="true" omitNorms="true"/>
     <fieldType name="random" class="solr.RandomSortField" indexed="true" />
 	
     <fieldType name="isbn" class="solr.TextField">
@@ -41,7 +41,7 @@
   </fields>
 	
   <uniqueKey>id</uniqueKey>
- <!-- <defaultSearchField>isbn_text</defaultSearchField> -->
+  <df>isbn_text</df> 
 
   
  <!-- <solrQueryParser defaultOperator="OR"/> -->
