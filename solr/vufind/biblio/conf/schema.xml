@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <schema name="VuFind Bibliographic Index" version="1.2">
-  <types>
+ <types>
     <!-- Define fieldType long as it is needed by the _version_ field required by Solr 4.x -->
     <fieldType name="long" class="solr.LongPointField" positionIncrementGap="0"/>
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
@@ -22,8 +22,9 @@
         <charFilter class="solr.PatternReplaceCharFilterFactory"
         pattern="[\u02BB\u02B9\u2018\u2019\u02BF]" replacement="'" />
         <tokenizer class="solr.ICUTokenizerFactory"/>
-        <filter class="solr.WordDelimiterGraphFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
-        <!--<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>-->
+        <!--  <charFilter class="solr.PatternReplaceCharFilterFactory"/> -->
+	<!-- <filter class="solr.WordDelimiterGraphFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/> -->
+	<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> 
         <filter class="solr.ICUFoldingFilterFactory"/>
         <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
         <filter class="solr.SnowballPorterFilterFactory" language="English"/>
@@ -35,7 +36,7 @@
         <tokenizer class="solr.ICUTokenizerFactory"/>
         <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="true"/>
         <filter class="solr.WordDelimiterGraphFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0" splitOnCaseChange="1"/>
-        <!--<filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/>-->
+	<!--  <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
         <filter class="solr.ICUFoldingFilterFactory"/>
         <filter class="solr.KeywordMarkerFilterFactory" protected="protwords.txt"/>
         <filter class="solr.SnowballPorterFilterFactory" language="English"/>
@@ -44,14 +45,13 @@
     </fieldType>
     <!-- Text Field without Stemming and Synonyms -->
     <fieldType name="textProper" class="solr.TextField">
-    <!-- positionIncrementGap="0"-->
-      <analyzer type="index">
+	    <analyzer type="index">
         <charFilter class="solr.PatternReplaceCharFilterFactory"
         pattern="[\u02BB\u02B9\u2018\u2019\u02BF]" replacement="'" />
         <tokenizer class="solr.ICUTokenizerFactory"/>
         <filter class="solr.WordDelimiterGraphFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="1" catenateNumbers="1" catenateAll="0"/>
         <filter class="solr.ICUFoldingFilterFactory"/>
-        <!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
+	<!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
       <analyzer type="query">
@@ -60,10 +60,11 @@
         <tokenizer class="solr.ICUTokenizerFactory"/>
         <filter class="solr.WordDelimiterGraphFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0"/>
         <filter class="solr.ICUFoldingFilterFactory"/>
-        <!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
+	<!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
     </fieldType>
+   
     <!-- Text Field for anchored searching -->
     <!-- See Bill Dueber's writeup on exactish matches:
       http://robotlibrarian.billdueber.com/boosting-on-exactish-anchored-phrase-matching-in-solr-sst-4/
@@ -86,7 +87,7 @@
         catenateAll="0"/>
     -->
         <filter class="solr.ICUFoldingFilterFactory"/>
-        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>
+        <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>
         <filter class="solr.CJKWidthFilterFactory"/>
         <filter class="solr.CJKBigramFilterFactory"/>
       </analyzer>
@@ -107,20 +108,21 @@
         catenateAll="0"/>
     -->
         <filter class="solr.ICUFoldingFilterFactory"/>
-        <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>
+        <filter class="solr.SynonymGraphFilterFactory" synonyms="synonyms.txt" ignoreCase="true" expand="false"/>
         <filter class="solr.CJKWidthFilterFactory"/>
-        <filter class="solr.CJKBigramFilterFactory"/> 
+        <filter class="solr.CJKBigramFilterFactory"/>
       </analyzer>
     </fieldtype>
+
     <!-- Basic Text Field for use with Spell Correction -->
     <fieldType name="textSpell" class="solr.TextField" positionIncrementGap="100">
-      <analyzer>
+	    <analyzer>
         <charFilter class="solr.PatternReplaceCharFilterFactory"
         pattern="[\u02BB\u02B9\u2018\u2019\u02BF]" replacement="'" />
         <tokenizer class="solr.ICUTokenizerFactory"/>
         <filter class="solr.WordDelimiterGraphFilterFactory" generateWordParts="1" generateNumberParts="1" catenateWords="0" catenateNumbers="0" catenateAll="0"/>
         <filter class="solr.ICUFoldingFilterFactory"/>
-        <!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
+	<!--  <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
     </fieldType>
@@ -129,7 +131,7 @@
       <analyzer type="index">
         <tokenizer class="solr.ICUTokenizerFactory"/>
         <filter class="solr.ICUFoldingFilterFactory"/>
-        <!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
+	<!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
         <filter class="solr.ShingleFilterFactory" maxShingleSize="2" outputUnigrams="false"/>
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
@@ -138,7 +140,7 @@
         pattern="[\u02BB\u02B9\u2018\u2019\u02BF]" replacement="'" />
         <tokenizer class="solr.ICUTokenizerFactory"/>
         <filter class="solr.ICUFoldingFilterFactory"/>
-        <!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
+	<!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="stopwords.txt"/> -->
         <filter class="solr.ShingleFilterFactory" maxShingleSize="2" outputUnigrams="false"/>
         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
@@ -165,6 +167,8 @@
     <fieldType name="date" class="solr.DatePointField" sortMissingLast="true" omitNorms="true"/>
     <fieldType name="random" class="solr.RandomSortField" indexed="true" />
     <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
+    <!-- add geo field to handle geographic search and display capabilities -->
+    <fieldType name="geo" class="solr.SpatialRecursivePrefixTreeFieldType" distErrPct="0.025" maxDistErr="0.000009" distanceUnits="degrees" />
   </types>
  <fields>
    <!-- Required by Solr 4.x -->
@@ -204,13 +208,13 @@
    <field name="publisherStr" type="string" indexed="true" stored="false" multiValued="true"/>
    <field name="publishDate" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="publishDateSort" type="string" indexed="true" stored="false"/>
-   <field name="edition" type="string" indexed="true" stored="true" multiValued="true"/>
+   <field name="edition" type="string" indexed="true" stored="true"/>
    <field name="description" type="text" indexed="true" stored="true"/>
    <field name="contents" type="text" indexed="true" stored="true" multiValued="true"/>
    <field name="url" type="string" indexed="false" stored="true" multiValued="true"/>
    <field name="thumbnail" type="string" indexed="false" stored="true"/>
    <!-- Catalog Specific Fields -->
-   <!--<field name="lccn" type="string" indexed="true" stored="true"/>-->
+   <!-- <field name="lccn" type="string" indexed="true" stored="true"/> -->
    <field name="ctrlnum" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="isbn" type="isn" indexed="true" stored="true" multiValued="true"/>
    <field name="issn" type="isn" indexed="true" stored="true" multiValued="true"/>
@@ -255,7 +259,7 @@
    <field name="era_facet" type="textFacet" indexed="true" stored="true" multiValued="true"/>
    <field name="illustrated" type="string" indexed="true" stored="true" multiValued="false"/>
    <!-- Used for geographic search and display fields -->
-   <!-- <field name="long_lat" type="geo" indexed="true" stored="true" multiValued="true"/> -->
+   <!-- <field name="long_lat" type="geo" indexed="true" stored="true" multiValued="true" /> -->
    <field name="long_lat_display" type="text" indexed="true" stored="true" multiValued="true"/>
    <field name="long_lat_label" type="string" indexed="false" stored="true" multiValued="true"/>
    <!-- Container fields (i.e. for describing journal containing an article) -->
@@ -331,7 +335,8 @@
    <dynamicField name="*_txtP_mv" type="textProper" indexed="true" stored="true" multiValued="true"/>
    <dynamicField name="*_random" type="random" />
    <dynamicField name="*_boolean" type="boolean" indexed="true" stored="true"/>
-  <!-- <dynamicField name="*_geo_mv" type="geo" indexed="true" stored="true" multiValued="true" /> -->
+   <dynamicField name="*_geo" type="geo" indexed="true" stored="true" multiValued="false" />
+   <dynamicField name="*_geo_mv" type="geo" indexed="true" stored="true" multiValued="true" />
  </fields>
  <uniqueKey>id</uniqueKey>
  <!-- CopyFields for Spelling -->
@@ -347,11 +352,13 @@
  <copyField source="series_browse" dest="series_facet"/>
  <copyField source="title_full" dest="title_fullStr"/>
  <copyField source="title_full" dest="title_full_unstemmed"/>
+ <copyField source="author" dest="author_facet"/>
+ <copyField source="author2" dest="author_facet"/>
+ <copyField source="author_corporate" dest="author_facet"/>
  <copyField source="publisher" dest="publisherStr"/>
  <copyField source="topic" dest="topic_unstemmed"/>
  <copyField source="allfields" dest="allfields_unstemmed"/>
  <copyField source="fulltext" dest="fulltext_unstemmed"/>
- <!-- UChicago additions for Faceting on Text -->
  <!-- CopyFields for Alphabetic Browse -->
  <!--<copyField source="topic"    dest="topic_browse"/> -->
  <!--<copyField source="author"    dest="author_browse"/> -->
@@ -362,8 +369,6 @@
  <copyField source="format"    dest="allfields_unstemmed"/>
  <!-- CopyFields for call numbers -->
  <copyField source="dewey-raw" dest="dewey-search"/>
- <!-- UChicago: populate callnumber-search separately -->
- <!-- <copyField source="callnumber-raw" dest="callnumber-search"/> -->
  <copyField source="callnumber-raw" dest="callnumber-search"/>
 <!-- CopyFields for exactish boosting -->
  <copyField source="title_short"    dest="title_short_exact"/>
@@ -372,7 +377,4 @@
  <!-- title_auth_exact obsolete, remove in stages -->
  <!-- <copyField source="title_auth"    dest="title_auth_exact"/> -->
  <copyField source="title_author"    dest="title_author_exact"/>
-
- <!-- Default Boolean Operator -->
- <solrQueryParser defaultOperator="AND"/>
 </schema>
