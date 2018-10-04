@@ -71,7 +71,7 @@
 
 <div class="record source<?=$this->escapeHtmlAttr($this->driver->getSourceIdentifier())?> row">
   <?php $sidebarList = $this->related()->getList($this->driver); ?>
-  <div class="<?=$this->layoutClass('mainbody')?><?=count($sidebarList) < 1 ? ' solo' : '' ?>">
+  <div class="<?=$this->layoutClass('mainbody')?><?=count($sidebarList) < 1 ? ' solo' : '' ?> col-sm-9">
     <input type="hidden" value="<?=$this->escapeHtmlAttr($this->driver->getUniqueId())?>" class="hiddenId" />
     <input type="hidden" value="<?=$this->escapeHtmlAttr($this->driver->getSourceIdentifier()) ?>" class="hiddenSource" />
     <?=$this->flashmessages()?>
@@ -116,7 +116,7 @@
     <abbr class="unapi-id" title="<?php echo $this->driver->getUniqueId()?>"></abbr>
   </div>
 
-  <div class="<?=$this->layoutClass('sidebar')?>">
+  <div class="<?=$this->layoutClass('sidebar')?> col-sm-3">
     <?php foreach ($sidebarList as $current): ?>
       <?=$this->related()->render($current)?>
     <?php endforeach; ?>

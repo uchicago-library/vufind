@@ -3,7 +3,7 @@
     $this->headTitle('Mansueto Cart');
 
 ?>
-<div class="<?=$this->layoutClass('mainbody')?>">
+<div class="<?=$this->layoutClass('mainbody')?> col-sm-9">
     <h2>Mansueto Cart</h2>
     <?=$this->flashmessages()?>
 
@@ -67,7 +67,7 @@ href="/vufind/MyResearch/Holds">Requested Items</a>.</p>
     <? endif; ?>
 </div>
 
-<div class="<?=$this->layoutClass('sidebar')?>">
+<div class="<?=$this->layoutClass('sidebar')?> col-sm-3">
   <?=$this->context($this)->renderInContext("myresearch/menu.phtml", array('active' => 'storagerequests'))?>
 </div>
 

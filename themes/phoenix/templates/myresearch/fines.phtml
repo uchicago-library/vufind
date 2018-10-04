@@ -97,9 +97,12 @@
           <?php else: ?>
             <a href="<?=$this->recordLink()->getUrl($record['driver'])?>"><?=$this->escapeHtml(trim($record['title'], '/:'))?></a>
           <?php endif; ?>
-          <?
-            $locationName = $record['locationName'];
-            if ($locationName) {
+          <?php
+            $locationName = null;
+            if (isset($record['locationName'])) {
+              $locationName = $record['locationName'];
+            }
+            if (isset($locationName)) {
               echo "<br/>" . $locationName;
             }
           ?>

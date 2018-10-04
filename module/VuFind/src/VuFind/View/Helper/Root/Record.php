@@ -280,7 +280,7 @@ class Record extends AbstractClassBasedTemplateRenderer
         if (!empty($isbn)) {
             $idClasses[] = 'ISBN' . $isbn;
         }
-        if (!empty($lccn)) {
+        if (is_string($lccn) && !empty($lccn)) {
             $idClasses[] = 'LCCN' . $lccn;
         }
         if (!empty($oclc)) {

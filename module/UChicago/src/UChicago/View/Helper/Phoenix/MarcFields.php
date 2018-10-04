@@ -189,7 +189,7 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
             if ($pos == 'top' || $pos == 'top-hidden') {
  
                 /*Title: get special template*/
-                if (($marcData[0]['currentField'] == 245)) {
+                if (array_key_exists(0, $marcData) && $marcData[0]['currentField'] == 245) {
                     include('themes/phoenix/templates/Helpers/MarcFields/245.phtml');
                 }
                 /*Get everything else*/

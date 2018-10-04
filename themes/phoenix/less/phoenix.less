@@ -439,6 +439,11 @@ body.phoenix .group {
         display: none;
     }
 }
+#advSearchLimits,
+#publishDate.publishDateLimit {
+    width: 100%;
+    padding-right: 0;
+}
 #advSearchP a {
     color: #5c5c5c;
 }
@@ -524,6 +529,9 @@ search.)
 }
 .form-vertical .form-control {
     max-width: 100%;
+}
+#sort_options_1.jumpMenu.form-control {
+    width: auto;
 }
 
 .modal-body.in[style="padding-right: 0px;"] { /*Put "padding" back that twitter bootstrap removes via inline styles (bugfix for modal windows)*/
@@ -1103,8 +1111,8 @@ table.alphabrowse {
     font-size: @font-size-base + 1;
 }
 .list-group.facet > li:first-child,
-.list-group.filters > li:first-child{
-    //background-color: @gray-lighter; 
+.list-group.filters > li:first-child,
+.facet-group button.title {
     background-color: @table-bg;
 }
 .template-dir-search.template-name-results {
@@ -1122,6 +1130,14 @@ table.alphabrowse {
 }
 .result .media {
     margin-bottom: 0;
+    overflow: visible;
+    .media-body {
+        overflow: visible;
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+    }
 }
 
 

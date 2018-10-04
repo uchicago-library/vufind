@@ -62,7 +62,7 @@
   $this->headScript()->appendFile("check_save_statuses.js");
 ?>
 <div class="row">
-<div class="<?=$this->layoutClass('mainbody')?>">
+<div class="<?=$this->layoutClass('mainbody')?> col-sm-9">
   <?php if (($recordTotal = $this->results->getResultTotal()) > 0): // only display these at very top if we have results ?>
     <?php foreach ($this->results->getRecommendations('top') as $current): ?>
       <?=$this->recommend($current)?>
@@ -83,8 +83,8 @@
 
     <?php if ($recordTotal > 0): ?>
       <div class="search-controls">
-        <?=$this->render('search/controls/limit.phtml')?>
         <?=$this->render('search/controls/sort.phtml')?>
+        <?=$this->render('search/controls/limit.phtml')?>
         <?=$this->render('search/controls/view.phtml')?>
       </div>
     <?php endif; ?>
@@ -143,7 +143,7 @@
 <?php /* End Main Listing */ ?>
 
 <?php /* Narrow Search Options */ ?>
-<div class="<?=$this->layoutClass('sidebar')?>">
+<div class="<?=$this->layoutClass('sidebar')?> col-sm-3">
   <?php foreach ($this->results->getRecommendations('side') as $current): ?>
     <?=$this->recommend($current)?>
   <?php endforeach; ?>

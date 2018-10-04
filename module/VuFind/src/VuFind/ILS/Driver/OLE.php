@@ -277,12 +277,12 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                "lower(krim_entity_nm_t.{$login_field}) = :login AND " .
                "lower(ole_ptrn_t.BARCODE) = :barcode";
 
+        $utf8DecodeLogin = utf8_decode($login);
+        $lowercaseLogin = strtolower($utf8DecodeLogin);
+        $utf8DecodeBarcode = utf8_decode($barcode);
+        $lowercaseBarcode = strtolower($utf8DecodeBarcode);
         
         try {
-            $decoLogin = utf8_decode($login);
-            $decoBarcode = utf8_decode($barcode);
-            $lowercaseLogin = strtolower($decoLogin);
-            $lowercaseBarcode = strtolower($decoBarcode);
             $sqlStmt = $this->db->prepare($sql);
             $sqlStmt->bindParam(
                 ':login', $lowercaseLogin, PDO::PARAM_STR
@@ -413,12 +413,22 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     l.NUM_OVERDUE_NOTICES_SENT AS overdue_notices_count, i.COPY_NUMBER AS copy_number, i.ENUMERATION AS enumeration,
                     i.CHRONOLOGY AS chronology, h.CALL_NUMBER_PREFIX AS call_number_prefix, h.CALL_NUMBER AS call_number, 
                     h.IMPRINT AS imprint, bib.CONTENT AS bib_data, i.BARCODE AS barcode,
-                    l.NUM_RENEWALS AS number_of_renewals
+                    loc.LOCN_NAME AS location_name,
+                    l.NUM_RENEWALS AS number_of_renewals,
+                    l.ole_proxy_borrower_nm,
+                    it.itm_typ_cd, it.itm_typ_desc,
+                    i.claims_returned,
+                    r.loan_tran_id,
+                    r.ole_rqst_typ_id,
+                    i.item_type_id, i.temp_item_type_id
                 FROM uc_people p
                 JOIN ole_dlvr_loan_t l ON p.id = l.OLE_PTRN_ID
                 JOIN ole_ds_item_t i ON i.BARCODE = l.ITM_ID
                 JOIN ole_ds_holdings_t h ON i.HOLDINGS_ID = h.HOLDINGS_ID
                 JOIN ole_ds_bib_t bib ON bib.BIB_ID = h.BIB_ID
+                LEFT JOIN ole_dlvr_rqst_t r on r.loan_tran_id = l.loan_tran_id
+                LEFT JOIN ole_cat_itm_typ_t it ON it.itm_typ_cd_id = coalesce(i.temp_item_type_id, i.item_type_id)
+                LEFT JOIN ole_locn_t loc on loc.LOCN_CD = SUBSTRING_INDEX(h.LOCATION, \'/\', -1)
                     WHERE p.library_id = :barcode 
                         AND i.CURRENT_BORROWER = p.id';
          try {
@@ -436,18 +446,32 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         }
 
         /*Set the default sort order for checked out items.*/
-        switch ($this->coiSort) {
+        $sort = $this->coiSort;
+        if (array_key_exists('sort', $_POST)) {
+            $sort = $_POST['sort'];
+        }
+
+        switch ($sort) {
             case 'dueDate':
                 /*By duedate*/
-                uasort($transList, function($a, $b) { return OLE::cmp(OLE::sortDate($a['duedate']), OLE::sortDate($b['duedate'])); });
+                uasort($transList, function($a, $b) { return strnatcasecmp($a['duedate'], $b['duedate']); });
                 break;
             case 'loanedDate' :
                 /*By date checked out*/
-                uasort($transList, function($a, $b) { return OLE::cmp(OLE::sortDate($a['loanedDate']), OLE::sortDate($b['loanedDate'])); });
+                uasort($transList, function($a, $b) { return strnatcasecmp($a['loanedDate'], $b['loanedDate']); });
+                break;
+            case 'author':
+                /*Alphabetical by author*/
+                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['author']), preg_replace('/[^ \w]+/', '', $b['author'])); });
+                break;
+            case 'loanType':
+                /*Alphabetical by item (loan) type*/
+                usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['loanType']), preg_replace('/[^ \w]+/', '', $b['loanType'])); });
                 break;
             default:
                 /*Alphabetical*/
                 usort($transList, function($a, $b){ return strcasecmp(preg_replace('/[^ \w]+/', '', $a['title']), preg_replace('/[^ \w]+/', '', $b['title'])); });
+                break;
         }
 
         return $transList;
@@ -481,9 +505,11 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     public function getMyFines($patron)
     {
 
+        // Variables to use later
         $fineList = array();
         $transList = $this->getMyTransactions($patron);
 
+        // Build a request to the OLE circ API
         $uri = $this->circService . '?service=fine&patronBarcode=' . $patron['barcode'] . '&operatorId=' . $this->operatorId;
         $request = new Request();
         $request->setMethod(Request::METHOD_GET);
@@ -492,35 +518,63 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $client = new Client();
         $client->setOptions(array('timeout' => 30));
 
+        // Make a request to the OLE circ API and retrieve data
         try {
             $response = $client->dispatch($request);
         } catch (Exception $e) {
             throw new ILSException($e->getMessage());
         }
-        
         $content_str = $response->getBody();
         $xml = simplexml_load_string($content_str);
-        
         $fines = $xml->xpath('//fineItem');
 
+        // Make a request to the database because the OLE circ API is insufficient  
+        $finesData = [];
+        $sql = 'select pb.ole_ptrn_id, pb.ptrn_bill_id, ft.pay_status_id,
+                ft.due_dt_time, ft.check_in_dt_time_ovr_rd, ft.check_in_dt_time
+                from ole_dlvr_ptrn_bill_t pb
+                    left join ole_dlvr_ptrn_bill_fee_typ_t ft on pb.ptrn_bill_id = ft.ptrn_bill_id
+                        where ole_ptrn_id = :id';
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(array(':id' => $patron['id']));
+
+            while ($row = $stmt->fetch()) {
+                $finesData[$row['ptrn_bill_id']]['pay_status_id'] = $row['pay_status_id'];
+                $finesData[$row['ptrn_bill_id']]['duedate'] = $row['due_dt_time'];
+                if ($row['check_in_dt_time_ovr_rd']) { 
+                    $finesData[$row['ptrn_bill_id']]['returndate'] = $row['check_in_dt_time_ovr_rd'];
+                }
+                else {
+                    $finesData[$row['ptrn_bill_id']]['returndate'] = $row['check_in_dt_time'];
+                }
+            }
+        }
+        catch (Exception $e){
+            throw new ILSException($e->getMessage());
+        }
+
         foreach($fines as $fine) {
-            //var_dump($fine);
             $processRow = $this->processMyFinesData($fine, $patron);
-            //var_dump($processRow);
+
+            // Add variables by checking the database against the api :-(
+            $processRow['suspended'] = $finesData[$processRow['patronBillId']]['pay_status_id'] == '55';
+            $processRow['duedate'] = $finesData[$processRow['patronBillId']]['duedate'];
+            $processRow['returndate'] = $finesData[$processRow['patronBillId']]['returndate'];
             
             if($processRow['id']) {
                 foreach($transList as $trans) {
                     if ($this->bibPrefix . $trans['id'] == $processRow['id']) {
                         $processRow['checkout'] = $trans['loanedDate'];
-                        $processRow['duedate'] = $trans['duedate'];
+                        //$processRow['duedate'] = $trans['duedate'];
                         $processRow['title'] = $trans['title'];
+                        $processRow['locationName'] = $trans['locationName'];
                         break;
                     }
                 }
             }
             $fineList[] = $processRow;
         }
-
 
         return $fineList;
 
@@ -548,6 +602,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                  'billdate' => (string)$itemXml->billDate,
                  'createdate' => (string)$itemXml->dateCharged,
                  'title' => (string)$itemXml->title,
+                 'patronBillId' => (string)$itemXml->patronBillId,
                  'checkout' => '',
                  'duedate' => '',
                  'id' => $recordId
@@ -597,12 +652,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $code = $xml->xpath('//code');
         $code = (string)$code[0][0];
         
-        //var_dump($code);
-        //var_dump($xml);
-
+        $holdsList = [];
         if ($code == '000') {
             $holdItems = $xml->xpath('//hold');
-            $holdsList = array();
             
             foreach($holdItems as $item) {
                 //var_dump($item);
@@ -632,24 +684,37 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         // Did the API change to return a string instead of date? (DL)
         $available = ((string) $itemXml->availableStatus == 'ONHOLD') ?  true:false;
 
-        // Get a human-readable description for the pickup location. 
-        $sql = "SELECT OLE_CRCL_DSK_PUB_NAME " .
-               "FROM $this->dbName.ole_crcl_dsk_t " .
-               "WHERE ole_crcl_dsk_id = :deskid";
-
-        $location = '';
-        
+        /* Get stuff from the DB that we should be getting from the
+           circ API but can't */
+        $sql = "select r.item_uuid, r.hold_exp_date, r.uc_item_id, i.item_id, i.holdings_id,
+                i.temp_item_type_id, i.item_type_id, loc.locn_name as item_location, h.staff_only,
+                hl.locn_name as holdings_location, ityp.itm_typ_desc, cd.ole_crcl_dsk_pub_name
+                    from ole_dlvr_rqst_t r
+                    left join ole_ds_item_t i on i.item_id = r.uc_item_id
+                    left join ole_ds_holdings_t h on h.holdings_id = i.holdings_id
+                    left join ole_locn_t loc on loc.locn_cd = SUBSTRING_INDEX(i.location, '/', -1)
+                    left join ole_locn_t hl on hl.locn_cd = SUBSTRING_INDEX(h.location, '/', -1)
+                    left join ole_cat_itm_typ_t ityp on ityp.itm_typ_cd_id = coalesce(i.temp_item_type_id, i.item_type_id)
+                    left join ole_crcl_dsk_t cd on ole_crcl_dsk_id = :deskid
+                        where ole_rqst_id = :requestid";
         try {
-            $sqlStmt = $this->db->prepare($sql);
-            $sqlStmt->bindParam(
-                ':deskid', strtolower(utf8_decode($itemXml->pickupLocation)), PDO::PARAM_STR
-            );
-            $sqlStmt->execute();
-            $row = $sqlStmt->fetch(PDO::FETCH_ASSOC);
-            if (isset($row['OLE_CRCL_DSK_PUB_NAME']) && ($row['OLE_CRCL_DSK_PUB_NAME'] != '')) {
-                $location = $row['OLE_CRCL_DSK_PUB_NAME'];
+            /*Query the database*/
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':requestid' => $itemXml->requestId,
+                            ':deskid' => strtolower(utf8_decode($itemXml->pickupLocation))]);
+
+            while ($row = $stmt->fetch()) {
+                $pickupLoc = $row['ole_crcl_dsk_pub_name'];
+                $itemLoc = $row['item_location'];
+                $loanType = $row['itm_typ_desc'];
+                $hold_until_date = $row['hold_exp_date'];
+                $shelvingLoc = $row['holdings_location'];
+                if ($itemLoc) {
+                    $shelvingLoc = $itemLoc;
             }
-        } catch (PDOException $e) {
+            }
+        }
+        catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
 
@@ -657,7 +722,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'id' => substr((string) $itemXml->catalogueId, strpos((string) $itemXml->catalogueId, '-')+1),
             'item_id' => (string) $itemXml->itemId,
             'type' => (string) $itemXml->requestType,
-            'location' => (string) $location,
+            'location' => (string) $pickupLoc,
+            'shelvingLocation' => $shelvingLoc,
             'expire' => (string) $itemXml->expiryDate,
             'create' => (string) $itemXml->createDate,
             'position' => (string) $itemXml->priority,
@@ -666,9 +732,46 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'volume' => (string) $itemXml->volumeNumber,
             'publication_year' => '',
             'title' => strlen((string) $itemXml->title)
-                ? (string) $itemXml->title : "unknown title"
+                ? (string) $itemXml->title : "unknown title",
+            'status' => (string) $itemXml->availableStatus,
+            'hold_until_date' => $hold_until_date,
+            'loan_type' => $loanType 
         );
 
+    }
+
+    /**
+     * UChicago helper function for calculating if
+     * an item is due soon or overdue.
+     *
+     * @param $duedate, string
+     *
+     * @return associative array with boolean entries
+     * for 'overdue' and 'duesoon'. Only one of these
+     * can be true at a given time because an item
+     * can never be overdue and due soon at the same time.
+     */
+    protected function getItemDueStatus($duedate)
+    {
+        $now = new \DateTime();
+        $itemDueStatus = ['overdue' => false, 'duesoon' => false];
+        try {
+            $dateObj = new \DateTime($duedate);
+            $diff = $now->diff($dateObj);
+            $days = [0 => $diff->days,
+                     1 => $diff->days * -1];
+            $interval = $days[$diff->invert];
+        } catch (Exception $e) {
+            $interval = INF;
+        }
+
+        if ($interval < 0) {
+            $itemDueStatus['overdue'] =  true;
+        }
+        elseif ($duedate != null and $interval < (int)$this->config['UserAccount']['due_soon']) {
+            $itemDueStatus['duesoon'] = true;
+        }
+        return $itemDueStatus;
     }
 
     /**
@@ -691,19 +794,28 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
         $dueStatus = ($row['overdue_notices_count'] > 0) ? "overdue" : "";
         
+        $locationName = $row['location_name'];
+        
         $xml = simplexml_load_string($row['bib_data']);
 
         $title = ''; 
+        $author = '';
         foreach($xml->record->xpath('*') as $field) {
             if ($field->attributes() == '245') {
                 $title = (string) $field->subfield;
             }
+            else if ($field->attributes() == '100') {
+                $author = (string) $field->subfield;
+            }
         }
 
-        /*See if item is on indefinite loan.*/
+        /* See if item is on indefinite loan */
         $isIndefiniteLoan = strlen($dueDate) < 1;
 
-        $transactions = array(
+        /* See if the item is overdue or due soon */
+        $itemDueStatus = $this->getItemDueStatus($dueDate);
+
+        $transactions = [
             'id' => $row['bib_num'],
             'item_id' => $row['item_id'],
             'duedate' => ($isIndefiniteLoan == false ? date($dateFormat, strtotime($dueDate)) : null),
@@ -717,11 +829,21 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'publication_year' => $row['imprint'],
             'renew' => $row['number_of_renewals'],
             'title' => $title != '' ? $title : "unknown title",
-            'barcode' => $row['barcode'] 
-        );
+            'author' => $author != '' ? $author : '',
+            'locationName' => $locationName,
+            'barcode' => $row['barcode'],
+            'overdue' => $itemDueStatus['overdue'],
+            'duesoon' => $itemDueStatus['duesoon'],
+            'loanTypeCode' => $row['itm_typ_cd'],
+            'loanType' => $row['itm_typ_desc'] != '' ? $row['itm_typ_desc'] : "ZZZ",
+            'claimsReturned' => true ? strtolower($row['claims_returned']) == 'y' : false,
+            'isLost' => true ? $row['item_status_id'] == 14 : false,
+            'proxyBorrower' => str_replace(',', ', ', $row['ole_proxy_borrower_nm']),
+            'recalled' => $row['ole_rqst_typ_id'] == 2 
+        ];
         $renewData = $this->checkRenewalsUpFront
             ? $this->isRenewable($patron['id'], $transactions['item_id'])
-            : array('message' => 'renewable', 'renewable' => true);
+            : ['message' => 'renewable', 'renewable' => true];
 
         $transactions['renewable'] = $renewData['renewable'];
         $transactions['message'] = $isIndefiniteLoan == false ? $renewData['message'] : null;
@@ -799,7 +921,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
                 $items[] = $item; 
             }
-        } catch (Exception $e){
+        }
+        catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
         return $items;
@@ -878,7 +1001,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     break;
                 }
             }
-        } catch (Exception $e){
+        }
+        catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
         return $retval;
@@ -887,12 +1011,12 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     /**
      *
      */
-    protected function getItems($id, $holdingId, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay) {
+    protected function getItems($id, $holdingId, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay, $isSerial, $holdingCallNumPrefix) {
 
         /*Get items by holding id*/
         $sql = 'SELECT i.ITEM_ID AS item_id, i.HOLDINGS_ID AS holdings_id, i.BARCODE AS barcode, i.URI AS uri, 
                     i.ITEM_TYPE_ID AS item_type_id, i.TEMP_ITEM_TYPE_ID as temp_item_type_id, 
-                    itype.ITM_TYP_CD AS itype_code, itype.ITM_TYP_NM AS itype_name, 
+                    itype.ITM_TYP_CD AS itype_code, itype.ITM_TYP_DESC AS itype_desc, 
                     istat.ITEM_AVAIL_STAT_CD AS status_code, istat.ITEM_AVAIL_STAT_NM AS status_name,
                     i.LOCATION AS location, loc.LOCN_NAME AS locn_name,
                     i.CALL_NUMBER_TYPE_ID, i.CALL_NUMBER_PREFIX, i.CALL_NUMBER, i.ENUMERATION, i.CHRONOLOGY, i.COPY_NUMBER, 
@@ -919,7 +1043,6 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             $items = array();
             while ($row = $stmt->fetch()) {
                 $item = array();
-                //print_r($row);
         
                 $callnumber = (!empty($row['CALL_NUMBER']) ? $row['CALL_NUMBER'] : $holdingCallNum);
 
@@ -932,26 +1055,47 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $sort_enumeration_tmp = preg_split('/[\s-]/', $enumeration);
                 $sort_enumeration = array_shift($sort_enumeration_tmp);
                 $itemCallNumTypeId = (!empty($row['CALL_NUMBER_TYPE_ID']) ? trim($row['CALL_NUMBER_TYPE_ID']) : null);
-                $itemCallNumDisplay = (!empty($row['CALL_NUMBER_PREFIX']) ? trim($row['CALL_NUMBER_PREFIX']) . ' ' . $callnumber : null);
+                $itemCallNumDisplay = null;
+                if ($row['CALL_NUMBER_PREFIX'] || $row['CALL_NUMBER']) {
+                    $itemCallNumDisplay = trim($row['CALL_NUMBER_PREFIX']) . ' ' . $callnumber;
+                }
                 $itemCallNum = (isset($row['CALL_NUMBER']) ? trim($row['CALL_NUMBER']) : null);
-                $holdtype = ($available == true) ? "hold":"recall";
-                $itemTypeArray = ($row['itype_name'] ? explode('-', $row['itype_name']) : array());
-                $itemTypeName = trim($itemTypeArray[1]);
+                $itemTypeName = trim($row['itype_desc']);
                 $itemLocation = $row['locn_name'];
                 $itemLocCodes = $row['location'];
                               
+                /* Set hold types */
+                $holdtype = 'recall';
+                $hold_stat = ['AVAILABLE',
+                              'ONHOLD',
+                              'ONORDER',
+                              'INPROCESS',
+                              'INTRANSIT',
+                              'RECENTLY-RETURNED'];
+                if (in_array($status, $hold_stat)) {
+                    $holdtype = 'hold';
+                }
+
                 /*Build the items*/ 
                 $item['id'] = $id;
                 $item['availability'] = $available;
                 $item['status'] = $status;
                 $item['status_name'] = $statusName; /* This alters the signature of the getHolding method, see https://vufind.org/wiki/development:plugins:ils_drivers#getholding. It's too painful to do this any other way. */
-                $item['location'] = (!empty($itemLocation) ? $itemLocation : $holdingLocation);
+                $item['location'] = $holdingLocation;
                 $item['reserve'] = '';
                 $item['callnumbertypeid'] = $itemCallNumTypeId;
-                $item['callnumber'] = (!empty($itemCallNum) ? $itemCallNum : $holdingCallNum);
-                $item['duedate'] = (isset($row['DUE_DATE_TIME']) ? $row['DUE_DATE_TIME'] : 'Indefinite') ;
+                $item['callnumber'] = $holdingCallNum;
+                $item['duedate'] = (isset($row['DUE_DATE_TIME']) ? $row['DUE_DATE_TIME'] : 'Indefinite');
                 $item['returnDate'] = '';
+                if ($copyNum && $enumeration) {
                 $item['number'] = $copyNum . ' : ' . $enumeration;
+                }
+                elseif ($copyNum) {
+                    $item['number'] = $copyNum;
+                }
+                else {
+                    $item['number'] = $enumeration;
+                }
                 $item['requests_placed'] = '';
                 $item['barcode'] = $row['barcode'];
                 $item['item_id'] = $row['item_id'];
@@ -960,11 +1104,14 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['holdtype'] = $holdtype;
                 /*UChicago specific?*/
                 $item['claimsReturned'] = ($row['CLAIMS_RETURNED'] == 'Y' ? true : false);
-                $item['sort'] = preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', $sort_enumeration);
+                $item['sort'] = $enumeration;
                 $item['itemTypeCode'] = $row['itype_code'];
                 $item['itemTypeName'] = $itemTypeName;
-                $item['callnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : $holdingCallNumDisplay);
+                $item['callnumberDisplay'] = $holdingCallNumDisplay;
+                $item['holdingCallNumPrefix'] = $holdingCallNumPrefix;
+                $item['itemCallnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : null);
                 $item['locationCodes'] = (!empty($itemLocCodes) ? $itemLocCodes : $holdingLocCodes);
+                $item['itemLocation'] = (!empty($itemLocation) ? $itemLocation : null);
     
                 $items[] = $item;
             }
@@ -987,29 +1134,15 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         }
 
         /*Sort numerically by copy/volume number.*/
-        usort($items, function($a, $b) { return OLE::cmp($a['sort'], $b['sort']); });
-        return $items;
+        usort($items, function($a, $b) { return strnatcasecmp($a['sort'], $b['sort']); });
+        if ($isSerial) {
+            return array_reverse($items);
+    }
+        else {
+            return $items;
+        }
     }
 
-    /**
-     * A trivial helper method used in getItems as a comparison 
-     * callback for usort in ordering item lists by a definied 
-     * sort key. This should be removed, along with usort and 
-     * the $item['sort'] key in getItems once the DB is returning 
-     * things in the proper order.
-     *
-     * @param $a string, formatted copy/volume numbers in the 
-     * $item['sort'] key for each item in he items array.
-     * @param $b same as $a
-     *
-     * returns -1, 0, or 1
-     */
-    public function cmp($a, $b) {
-        if ($a == $b) {
-            return 0;
-        }
-        return ($a < $b) ? -1 : 1;
-    }
 
     /**
      * Get Summary of Holdings
@@ -1068,7 +1201,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     $summary['location'] = $location;
                     //$summary['notes'] = array($summary->note[0]->value);
                     //$summary['summary'] = array($summary->textualHoldings);
-                    $summary['library has'] = ($summaryType == 'Basic Bibliographic Unit' ? array($row['TEXT'] . ' ' . $row['note']) : null);
+                    $summary['issues'] = ($summaryType == 'Basic Bibliographic Unit' ? array($row['TEXT'] . ' ' . $row['note']) : null);
                     $summary['indexes'] =  ($summaryType == 'Indexes' ? array($row['TEXT'] . ' ' . $row['note']) : null);
                     $summary['supplements'] = ($summaryType == 'Supplementary Material' ? array($row['TEXT'] . ' ' .$row['note']) : null);
                     $summary['availability'] = true;
@@ -1130,7 +1263,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     $eHoldings[] = $item;
                 }
             }
-        } catch (Exception $e){
+        }
+        catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
         return $eHoldings;
@@ -1168,6 +1302,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                    FROM ole_ser_rcv_his_rec s
                         JOIN ole_ser_rcv_rec r ON r.SER_RCV_REC_ID = s.SER_RCV_REC_ID
                             where s.PUB_DISPLAY = "Y"
+				and r.PUBLIC_DISPLAY = "Y"
                                 and s.RCV_REC_TYP = :type
                                 and r.INSTANCE_ID = :holdingId';
  
@@ -1182,11 +1317,11 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             while ($row = $stmt->fetch()) {
 
                 $item = array();
-                $unboundLocation = $row['unbound_loc_name'];
-                $unboundLocCodes = $row['unbound_loc_codes'];
+                $unboundLocation = isset($row['unbound_loc_name']) ? $row['unbound_loc_name'] : null;
+                $unboundLocCodes = isset($row['unbound_loc_codes']) ? $row['unbound_loc_codes'] : null;
 
                 $item['id'] = $id;
-                $item['location'] = (!empty($unboundLocation) ? $unboundLocation : $holdingLocation);
+                $item['location'] = $holdingLocation;
                 $item['locationCodes'] = $unboundLocCodes;
                 $item['availability'] = true;
                 $item['status'] = 'AVAILABLE';
@@ -1197,22 +1332,23 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 /*Filter out summary holdings. These will be returned
                 along with the getSummaryHoldings method.*/
                 if (!in_array($row['RCV_REC_TYP'], $summaryTypes)) {
-                    $item['unbound'] = $row['enum'] . $row['chron'];
+                    $item['unbound issues'] = $row['enum'] . ' ' . $row['chron'] . '^' . $unboundLocation;
                 }
                 $item['note'] = $row['note'];
 
                 /*Append the proper types for summary holdings*/
                 $item['indexes'] = ($type == 'Index' ? array($row['enum'] . ' ' . $row['chron'],  '') : null);
-                $item['supplements'] = ($type == 'Supplementary' ? array($row['enum'] . ' ' . $row['chron'],  '') : null);
+                $item['unbound supplements'] = ($type == 'Supplementary' ? array($row['enum'] . ' ' . $row['chron'] . '^' . $unboundLocation,  '') : null);
 
                 if (!empty($item)) {
                     $items[] = $item;
                 }
             }
-        } catch (Exception $e){
+        }
+        catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
-        return $items;
+        return array_reverse($items);
     }
 
 
@@ -1238,7 +1374,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 location, loc.LOCN_NAME AS locn_name,
                        h.CALL_NUMBER_TYPE_ID AS call_number_type_id,
                        h.CALL_NUMBER_PREFIX AS call_number_prefix, h.CALL_NUMBER AS
-                call_number, h.COPY_NUMBER AS copy_number,
+                call_number, h.COPY_NUMBER AS copy_number, bib.type, bib.level,
                        (SELECT GROUP_CONCAT(note.NOTE SEPARATOR "::|::")
                         FROM ole_ds_holdings_note_t note
                         WHERE note.HOLDINGS_ID = h.HOLDINGS_ID
@@ -1261,8 +1397,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                         WHERE itm.HOLDINGS_ID = h.HOLDINGS_ID
                         ) AS item_count
                     FROM ole_ds_holdings_t h
-                    LEFT JOIN ole_locn_t loc on loc.LOCN_CD = SUBSTRING_INDEX(h.LOCATION, \'/\',
-                -1)
+                    LEFT JOIN ole_locn_t loc on loc.LOCN_CD = SUBSTRING_INDEX(h.LOCATION, \'/\', -1)
+                    LEFT JOIN uc_bib_ext bib on bib.id = :id
                     WHERE h.STAFF_ONLY = "N"
                     AND h.BIB_ID =  :id';
 
@@ -1279,10 +1415,11 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 //print_r($row);
 
                 /*Convenience variables.*/
-                $shelvingLocation = $row['locn_name'];
+                $copyNum = trim($row['copy_number']);
                 $holdingCallNumTypeId = trim($row['call_number_type_id']);
                 $holdingCallNum = trim($row['call_number']);
-                $holdingCallNumDisplay = trim($row['call_number_prefix'] . ' ' . $row['call_number']);
+                $holdingCallNumDisplay = trim($row['call_number_prefix'] . ' ' . $row['call_number'] . ' ' . $copyNum);
+                $holdingCallNumPrefix = trim($row['call_number_prefix']);
                 $holdingNotes = explode('::|::', $row['note']);
                 $hasAnalytics = isset($row['analytic_count']) ? intval($row['analytic_count']) > 0 : null;
                 $hasExtOwnership = intval($row['ext_ownership_count']) > 0;
@@ -1292,6 +1429,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $hasUnboundItems = intval($row['ser_rcv_rec_count']) > 0;
                 $holdingId = $row['holdings_id'];
                 $locationCodes = $row['location'];
+                $shelvingLocation = $row['locn_name'] . ' - ' . $holdingId;
+                $isSerial = (strtolower($row['type']) == 'a' && in_array(strtolower($row['level']), ['b','i','s']));
 
                 /*Get e-holdings if they exist*/
                 /*if ($hasEholdings) {
@@ -1300,6 +1439,14 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                         $items[] = $eHolding;
                     }
                 }*/
+                
+                /*Get serials receiving data*/
+                if ($hasUnboundItems) {
+                    $unboundSerials = $this->getSerialReceiving($id, $holdingId, $shelvingLocation, $holdingCallNum, $holdingCallNumDisplay);
+                    foreach($unboundSerials as $unboundItem) {
+                        $items[] = $unboundItem;
+                    }
+                }
                 
                 /*Build a mock item for each of the holdings if no items exist*/
                 if(((!$hasItems or $hasHoldingNote) and (!empty($shelvingLocation))) and !$hasEholdings) { 
@@ -1328,33 +1475,23 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 } 
 
                 /*Get individual item data*/           
-                $oleItems = $this->getItems($id, $holdingId, $shelvingLocation, $locationCodes, $holdingCallNum, $holdingCallNumDisplay);
+                $oleItems = $this->getItems($id, $holdingId, $shelvingLocation, $locationCodes, $holdingCallNum, $holdingCallNumDisplay, $isSerial, $holdingCallNumPrefix);
                 foreach($oleItems as $oleItem) {
                     /* Rather than pass the call number type of the
                      * holding to getItems(), I add the call number type id here.
                      * This way we don't have to change the function's signature.
                      * -jej
                      */
-                    if ($oleItem['callnumbertypeid'] == NULL) {
+                    if (empty($oleItem['callnumbertypeid'])) {
                         $oleItem['callnumbertypeid'] = $holdingCallNumTypeId;
                     }
                     $items[] = $oleItem;
                 }
 
-                /*Get serials receiving data*/
-                if ($hasUnboundItems) {
-                    $unboundSerials = $this->getSerialReceiving($id, $holdingId, $shelvingLocation, $holdingCallNum, $holdingCallNumDisplay);
-                    foreach($unboundSerials as $unboundItem) {
-                        $items[] = $unboundItem;
-                    }
-                }
             }
 
-        } catch (Exception $e){
-            //var_dump(get_class_methods($e));
-            //var_dump($e->getLine());
-            //var_dump($e->getMessage());
-            //print($e->getTraceAsString());
+        }
+        catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
 
@@ -1423,7 +1560,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['callnumber'] = (!empty($itemCallNum) ? $itemCallNum : $holdingCallNum);
                 $item['duedate'] = (isset($row['DUE_DATE_TIME']) ? $row['DUE_DATE_TIME'] : 'Indefinite') ;
                 $item['returnDate'] = '';
-                $item['number'] = $copyNum . ' : ' . $enumeration;
+                $item['number'] = $enumeration;
                 $item['requests_placed'] = '';
                 $item['barcode'] = $row['BARCODE'];
                 $item['item_id'] = $row['ITEM_ID'];
@@ -1432,7 +1569,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['holdtype'] = $holdtype;
                 /*UChicago specific?*/
                 $item['claimsReturned'] = ($row['CLAIMS_RETURNED'] == 'Y' ? true : false);
-                $item['sort'] = preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
+                $item['sort'] = $enumeration; //preg_replace('/[^[:digit:]]/','', $copyNum) .  preg_replace('/[^[:digit:]]/','', array_shift(preg_split('/[\s-]/', $enumeration)));
                 $item['itemTypeCode'] = $row['ITM_TYP_CD'];
                 $item['itemTypeName'] = $itemTypeName;
                 $item['callnumberDisplay'] = (!empty($itemCallNumDisplay) ? $itemCallNumDisplay : $holdingCallNumDisplay);
@@ -1440,12 +1577,13 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     
                 $items[] = $item;
             }
-        } catch (Exception $e){
+        }
+        catch (Exception $e){
             throw new ILSException($e->getMessage());
         }
 
         /*Sort numerically by copy/volume number.*/
-        usort($items, function($a, $b) { return OLE::cmp($a['sort'], $b['sort']); });
+        usort($items, function($a, $b) { return strnatcasecmp($a['sort'], $b['sort']); });
         return $items;
     }
 
@@ -1555,13 +1693,21 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $patron = $holdDetails['patron'];
         $patronId = $patron['id'];
         $service = 'placeRequest';
-        $requestType = ($holdDetails['holdtype'] == "recall") ? urlencode('Recall/Hold Request'):urlencode('Hold/Delivery Request');
         $bibId = $holdDetails['id'];
         $itemBarcode = $holdDetails['barcode'];
         $patronBarcode = $patron['barcode'];
         $pickupLocation = $holdDetails['pickUpLocation'];
+        $itemId = $holdDetails['item_id'];
 
+        $requestType = urlencode('Recall/Hold Request');
+        if ($holdDetails['holdtype'] == 'hold') {
+            $requestType = urlencode('Hold/Hold Request');
+        }
+
+        $uri = $this->circService . "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemId={$itemId}&requestType={$requestType}&pickupLocation={$pickupLocation}";
+        if ($itemBarcode) {
         $uri = $this->circService .  "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcode}&requestType={$requestType}&pickupLocation={$pickupLocation}";
+        }
         
         $request = new Request();
         $request->setMethod(Request::METHOD_POST);
@@ -1683,7 +1829,6 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
      */
     public function getRenewDetails($checkOutDetails)
     {
-      //var_dump($checkOutDetails);
       $renewDetails = $checkOutDetails['item_id'] . ',' . $checkOutDetails['id'];
     //$renewDetails['item_id'] = $checkOutDetails['id'];
         return $renewDetails;
@@ -1699,7 +1844,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
      * including the Patron ID and an array of renewal IDS
      *
      * @throws ILSException - TODO
-     * @return array              An array of renewal information keyed by item ID
+     * @return array of renewal information keyed by item ID
      */
      /* TODO: implement error messages from OLE once status codes are returned correctly
      HTTP/1.1 200 OK
@@ -1749,6 +1894,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $request->setUri($uri);
         $request->setContent(json_encode($json));
         $client = new Client();
+        $client->setEncType('text/json');
         $client->setOptions(array('timeout' => 4030));
         // invalid parameter headers passed...
         
@@ -1769,12 +1915,13 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             $code = (string)$renewal['code'];
             $success = (bool)$renewal['success'];
             $newDate = (string)$renewal['newDueDate'];
-            $itemBarcode = $barcodes[$i];
+            $itemBarcode = (string)$renewal['itemBarcode'];
             $finalResult['details'][$itemBarcode] = array(
                                 "success" => $success,
                                 "new_date" => $newDate,
                                 "item_id" => $itemBarcode,
                                 "sysMessage" => (string)$msg,
+                                "code" => $code
                                 );
             $i++;
         }

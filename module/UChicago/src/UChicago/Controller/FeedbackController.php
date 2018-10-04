@@ -99,7 +99,10 @@ class FeedbackController extends \VuFind\Controller\FeedbackController
    public function knowledgeTrackerAction()
     {
         // Get the config files
-        $config = $this->getServiceLocator()->get('VuFind\Config')->get('config');
+        $config = null;
+        if ($this->serviceLocator) {
+            $config = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('config');
+        }
 
         // Set variables from the config
         $libId = $config['KnowledgeTracker']['library_id'];
@@ -122,7 +125,7 @@ class FeedbackController extends \VuFind\Controller\FeedbackController
      */
    public function knowledgeTrackerFormAction()
     {
-        $config = $this->getServiceLocator()->get('VuFind\Config')->get('config');
+        $config = $this->serviceLocator->get('VuFind\Config\PluginManager')->get('config');
         $post = $this->getRequest()->getPost();
 
         /*Don't use the zend framework for http requests. 

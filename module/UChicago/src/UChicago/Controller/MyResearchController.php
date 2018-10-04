@@ -92,7 +92,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
         $catalog = $this->getILS();
 
-        $storagerequest = new StorageRequest($config, $user->cat_username);
+        $storagerequest = new \UChicago\StorageRequest\StorageRequest($config, $user->cat_username);
 
         // Get bib number and barcode number from URL params.
         $bib = $this->params()->fromQuery('bib');

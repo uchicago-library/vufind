@@ -21,8 +21,9 @@ class PinController extends AbstractAdmin
 
 	    // pull settings out of database config
 	    $database_info = str_replace('mysql://', '', $config->Database->database);
-	    list($user, $password) = explode(':', array_shift(explode('@', $database_info)));
-	    list($host, $dbname) = explode('/', array_pop(explode('@', $database_info)));
+        $database_info_array = explode('@', $database_info);
+	    list($user, $password) = explode(':', array_shift($database_info_array));
+	    list($host, $dbname) = explode('/', array_pop($database_info_array));
 
         // log into the database and just display some stuff. 
         $this->db = new \PDO(

@@ -390,7 +390,9 @@
                  <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc&consult=true">consult the series record</a>.
               <?php else: ?>
               <?php $statusClass = in_array(strtolower($row['status']), $OFFSITE) ? 'text-unknown' : 'text-danger' ?>
+              <?php if(isset($row['status_name']) || $row['status'] == 'MISSING-FROM-MANSUETO'): ?>
               <span class=<?=$statusClass?>><?=$this->transEsc($row['status'] == 'MISSING-FROM-MANSUETO' ? 'Missing' : $row['status_name'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
+              <?php endif; ?>
               <?php if (isset($row['returnDate']) && $row['returnDate']): ?>&ndash; <span class="small"><?=$this->escapeHtml($row['returnDate'])?></span><?php endif; ?>
               <?php if (isset($row['duedate']) && $row['duedate']): ?>
                 <?/*Only display duedates for loaned items*/?>

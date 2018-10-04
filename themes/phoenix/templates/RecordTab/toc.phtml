@@ -12,9 +12,11 @@
 <?php if (!empty($toc)): ?>
   <strong><?=$this->transEsc('Table of Contents')?>: </strong>
   <ul class="toc">
-    <?php foreach ($toc['Syndetics'][0]['Content'] as $line): ?>
+    <?php if (isset($toc)): ?>
+    <?php foreach ($toc as $line): ?>
       <li><?=$this->escapeHtml($line)?></li>
     <?php endforeach; ?>
+    <?php endif; ?>
   </ul>
 <?php else: ?>
   <?=$this->transEsc("Table of Contents unavailable")?>.

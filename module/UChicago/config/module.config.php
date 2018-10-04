@@ -1,118 +1,201 @@
 <?php
-namespace UChicago\Module\Configuration;
 
-$config = array(
-    'controllers' => array(
-        'factories' => array(
-            'adminpin' => 'VuFindAdmin\Controller\Factory::getPinController',
-            'ajax' => 'UChicago\Controller\Factory::getAjaxController',
-            'cart' => 'UChicago\Controller\Factory::getCartController',
-            'feedback' => 'UChicago\Controller\Factory::getFeedbackController',
-            'my-research' => 'UChicago\Controller\Factory::getMyResearchController',
-            'record' => 'UChicago\Controller\Factory::getRecordController',
-            'search' => 'UChicago\Controller\Factory::getSearchController',
-        ),
+return array (
+  'controllers' => 
+  array (
+    'factories' => 
+    array (
+      'VuFindAdmin\Controller\PinController' => 'VuFind\Controller\AbstractBaseFactory',
+      'UChicago\Controller\CartController' => 'VuFind\Controller\CartControllerFactory',
+      'UChicago\Controller\FeedbackController' => 'VuFind\Controller\AbstractBaseFactory',
+      'UChicago\Controller\MyResearchController' => 'VuFind\Controller\AbstractBaseFactory',
+      'UChicago\Controller\RecordController' => 'VuFind\Controller\AbstractBaseWithConfigFactory',
+      'UChicago\Controller\AjaxController' => 'UChicago\Controller\AjaxControllerFactory',
     ),
-    'router' => array(
-        'routes' => array(
-            'admin' => array(
-                'child_routes' => array(
-                    'pin' => array(
-                        'type' => 'Zend\Mvc\Router\Http\Segment',
-                        'options' => array(
-                            'route'    => '/Pin[/:action]',
-                            'defaults' => array(
-                                'controller' => 'AdminPin',
-                                'action'     => 'Home',
-                            )
-                        )
-                    ),
-                ),
+    'aliases' => array(
+      'AJAX' => 'UChicago\Controller\AjaxController',
+      'ajax' => 'UChicago\Controller\AjaxController',
+      'Pin' => 'VuFindAdmin\Controller\PinController',
+      'Feedback' => 'UChicago\Controller\FeedbackController',
+      'feedback' => 'UChicago\Controller\FeedbackController',
+      'MyResearch' => 'UChicago\Controller\MyResearchController',
+      'myresearch' => 'UChicago\Controller\MyResearchController',
+    ), 
+    array (
+      'VuFind\\Controller\\AjaxController' => 'UChicago\\Controller\\AjaxController',
+    ),
+  ),
+  'router' => 
+  array (
+    'routes' => 
+    array (
+      'admin' => 
+      array (
+        'child_routes' => 
+        array (
+          'pin' => 
+          array (
+            'type' => 'Zend\\Router\\Http\\Segment',
+            'options' => 
+            array (
+              'route' => '/Pin[/:action]',
+              'defaults' => 
+              array (
+                'controller' => 'Pin',
+                'action' => 'Home',
+              ),
             ),
+          ),
         ),
-    ),
-    'service_manager' => array(
-        'allow_override' => true,
-        'factories' => array(
-            'VuFind\ContentTOCPluginManager' => 'UChicago\Service\Factory::getContentTOCPluginManager',
-            'VuFind\Mailer' => 'UChicago\Mailer\Factory',
+      ),
+      'feedback-knowledgetracker' => 
+      array (
+        'type' => 'Zend\\Router\\Http\\Literal',
+        'options' => 
+        array (
+          'route' => '/Feedback/KnowledgeTracker',
+          'defaults' => 
+          array (
+            'controller' => 'Feedback',
+            'action' => 'KnowledgeTracker',
+          ),
         ),
-    ),//service_manager
-    'vufind' => array(
-        'plugin_managers' => array(
-            'content' => array(
-                'factories' => array(
-                    'toc' => 'UChicago\Content\Factory::getTOC',
-                ),
-            ),//content
-            'content_toc' => array(
-                'factories' => array(
-                    'syndetics' => 'UChicago\Content\TOC\Factory::getSyndetics',
-                ),
-            ),//content_toc
-            'recorddriver' => array(
-                'factories' => [
-                    'UChicago\RecordDriver\SolrMarc\SolrMarc' => 'UChicago\RecordDriver\Factory::getSolrMarc',
-                    'solrmarc' => 'UChicago\RecordDriver\Factory::getSolrMarc',
-                    'solrsfx' => 'UChicago\RecordDriver\Factory::getSolrSfx',
-                    'solrhathi' => 'UChicago\RecordDriver\Factory::getSolrHathi',
-                ],
-                'aliases' => [
-                    'solrmarc' => 'UChicago\RecordDriver\SolrMarc\SolrMarc',
-                ],
-            ),//recorddriver
-            'recordtab' => array(
-                'factories' => array(
-                    'holdingsils' => 'UChicago\RecordTab\Factory::getHoldingsILS', 
-                    'chicagotoc' => 'UChicago\RecordTab\Factory::getTOC',
-                ),  
-            ),//recordtab
-            'search_results' => array(// Fix file open instead of method call bug. Addresses out of memory error???
-                'abstract_factories' => array('VuFind\Search\Results\PluginFactory'),
-                'factories' => array(
-                    'solr' => array('VuFind\Search\Results\Factory', 'getSolr'),
-                ),
-            ),//search_results 
-        ),//plugin_managers
-        // This section controls which tabs are used for which record driver classes.
-        // Each sub-array is a map from a tab name (as used in a record URL) to a tab
-        // service (found in recordtab_plugin_manager, below).  If a particular record
-        // driver is not defined here, it will inherit configuration from a configured
-        // parent class.  The defaultTab setting may be used to specify the default
-        // active tab; if null, the value from the relevant .ini file will be used.
-        'recorddriver_tabs' => array(
-            'VuFind\RecordDriver\SolrMarc' => array(
-                'tabs' => array(
-                    'Holdings' => 'HoldingsILS', 
-                    'Description' => null,
-                    'TOC' => 'ChicagoTOC', 
-                    'UserComments' => 'UserComments',
-                    'Reviews' => 'Reviews', 
-                    'Excerpt' => 'Excerpt',
-                    'Preview' => 'preview',
-                    'HierarchyTree' => 'HierarchyTree', 
-                    'Map' => 'Map',
-                    'Similar' => null,
-                    'Details' => 'StaffViewMARC',
-                ),
-                'defaultTab' => null,
-            ),
-
-        ),//recorddriver_tabs
+      ),
+      'feedback-knowledgetrackerform' => 
+      array (
+        'type' => 'Zend\\Router\\Http\\Literal',
+        'options' => 
+        array (
+          'route' => '/Feedback/KnowledgeTrackerForm',
+          'defaults' => 
+          array (
+            'controller' => 'Feedback',
+            'action' => 'KnowledgeTrackerForm',
+          ),
+        ),
+      ),
+      'myresearch-storagerequest' => 
+      array (
+        'type' => 'Zend\\Router\\Http\\Literal',
+        'options' => 
+        array (
+          'route' => '/MyResearch/StorageRequest',
+          'defaults' => 
+          array (
+            'controller' => 'MyResearch',
+            'action' => 'StorageRequest',
+          ),
+        ),
+      ),
     ),
+  ),
+  'service_manager' => 
+  array (
+    'allow_override' => true,
+    'factories' => 
+    array (
+      'VuFind\\ContentTOCPluginManager' => 'UChicago\\Service\\Factory::getContentTOCPluginManager',
+      'VuFind\\Mailer' => 'UChicago\\Mailer\\Factory',
+      'UChicago\\AjaxHandler\\PluginManager' => 'VuFind\\ServiceManager\\AbstractPluginManagerFactory',
+    ),
+  ),
+  'vufind' => 
+  array (
+    'plugin_managers' =>
+     array (
+      'ajaxhandler' =>
+      array (
+        'aliases' =>
+        array (
+          'dedupedEholdings' => 'UChicago\AjaxHandler\GetDedupedEholdings',
+          'mapLink' => 'UChicago\AjaxHandler\GetMapLink',
+          'getItemStatuses' => 'UChicago\AjaxHandler\GetItemStatuses',
+        ),
+        'factories' =>
+        array (
+          'UChicago\AjaxHandler\GetDedupedEholdings' => 'UChicago\AjaxHandler\AbstractAjaxHandlerFactory',
+          'UChicago\AjaxHandler\GetMapLink' => 'UChicago\AjaxHandler\AbstractAjaxHandlerFactory',
+          'UChicago\AjaxHandler\GetItemStatuses' => 'VuFind\AjaxHandler\GetItemStatusesFactory',
+        ),
+      ),
+      'content' => 
+      array (
+        'factories' => 
+        array (
+          'toc' => 'UChicago\\Content\\Factory::getTOC',
+        ),
+      ),
+      'content_toc' => 
+      array (
+        'factories' => 
+        array (
+          'syndetics' => 'UChicago\\Content\\TOC\\Factory::getSyndetics',
+        ),
+      ),
+      'recorddriver' => 
+      array (
+        'factories' => 
+        array (
+          'solrmarc' => 'UChicago\\RecordDriver\\Factory::getSolrMarc',
+          'solrsfx' => 'UChicago\\RecordDriver\\Factory::getSolrSfx',
+          'solrhathi' => 'UChicago\\RecordDriver\\Factory::getSolrHathi',
+        ),
+        'delegators' => 
+        array (
+          'UChicago\\RecordDriver\\SolrMarcPhoenix' => 
+          array (
+            0 => 'VuFind\\RecordDriver\\IlsAwareDelegatorFactory',
+          ),
+        ),
+        'aliases' => 
+        array (
+          'solrmarc' => 'UChicago\\RecordDriver\\SolrMarcPhoenix',
+        ),
+      ),
+      'recordtab' => 
+      array (
+        'factories' => 
+        array (
+          'UChicago\\RecordTab\\HoldingsILS' => 'UChicago\\RecordTab\\Factory::getHoldingsILS',
+          'chicagotoc' => 'UChicago\\RecordTab\\Factory::getTOC',
+        ),
+      ),
+      'search_results' => 
+      array (
+        'abstract_factories' => 
+        array (
+          0 => 'VuFind\\Search\\Results\\PluginFactory',
+        ),
+        'factories' => 
+        array (
+          'solr' => 
+          array (
+            0 => 'VuFind\\Search\\Results\\Factory',
+            1 => 'getSolr',
+          ),
+        ),
+      ),
+    ),
+    'recorddriver_tabs' => 
+    array (
+      'UChicago\\RecordDriver\\SolrMarcPhoenix' => 
+      array (
+        'tabs' => 
+        array (
+          'Holdings' => 'UChicago\\RecordTab\\HoldingsILS',
+          'Description' => NULL,
+          'TOC' => 'ChicagoTOC',
+          'UserComments' => 'UserComments',
+          'Reviews' => 'Reviews',
+          'Excerpt' => 'Excerpt',
+          'Preview' => 'preview',
+          'HierarchyTree' => 'HierarchyTree',
+          'Map' => 'Map',
+          'Similar' => NULL,
+          'Details' => 'StaffViewMARC',
+        ),
+        'defaultTab' => NULL,
+      ),
+    ),
+  ),
 );
-
-
-// Define static routes -- Controller/Action strings
-$staticRoutes = [
-    'Feedback/KnowledgeTracker',
-    'Feedback/KnowledgeTrackerForm',
-    'MyResearch/StorageRequest',
-];
-    
-// Build static routes
-$routeGenerator = new \VuFind\Route\RouteGenerator();
-$routeGenerator->addStaticRoutes($config, $staticRoutes);
-
-
-return $config;

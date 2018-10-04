@@ -33,7 +33,7 @@ function getDedupedEholdings(issns, target) {
     var response = JSON.parse(data);
     target.append(response.data);
 
-    if (response.data != '' && response.status == 'OK') {
+    if (response.data != '') {
         target.parent().find('.local-eholding').hide();
     }
 

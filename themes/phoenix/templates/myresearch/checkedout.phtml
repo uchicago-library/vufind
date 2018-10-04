@@ -20,7 +20,7 @@
 ?>
 
 <div class="row">
-  <div class="<?=$this->layoutClass('mainbody')?>">
+  <div class="<?=$this->layoutClass('mainbody')?> col-sm-9">
     <h2><?=$this->transEsc('Checked Out Items')?> <small>(<?=count($this->transactions)?>)</small></h2>
 
     <?=$this->flashmessages()?>
@@ -280,7 +280,7 @@
     <?php endif; ?>
 </div>
 
-<div class="<?=$this->layoutClass('sidebar')?>">
+<div class="<?=$this->layoutClass('sidebar')?> col-sm-3">
     <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'checkedout'])?>
   </div>
 </div>

@@ -85,13 +85,20 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
             if (isset($item['callnumberDisplay']) && strlen($item['callnumberDisplay']) > 0) {
                 $callNos['display'][] = $item['callnumberDisplay'];
                 $callNos['sort'][] = $item['callnumber'];
-                $callNos['callnumbertypeid'][] = $item['callnumbertypeid'];
-                $callNos['holdingCallNumPrefix'] = $item['holdingCallNumPrefix'];
+                $callNos['callnumbertypeid'][] = isset($item['callnumbertypeid']) ? $item['callnumbertypeid'] : null;
+                if (array_key_exists('holdingCallNumPrefix', $item)) {
+                  $callNos['holdingCallNumPrefix'] = $item['holdingCallNumPrefix'];
+                } else {
+                  $callNos['holdingCallNumPrefix'] = '';
+                }
             }
         }
 
-        sort($callNos['sort']);
-        return ['display' => array_unique($callNos['display']), 'sort' => $callNos['sort'], 'typeid' => $callNos['callnumbertypeid'], 'prefix' => $callNos['holdingCallNumPrefix']];
+        if(count($callNos) > 0) {
+            sort($callNos['sort']);
+            return ['display' => array_unique($callNos['display']), 'sort' => $callNos['sort'], 'typeid' => $callNos['callnumbertypeid'], 'prefix' => $callNos['holdingCallNumPrefix']];
+        }
+        return [];
     }
 
     /**
@@ -122,7 +129,7 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
      */
     public function getDueDate($row)
     {
-        $location = ($row['itemLocation'] ? $row['itemLocation'] : $row['location']);
+        $location = ((array_key_exists('itemLocation', $row) && $row['itemLocation']) ? $row['itemLocation'] : $row['location']);
         if ($row['duedate'] == 'Indefinite') {
             $due = 'no due date unless recalled';
         } else {

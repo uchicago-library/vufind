@@ -608,7 +608,7 @@ class DefaultRecord extends AbstractBase
 
         // If there is a forward slash (/) in the string, remove it, and remove all
         // characters to the right of the forward slash.
-        if (strpos($raw, '/') > 0) {
+        if (is_string($raw) && strpos($raw, '/') > 0) {
             $tmpArray = explode("/", $raw);
             $raw = $tmpArray[0];
         }
@@ -621,7 +621,7 @@ class DefaultRecord extends AbstractBase
                     ii. If the length of the substring is less than 6, left-fill the
                     substring with zeros until  the length is six.
         */
-        if (strpos($raw, '-') > 0) {
+        if (is_string($raw) && strpos($raw, '-') > 0) {
             // haven't checked for i. above. If they aren't all digits, there is
             // nothing that can be done, so might as well leave it.
             $tmpArray = explode("-", $raw);
