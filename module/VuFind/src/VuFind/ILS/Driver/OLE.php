@@ -1287,7 +1287,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
 
         /*Get serial receiving data (unbound periodicals) by holdingId*/
         $sql = 'SELECT r.INSTANCE_ID, SUBSTRING_INDEX(r.UNBOUND_LOC, \'/\', -1)  AS unbound_shelving_loc, SER_RCPT_LOC, 
-                s.SER_RCPT_HIS_REC_ID, s.SER_RCV_REC_ID, s.RCV_REC_TYP,
+                s.SER_RCPT_HIS_REC_ID, s.SER_RCV_REC_ID, s.RCV_REC_TYP, r.ACTIVE,
                    CONCAT_WS(" ", s.ENUM_LVL_1, s.ENUM_LVL_2, s.ENUM_LVL_3, s.ENUM_LVL_4, s.ENUM_LVL_5, s.ENUM_LVL_6) AS enum,
                    if(LEFT(s.CHRON_LVL_1,1)=\'(\' || LENGTH(s.CHRON_LVL_1) = 0,
                       s.CHRON_LVL_1,
@@ -1302,7 +1302,8 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                    FROM ole_ser_rcv_his_rec s
                         JOIN ole_ser_rcv_rec r ON r.SER_RCV_REC_ID = s.SER_RCV_REC_ID
                             where s.PUB_DISPLAY = "Y"
-				and r.PUBLIC_DISPLAY = "Y"
+				                and r.PUBLIC_DISPLAY = "Y"
+                                and r.ACTIVE = "Y"
                                 and s.RCV_REC_TYP = :type
                                 and r.INSTANCE_ID = :holdingId';
  
