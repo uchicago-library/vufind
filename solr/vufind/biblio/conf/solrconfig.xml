@@ -42,7 +42,7 @@
        If replication is in use, this should match the replication configuration. -->
   <dataDir>${solr.solr.home:./solr}/biblio</dataDir>
 
-  <lib dir="./lib" />
+  <lib dir="../../lib" />
   <lib dir="../../vendor/contrib/analysis-extras/lib" regex=".*\.jar" />
   <lib dir="../../vendor/contrib/analysis-extras/lucene-libs" regex=".*\.jar" />
   <lib dir="../jars" regex=".*\.jar" />
