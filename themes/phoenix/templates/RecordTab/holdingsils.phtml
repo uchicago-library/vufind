@@ -19,7 +19,9 @@
     }
 
     $bib = $this->driver->getUniqueID();
-    $isSfxStub = strtolower(substr($bib, 0, 3)) == 'sfx'; 
+    $isSfxStub = strtolower(substr($bib, 0, 3)) == 'sfx';
+    $issns = $this->driver->getISSNs();
+    $hasIssns = count($issns) > 0;
 
     // E-resource links
     $hathiLink = $this->HathiLink()->getHathiLink();
@@ -61,7 +63,7 @@
 <?php $holdingTitleHold = $this->driver->tryMethod('getRealTimeTitleHold'); if (!empty($holdingTitleHold)): ?>
   <a class="placehold" data-lightbox title="<?=$this->transEsc('request_place_text')?>" href="<?=$this->recordLink()->getRequestUrl($holdingTitleHold)?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc('title_hold_place')?></a>
 <?php endif; ?>
-<?php if (!empty($urls) || $openUrlActive || $hathiLink || $isSfxStub): ?>
+<?php if (!empty($urls) || $openUrlActive || $hathiLink || $isSfxStub || $hasIssns): ?>
   <div class="holdings-locpanel">
   <div class="locpanel-heading online">
   <h2><?=$this->transEsc("Online")?></h2><br/>
@@ -73,7 +75,7 @@
       <?endif;?>
   <?php endif; ?>
   </div><!--/.locpanel-heading online-->
-  <div id="e-links" class="holdings-unit" data-issns="<?=implode(',', $this->driver->getISSNs())?>">
+  <div id="e-links" class="holdings-unit" data-issns="<?=implode(',', $issns)?>">
   <?php if (!empty($urls)): ?>
     <?php foreach ($urls as $current): ?>
       <?php $linkText = (!empty($current['text']) ? ': '.$current['text'] : ''); ?>
