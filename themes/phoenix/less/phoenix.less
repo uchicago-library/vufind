@@ -556,9 +556,13 @@ footer a:focus {
 }
 
 #uc_logo {
-    background:url("../../images/uc_logo.png") no-repeat scroll left center transparent;
+    background: url("../../images/uc_logo.png") no-repeat scroll left center transparent;
     width:141px;
     height:30px;
+    @media (max-width: @screen-xs-max) {
+        background-position: center center;
+        width: 100%;
+    }
 }
 
 #uc_logo a {
@@ -568,6 +572,9 @@ footer a:focus {
     overflow:hidden;
     text-indent: 100%;
     white-space: nowrap;
+    @media (max-width: @screen-xs-max) {
+        width: 100%;
+    }
 }
 
 footer .text-right {
@@ -584,8 +591,7 @@ footer .text-right {
     margin-top:25px;
     margin-bottom:-@container-padding-btm;
 }
-.attn-ex {
-}
+
 .attention .hr {
     border-top:1px dashed @brand-primary-dark;
     padding-bottom:0;
@@ -601,6 +607,22 @@ footer .text-right {
     margin-bottom:0;
 }
 
+.footer-container {
+    float: left;
+}
+.poweredby {
+    float: right;
+    text-align: right;
+}
+
+.footer-container,
+.poweredby {
+    width: 40%;
+    @media (max-width: @screen-xs-max) {
+        width: 100%;
+        text-align: center;
+    }
+}
 
 // Buttons
 .btn-primary:hover,
