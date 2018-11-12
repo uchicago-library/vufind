@@ -63,8 +63,9 @@
 <?php $holdingTitleHold = $this->driver->tryMethod('getRealTimeTitleHold'); if (!empty($holdingTitleHold)): ?>
   <a class="placehold" data-lightbox title="<?=$this->transEsc('request_place_text')?>" href="<?=$this->recordLink()->getRequestUrl($holdingTitleHold)?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc('title_hold_place')?></a>
 <?php endif; ?>
-<?php if (!empty($urls) || $openUrlActive || $hathiLink || $isSfxStub || $hasIssns): ?>
-  <div class="holdings-locpanel">
+<?php $hasLinks = !empty($urls) || $openUrlActive || $hathiLink || $isSfxStub ?>
+<?php if ($hasLinks || $hasIssns): ?>
+  <div class="holdings-locpanel online">
   <div class="locpanel-heading online">
   <h2><?=$this->transEsc("Online")?></h2><br/>
   <?php if (!empty($urls)): ?>
@@ -75,7 +76,7 @@
       <?endif;?>
   <?php endif; ?>
   </div><!--/.locpanel-heading online-->
-  <div id="e-links" class="holdings-unit" data-issns="<?=implode(',', $issns)?>">
+  <div id="e-links" class="holdings-unit" data-issns="<?=implode(',', $issns)?>" data-server-side-links="<?=$hasLinks ? 'true' : '' ?>">
   <?php if (!empty($urls)): ?>
     <?php foreach ($urls as $current): ?>
       <?php $linkText = (!empty($current['text']) ? ': '.$current['text'] : ''); ?>
@@ -165,7 +166,7 @@
 <?php $flatHoldingsNotes = [] ?>
 <?php $holdingNotesCount = 0 ?>
 <?php $emptyHoldingNotes = true ?>
-<?php if (isset($otherTextualHoldings['textfields'])): ?>
+<?php if (isset($holdingsNotes['textfields'])): ?>
   <?php $flatHoldingsNotes = call_user_func_array('array_merge', $holdingsNotes['textfields']); ?>
   <?php $holdingNotesCount = count($flatHoldingsNotes); ?>
   <?php $emptyHoldingNotes = empty(trim($flatHoldingsNotes[0])); ?>

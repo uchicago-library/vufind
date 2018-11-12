@@ -152,7 +152,7 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
     private function displayable($data) {
         $flag = true;
         foreach($data as $d) {
-            if ($d['currentField'] == 561) {
+            if (isset($d['currentField']) && $d['currentField'] == 561) {
                 if ($d['indicator1'] == "0") {
                     $flag = false;
                 }
@@ -189,7 +189,11 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
             if ($pos == 'top' || $pos == 'top-hidden') {
  
                 /*Title: get special template*/
-                if (array_key_exists(0, $marcData) && $marcData[0]['currentField'] == 245) {
+                $isTitle = false;
+                if (isset($marcData[0]['currentField'])) {
+                    $isTitle = $marcData[0]['currentField'] == 245;
+                }
+                if (array_key_exists(0, $marcData) && $isTitle) {
                     include('themes/phoenix/templates/Helpers/MarcFields/245.phtml');
                 }
                 /*Get everything else*/
@@ -199,7 +203,10 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
                         echo '<th>';
                             /*Print the html label*/
                             foreach($marcData as $l){
-                                $label = $l['label'];
+                                $label = '';
+                                if (isset($l['label'])) {
+                                    $label = $l['label'];
+                                }
                                 if (!empty($label)) {
                                     echo $label;
                                     break;
@@ -209,64 +216,68 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
                         echo '<td>';
                     }
                         foreach($marcData as $data){
+                            $currentField = null;
+                            if (isset($data['currentField'])) {
+                                $currentField = $data['currentField'];
+                            }
                             /*246: get special template*/
-                            if (($data['currentField'] == 246)) {
+                            if (($currentField == 246)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/246.phtml');
                             }
                             /*780: get special template*/
-                            elseif (($data['currentField'] == 780)) {
+                            elseif (($currentField == 780)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/780.phtml');
                             }
                             /*785: get special template*/
-                            elseif (($data['currentField'] == 785)) {
+                            elseif (($currentField == 785)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/785.phtml');
                             }
                             /*521: get special template*/
-                            elseif (($data['currentField'] == 521)) {
+                            elseif (($currentField == 521)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/521.phtml');
                             }
                             /*526: get special template*/
-                            elseif (($data['currentField'] == 526)) {
+                            elseif (($currentField == 526)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/526.phtml');
                             }
                             /*541, 561, 583: get special template*/
-                            elseif (($data['currentField'] == 541) || ($data['currentField'] == 561) || ($data['currentField'] == 583)) {
+                            elseif (($currentField == 541) || ($currentField == 561) || ($currentField == 583)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/541.phtml');
                             }
                             /*555: get special template*/
-                            elseif (($data['currentField'] == 555)) {
+                            elseif (($currentField == 555)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/555.phtml');
                             }
                             /*565: get special template*/
-                            elseif (($data['currentField'] == 565)) {
+                            elseif (($currentField == 565)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/565.phtml');
                             }
                             /*130, 730, 793 (Uniform Title): get special template*/
-                            elseif (($data['currentField'] == 130) || ($data['currentField'] == 730) || ($data['currentField'] == 793)) {
+                            elseif (($currentField == 130) || ($currentField == 730) || ($currentField == 793)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/uniformTitle.phtml');
                             }
                             /*440, 490, 800, 810, 811, 830 (Series): get special template*/
-                            elseif (($data['currentField'] == 440) || ($data['currentField'] == 490) || ($data['currentField'] == 800) || 
-                                    ($data['currentField'] == 810) || ($data['currentField'] == 811) || ($data['currentField'] == 830)) {
+                            elseif (($currentField == 440) || ($currentField == 490) || ($currentField == 800) || 
+                                    ($currentField == 810) || ($currentField == 811) || ($currentField == 830)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/series.phtml');
                             }
                             /*100, 110, 111 (Author), 700, 710, 711, 790, 791, 
                             792 (Other authors/contributors - Other uniform titles together): get special template*/
-                            elseif (($data['currentField'] == 100) || ($data['currentField'] == 110) || ($data['currentField'] == 111) || ($data['currentField'] == 700) || 
-                                    ($data['currentField'] == 710) || ($data['currentField'] == 711) || ($data['currentField'] == 790) || ($data['currentField'] == 791)) {
+                            elseif (($currentField == 100) || ($currentField == 110) || ($currentField == 111) || ($currentField == 700) || 
+                                    ($currentField == 710) || ($currentField == 711) || ($currentField == 790) || ($currentField == 791)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/author.phtml');
                             }
                             /*240, 243 (Uniform Title)*/
-                            elseif (($data['currentField'] == 240) || ($data['currentField'] == 243)) {
+                            elseif (($currentField == 240) || ($currentField == 243)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/uniformTitle.phtml');
                             }
                             /*600, 610, 611, 630, 650, 651, 654, 655 (Subject headings, Topics): get special template*/
-                            elseif (($data['currentField'] == 600) || ($data['currentField'] == 610) || ($data['currentField'] == 611) || ($data['currentField'] == 630) || 
-                                    ($data['currentField'] == 650) || ($data['currentField'] == 651) || ($data['currentField'] == 654) || ($data['currentField'] == 655)) {
+                            elseif (($currentField == 600) || ($currentField == 610) || ($currentField == 611) || ($currentField == 630) || 
+                                    ($currentField == 650) || ($currentField == 651) || ($currentField == 654) || ($currentField == 655)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/topics.phtml');
                             }
                             /*382 (Instrumentation): get special template*/
-                            elseif (($data['currentField'] == 382)) {
+                            elseif (($currentField == 382)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/382.phtml');
                             }
                             /*Default: get the default template*/

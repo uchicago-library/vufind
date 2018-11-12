@@ -8,9 +8,10 @@
         <label class="hidden-xs hidden-sm">
       <?=$this->record($current)->getCheckbox('', 'search-cart-form', $recordNumber)?>
         </label>
-      <?php else: ?>
-        <span class="hidden-xs hidden-sm"><?=$recordNumber ?></span>
       <?php endif; ?>
+        <span class="hidden-xs hidden-sm">
+          <?=$recordNumber ?>
+        </span>
     </div>
     <?=$this->record($current)->getSearchResult('list')?>
   </div>

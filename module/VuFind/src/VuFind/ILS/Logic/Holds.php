@@ -317,7 +317,10 @@ class Holds
 
         if (count($result)) {
             foreach ($result as $copy) {
-                $show = !in_array($copy['location'], $this->hideHoldings);
+                $show = false;
+                if (isset($copy['location'])) {
+                    $show = !in_array($copy['location'], $this->hideHoldings);
+                }
                 if ($show) {
                     $groupKey = $this->getHoldingsGroupKey($copy);
                     $holdings[$groupKey][] = $copy;

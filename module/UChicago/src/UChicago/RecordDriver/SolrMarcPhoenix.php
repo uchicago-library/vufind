@@ -40,7 +40,6 @@ use VuFind\Exception\ILS as ILSException, VuFind\XSLT\Processor as XSLTProcessor
  */
 class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
 {
-
     /**
      * For testing if a record can be parsed by this class in the results view.
      * If a more robust solution is needed in the future we can write a view helper

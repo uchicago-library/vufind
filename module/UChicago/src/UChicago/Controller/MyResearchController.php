@@ -112,7 +112,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 	                // available at Mansueto. if the last ones didn't
 	                // have that status it would fail. 
 		            //if (strpos(str_replace(" ", "", $entry['number']), $copy) === 0) {
-	                if ($entry['barcode'] == $barcode) {
+	                if (isset($entry['barcode']) && $entry['barcode'] == $barcode) {
 		                $status = $entry['status'];
 		            }
 	            }

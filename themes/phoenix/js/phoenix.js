@@ -29,8 +29,17 @@ function getAlert(){
 }
 
 function getDedupedEholdings(issns, target) {
+  var hasPHPLinks = target.attr('data-server-side-links');
   $.get( VuFind.path + '/AJAX/JSON?method=dedupedEholdings', 'issns=' + issns, function(data, status, xhr) {
     var response = JSON.parse(data);
+
+    // Delete the Online links box if there aren't any server 
+    // side links and nothing is returned from the deduping 
+    // service. Should only affect full record page
+    if (!hasPHPLinks && !response.data) {
+        $('.tab-pane .online').remove();
+    }
+
     target.append(response.data);
 
     if (response.data != '') {
