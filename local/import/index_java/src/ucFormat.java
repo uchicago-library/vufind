@@ -43,7 +43,6 @@ public class ucFormat
 		char leaderBit;
 		ControlField fixedField = (ControlField) record.getVariableField("008");
 		List<VariableField> items  = record.getVariableFields("929");
-		List df856List  = record.getVariableFields("856");  
 		List df300List  = record.getVariableFields("300");
 		List df336List  = record.getVariableFields("336");
 		List df337List  = record.getVariableFields("337"); 
@@ -115,19 +114,6 @@ public class ucFormat
 					}     
 
 				}
-			}
-		}
-
-		//in field 856, check for non filling indicator 1 to be equal 4 and non filling indicator 2 to be equal 0 or 1
-		DataField fld856 = (DataField) record.getVariableField("856");
-		if (fld856 != null)
-		{
-			char ind1 = fld856.getIndicator1(); 
-			char ind2 = fld856.getIndicator2();
-
-			if ( ind1 == '4' && ind2 == '0' || ind2 == '1')
-			{
-				result.add("Eresource");	   
 			}
 		}
 
