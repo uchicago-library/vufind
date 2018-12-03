@@ -23,15 +23,15 @@ fi
 
 if [ "$1" == "-f" ]; then
     shift
-    java -jar $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl | xmllint --format -
+    java -jar -Xms4G -Xmx4G $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl | xmllint --format -
 elif [ "$1" == "-m" ]; then
     shift
-    java -jar $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl | $scriptdir/to_utf8 $scriptdir/syn_config.properties
+    java -jar -Xms4G -Xmx4G $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl | $scriptdir/to_utf8 $scriptdir/syn_config.properties
 elif [ "$1" == "-p" ]; then
     shift
-    java -jar $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl | printrecord $scriptdir/syn_config.properties
+    java -jar -Xms4G -Xmx4G $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl | printrecord $scriptdir/syn_config.properties
 else
-    java -jar $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl 
+    java -jar -Xms4G -Xmx4G $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl 
 fi
 
 exit 0
