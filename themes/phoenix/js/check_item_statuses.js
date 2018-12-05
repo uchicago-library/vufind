@@ -67,7 +67,7 @@ function displayItemStatus(result, $item) {
     $item.find('.locationDetails').html(locationListHTML);
   } else {
     // Default case -- load call number and location into appropriate containers:
-    $item.find('.callnumber').empty().append(linkCallnumbers(result.callnumber, result.callnumber_handler) + '');
+    $item.find('.callnumber').empty().append(linkCallnumbers(result.callnumber, null) + '');
     $item.find('.location').empty().append(
       result.reserve === 'true'
         ? result.reserve_message
