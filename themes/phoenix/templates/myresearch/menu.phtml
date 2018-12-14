@@ -5,11 +5,11 @@
 ?>
 <h4><?=$this->transEsc('Your Account')?></h4>
 <div class="list-group">
-  <?php if ($this->userlist()->getMode() !== 'disabled'): ?>
-    <a href="<?=$this->url('myresearch-favorites')?>"<?=$this->active == 'favorites' ? ' class="active"' : ''?>>
-      <i class="fa fa-fw fa-star" aria-hidden="true"></i> <?=$this->transEsc('Favorites')?>
-    </a>
-  <?php endif; ?>
+  <?php //if ($this->userlist()->getMode() !== 'disabled'): ?>
+    <!--<a href="<?//=$this->url('myresearch-favorites')?>"<?//=$this->active == 'favorites' ? ' class="active"' : ''?>>
+      <i class="fa fa-fw fa-star" aria-hidden="true"></i> <?//=$this->transEsc('Favorites')?>
+    </a>-->
+  <?php //endif; ?>
   <?php if ('ils-none' !== $this->ils()->getOfflineMode()): ?>
     <?php if ($this->ils()->checkCapability('getMyTransactions', $capabilityParams)): ?>
       <a href="<?=$this->url('myresearch-checkedout')?>" class="list-group-item<?=$this->active == 'checkedout' ? ' active' : ''?>">
