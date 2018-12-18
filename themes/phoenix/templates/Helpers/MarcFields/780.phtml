@@ -24,9 +24,9 @@
               $subLabel = '<span class="subLabel">Separated from</span>';
    }  
 
-   echo $subLabel . ' '. implode(' ', $data['subfieldData']).'<br/>';
+   echo $subLabel . ' '. htmlentities(implode(' ', $data['subfieldData'])).'<br/>';
 
        if (!empty($data['vernacularData'])) {
-           echo implode(' ', $data['vernacularData']).'<br />';
+           echo htmlentities(implode(' ', $data['vernacularData'])).'<br />';
        }
 ?>

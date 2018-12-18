@@ -1,11 +1,11 @@
 <!--resultsSeries.phtml-->
 <div class="<?=strtolower($data['label'])?>">
     <? if (!empty($data['subfieldData'])) : 
-       echo implode(' ', $data['subfieldData']) ?>
+       echo htmlentities(implode(' ', $data['subfieldData'])) ?>
     <? endif; ?>   
     <? if (!empty($data['vernacularData'])) :
         echo '<br />';
-        echo implode(' ', $data['vernacularData']);
+        echo htmlentities(implode(' ', $data['vernacularData']));
         echo '<br />';
     ?>
     <? endif; ?>   

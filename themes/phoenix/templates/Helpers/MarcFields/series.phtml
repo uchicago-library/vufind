@@ -1,9 +1,9 @@
 <!--series.phtml-->
 <? /*If it's a 490 field don't link it, otherwise link to a series browse*/
            if($data['currentField'] == 490) : ?>
-               <? echo strip_tags(implode(' ', $data['subfieldData'])) ?><br/>
+               <? echo strip_tags(htmlentities(implode(' ', $data['subfieldData']))) ?><br/>
                <? if (!empty($data['vernacularData'])) :
-                      echo strip_tags(implode(' ', $data['vernacularData']));?><br />
+                      echo strip_tags(htmlentities(implode(' ', $data['vernacularData'])));?><br />
                <? endif; ?>
            <? else: ?>
                <? 
@@ -16,7 +16,7 @@
                   ?>
                   <a href="<? echo '/vufind/alphabrowse'.'/home?source=series&from='.strip_tags(urlencode(trim($link)), ' ') ?>"><? echo $marcValue ?></a><br/>
                   <? if (!empty($data['vernacularData'])) :
-                      echo implode(' ', $data['vernacularData']);?><br />
+                      echo htmlentities(implode(' ', $data['vernacularData']));?><br />
                   <? endif; ?>
 
            <?endif?>

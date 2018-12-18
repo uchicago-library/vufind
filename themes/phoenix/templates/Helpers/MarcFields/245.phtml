@@ -3,9 +3,9 @@
    <td colspan="2">
       <h1>
       <? foreach($marcData as $data) : ?>
-          <? echo implode(' ', $data['subfieldData']) ?>
+          <? echo htmlentities(implode(' ', $data['subfieldData'])) ?>
               <? if (!empty($data['vernacularData'])) : ?> 
-                    <br/><? echo implode(' ', $data['vernacularData']);?>
+                    <br/><? echo htmlentities(implode(' ', $data['vernacularData']));?>
               <? endif; ?>
       <? endforeach; ?>
       </h1>
