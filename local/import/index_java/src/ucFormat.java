@@ -52,7 +52,8 @@ public class ucFormat
 		List df502List  = record.getVariableFields("502"); 
 		List df538List  = record.getVariableFields("538"); 
 		List df903List  = record.getVariableFields("903");
-		List df929List  = record.getVariableFields("929");
+	        List df928List  = record.getVariableFields("928");
+	        List df929List  = record.getVariableFields("929");
 
 
 		String formatString;
@@ -319,6 +320,16 @@ public class ucFormat
 			if (iter502.hasNext())
 			{
 				result.add("Dissertations");
+			}
+		}
+
+
+		Iterator iter = df928List.iterator();
+		{
+			DataField fld928;
+			if (iter.hasNext())
+			{
+				result.add("Eresource");
 			}
 		}
 
