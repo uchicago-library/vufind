@@ -177,7 +177,7 @@
 <?php $firstBarcode = $this->tab->getFirstBarcode($holding);?>
 
 <?/*Callnumbers*/?>
-<?php $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos)): ?>
+<?php $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos) || trim(strtolower($locationText)) == 'on order'): ?>
 
 <?php $hasCallNos = !empty($callNos['display']); ?>
 <?foreach ($callNos['display'] as $numKey => $callNo): ?>
