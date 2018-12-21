@@ -54,7 +54,7 @@
       <p class="adv_search_links">
         <a href="<?=$this->url($advSearch)?>?edit=<?=$this->escapeHtmlAttr($this->searchId)?>" class="mini-adv-link"><?=$this->transEsc("Edit this Advanced Search")?></a>
         <a href="<?=$this->url($advSearch) . $hiddenFilterParams?>" class="mini-adv-link"><?=$this->transEsc("Start a new Advanced Search")?></a>
-        <a href="<?=$this->url($searchHome) . $hiddenFilterParams?>" class="mini-basic-link"><?=$this->transEsc("Start a new Basic Search")?></a>
+        <a href="/vufind/" class="mini-basic-link"><?=$this->transEsc("Start a new Basic Search")?></a>
       </p>
     <?php if (!empty($tabs)): ?></div><?php endif; ?>
   </div>

@@ -478,6 +478,7 @@ $(document).ready(function() {
 
     // Set up basic and advanced search links. 
     $('#basicSearchSwitch a').click(switchToBasicSearch);
+    $('.adv_search_links .mini-basic-link').click(switchToBasicSearch);
     $('#advancedSearchSwitch a').click(switchToAdvancedSearch);
 
     // Create "Add search group" and "what is a group?" links.
