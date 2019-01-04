@@ -124,7 +124,7 @@ class PinController extends AbstractAdmin
                     if (strtolower($lastname) != strtolower($form_lastname)) {
                         $messages[] = "No information available for that barcode/last name combination.";
                     } else {
-				        $sql = "INSERT INTO user VALUES (NULL, :barcode, :pin, NULL, :firstname, :lastname, :email, :barcode, :catpassword, NULL,'','','', :date, '', NULL)";
+                                        $sql = "INSERT INTO user VALUES (NULL, :barcode, :pin, NULL, :firstname, :lastname, :email, :barcode, :catpassword, NULL,'','','', :date, '', NULL, :date, NULL)";
 				        $sth = $this->db->prepare($sql);
 				        $r = $sth->execute(array(
 	                        ':barcode' => $form_barcode,

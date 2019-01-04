@@ -14,6 +14,7 @@ $config = [
             'Admin' => 'VuFindAdmin\Controller\AdminController',
             'AdminConfig' => 'VuFindAdmin\Controller\ConfigController',
             'AdminMaintenance' => 'VuFindAdmin\Controller\MaintenanceController',
+            'AdminPin' => 'VuFindAdmin\Controller\PinController',
             'AdminSocial' => 'VuFindAdmin\Controller\SocialstatsController',
             'AdminTags' => 'VuFindAdmin\Controller\TagsController',
         ],
