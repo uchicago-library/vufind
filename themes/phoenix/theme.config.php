@@ -41,6 +41,7 @@ return [
             'ServiceLinks' => 'UChicago\View\Helper\Phoenix\ServiceLinks',
         ],
         'invokables' => [
+            'jqueryValidation' => 'VuFind\View\Helper\Root\JqueryValidation',
             'ViewToggle' => 'UChicago\View\Helper\Phoenix\ViewToggle',
         ]    
     ],

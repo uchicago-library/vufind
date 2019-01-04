@@ -70,6 +70,9 @@ class PinController extends AbstractAdmin
 
         $messages = array();
 
+        $form_barcode = '';
+        $form_lastname = '';
+
         // Process request, if necessary:
         if (!is_null($this->params()->fromPost('submit', null))) {
             $form_barcode = $this->params()->fromPost('barcode');
