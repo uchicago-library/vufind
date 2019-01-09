@@ -136,9 +136,9 @@ return array (
       array (
         'factories' => 
         array (
-          'solrmarc' => 'UChicago\\RecordDriver\\Factory::getSolrMarc',
-          'solrsfx' => 'UChicago\\RecordDriver\\Factory::getSolrSfx',
-          'solrhathi' => 'UChicago\\RecordDriver\\Factory::getSolrHathi',
+          'UChicago\RecordDriver\SolrMarcPhoenix' => 'UChicago\RecordDriver\Factory::getSolrMarc',
+          'UChicago\RecordDriver\SolrMarcPhoenix' => 'UChicago\RecordDriver\Factory::getSolrSfx',
+          'UChicago\RecordDriver\SolrMarcPhoenix' => 'UChicago\RecordDriver\Factory::getSolrHathi',
         ),
         'delegators' => 
         array (
@@ -150,6 +150,8 @@ return array (
         'aliases' => 
         array (
           'solrmarc' => 'UChicago\\RecordDriver\\SolrMarcPhoenix',
+          'solrsfx' => 'UChicago\\RecordDriver\\SolrMarcPhoenix',
+          'solrhathi' => 'UChicago\\RecordDriver\\SolrMarcPhoenix',
         ),
       ),
       'recordtab' => 
