@@ -118,7 +118,7 @@
         <?php endif; ?>
       </tr>
       <?php endif; ?>
-      <?php if (!isset($record['suspended']) /*&& !$record['suspended'] - broke post 5.0 merge - brad */): ?>
+      <?php if (!$record['suspended']): ?>
         <?php $totalDue += $record['balance']; ?>
       <?php endif; ?>
     <?php endforeach; ?>
