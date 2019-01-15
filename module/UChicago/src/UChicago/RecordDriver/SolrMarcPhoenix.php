@@ -27,7 +27,8 @@
  * @link     https://vufind.org/wiki/development:plugins:record_drivers Wiki
  */
 namespace UChicago\RecordDriver;
-use VuFind\Exception\ILS as ILSException, VuFind\XSLT\Processor as XSLTProcessor;
+use VuFind\Exception\ILS as ILSException;
+use VuFind\XSLT\Processor as XSLTProcessor;
 
 /**
  * Model for MARC records in Solr.
@@ -40,6 +41,9 @@ use VuFind\Exception\ILS as ILSException, VuFind\XSLT\Processor as XSLTProcessor
  */
 class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
 {
+
+    use \UChicago\RecordDriver\MarcAdvancedTrait;
+
     /**
      * For testing if a record can be parsed by this class in the results view.
      * If a more robust solution is needed in the future we can write a view helper

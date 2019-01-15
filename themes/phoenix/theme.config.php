@@ -26,6 +26,7 @@ return [
             'UChicago\View\Helper\Phoenix\MarcFields' => 'UChicago\View\Helper\Phoenix\MarcFieldsFactory',
             'UChicago\View\Helper\Phoenix\SearchContext' => 'UChicago\View\Helper\Phoenix\SearchContextFactory',
             'UChicago\View\Helper\Phoenix\ServiceLinks' => 'UChicago\View\Helper\Phoenix\ServiceLinksFactory',
+            'UChicago\View\Helper\Phoenix\RecordLink' => 'VuFind\View\Helper\Root\RecordLinkFactory',
         ],
         'aliases' => [
             'Alert' => 'UChicago\View\Helper\Phoenix\Alert',
@@ -37,6 +38,7 @@ return [
             'HathiLink' => 'UChicago\View\Helper\Phoenix\HathiLink',
             'KnowledgeTracker' => 'UChicago\View\Helper\Phoenix\KnowledgeTracker',
             'MarcFields' => 'UChicago\View\Helper\Phoenix\MarcFields',
+            'recordLink' => 'UChicago\View\Helper\Phoenix\RecordLink',
             'SearchContext' => 'UChicago\View\Helper\Phoenix\SearchContext',
             'ServiceLinks' => 'UChicago\View\Helper\Phoenix\ServiceLinks',
         ],
