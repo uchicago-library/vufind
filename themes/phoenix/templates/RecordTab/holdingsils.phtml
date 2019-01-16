@@ -20,7 +20,11 @@
 
     $bib = $this->driver->getUniqueID();
     $isSfxStub = strtolower(substr($bib, 0, 3)) == 'sfx';
-    $issns = $this->driver->getISSNs();
+    $sfxNum = $isSfxStub ? substr($bib, 4) : '';
+    $rawISSNs = array_map(function($val) {
+        return explode(' ', $val);
+    }, $this->driver->getISSNs());
+    $issns = !empty($rawISSNs) ? call_user_func_array('array_merge', $rawISSNs) : [];
     $hasIssns = count($issns) > 0;
 
     // E-resource links
@@ -76,7 +80,7 @@
       <?endif;?>
   <?php endif; ?>
   </div><!--/.locpanel-heading online-->
-  <div id="e-links" class="holdings-unit" data-issns="<?=implode(',', $issns)?>" data-server-side-links="<?=$hasLinks ? 'true' : '' ?>">
+  <div id="e-links" class="holdings-unit" data-sfx="<?=$sfxNum?>" data-issns="<?=implode(',', $issns)?>" data-server-side-links="<?=$hasLinks ? 'true' : '' ?>">
   <?php if (!empty($urls)): ?>
     <?php foreach ($urls as $current): ?>
       <?php $linkText = (!empty($current['text']) ? ': '.$current['text'] : ''); ?>

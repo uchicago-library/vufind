@@ -86,11 +86,18 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
      *
      * @return array
      */
-    public function getDedupedEholdings($issns) {
+    public function getDedupedEholdings($issns, $sfxNum) {
         $config = $this->getConfig();
         $code = $config['DedupedEholdings']['code'];
         $function = $config['DedupedEholdings']['function'];
-        $url = $config['DedupedEholdings']['url'] . '?code=' . $code . '&function=' . $function . '&callback=vufind' . '&issns=' . $issns;
+        $url = $config['DedupedEholdings']['url'] . '?code=' . $code . '&function=' . $function . '&callback=vufind';
+
+        if (strlen($issns) > 0) {
+            $url .= '&issns="' . $issns;
+        }
+        if (strlen($sfxNum) > 0) {
+            $url .= '&sfx=' . $sfxNum;
+        }
 
         $request = new Request();
         $request->setMethod(Request::METHOD_GET);
@@ -112,9 +119,9 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
      *
      * @return string, html
      */
-    public function getDedupedEholdingsHtml($issns) {
+    public function getDedupedEholdingsHtml($issns, $sfxNum) {
         $config = $this->getConfig();
-        $dedupedEholdings = $this->getDedupedEholdings($issns);
+        $dedupedEholdings = $this->getDedupedEholdings($issns, $sfxNum);
         $coverageLabel = $config['DedupedEholdings']['coverage_label'];
         $format = '<a href="%s" class="eLink external">%s</a> %s %s<br/>';
         $retval = '';
@@ -140,7 +147,9 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
 
     public function handleRequest(Params $params) {
         $issns = $_GET['issns'];
-        $html = $this->getDedupedEholdingsHtml($issns);
+        $sfxNum = $_GET['sfx'];
+
+        $html = $this->getDedupedEholdingsHtml($issns, $sfxNum);
         return [ $html ];
     }
 

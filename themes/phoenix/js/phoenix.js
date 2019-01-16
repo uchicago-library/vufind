@@ -28,9 +28,9 @@ function getAlert(){
     });
 }
 
-function getDedupedEholdings(issns, target) {
+function getDedupedEholdings(issns, sfx, target) {
   var hasPHPLinks = target.attr('data-server-side-links');
-  $.get( VuFind.path + '/AJAX/JSON?method=dedupedEholdings', 'issns=' + issns, function(data, status, xhr) {
+  $.get( VuFind.path + '/AJAX/JSON?method=dedupedEholdings', 'issns=' + issns + '&sfx=' + sfx, function(data, status, xhr) {
     var response = JSON.parse(data);
 
     // Delete the Online links box if there aren't any server 
@@ -71,9 +71,10 @@ $(document).ready(function() {
     /*** Deduped eholdings instead of sfx ***/
     $('[data-issns]').each(function() {
         var issns = $(this).data('issns');
-        getDedupedEholdings(issns, $(this));
+        var sfxNum = $(this).data('sfx');
+        getDedupedEholdings(issns, sfxNum, $(this));
     });
-    
+
     /*** Maplookup service link ***/
     $('.maplookup').each(function() {
         var loc = $(this).data('location');
