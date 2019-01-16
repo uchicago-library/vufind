@@ -5,6 +5,9 @@
   $thumbnailAlignment = $this->record($this->driver)->getThumbnailAlignment('result');
   $isMarc = isset($this->driver->isMarc) ? $this->driver->isMarc : false;
   $hathiLink = $this->HathiLink()->getHathiLink();
+  $bib = $this->driver->getUniqueID();
+  $isSfxStub = strtolower(substr($bib, 0, 3)) == 'sfx';
+  $sfxNum = $isSfxStub ? substr($bib, 4) : '';
   if ($cover):
     ob_start(); ?>
     <div class="media-<?=$thumbnailAlignment ?> <?=$this->escapeHtmlAttr($coverDetails['size'])?> col-sm-2 col-xs-0 left hidden-xs">
@@ -177,7 +180,7 @@
         <?php endif; ?>
         <?=$this->record($this->driver)->getPreviews()?>
 
-        <div class="deduped-eholdings" data-issns="<?=implode(',', $this->driver->getISSNs())?>"></div>
+        <div class="deduped-eholdings" data-sfx="<?=$sfxNum?>" data-issns="<?=implode(',', $this->driver->getISSNs())?>"></div>
 
       </div>
       <div class="col-xs-0 right text-right hidden-print hidden-xs format-list">
