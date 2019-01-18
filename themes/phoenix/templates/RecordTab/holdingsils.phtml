@@ -21,10 +21,7 @@
     $bib = $this->driver->getUniqueID();
     $isSfxStub = strtolower(substr($bib, 0, 3)) == 'sfx';
     $sfxNum = $isSfxStub ? substr($bib, 4) : '';
-    $rawISSNs = array_map(function($val) {
-        return explode(' ', $val);
-    }, $this->driver->getISSNs());
-    $issns = !empty($rawISSNs) ? call_user_func_array('array_merge', $rawISSNs) : [];
+    $issns = $this->driver->getISSNs();
     $hasIssns = count($issns) > 0;
 
     // E-resource links
