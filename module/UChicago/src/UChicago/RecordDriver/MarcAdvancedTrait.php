@@ -53,10 +53,42 @@ trait MarcAdvancedTrait
      */
     protected function getFieldData($field)
     {
-        // Make sure that there is a t field to be displayed:
-        if ($title = $field->getSubfield('t')) {
-            $title = $title->getData();
-        } else {
+
+        // Configuration
+        $config = [
+            '760' => 'abcdghimnostxy',
+            '762' => 'abcdghimnostxy',
+            '765' => 'abcdghikmnorstuxyz',
+            '767' => 'abcdghikmnorstuxyz',
+            '770' => 'abcdghikmnorstuxyz',
+            '772' => 'abcdghikmnorstuxyz',
+            '773' => 'abstx',
+            '774' => 'abstx ',
+            '775' => 'abcdefghikmnorstuxyz',
+            '776' => 'abcdghikmnorstuxyz',
+            '777' => 'abcdghikmnostxy',
+            '786' => 'abcdhijkmnoprstuxy',
+            '787' => 'abcdghikmnorstuxyz',
+        ];
+
+
+        // Get subfields from config if possible, otherwise use fallback
+        $tag = $field->getTag();
+        $subfields = str_split('ast');
+        if (array_key_exists($tag, $config)) {
+            $subfields = str_split($config[$tag]);
+        }
+
+        // Build the title out of subfields
+        $title = '';
+        foreach($subfields as $subfield) {
+            if ($t = $field->getSubfield($subfield)) {
+                $title .= ' ' . $t->getData();
+            }
+        }
+
+        // Bail if there isn't a title
+        if (empty($title)) {
             return false;
         }
 
@@ -123,6 +155,9 @@ trait MarcAdvancedTrait
                 break;
             case 'title':
                 $link = ['type' => 'title', 'value' => $title];
+                break;
+            case 'none':
+                $link = ['type' => 'none', 'value' => $title];
                 break;
             }
             // Exit loop if we have a link
