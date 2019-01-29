@@ -17,7 +17,7 @@ function getAlert(){
             var html = '';
             var link = '';
             if (page.more_info.replace( /<.*?>/g, '' )) {
-                link = '<a href="' + url + '">More info...</a>';
+                link = ' <a href="' + url + '">More info...</a>';
             }
             if (level == 'alert-high') {
                 html += '<div id="alert" class="container">' + msg + link + ' </div>';
