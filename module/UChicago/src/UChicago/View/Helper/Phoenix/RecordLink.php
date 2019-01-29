@@ -86,6 +86,9 @@ class RecordLink extends \VuFind\View\Helper\Root\RecordLink
                 . '?lookfor=' . urlencode($link['value'])
                 . '&type=title';
             break;
+        case 'none':
+            $url = '';
+            break;
         default:
             throw new \Exception('Unexpected link type: ' . $link['type']);
         }
