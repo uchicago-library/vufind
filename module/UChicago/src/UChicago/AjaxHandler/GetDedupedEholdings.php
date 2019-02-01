@@ -123,20 +123,20 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
         $config = $this->getConfig();
         $dedupedEholdings = $this->getDedupedEholdings($issns, $sfxNum);
         $coverageLabel = $config['DedupedEholdings']['coverage_label'];
-        $format = '<a href="%s" class="eLink external">%s</a> %s %s<br/>';
+        $format = '<a href="%s" class="eLink external">%s</a> %s %s<br/>%s';
         $retval = '';
         if ($dedupedEholdings) {
             $deduped = $dedupedEholdings['deduped'];
             $complete = $dedupedEholdings['complete'];
             foreach($deduped as $deh) {
-                $retval .= sprintf($format, $deh['url'], $deh['name'], $coverageLabel, $deh['coverageString']);
+                $retval .= sprintf($format, $deh['url'], $deh['name'], $coverageLabel, $deh['coverageString'], $deh['note']);
             }
             if ($complete) {
                 if (count($deduped) < count($complete)) {
                     $retval .= '<div class="toggle">View all available e-resources for this title</div>';
                     $retval .= '<div class="e-list hide">';
                     foreach($complete as $ch) {
-                        $retval .= sprintf($format, $ch['url'], $ch['name'], $coverageLabel, $ch['coverageString']);
+                        $retval .= sprintf($format, $ch['url'], $ch['name'], $coverageLabel, $ch['coverageString'], $ch['note']);
                     }
                     $retval .= '</div>';
                 }
