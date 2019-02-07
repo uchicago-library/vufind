@@ -33,7 +33,7 @@ public class ucOLEcollection {
 
 					if(str.equals("PerPhy") || str.equals("ResupC") || str.equals("Sci") || str.equals("SciDDC") || str.equals("SciLg") || 
 							str.equals("SciMic") || str.equals("SciRef") || str.equals("SciRes") || str.equals("SciTecP") || str.equals("PerBio") ||
-							str.equals("SDDCLg") || str.equals("SFilm") || str.equals("SMedia") || str.equals("SMicDDC") || 
+							str.equals("SDDCLg") || str.equals("SFilm") || str.equals("SMedia") || str.equals("SMicDDC") ||  str.equals("Games") || 
 							str.equals("SRefPer") || str.equals("MssCr") || str.equals("RareCr") || str.equals("RaCrInc") || str.equals("SciASR"))
 					{               
 						result.add("Crerar Library");
