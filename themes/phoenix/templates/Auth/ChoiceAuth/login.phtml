@@ -1,3 +1,13 @@
+<?php
+    $isPageRequest = false;
+    if (isset($_GET['holdtype'])) {
+        $ht = $_GET['holdtype'];
+        $isPageRequest = $ht == 'page';
+    }
+?>
+<?php if ($isPageRequest):?>
+  <?=$this->BootstrapAlert()->makeAlert('info', 'If you are unable to log in, please ask for assistance at any reference or circulation desk', ''); ?>
+<?php endif; ?>
 <h3 class="col-sm-12"><?=$this->transEsc('choose_login_method')?></h3>
 <div id="authcontainer">
 <?php $methods = $this->auth()->getManager()->getSelectableAuthOptions(); ?>
