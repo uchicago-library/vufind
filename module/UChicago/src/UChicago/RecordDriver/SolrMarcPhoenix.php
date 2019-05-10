@@ -349,7 +349,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             ['label'  => 'Language',
              'values' => ['041|abde', '008']], //the 008 field will blow up the crosswalk function. Instead we return languages outside of the loop with the getLanguages function
             ['label'  => 'Series',
-             'values' => ['440|anpvx','490|avx','800|abcdefghklmnopqrstuv','810|abcdefghklmnoprstuv','811|acdefghklnpqstuv','830|adfghklmnoprstv']],
+             'values' => ['440|anpvx','490|avx','800|abcdefghklmnopqrstuv','810|abcdefghklmnoprstuv','811|acdefghklnpqstuv','830|adfghklmnoprstv', '930|adfghklmnoprstv']],
             ['label'  => 'Subject',
              'values' => ['600|abcdefgklmnopqrstuvxyz','610|abcdefgklmnoprstuvxyz','611|acdefgklnpqstuvxyz','630|adfgklmnoprstvxyz','650|abcdevxyz','651|avxyz','654|abcvyz','655|abcvxyz']],
             ['label'  => 'Cartographic data',
@@ -506,7 +506,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             ['label'  => 'Description',
              'values' => ['300|abcefg3']],
             ['label'  => 'Series',
-             'values' => ['440|anpvx', '490|avx', '830|anpvsx', '800|acdtklfv', '810|abtv']],
+             'values' => ['440|anpvx', '490|avx', '830|anpvsx', '930|anpvs', '800|acdtklfv', '810|abtv']],
         ],
     ]; // end $displayConfig
 

@@ -256,9 +256,10 @@ class MarcFields extends \Zend\View\Helper\AbstractHelper
                             elseif (($currentField == 130) || ($currentField == 730) || ($currentField == 793)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/uniformTitle.phtml');
                             }
-                            /*440, 490, 800, 810, 811, 830 (Series): get special template*/
+                            /*440, 490, 800, 810, 811, 830, 930 (Series): get special template*/
                             elseif (($currentField == 440) || ($currentField == 490) || ($currentField == 800) || 
-                                    ($currentField == 810) || ($currentField == 811) || ($currentField == 830)) {
+                                    ($currentField == 810) || ($currentField == 811) || ($currentField == 830) ||
+                                    ($currentField == 930)) {
                                 include('themes/phoenix/templates/Helpers/MarcFields/series.phtml');
                             }
                             /*100, 110, 111 (Author), 700, 710, 711, 790, 791, 
