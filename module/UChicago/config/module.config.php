@@ -7,7 +7,6 @@ return array (
     array (
       'VuFindAdmin\Controller\PinController' => 'VuFind\Controller\AbstractBaseFactory',
       'UChicago\Controller\CartController' => 'VuFind\Controller\CartControllerFactory',
-      'UChicago\Controller\FeedbackController' => 'VuFind\Controller\AbstractBaseFactory',
       'UChicago\Controller\MyResearchController' => 'VuFind\Controller\AbstractBaseFactory',
       'UChicago\Controller\RecordController' => 'VuFind\Controller\AbstractBaseWithConfigFactory',
       'UChicago\Controller\AjaxController' => 'UChicago\Controller\AjaxControllerFactory',
@@ -16,8 +15,6 @@ return array (
       'AJAX' => 'UChicago\Controller\AjaxController',
       'ajax' => 'UChicago\Controller\AjaxController',
       'Pin' => 'VuFindAdmin\Controller\PinController',
-      'Feedback' => 'UChicago\Controller\FeedbackController',
-      'feedback' => 'UChicago\Controller\FeedbackController',
       'MyResearch' => 'UChicago\Controller\MyResearchController',
       'myresearch' => 'UChicago\Controller\MyResearchController',
     ), 
@@ -45,32 +42,6 @@ return array (
                 'action' => 'Home',
               ),
             ),
-          ),
-        ),
-      ),
-      'feedback-knowledgetracker' => 
-      array (
-        'type' => 'Zend\\Router\\Http\\Literal',
-        'options' => 
-        array (
-          'route' => '/Feedback/KnowledgeTracker',
-          'defaults' => 
-          array (
-            'controller' => 'Feedback',
-            'action' => 'KnowledgeTracker',
-          ),
-        ),
-      ),
-      'feedback-knowledgetrackerform' => 
-      array (
-        'type' => 'Zend\\Router\\Http\\Literal',
-        'options' => 
-        array (
-          'route' => '/Feedback/KnowledgeTrackerForm',
-          'defaults' => 
-          array (
-            'controller' => 'Feedback',
-            'action' => 'KnowledgeTrackerForm',
           ),
         ),
       ),
