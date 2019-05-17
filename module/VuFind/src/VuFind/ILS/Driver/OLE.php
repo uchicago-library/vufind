@@ -1009,6 +1009,38 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
     }
 
     /**
+     * Determines what kind of a hold type to give an item.
+     * Defaults to "recall".
+     *
+     * @param string $status, OLE status code.
+     *
+     * @return string, type of hold
+     */
+    protected function getHoldType($status) {
+        $holdtype = 'recall';
+
+        $holdStatuses = [
+            'ONHOLD',
+            'ONORDER',
+            'INPROCESS',
+            'INTRANSIT',
+        ];
+
+        $pageStatuses = [
+            'AVAILABLE',
+            'RECENTLY-RETURNED'
+        ];
+
+        if (in_array($status, $holdStatuses)) {
+            $holdtype = 'hold';
+        } elseif (in_array($status, $pageStatuses)) {
+            $holdtype = 'page';
+        }
+
+        return $holdtype;
+    }
+
+    /**
      *
      */
     protected function getItems($id, $holdingId, $holdingLocation, $holdingLocCodes, $holdingCallNum, $holdingCallNumDisplay, $isSerial, $holdingCallNumPrefix) {
@@ -1064,18 +1096,6 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $itemLocation = $row['locn_name'];
                 $itemLocCodes = $row['location'];
                               
-                /* Set hold types */
-                $holdtype = 'recall';
-                $hold_stat = ['AVAILABLE',
-                              'ONHOLD',
-                              'ONORDER',
-                              'INPROCESS',
-                              'INTRANSIT',
-                              'RECENTLY-RETURNED'];
-                if (in_array($status, $hold_stat)) {
-                    $holdtype = 'hold';
-                }
-
                 /*Build the items*/ 
                 $item['id'] = $id;
                 $item['availability'] = $available;
@@ -1101,7 +1121,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['item_id'] = $row['item_id'];
                 $item['is_holdable'] = true;
                 $item['itemNotes'] = $row['note'];
-                $item['holdtype'] = $holdtype;
+                $item['holdtype'] = $this->getHoldType($status);
                 /*UChicago specific?*/
                 $item['claimsReturned'] = ($row['CLAIMS_RETURNED'] == 'Y' ? true : false);
                 $item['sort'] = $enumeration;
@@ -1703,11 +1723,13 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $requestType = urlencode('Recall/Hold Request');
         if ($holdDetails['holdtype'] == 'hold') {
             $requestType = urlencode('Hold/Hold Request');
+        } elseif ($holdDetails['holdtype'] == 'page') {
+            $requestType = urlencode('Page/Hold Request');
         }
 
         $uri = $this->circService . "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemId={$itemId}&requestType={$requestType}&pickupLocation={$pickupLocation}";
         if ($itemBarcode) {
-        $uri = $this->circService .  "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcode}&requestType={$requestType}&pickupLocation={$pickupLocation}";
+            $uri = $this->circService .  "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcode}&requestType={$requestType}&pickupLocation={$pickupLocation}";
         }
         
         $request = new Request();

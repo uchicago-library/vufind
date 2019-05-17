@@ -522,21 +522,54 @@ class ServiceLinks extends AbstractHelper {
         }
     }
 
+
+    /**
+     * Helper method used to test if the conditions are
+     * present for a can't find it link.
+     *
+     * @param row, array of holdings and item information
+     *
+     * @return boolean
+     */
+    protected function isCantFindIt($row){
+        $shelvingLocations = array_map('strtolower', $this->lookupLocation['cantFindIt']);
+        if (in_array($row['status'], $this->lookupStatus['cantFindIt']) and
+            in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations)) {
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Helper method used to test if the conditions are
+     * present for a dllStorage link.
+     *
+     * @param row, array of holdings and item information
+     *
+     * @return boolean
+     */
+    protected function isDllStorage($row){
+        $shelvingLocations = array_map('strtolower', $this->lookupLocation['dllStorage']); 
+        if (in_array($row['status'], $this->lookupStatus['dllStorage']) and 
+            in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations)) {
+                return true;
+        }
+        return false;
+    }
+
     /**
      * Method creates a link to the Can't find it service
      *
-     * @param row, array of holdings and item information 
-     *        	
+     * @param row, array of holdings and item information
+     *
      * @return html string
      */
     public function cantFindIt($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/cant-find-it-OLE.php?barcode=' . $row['barcode'] . '&amp;bib=' . $row['id'];
-        $serviceLink = $this->getLinkConfig('cantFindIt', $defaultUrl);
+        $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
+        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('cantFindIt', $defaultUrl), $row);
         $displayText = '<i class="fa fa-search-plus" aria-hidden="true"></i> Can\'t find it?';
-        $shelvingLocations = array_map('strtolower', $this->lookupLocation['cantFindIt']); 
-        if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['cantFindIt'])) and 
-            (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
-                return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        if ($serviceLink and $this->isCantFindIt($row)) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
 
@@ -563,12 +596,15 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function dllStorage($row) {
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/item-mods-lookup_OLE.php?type=law&amp;bib=' . $row['id'] .'&amp;barcode=' . $row['barcode'] . '&amp;database=production';
-        $serviceLink = $this->getLinkConfig('dllStorage', $defaultUrl);
+        // Add a special url param to differentiate DLL Storage page/holds
+        // from regular (Can't find it?) page/holds. 
+        if(isset($row['link']['query'])) {
+            $row['link']['query'] = 'isDllStorage=true&' . $row['link']['query'];
+        }
+        $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
+        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('dllStorage', $defaultUrl), $row);
         $displayText = 'Request from DLL Storage';
-        $shelvingLocations = array_map('strtolower', $this->lookupLocation['dllStorage']); 
-        if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['dllStorage'])) and 
-            (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
+        if ($serviceLink and $this->isDllStorage($row)) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
