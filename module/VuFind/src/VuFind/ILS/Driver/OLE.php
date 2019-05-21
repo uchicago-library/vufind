@@ -1013,12 +1013,22 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
      * Defaults to "recall".
      *
      * @param string $status, OLE status code.
+     * @param string $shelvingLocCode, shelving location code
      *
      * @return string, type of hold
      */
-    protected function getHoldType($status) {
-        $holdtype = 'recall';
+    protected function getHoldType($status, $shelvingLocCode) {
 
+        // Default to page/hold, recall/holds are no longer needed
+        $holdtype = 'page';
+
+        $holdLocationCodes = [
+            'XClosedCJK',
+            'XClosedGen'
+        ];
+
+        // Unavailable hold statuses, should not contain
+        // a status that would evaluate to AVAILABLE
         $holdStatuses = [
             'ONHOLD',
             'ONORDER',
@@ -1031,7 +1041,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             'RECENTLY-RETURNED'
         ];
 
-        if (in_array($status, $holdStatuses)) {
+        if (($status == 'AVAILABLE' || $status == 'RECENTLY-RETURNED') && (in_array($shelvingLocCode, $holdLocationCodes))) {
+            $holdtype = 'hold';
+        } elseif (in_array($status, $holdStatuses)) {
             $holdtype = 'hold';
         } elseif (in_array($status, $pageStatuses)) {
             $holdtype = 'page';
@@ -1095,6 +1107,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $itemTypeName = trim($row['itype_desc']);
                 $itemLocation = $row['locn_name'];
                 $itemLocCodes = $row['location'];
+
+                $locCodesArr = explode('/', $itemLocCodes);
+                $shelvingLocCode = $locCodesArr[count($locCodesArr) - 1];
                               
                 /*Build the items*/ 
                 $item['id'] = $id;
@@ -1121,7 +1136,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $item['item_id'] = $row['item_id'];
                 $item['is_holdable'] = true;
                 $item['itemNotes'] = $row['note'];
-                $item['holdtype'] = $this->getHoldType($status);
+                $item['holdtype'] = $this->getHoldType($status, $shelvingLocCode);
                 /*UChicago specific?*/
                 $item['claimsReturned'] = ($row['CLAIMS_RETURNED'] == 'Y' ? true : false);
                 $item['sort'] = $enumeration;
