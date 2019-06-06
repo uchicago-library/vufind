@@ -1734,6 +1734,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $patronBarcode = $patron['barcode'];
         $pickupLocation = $holdDetails['pickUpLocation'];
         $itemId = $holdDetails['item_id'];
+        $comment = urlencode($holdDetails['comment']);
 
         $requestType = urlencode('Recall/Hold Request');
         if ($holdDetails['holdtype'] == 'hold') {
@@ -1742,9 +1743,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
             $requestType = urlencode('Page/Hold Request');
         }
 
-        $uri = $this->circService . "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemId={$itemId}&requestType={$requestType}&pickupLocation={$pickupLocation}";
+        $uri = $this->circService . "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemId={$itemId}&requestType={$requestType}&pickupLocation={$pickupLocation}&requestNote={$comment}";
         if ($itemBarcode) {
-            $uri = $this->circService .  "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcode}&requestType={$requestType}&pickupLocation={$pickupLocation}";
+            $uri = $this->circService .  "?service={$service}&patronBarcode={$patronBarcode}&operatorId={$this->operatorId}&itemBarcode={$itemBarcode}&requestType={$requestType}&pickupLocation={$pickupLocation}&requestNote={$comment}";
         }
         
         $request = new Request();
