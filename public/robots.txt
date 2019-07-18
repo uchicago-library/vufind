@@ -1,0 +1,3 @@
+User-agent: Scrapy
+User-agent: MauiBot
+Disallow: /
