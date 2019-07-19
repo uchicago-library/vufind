@@ -1,3 +1,11 @@
-User-agent: Scrapy
-User-agent: MauiBot
-Disallow: /
+User-agent: *
+Disallow: /vufind/AJAX
+Disallow: /vufind/Alphabrowse
+Disallow: /vufind/Browse
+Disallow: /vufind/Combined
+Disallow: /vufind/Search/Results
+Disallow: /vufind/AJAX/
+Disallow: /vufind/Alphabrowse/
+Disallow: /vufind/Browse/
+Disallow: /vufind/Combined/
+Disallow: /vufind/Search/Results/
