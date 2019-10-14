@@ -321,6 +321,7 @@ class AbstractBase extends AbstractActionController
 
         // Now check if the user has provided credentials with which to log in:
         $ilsAuth = $this->getILSAuthenticator();
+        $patron = null;
         if (($username = $this->params()->fromPost('cat_username', false))
             && ($password = $this->params()->fromPost('cat_password', false))
         ) {
@@ -613,6 +614,15 @@ class AbstractBase extends AbstractActionController
         $myResearchHomeUrl = $this->getServerUrl('myresearch-home');
         $mrhuNorm = $this->normalizeUrlForComparison($myResearchHomeUrl);
         if ($mrhuNorm === $refererNorm) {
+            return;
+        }
+
+        // If the referer is the MyResearch/UserLogin action, it probably means
+        // that the user is repeatedly mistyping their password. We should
+        // ignore this and instead rely on any previously stored referer.
+        $myUserLogin = $this->getServerUrl('myresearch-userlogin');
+        $mulNorm = $this->normalizeUrlForComparison($myUserLogin);
+        if (0 === strpos($refererNorm, $mulNorm)) {
             return;
         }
 
