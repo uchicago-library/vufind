@@ -4,6 +4,8 @@
     $user = $account->isLoggedIn();
     $openUrl = $this->openUrl($this->driver, 'holdings');
     $openUrlActive = $openUrl->isActive();
+    $doi = $this->doi($this->driver, 'holdings');
+    $doiActive = $doi->isActive();
     $offlineMode = $this->ils()->getOfflineMode();
     $callNumDisplayText = '(Browse by Call Number)';
     $callNumLabel = 'Call Number:';
@@ -64,7 +66,7 @@
 <?php $holdingTitleHold = $this->driver->tryMethod('getRealTimeTitleHold'); if (!empty($holdingTitleHold)): ?>
   <a class="placehold" data-lightbox title="<?=$this->transEsc('request_place_text')?>" href="<?=$this->recordLink()->getRequestUrl($holdingTitleHold)?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc('title_hold_place')?></a>
 <?php endif; ?>
-<?php $hasLinks = !empty($urls) || $openUrlActive || $hathiLink || $isSfxStub ?>
+<?php $hasLinks = !empty($urls) || $openUrlActive || $doiActive || $hathiLink || $isSfxStub ?>
 <?php if ($hasLinks || $hasIssns): ?>
   <div class="holdings-locpanel online">
   <div class="locpanel-heading online">
@@ -88,6 +90,7 @@
   <?php endif; ?>
 
   <?php if ($openUrlActive): ?><?=$openUrl->renderTemplate()?><?php endif; ?>
+  <?php if ($doiActive): ?><?=$doi->renderTemplate()?><?php endif; ?>
 
   <?/*Build a Hathi link for records with a 903 field = to "Hathi" or records with a bib# beginning with ocm or ocn.*/?>
   <?php if ($hathiLink) : ?>

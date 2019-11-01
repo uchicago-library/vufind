@@ -32,6 +32,7 @@ use VuFind\Exception\Forbidden as ForbiddenException;
 use VuFind\Exception\ILS as ILSException;
 use VuFind\Exception\ListPermission as ListPermissionException;
 use VuFind\Exception\Mail as MailException;
+use VuFind\ILS\PaginationHelper;
 use VuFind\Search\RecommendListener;
 use Zend\Stdlib\Parameters;
 use Zend\View\Model\ViewModel;
@@ -76,7 +77,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
      * altering something. 
      */
 
-    public function storageRequestAction() 
+    public function storageRequestAction()
     {
         $config = $this->getConfig();
 
@@ -84,7 +85,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         if ($user == false) {
             return $this->forceLogin();
         }
- 
+
         // Stop now if the user does not have valid catalog credentials available:
         if (!is_array($patron = $this->catalogLogin())) {
             // do something.
@@ -105,33 +106,33 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
         switch($action) {
             case 'add':
-                $status = '';                
-	            foreach ($catalog->getHolding($bib) as $entry) {
-	                // was using this, but it wasn't able to work with
-	                // issues in a serial where only some of them were
-	                // available at Mansueto. if the last ones didn't
-	                // have that status it would fail. 
-		            //if (strpos(str_replace(" ", "", $entry['number']), $copy) === 0) {
-	                if (isset($entry['barcode']) && $entry['barcode'] == $barcode) {
-		                $status = $entry['status'];
-		            }
-	            }
+                $status = '';
+                foreach ($catalog->getHolding($bib) as $entry) {
+                    // was using this, but it wasn't able to work with
+                    // issues in a serial where only some of them were
+                    // available at Mansueto. if the last ones didn't
+                    // have that status it would fail.
+                    //if (strpos(str_replace(" ", "", $entry['number']), $copy) === 0) {
+                    if (isset($entry['barcode']) && $entry['barcode'] == $barcode) {
+                        $status = $entry['status'];
+                    }
+                }
 
-	            if ($status == 'AVAILABLE-AT-MANSUETO') {
-	                $storagerequest->addRequest($bib, $barcode, $catalog);
-	            } else if ($status == 'LOANED') {
-	                $this->flashMessenger()->setNamespace('error')->addMessage('This item is not available for request because it is currently on loan.');
-	            } else {
-	                $this->flashMessenger()->setNamespace('error')->addMessage('This item is not available for request.');
-	            }
-	            break;
-	        case 'remove':
-	            foreach ($this->params()->fromPost('remove') as $bib_barcode_pair) {
-	                list($this_bib, $this_barcode) = explode("|", $bib_barcode_pair);
-	                $storagerequest->removeRequest($this_bib, $this_barcode);
-	            }
-	            break;
-	        case 'request':
+                if ($status == 'AVAILABLE-AT-MANSUETO') {
+                    $storagerequest->addRequest($bib, $barcode, $catalog);
+                } else if ($status == 'LOANED') {
+                    $this->flashMessenger()->setNamespace('error')->addMessage('This item is not available for request because it is currently on loan.');
+                } else {
+                    $this->flashMessenger()->setNamespace('error')->addMessage('This item is not available for request.');
+                }
+                break;
+            case 'remove':
+                foreach ($this->params()->fromPost('remove') as $bib_barcode_pair) {
+                    list($this_bib, $this_barcode) = explode("|", $bib_barcode_pair);
+                    $storagerequest->removeRequest($this_bib, $this_barcode);
+                }
+                break;
+            case 'request':
                 /*
                 JEJ HACK 
                 code to get this stuff from the config file will look something like this:
@@ -142,33 +143,33 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 printf("%s\n", $config->PickupLocations->defaultLocationDescription);
                 */
 
-	            if ($this->params()->fromPost('location') == '') {
-	                $this->flashMessenger()->setNamespace('error')->addMessage('Please select a pickup location from the pulldown below.');
-	            } else {
-	                $storagerequest->placeRequest($this->params()->fromPost('barcode'), $this->params()->fromPost('bib'), $this->params()->fromPost('location')); 
-	                $pickup_info = '';
+                if ($this->params()->fromPost('location') == '') {
+                    $this->flashMessenger()->setNamespace('error')->addMessage('Please select a pickup location from the pulldown below.');
+                } else {
+                    $storagerequest->placeRequest($this->params()->fromPost('barcode'), $this->params()->fromPost('bib'), $this->params()->fromPost('location'));
+                    $pickup_info = '';
 
                     // Must be defined after placeRequest is called
                     $failures = $storagerequest->getFailures();
                     $victories = $storagerequest->getVictories();
 
-	                switch ($this->params()->fromPost('location')) {
-	                    case 'CRERAR':
-	                        $pickup_info = 'Crerar within 1 business day';
-	                        break;
-	                    case 'ECKHART':
-	                        $pickup_info = 'Eckhart within 1 business day';
-	                        break;
-	                    case 'LAW':
-	                        $pickup_info = 'D\'Angelo within 1 business day';
-	                        break;
-	                    case 'SSAd':
-	                        $pickup_info = 'SSA within 1 business day';
-	                        break;
-	                    default:
-	                        $pickup_info = 'Mansueto within 15 min during open hours';
-	                        break;
-	                }
+                    switch ($this->params()->fromPost('location')) {
+                        case 'CRERAR':
+                            $pickup_info = 'Crerar within 1 business day';
+                            break;
+                        case 'ECKHART':
+                            $pickup_info = 'Eckhart within 1 business day';
+                            break;
+                        case 'LAW':
+                            $pickup_info = 'D\'Angelo within 1 business day';
+                            break;
+                        case 'SSAd':
+                            $pickup_info = 'SSA within 1 business day';
+                            break;
+                        default:
+                            $pickup_info = 'Mansueto within 15 min during open hours';
+                            break;
+                    }
 
                     if ($failures) {
                         if ($victories) {
@@ -187,9 +188,9 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 break;
         }
 
-	    return $this->createViewModel(
-	        ['storagerequests' => $storagerequest->getRequests()]
-	    );
+        return $this->createViewModel(
+            ['storagerequests' => $storagerequest->getRequests()]
+        );
     }
 
 
@@ -234,7 +235,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         // method. Set a flag for passing to the template.
         // This will tell us which alert message to display.
         $failure = false;
-        foreach ($renewResult as $entry) {  
+        foreach ($renewResult as $entry) {
             if ($entry['success'] == false) {
                 $failure = true;
                 break;
@@ -244,42 +245,45 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         // By default, assume we will not need to display a renewal form:
         $renewForm = false;
 
-        // Get checked out item details:
-        $result = $catalog->getMyTransactions($patron);
+        // Get paging setup:
+        $config = $this->getConfig();
+        $pageOptions = $this->getPaginationHelper()->getOptions(
+            (int)$this->params()->fromQuery('page', 1),
+            $this->params()->fromQuery('sort'),
+            $config->Catalog->checked_out_page_size ?? 50,
+            $catalog->checkFunction('getMyTransactions', $patron)
+        );
 
-        // Sort results. 
+        // Get checked out item details:
+        $result = $catalog->getMyTransactions($patron, $pageOptions['ilsParams']);
+
+        // Sort results.
         $sort_by = [];
         $search_types = [0 => 'loanedDate', 1 => 'duedate'];
         // convert dates like 1/1/2017 into something sortable.
         if ($sort == $search_types[0] || $sort == $search_types[1]) {
-            foreach ($result as $r) {
+            foreach ($result['records'] as $r) {
                 $d = explode('/', trim($r[$sort]));
                 $sort_by[] = sprintf("%04d%02d%02d %s", $d[2], $d[0], $d[1], trim($r['title']));
             }
         } else {
-            foreach ($result as $r) {
+            foreach ($result['records'] as $r) {
                 $sort_by[] = strtolower(trim($r[$sort]));
             }
         }
-        array_multisort($sort_by, SORT_ASC, $result);
+        array_multisort($sort_by, SORT_ASC, $result['records']);
 
-        // Get page size:
-        $config = $this->getConfig();
-        $limit = isset($config->Catalog->checked_out_page_size)
-            ? $config->Catalog->checked_out_page_size : 50;
 
         // Build paginator if needed:
-        if ($limit > 0 && $limit < count($result)) {
-            $adapter = new \Zend\Paginator\Adapter\ArrayAdapter($result);
-            $paginator = new \Zend\Paginator\Paginator($adapter);
-            $paginator->setItemCountPerPage($limit);
-            $paginator->setCurrentPageNumber($this->params()->fromQuery('page', 1));
+        $paginator = $this->getPaginationHelper()->getPaginator(
+            $pageOptions, $result['count'], $result['records']
+        );
+        if ($paginator) {
             $pageStart = $paginator->getAbsoluteItemNumber(1) - 1;
-            $pageEnd = $paginator->getAbsoluteItemNumber($limit) - 1;
+            $pageEnd = $paginator->getAbsoluteItemNumber($pageOptions['limit']) - 1;
         } else {
-            $paginator = false;
             $pageStart = 0;
-            $pageEnd = count($result);
+            $pageEnd = $result['count'];
         }
 
         $transactions = $hiddenTransactions = [];
@@ -288,7 +292,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         $claimsReturned = false;
         $isLost = false;
         $recalled = false;
-        foreach ($result as $i => $current) {
+        foreach ($result['records'] as $i => $current) {
             // UChicago customization
             // Test if items are due soon or overdue
             // Set the approptiate variables and flags
@@ -296,18 +300,17 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 $itemsOverdue =  true;
             }
             if ($current['duesoon']) {
-                $itemsDueSoon = true; 
+                $itemsDueSoon = true;
             }
             if ($current['claimsReturned']) {
-                $claimsReturned = true; 
+                $claimsReturned = true;
             }
             if ($current['isLost']) {
-                $isLost = true; 
+                $isLost = true;
             }
             if ($current['recalled']) {
-                $recalled = true; 
+                $recalled = true;
             }
-
 
             // Add renewal details if appropriate:
             $current = $this->renewals()->addRenewDetails(
@@ -321,12 +324,19 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             }
 
             // Build record driver (only for the current visible page):
-            if ($i >= $pageStart && $i <= $pageEnd) {
+            if ($pageOptions['ilsPaging'] || ($i >= $pageStart && $i <= $pageEnd)) {
                 $transactions[] = $this->getDriverForILSRecord($current);
             } else {
                 $hiddenTransactions[] = $current;
             }
         }
+
+        $displayItemBarcode
+            = !empty($config->Catalog->display_checked_out_item_barcode);
+
+        $ilsPaging = $pageOptions['ilsPaging'];
+        $sortList = $pageOptions['sortList'];
+        $params = $pageOptions['ilsParams'];
         return $this->createViewModel(
             compact(
                 'sort', 'transactions', 'renewForm', 'renewResult', 'paginator',
