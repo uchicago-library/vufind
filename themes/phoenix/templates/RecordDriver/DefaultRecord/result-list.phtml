@@ -148,6 +148,8 @@
             */
           $openUrl = $this->openUrl($this->driver, 'results');
           $openUrlActive = $openUrl->isActive();
+          $doi = $this->doi($this->driver, 'results');
+          $doiActive = $doi->isActive();
           // Account for replace_other_urls setting
           $urls = $this->Eholdings()->getEholdingLinks();//Replace default 856 urls with e-holdings from the 928 fields (previously 098s) ?>
           <?php if (!$openUrlActive && empty($urls) && $this->driver->supportsAjaxStatus()): ?>
@@ -157,9 +159,13 @@
           <?php endif; ?>
         </div><!--/.callnumAndLocation -->
 
-          <?php if ($openUrlActive || !empty($urls)): ?>
+          <?php if ($openUrlActive || $doiActive || !empty($urls)): ?>
           <?php if ($openUrlActive): ?>
             <?=$openUrl->renderTemplate()?>
+          <?php endif; ?>i
+          <?php if ($doiActive): ?>
+            <br/>
+            <?=$doi->renderTemplate()?>
           <?php endif; ?>
           <?php if (!is_array($urls)) $urls = [];
             if(!$this->driver->isCollection()):

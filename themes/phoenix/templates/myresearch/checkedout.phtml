@@ -5,6 +5,9 @@
     // Set up breadcrumbs:
     $this->layout()->breadcrumbs = '<li><a href="' . $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') . '</a></li> <li class="active">' . $this->transEsc('Checked Out Items') . '</li>';
 
+    // Check if "Renew All" button can be displayed:
+    $renewAll = !$this->ilsPaging || !$paginator;
+
     // UChicago customization
     // Since the OLE api returns incomplete data, we must create a test for "patron level"
     // renewal failures and capture the data for display purposes. This wouldn't be needed
@@ -18,7 +21,9 @@
         }
     }
 ?>
-
+<a class="search-filter-toggle visible-xs" href="#myresearch-sidebar" data-toggle="offcanvas" title="Expand Sidebar">
+  <?=$this->transEsc('Your Account') ?>
+</a>
 <div class="row">
   <div class="<?=$this->layoutClass('mainbody')?> col-sm-9">
     <h2><?=$this->transEsc('Checked Out Items')?> <small>(<?=count($this->transactions)?>)</small></h2>
@@ -62,26 +67,35 @@
                <input type="checkbox" class="checkbox-select-all" name="selectAll" id="<?=$this->idPrefix?>addFormCheckboxSelectAll"/>
                <span>Select all</span>
              </label>-->
-            <input type="submit" class="btn btn-primary <?=$disabled?>" id="renewAll" name="renewAll" value="<?=$this->transEsc('renew_all')?>" />
+             <?php if ($renewAll): ?>
+               <input type="submit" class="btn btn-primary" id="renewAll" name="renewAll" value="<?=$this->transEsc('renew_all')?>" />
+             <?php endif; ?>
             <input type="submit" class="btn btn-default <?=$disabled?>" id="renewSelected" name="renewSelected" value="<?=$this->transEsc("renew_selected")?>" />
           </div>
         </div>
       <?php endif; ?>
 
+    <nav class="search-header hidden-print">
       <?php if ($paginator): ?>
-      <?php
-        $end = min(
-          $paginator->getAbsoluteItemNumber($paginator->getItemCountPerPage()),
-          $paginator->getTotalItemCount()
-        );
-        $transParams = [
-          '%%start%%' => $this->localizedNumber($paginator->getAbsoluteItemNumber(1)),
-          '%%end%%' => $this->localizedNumber($end),
-          '%%total%%' => $this->localizedNumber($paginator->getTotalItemCount())
-        ];
-        ?>
-      <?=$this->translate('showing_items_of_html', $transParams); ?>
+        <div class="search-stats">
+          <?php
+            $end = min(
+              $paginator->getAbsoluteItemNumber($paginator->getItemCountPerPage()),
+              $paginator->getTotalItemCount()
+            );
+            $transParams = [
+              '%%start%%' => $this->localizedNumber($paginator->getAbsoluteItemNumber(1)),
+              '%%end%%' => $this->localizedNumber($end),
+              '%%total%%' => $this->localizedNumber($paginator->getTotalItemCount())
+            ];
+          ?>
+          <?=$this->translate('showing_items_of_html', $transParams); ?>
+        </div>
       <?php endif; ?>
+      <?php if ($this->sortList): ?>
+        <?=$this->context($this)->renderInContext('myresearch/controls/sort.phtml', ['sortList' => $this->sortList]); ?>
+      <?php endif; ?>
+    </nav>
 
       <?php foreach ($hiddenTransactions as $ilsDetails): ?>
         <?php if (isset($this->renewResult[$ilsDetails['item_id']])): ?>
@@ -274,13 +288,13 @@
         </div>
       <?php endforeach; ?>
       <?php if ($this->renewForm): ?></form><?php endif; ?>
-      <?=$paginator ? $this->paginationControl($paginator, 'Sliding', 'Helpers/pagination.phtml') : ''?>
+      <?=$paginator ? $this->paginationControl($paginator, 'Sliding', 'Helpers/pagination.phtml', compact('params')) : ''?>
     <?php else: ?>
       <?=$this->transEsc('You do not have any items checked out')?>.
     <?php endif; ?>
 </div>
 
-<div class="<?=$this->layoutClass('sidebar')?> col-sm-3">
+<div class="<?=$this->layoutClass('sidebar')?> col-sm-3" id="myresearch-sidebar">
     <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'checkedout'])?>
   </div>
 </div>

@@ -8,6 +8,11 @@
     // Template for use by the renderArray helper:
     $arrTemplate = '<tr><th>%%LABEL%%:</th><td> %%VALUE%%</td></tr>';
 ?>
+
+<a class="search-filter-toggle visible-xs" href="#account-sidebar" data-toggle="offcanvas" title="Expand Sidebar">
+  <?=$this->transEsc('Your Account') ?>
+</a>
+
 <div class="row">
   <div class="<?=$this->layoutClass('mainbody')?> col-sm-9">
     <h2><?=$this->transEsc('Your Profile')?></h2>
@@ -59,13 +64,13 @@
           ]
         )?>
     </table>
-  <?php if ('ils-none' !== $this->ils()->getOfflineMode() && isset($this->patronLoginView) && !empty($this->patronLoginView->getTemplate())): ?>
+  <?php if ('ils-none' !== $this->ils()->getOfflineMode() && isset($this->patronLoginView) && $this->patronLoginView && !empty($this->patronLoginView->getTemplate())): ?>
     <?=$this->partial($this->patronLoginView);?>
   <?php endif; ?>
     <p><a href="https://www.lib.uchicago.edu/borrow/access-privileges/library-cards-and-account-information/" target="_blank" class="external">Keeping contact information current</a></p>
   </div>
 
-<div class="<?=$this->layoutClass('sidebar')?> col-sm-3">
+<div class="<?=$this->layoutClass('sidebar')?> col-sm-3" id="myresearch-sidebar>
   <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'profile'])?>
 </div>
 </div>

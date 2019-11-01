@@ -5,6 +5,11 @@
   // Set up breadcrumbs:
   $this->layout()->breadcrumbs = '<li><a href="' . $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') . '</a></li> <li class="active">' . $this->transEsc('My Holds') . '</li>';
 ?>
+
+<a class="search-filter-toggle visible-xs" href="#myresearch-sidebar" data-toggle="offcanvas" title="Expand Sidebar">
+  <?=$this->transEsc('Your Account') ?>
+</a>
+
 <div class="row">
   <div class="<?=$this->layoutClass('mainbody')?> col-sm-9">
     <h2><?=$this->transEsc('Requested Items') ?></h2>
@@ -175,7 +180,7 @@
   <?php endif; ?>
 </div>
 
-<div class="<?=$this->layoutClass('sidebar')?> col-sm-3">
+<div class="<?=$this->layoutClass('sidebar')?> col-sm-3" id="myresearch-sidebar">
   <?=$this->context($this)->renderInContext("myresearch/menu.phtml", ['active' => 'holds'])?>
 </div>
 </div>
