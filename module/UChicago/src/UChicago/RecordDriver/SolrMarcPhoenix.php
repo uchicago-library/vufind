@@ -593,6 +593,7 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
 
         /*Loop over the vernacular data and stash it into an array*/
         $v = [];
+        $disallowedSubfields = ['0', '1', '2'];
         foreach($vernacularData as $vernacularFields) {
             /*Only use subfield data from the File_MARC_Data_Field object: returns an array of File_MARC_Subfield objects*/
             $vernacularSubfields = $vernacularFields->getSubfields();
@@ -611,14 +612,19 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
             foreach($vernacularSubfields as $vernacular) {
                 /*Get the data we wish to return*/
                 $vernacularString = $vernacular->getData();
-                
+                $currentSubfield = $vernacular->getCode();
+
+                /*Skip subfield data we shouldn't be showing*/
+                if (in_array($currentSubfield, $disallowedSubfields)) {
+                    continue;
+                }
+
                 /*Match the returned strings with the value of subfield 6.
                 If a title of a book ever starts with 3 numbers that happen to be identical to the value of subfield 6 during the current iteration in the loop, there could be a problem*/ 
                 if($subfield6 && preg_match('/^'.$subfield6.'/', $vernacularString) == 1){
                     $vernacularString = $subfield6;
                 }
                 $vernacularArray = explode('#^@$*!', $vernacularString);
-
                 /*Array of subfield data for the current 880*/ 
                 $vs[] = $vernacularArray;
             }
