@@ -26,9 +26,12 @@
  * @link     https://vufind.org/wiki/development Wiki
  */
 namespace UChicago\Mailer;
+
+use Interop\Container\ContainerInterface;
 use Zend\Mail\Transport\InMemory;
-use Zend\Mail\Transport\Smtp, Zend\Mail\Transport\SmtpOptions;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\Mail\Transport\Smtp;
+use Zend\Mail\Transport\SmtpOptions;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Factory for instantiating Mailer objects
@@ -41,21 +44,76 @@ use Zend\ServiceManager\ServiceLocatorInterface;
  *
  * @codeCoverageIgnore
  */
-class Factory implements \Zend\ServiceManager\FactoryInterface
+class Factory implements FactoryInterface
 {
     /**
-     * Create service
+     * Build the mail transport object.
      *
-     * @param ServiceLocatorInterface $sm Service manager
+     * @param \Zend\Config\Config $config Configuration
      *
-     * @return mixed
+     * @return InMemory|Smtp
      */
-    public function createService(ServiceLocatorInterface $sm)
+    protected function getTransport($config)
     {
+        // In test mode? Return fake object:
+        if (isset($config->Mail->testOnly) && $config->Mail->testOnly) {
+            return new InMemory();
+        }
+
+        // Create mail transport:
+        $settings = [
+            'host' => $config->Mail->host, 'port' => $config->Mail->port
+        ];
+        if (isset($config->Mail->username) && isset($config->Mail->password)) {
+            $settings['connection_class'] = 'login';
+            $settings['connection_config'] = [
+                'username' => $config->Mail->username,
+                'password' => $config->Mail->password
+            ];
+            if (isset($config->Mail->secure)) {
+                // always set user defined secure connection
+                $settings['connection_config']['ssl'] = $config->Mail->secure;
+            } else {
+                // set default secure connection based on configured port
+                if ($settings['port'] == '587') {
+                    $settings['connection_config']['ssl'] = 'tls';
+                } elseif ($settings['port'] == '487') {
+                    $settings['connection_config']['ssl'] = 'ssl';
+                }
+            }
+        }
+        return new Smtp(new SmtpOptions($settings));
+    }
+
+    /**
+     * Create an object
+     *
+     * @param ContainerInterface $container     Service manager
+     * @param string             $requestedName Service being created
+     * @param null|array         $options       Extra options (optional)
+     *
+     * @return object
+     *
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     * creating a service.
+     * @throws ContainerException if any other error occurs
+     */
+    public function __invoke(ContainerInterface $container, $requestedName,
+        array $options = null
+    ) {
+        if (!empty($options)) {
+            throw new \Exception('Unexpected options passed to factory.');
+        }
+
         // Load configurations:
-        $config = $sm->get('VuFind\Config')->get('config');
+        $config = $container->get('VuFind\Config\PluginManager')->get('config');
 
         // Create service:
-        return new \UChicago\Mailer\Mailer($this->getTransport($config));
+        $class = new $requestedName($this->getTransport($config));
+        if (!empty($config->Mail->override_from)) {
+            $class->setFromAddressOverride($config->Mail->override_from);
+        }
+        return $class;
     }
 }

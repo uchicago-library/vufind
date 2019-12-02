@@ -14,6 +14,8 @@ return array (
     'aliases' => array(
       'AJAX' => 'UChicago\Controller\AjaxController',
       'ajax' => 'UChicago\Controller\AjaxController',
+      'Cart' => 'UChicago\Controller\CartController',
+      'cart' => 'UChicago\Controller\CartController',
       'Pin' => 'VuFindAdmin\Controller\PinController',
       'MyResearch' => 'UChicago\Controller\MyResearchController',
       'myresearch' => 'UChicago\Controller\MyResearchController',
@@ -66,9 +68,12 @@ return array (
     'factories' => 
     array (
       'VuFind\\ContentTOCPluginManager' => 'UChicago\\Service\\Factory::getContentTOCPluginManager',
-      'VuFind\\Mailer' => 'UChicago\\Mailer\\Factory',
+      'UChicago\Mailer\Mailer' => 'UChicago\Mailer\Factory',
       'UChicago\\AjaxHandler\\PluginManager' => 'VuFind\\ServiceManager\\AbstractPluginManagerFactory',
     ),
+    'aliases' => [
+      'UChicago\Mailer' => 'UChicago\Mailer\Mailer',
+    ],
   ),
   'vufind' => 
   array (
