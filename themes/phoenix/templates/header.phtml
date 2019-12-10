@@ -49,7 +49,7 @@
         <?php endif; ?>
         <?php if (is_object($account) && $account->loginEnabled()): // hide login/logout if unavailable ?>
           <li class="logoutOptions<?php if($account->dropdownEnabled()): ?> with-dropdown<?php endif ?><?php if(!$account->isLoggedIn()): ?> hidden<?php endif ?>">
-            <a href="<?=$this->url('myresearch-home', [], ['query' => ['redirect' => 0]])?>"><i id="account-icon" class="fa fa-home" aria-hidden="true"></i> <?=$this->transEsc("Your Account")?></a>
+            <a href="<?=$this->url('myresearch-home', [], ['query' => ['redirect' => 0]])?>"><i id="account-icon-disable-triangle" class="fa fa-home" aria-hidden="true"></i> <?=$this->transEsc("Your Account")?></a>
           </li>
           <li class="logoutOptions<?php if($account->dropdownEnabled()): ?> with-dropdown<?php endif ?><?php if(!$account->isLoggedIn()): ?> hidden<?php endif ?>">
             <a href="<?=$this->url('myresearch-logout')?>" class="logout"><i class="fa fa-sign-out" aria-hidden="true"></i> <?=$this->transEsc("Log Out")?></a>
