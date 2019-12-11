@@ -433,9 +433,9 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                     $sort_by[] = $s;
                     break;
                 case 'itemStatus':
-                    if ($ilsDetails['available']) {
+                    if (isset($ilsDetails['available'])) {
                         $sort_by[] = 'available';
-                    } else if ($ilsDetails['in_transit']) {
+                    } else if (isset($ilsDetails['in_transit'])) {
                         $sort_by[] = 'in_transit';
                     } else {
                         $sort_by[] = 'ZZZ';
