@@ -43,6 +43,31 @@ use Zend\Session\Container;
  */
 class CartController extends \VuFind\Controller\CartController
 {
+
+    /**
+     * Process requests for bulk actions from search results.
+     *
+     * @return mixed
+     */
+    public function searchresultsbulkAction()
+    {
+        // We came in from a search, so let's remember that context so we can
+        // return to it later. However, if we came in from a previous instance
+        // of this action (for example, because of a login screen), we should
+        // ignore that!
+        $referer = $this->getRequest()->getServer()->get('HTTP_REFERER');
+        $bulk = $this->url()->fromRoute('cart-searchresultsbulk');
+        $refHost = parse_url($referer)['host'];
+
+        if (substr($referer, -strlen($bulk)) != $bulk && $refHost != 'shibboleth2.uchicago.edu') {
+            $this->session->url = $referer;
+        }
+
+        // Now forward to the requested action:
+        return $this->forwardTo('Cart', $this->getCartActionFromRequest());
+    }
+
+
     /**
      * Email a batch of records.
      *
@@ -92,7 +117,7 @@ class CartController extends \VuFind\Controller\CartController
             // Attempt to send the email and show an appropriate flash message:
             try {
                 // If we got this far, we're ready to send the email:
-                $mailer = $this->serviceLocator->get('VuFind\Mailer');
+                $mailer = $this->serviceLocator->get('UChicago\Mailer');
                 $mailer->setMaxRecipients($view->maxRecipients);
                 $cc = $this->params()->fromPost('ccself') && $view->from != $view->to
                     ? $view->from : null;

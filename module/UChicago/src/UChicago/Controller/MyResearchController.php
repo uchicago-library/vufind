@@ -211,9 +211,11 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             return $patron;
         }
 
-        $sort = $this->params()->fromPost('sort');
-        if (!$sort) {
-            $sort = 'duedate';
+        // Get the sort from a cookie or the POST method
+        $sort = isset($_COOKIE['checkedout_items_sort']) ? $_COOKIE['checkedout_items_sort'] : 'duedate';
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $sort = $this->params()->fromPost('sort');
+            setcookie('checkedout_items_sort', $sort);
         }
 
         // Connect to the ILS:
@@ -431,9 +433,9 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                     $sort_by[] = $s;
                     break;
                 case 'itemStatus':
-                    if ($ilsDetails['available']) {
+                    if (isset($ilsDetails['available'])) {
                         $sort_by[] = 'available';
-                    } else if ($ilsDetails['in_transit']) {
+                    } else if (isset($ilsDetails['in_transit'])) {
                         $sort_by[] = 'in_transit';
                     } else {
                         $sort_by[] = 'ZZZ';

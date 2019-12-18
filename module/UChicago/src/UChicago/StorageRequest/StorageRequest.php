@@ -84,15 +84,15 @@ class StorageRequest
             $elements = $xml->xpath($p);
             foreach ($elements as $e) {
                 $se = $e->xpath('arr[@name="HoldingsCallNumber_display"]/str');
-                if ($se[0] and $se[0]->asXML()) {
+                if (isset($se[0]) and $se[0]->asXML()) {
                     $callNumber = $se[0]->asXML();
                 }
                 $se = $e->xpath('str[@name="CopyNumber_search"]');
-                if ($se[0] and $se[0]->asXML()) {
+                if (isset($se[0]) and $se[0]->asXML()) {
                     $copyNumber = $se[0]->asXML();
                 }
                 $se = $e->xpath('str[@name="Enumeration_display"]');
-                if ($se[0] and $se[0]->asXML()) {
+                if (isset($se[0]) and $se[0]->asXML()) {
                     $volumeNumber = $se[0]->asXML();
                 }
             }
