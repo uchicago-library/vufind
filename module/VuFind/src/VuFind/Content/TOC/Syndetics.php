@@ -43,8 +43,8 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
      *
      * @var array
      */
-    protected $sourceList = array(
-        'TOC' => array(
+    protected $sourceList = [
+        'TOC' => [
             'title' => 'TOC',
             'file' => 'TOC.XML',
             'div' => '<div id="syn_toc"></div>'
@@ -66,8 +66,8 @@ class Syndetics extends \VuFind\Content\AbstractSyndetics
      * @param \VuFindCode\ISBN $isbnObj ISBN object
      *
      * @throws \Exception
-     * @return array     returns array with table of contents data.
-     * @author john jung <jej@uchicago.edu>
+     * @return array     Returns array with table of contents data.
+     * @author John Jung <jej@uchicago.edu>
      */
     public function loadByIsbn($key, \VuFindCode\ISBN $isbnObj)
     {
