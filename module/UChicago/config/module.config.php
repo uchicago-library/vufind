@@ -67,7 +67,6 @@ return array (
     'allow_override' => true,
     'factories' => 
     array (
-      'VuFind\\ContentTOCPluginManager' => 'UChicago\\Service\\Factory::getContentTOCPluginManager',
       'UChicago\Mailer\Mailer' => 'UChicago\Mailer\Factory',
       'UChicago\\AjaxHandler\\PluginManager' => 'VuFind\\ServiceManager\\AbstractPluginManagerFactory',
     ),
@@ -92,20 +91,6 @@ return array (
           'UChicago\AjaxHandler\GetDedupedEholdings' => 'UChicago\AjaxHandler\AbstractAjaxHandlerFactory',
           'UChicago\AjaxHandler\GetMapLink' => 'UChicago\AjaxHandler\AbstractAjaxHandlerFactory',
           'UChicago\AjaxHandler\GetItemStatuses' => 'VuFind\AjaxHandler\GetItemStatusesFactory',
-        ),
-      ),
-      'content' => 
-      array (
-        'factories' => 
-        array (
-          'toc' => 'UChicago\\Content\\Factory::getTOC',
-        ),
-      ),
-      'content_toc' => 
-      array (
-        'factories' => 
-        array (
-          'syndetics' => 'UChicago\\Content\\TOC\\Factory::getSyndetics',
         ),
       ),
       'recorddriver' => 
@@ -135,7 +120,6 @@ return array (
         'factories' => 
         array (
           'UChicago\\RecordTab\\HoldingsILS' => 'UChicago\\RecordTab\\Factory::getHoldingsILS',
-          'chicagotoc' => 'UChicago\\RecordTab\\Factory::getTOC',
         ),
       ),
       'search_results' => 
@@ -162,7 +146,7 @@ return array (
         array (
           'Holdings' => 'UChicago\\RecordTab\\HoldingsILS',
           'Description' => NULL,
-          'TOC' => 'ChicagoTOC',
+          'TOC' => 'TOC',
           'UserComments' => 'UserComments',
           'Reviews' => 'Reviews',
           'Excerpt' => 'Excerpt',
