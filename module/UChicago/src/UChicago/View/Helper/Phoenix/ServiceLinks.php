@@ -306,7 +306,11 @@ class ServiceLinks extends AbstractHelper {
                              'ResupE',
                              'ResupS',
                              'SSAdRes',
-                             'SciRes']];
+                             'SciRes'],
+                        /*Blacklist*/
+                        'getIt' =>
+                            ['ITS'] //<--Library location
+                        ];
 
     /**
      * Configuration array for status codes that conditional service links 
@@ -617,10 +621,12 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function getIt($row) {
+        $libraryLoc = strtolower($this->getLocation($row['locationCodes'], 'library'));
+        $locations = array_map('strtolower', $this->lookupLocation['getIt']);
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/requestFromILL.php?database=production&amp;bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
         $serviceLink = $this->getLinkConfig('getIt', $defaultUrl); 
         $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request via Interlibrary Loan';
-        if (($serviceLink) and in_array($row['status'], $this->lookupStatus['getIt'])) {
+        if (($serviceLink) and in_array($row['status'], $this->lookupStatus['getIt']) and !in_array($libraryLoc, $locations)) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
