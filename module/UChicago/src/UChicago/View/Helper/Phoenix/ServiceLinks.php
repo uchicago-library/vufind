@@ -21,18 +21,25 @@ class ServiceLinks extends AbstractHelper {
      * @param link, url for the href    
      * @param text, display text for the link
      * @param classes, optional array of css classes to append
-     * defaults to noting.
+     * defaults to empty array.
+     * @param dataAttributes, optional array of html data attributes
+     * defaults to empty array.
+     * @param tagline, a helper text to append after the link
+     * defaults to an empty string
      *        	
      * @return html string
      */
-    protected function getServiceLinkTemplate($link, $text, $classes=[], $dataAttributes=[]) {
+    protected function getServiceLinkTemplate($link, $text, $classes=[], $dataAttributes=[], $tagline='') {
         $da = '';
         if ($dataAttributes) {
             foreach ($dataAttributes as $a => $v) {
                 $da .= 'data-' . $a . '="' . $v . '"';
             }
         }
-        return '<a href="' . $link . '" class="' . (empty($classes) ? 'service' : '') . implode(' ', $classes) . '" ' . $da . '>' . $text . '</a>';
+        if ($tagline) {
+          $tagline = ' <span class="service-tagline">' . $tagline . '</span>';
+        }
+        return '<a href="' . $link . '" class="' . (empty($classes) ? 'service' : '') . implode(' ', $classes) . '" ' . $da . '>' . $text . '</a>' . $tagline;
     }
 
     /**
@@ -798,9 +805,10 @@ class ServiceLinks extends AbstractHelper {
         $serviceLink = $this->getLinkConfig('scanAndDeliver', $defaultUrl); 
         $displayText = '<i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Scan and Deliver';
         $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
+        $tagline= '- requests will be delayed during library closure';
         if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
             (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
-                return $this->getServiceLinkTemplate($serviceLink, $displayText);
+                return $this->getServiceLinkTemplate($serviceLink, $displayText, [], [], $tagline);
         }
     }
 
