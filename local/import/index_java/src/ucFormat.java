@@ -324,13 +324,28 @@ public class ucFormat
 		}
 
 
-		Iterator iter = df928List.iterator();
+		Iterator iter928 = df928List.iterator();
 		{
 			DataField fld928;
-			if (iter.hasNext())
+			if (iter928.hasNext())
 			{
 				result.add("Eresource");
 			}
+                        while(iter928.hasNext())
+                        {
+                                fld928 = (DataField) iter928.next(); 
+                                if(fld928.getSubfield('g') != null)
+		        	{
+			        	if ( fld928.getSubfield('g').getData().contains("vidstream"))
+                                        {
+ 						 result.add("StreamingVideo"); 
+                                        }  
+                                        if ( fld928.getSubfield('g').getData().contains("audstream"))
+                                        { 
+                                                 result.add("StreamingAudio");
+                                        }   
+                                }
+                        }
 		}
 
 		Iterator iter903 = df903List.iterator();
