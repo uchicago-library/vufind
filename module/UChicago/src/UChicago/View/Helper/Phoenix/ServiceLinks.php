@@ -805,7 +805,7 @@ class ServiceLinks extends AbstractHelper {
         $serviceLink = $this->getLinkConfig('scanAndDeliver', $defaultUrl); 
         $displayText = '<i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Scan and Deliver';
         $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
-        $tagline= '- requests will be delayed during library closure';
+        $tagline= '- Suspended during library closure';
         if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
             (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
                 return $this->getServiceLinkTemplate($serviceLink, $displayText, [], [], $tagline);
