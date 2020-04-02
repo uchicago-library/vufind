@@ -63,6 +63,7 @@ class GetConfig extends \Zend\View\Helper\AbstractHelper
         $this->siteEmail = isset($siteConfig->Site->email) ? $siteConfig->Site->email : false;
         $this->alphabrowseSearchTypes = isset($siteConfig->AlphaBrowse_Types) ? $siteConfig->AlphaBrowse_Types : false;
         $this->dueSoonInterval = isset($siteConfig->MyAccount->due_soon) ? $siteConfig->MyAccount->due_soon : false;
+        $this->emergencyClosure = isset($siteConfig->Catalog->emergency_closure) ? $siteConfig->Catalog->emergency_closure : false;
     }
 
     /**
@@ -93,6 +94,16 @@ class GetConfig extends \Zend\View\Helper\AbstractHelper
     public function getWhenDueAlertInterval() 
     {
         return $this->dueSoonInterval;
+    }
+
+    /**
+     * Emergency building closure text for availability in the templates.
+     *
+     * @return string
+     */
+    public function getEmergencyClosure()
+    {
+        return $this->emergencyClosure;
     }
 
 }
