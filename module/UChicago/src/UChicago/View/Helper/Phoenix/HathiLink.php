@@ -155,7 +155,7 @@ class HathiLink extends AbstractHelper
             if($this->isETAS()) {
                 $linkText = 'HathiTrust Emergency Access [Login Required]';
                 if($helpLinkUrl) {
-                    $helpLink = '<a href="'. $helpLinkUrl . '" class="what-is-this">What is this?</a>';
+                    $helpLink = '<a href="'. $helpLinkUrl . '" class="login-directions">Login Directions</a>';
                 }
             } else {
                 $linkText = 'HathiTrust Digital Library';
