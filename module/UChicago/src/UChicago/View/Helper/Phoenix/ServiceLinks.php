@@ -496,6 +496,7 @@ class ServiceLinks extends AbstractHelper {
         }
     }
 
+
     /**
      * Method creates a link to the Mansueto ASR Storage system
      *
@@ -513,6 +514,7 @@ class ServiceLinks extends AbstractHelper {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
+
 
     /**
      * Method creates a link to the BorrowDirect consortium 
@@ -793,6 +795,43 @@ class ServiceLinks extends AbstractHelper {
         return $url;
     }
 
+
+    /**
+     * Creates a link to a form where users
+     * can request help.
+     *
+     * @return html string
+     */
+    public function requestHelp($row) {
+        $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
+        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/request/help.php?bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
+        if (!empty($patron)) {
+            $defaultUrl = $defaultUrl . '&amp;' . $patron;
+        }
+        $serviceLink = $this->getLinkConfig('requestHelp', $defaultUrl);
+        $displayText = '<i class="fa fa-comment" aria-hidden="true"></i> Get Help Finding an Online Copy';
+        if ($serviceLink) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+    }
+
+
+    /**
+     * Creates a link to a page explaining why items
+     * are temporarily unavailable.
+     *
+     * @return html string
+     */
+    public function requestsUnavailable($row) {
+        $defaultUrl = 'https://www.lib.uchicago.edu/borrow/requesting/services-suspended-during-library-closure/';
+        $serviceLink = $this->getLinkConfig('requestsUnavailable', $defaultUrl);
+        $displayText = '<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Requests Temporarily Unavailable';
+        if ($serviceLink) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+    }
+
+
     /**
      * Method creates a link to the Scan&Deliver service
      *
@@ -805,10 +844,9 @@ class ServiceLinks extends AbstractHelper {
         $serviceLink = $this->getLinkConfig('scanAndDeliver', $defaultUrl); 
         $displayText = '<i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Scan and Deliver';
         $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
-        $tagline= '- Suspended during library closure';
         if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
             (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
-                return $this->getServiceLinkTemplate($serviceLink, $displayText, [], [], $tagline);
+                return $this->getServiceLinkTemplate($serviceLink, $displayText, [], []);
         }
     }
 

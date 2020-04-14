@@ -442,10 +442,20 @@
                 <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib, $row)?>
                 <?=$this->ServiceLinks()->borrowDirect($row)?>
                 <?=$this->ServiceLinks()->uBorrow($row)?>
-               <?=$this->ServiceLinks()->request($row)?>
+                <?=$this->ServiceLinks()->request($row)?>
                 <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                 <?=$this->ServiceLinks()->offsite($row)?>
+                <?=$this->ServiceLinks()->requestHelp($row)?>
                 </span><?php /* END .service-links */?>
+
+                <?php /* Requests Unavailable Link */ ?>
+                <?php $unavailableLink = $this->ServiceLinks()->requestsUnavailable($row)?>
+                <?php if ($unavailableLink): ?>
+                  <span class="service-links">
+                    <?=$unavailableLink?>
+                  </span>
+                <?php endif; ?>
+
             <?php if (isset($row['itemNotes'])): ?>
               <div class="item-notes">
                 <?=$row['itemNotes']?>
