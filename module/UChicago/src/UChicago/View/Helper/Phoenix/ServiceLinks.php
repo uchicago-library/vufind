@@ -809,7 +809,7 @@ class ServiceLinks extends AbstractHelper {
             $defaultUrl = $defaultUrl . '&amp;' . $patron;
         }
         $serviceLink = $this->getLinkConfig('requestHelp', $defaultUrl);
-        $displayText = '<i class="fa fa-comment" aria-hidden="true"></i> Get Help Finding an Online Copy';
+        $displayText = '<i class="fa fa-comment" aria-hidden="true"></i> Need help? - Ask a Librarian';
         if ($serviceLink) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
