@@ -143,7 +143,7 @@ class HathiLink extends AbstractHelper
     {
         $bibId = $this->view->driver->getUniqueID();
         //Handle hathi links with proxy for https
-        $baseUrl = 'http://forms.lib.uchicago.edu/lib/hathi/info.test.php?q=oclc:';
+        $baseUrl = 'http://forms.lib.uchicago.edu/lib/hathi/info.php?q=oclc:';
         $hathiLink = false;
         $rawMarcData = $this->view->driver->crosswalk('hathiLink');
         $graphic = '<img src="/vufind/themes/phoenix/images/hathitrustFavicon.png" alt="HathiTrust Digital Library"/>';
