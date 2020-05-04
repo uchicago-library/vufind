@@ -143,7 +143,7 @@ class HathiLink extends AbstractHelper
     {
         $bibId = $this->view->driver->getUniqueID();
         //Handle hathi links with proxy for https
-        $url = 'http://forms.lib.uchicago.edu/lib/hathi/info.php?q=oclc:';
+        $baseUrl = 'http://forms.lib.uchicago.edu/lib/hathi/info.test.php?q=oclc:';
         $hathiLink = false;
         $rawMarcData = $this->view->driver->crosswalk('hathiLink');
         $graphic = '<img src="/vufind/themes/phoenix/images/hathitrustFavicon.png" alt="HathiTrust Digital Library"/>';
@@ -152,15 +152,17 @@ class HathiLink extends AbstractHelper
 
         if ($this->isHathi()) {
             $oclcNumber = $this->getOCLCNumbers();
+            $url = $baseUrl . $oclcNumber;
             if($this->isETAS()) {
                 $linkText = 'HathiTrust Emergency Access [Login Required]';
+                $url = $baseUrl . $oclcNumber . '&sso=true';
                 if($helpLinkUrl) {
                     $helpLink = '<a href="'. $helpLinkUrl . '" class="login-directions">Login Directions</a>';
                 }
             } else {
                 $linkText = 'HathiTrust Digital Library';
             }
-            $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . $oclcNumber . '" class="hathi eLink">' . $linkText . '</a>' . $helpLink . '</div>';
+            $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . '" class="hathi eLink">' . $linkText . '</a>' . $helpLink . '</div>';
         }
         return $hathiLink;
     }
