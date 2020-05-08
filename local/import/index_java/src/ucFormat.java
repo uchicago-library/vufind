@@ -43,7 +43,8 @@ public class ucFormat
 		char leaderBit;
 		ControlField fixedField = (ControlField) record.getVariableField("008");
 		List<VariableField> items  = record.getVariableFields("929");
-		List df300List  = record.getVariableFields("300");
+		List df024List  = record.getVariableFields("024");
+                List df300List  = record.getVariableFields("300");
 		List df336List  = record.getVariableFields("336");
 		List df337List  = record.getVariableFields("337"); 
 		List df338List  = record.getVariableFields("338"); 
@@ -51,10 +52,10 @@ public class ucFormat
 		List df347List  = record.getVariableFields("347"); 
 		List df502List  = record.getVariableFields("502"); 
 		List df538List  = record.getVariableFields("538"); 
+		List df856List  = record.getVariableFields("856");
 		List df903List  = record.getVariableFields("903");
 	        List df928List  = record.getVariableFields("928");
 	        List df929List  = record.getVariableFields("929");
-
 
 		String formatString;
 		char formatCode = ' ';
@@ -117,6 +118,28 @@ public class ucFormat
 				}
 			}
 		}
+
+
+                Iterator iter024 = df024List.iterator();
+                {
+                        DataField fld024;
+                        while (iter024.hasNext())
+                        {
+                                fld024 = (DataField) iter024.next();
+
+                                if(fld024.getSubfield('2') != null)
+                                {
+                                        if ( fld024.getSubfield('2').getData().contains("doi"))
+                                        {
+                                        	String str = (fld024.getSubfield('a').getData());
+                          			if(str != null)
+                                                 result.add(str);
+                                        }
+                                }
+                        }
+                }
+
+
 
 		Iterator iter300 = df300List.iterator();
 		{
@@ -322,6 +345,28 @@ public class ucFormat
 				result.add("Dissertations");
 			}
 		}
+
+
+               Iterator iter856 = df856List.iterator();
+                {
+                        DataField fld856;
+                        while (iter856.hasNext())
+                        {
+				fld856 = (DataField) iter856.next();
+				{						
+		 			if(fld856.getSubfield('u') != null)
+                                       	{
+                                               	String str = fld856.getSubfield('u').getData();
+			
+                       	                        if ( str.contains("/10."))
+                               	                {
+                                       	                result.add(str);        //$
+                                               	}
+					}
+				}
+                        }
+                }
+
 
 
 		Iterator iter928 = df928List.iterator();

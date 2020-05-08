@@ -289,6 +289,7 @@
    <field name="item_collection" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="series_facet" type="textFacet" indexed="true" stored="true" multiValued="true"/>
    <field name="barcode" type="string" indexed="true" stored="true" multiValued="true"/>
+   <field name="doi" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="import_time" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
    <!-- UChicago fields for exactish matching -->
    <field name="title_short_exact" type="text_lr" indexed="true" stored="true"/>
