@@ -479,6 +479,8 @@ class SolrMarcPhoenix extends \VuFind\RecordDriver\SolrMarc
              'values' => ['035|a']],
             ['label'  => 'Project identifier',
              'values' => ['903|a']],
+            ['label'  => 'ETAS',
+             'values' => ['903|r']],
         ],
         /**
          * Array of marc fields to display for 

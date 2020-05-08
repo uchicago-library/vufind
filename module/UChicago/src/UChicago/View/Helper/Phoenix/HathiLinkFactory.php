@@ -11,6 +11,7 @@ class HathiLinkFactory implements FactoryInterface
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
-        return new $requestedName();
+        $config = $container->get('VuFind\Config\PluginManager')->get('config');
+        return new $requestedName($config);
     }
 }

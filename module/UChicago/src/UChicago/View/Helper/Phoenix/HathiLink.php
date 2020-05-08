@@ -13,6 +13,13 @@ use Zend\View\Helper\AbstractHelper;
  */
 class HathiLink extends AbstractHelper
 {
+
+    public function __construct($siteConfig)
+    {
+        $this->hathiETAS = isset($siteConfig->Catalog->hathi_etas) ? $siteConfig->Catalog->hathi_etas : false;
+        $this->hathiETASHelpLink = isset($siteConfig->Catalog->hathi_etas_help_link) ? $siteConfig->Catalog->hathi_etas_help_link : false;
+    }
+
     /**
      * Checks to see if a shelving location of "Full Text" exists.
      * Used in outlier cases where a MARC 903a exists for a Hathi 
@@ -60,6 +67,28 @@ class HathiLink extends AbstractHelper
         return $hathi903;
     }
 
+
+    /**
+     * Helper method checks for the presence of a 903r equal to "ETAS".
+     * Returns true if a 903r equal to "ETAS" is present, otherwise false.
+     *
+     * @return boolean
+     */
+    private function isETAS() {
+        $rawMarcData = $this->view->driver->crosswalk('hathiLink');
+        $emergency_closure = $this->hathiETAS;
+        $etas = false;
+        if (isset($rawMarcData['ETAS'])) {
+            foreach ($rawMarcData['ETAS'] as $identifier) {
+                if (implode($identifier['subfieldData']) == "ETAS") {
+                    $etas = true;
+                    break;
+                }
+            }
+        }
+        return $etas;
+    }
+
     /**
      * Helper method checks if a record is a Hathi record according to the following criteria:
      * a record has a bib prefix of "ocm", a record has a bib prefix of "ocn", a record has a
@@ -69,7 +98,14 @@ class HathiLink extends AbstractHelper
      */
     public function isHathi() {
         $hathi = false;
-        $bibId = $this->view->driver->getUniqueID(); 
+        $bibId = $this->view->driver->getUniqueID();
+        $emergency_closure = $this->hathiETAS;
+        // A 903|a of "Hathi" and a 903|r of "ETAS" are both present, however,
+        // we are not under an emergency closure and shoul not display a link.
+        if ($this->isHathi903() && $this->isETAS() && !$emergency_closure) {
+            return false;
+        }
+        // Normal Hathi link display logic
         if ((preg_match ('/^ocm/i', $bibId) == 1) || (preg_match ('/^ocn/i', $bibId ) == 1) || ($this->isHathi903()) ) {
             $hathi = true;
         }
@@ -107,14 +143,26 @@ class HathiLink extends AbstractHelper
     {
         $bibId = $this->view->driver->getUniqueID();
         //Handle hathi links with proxy for https
-        $url = 'http://forms.lib.uchicago.edu/lib/hathi/info.php?q=oclc:';
+        $baseUrl = 'http://forms.lib.uchicago.edu/lib/hathi/info.php?q=oclc:';
         $hathiLink = false;
         $rawMarcData = $this->view->driver->crosswalk('hathiLink');
-        $graphic = '<img src="/vufind/themes/phoenix/images/hathitrustFavicon.png" alt="HathiTrust Digital Library"/>'; 
+        $graphic = '<img src="/vufind/themes/phoenix/images/hathitrustFavicon.png" alt="HathiTrust Digital Library"/>';
+        $helpLinkUrl = $this->hathiETASHelpLink;
+        $helpLink = '';
 
         if ($this->isHathi()) {
             $oclcNumber = $this->getOCLCNumbers();
-            $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . $oclcNumber . '" class="hathi eLink">HathiTrust Digital Library</a></div>';
+            $url = $baseUrl . $oclcNumber;
+            if($this->isETAS()) {
+                $linkText = 'HathiTrust Emergency Access [Login Required]';
+                $url = $baseUrl . $oclcNumber . '&sso=true';
+                if($helpLinkUrl) {
+                    $helpLink = '<a href="'. $helpLinkUrl . '" class="login-directions">Login Directions</a>';
+                }
+            } else {
+                $linkText = 'HathiTrust Digital Library';
+            }
+            $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . '" class="hathi eLink">' . $linkText . '</a>' . $helpLink . '</div>';
         }
         return $hathiLink;
     }

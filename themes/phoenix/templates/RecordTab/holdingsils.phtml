@@ -39,6 +39,9 @@
 
     // Item locations that are off site storage
     $OFFSITE = ['btaaspr'];
+
+    // Emergency closure set in the config
+    $emergency_closure = $this->GetConfig()->getEmergencyClosure();
 ?>
 
 <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
@@ -363,8 +366,14 @@
             <?php if ($row['availability']): ?>
               <?php /* Begin Available Items (Holds) */ ?>
 
-               <span class="text-success">
-                   <?=$this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'Available' : $row['status_name'])?><link property="availability" href="http://schema.org/InStock" />
+               <?php if ($emergency_closure): ?>
+                 <?php $display_status = $this->transEsc($emergency_closure); ?>
+                 <span class="text-danger">
+               <?php else: ?>
+                 <?php $display_status = $this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'Available' : $row['status_name'])?>
+                 <span class="text-success">
+               <?php endif; ?>
+                   <?=$display_status?><link property="availability" href="http://schema.org/InStock" />
                    <?php if (isset($row['itemTypeCode']) && !empty($row['itemTypeName'])):?>
                       <span class="loan-period">Loan period: <?=$row['itemTypeName']?>&nbsp;</span>
                    <?endif;?>
@@ -433,10 +442,20 @@
                 <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib, $row)?>
                 <?=$this->ServiceLinks()->borrowDirect($row)?>
                 <?=$this->ServiceLinks()->uBorrow($row)?>
-               <?=$this->ServiceLinks()->request($row)?>
+                <?=$this->ServiceLinks()->request($row)?>
                 <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                 <?=$this->ServiceLinks()->offsite($row)?>
+                <?=$this->ServiceLinks()->requestHelp($row)?>
                 </span><?php /* END .service-links */?>
+
+                <?php /* Requests Unavailable Link */ ?>
+                <?php $unavailableLink = $this->ServiceLinks()->requestsUnavailable($row)?>
+                <?php if ($unavailableLink): ?>
+                  <span class="service-links">
+                    <?=$unavailableLink?>
+                  </span>
+                <?php endif; ?>
+
             <?php if (isset($row['itemNotes'])): ?>
               <div class="item-notes">
                 <?=$row['itemNotes']?>
