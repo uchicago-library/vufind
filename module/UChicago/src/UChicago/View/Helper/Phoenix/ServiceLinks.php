@@ -54,7 +54,7 @@ class ServiceLinks extends AbstractHelper {
      *        	
      * @return a simple location string converted to lower case for matching
      */
-    protected function getLocation($locationString, $level) {
+    public function getLocation($locationString, $level) {
         $blocks = explode('/', $locationString);
         if($level == 'institution') {
             $location = $blocks[0];

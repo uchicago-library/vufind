@@ -367,10 +367,17 @@
           <?php else: ?>
             <?php if ($row['availability']): ?>
               <?php /* Begin Available Items (Holds) */ ?>
-
                <?php if ($emergency_closure): ?>
-                 <?php $display_status = $this->transEsc($emergency_closure); ?>
-                 <span class="<?=$this->GetConfig()->getECTextColor()?>">
+                 <?php /* Begin: Disable Configurable EC Status for Law Only (Revert Later) */ ?>
+                 <?php $building = $this->ServiceLinks()->getLocation($row['locationCodes'], 'library')?>
+                 <?php if ($building == 'dll'): ?>
+                   <?php $display_status ='Unavailable - Building Closed'; ?>
+                   <span class="text-danger">
+                 <?php /* END: Disable Configurable EC Status for Law Only (Revert Later) */ ?>
+                 <?php else: ?>
+                   <?php $display_status = $this->transEsc($emergency_closure); ?>
+                   <span class="<?=$this->GetConfig()->getECTextColor()?>">
+                 <? endif; ?>
                <?php else: ?>
                  <?php $display_status = $this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'Available' : $row['status_name'])?>
                  <span class="text-success">

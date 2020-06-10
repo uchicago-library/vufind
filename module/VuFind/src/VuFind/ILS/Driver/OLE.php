@@ -881,7 +881,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
      */
     public function getStatus($id)
     {
-        $sql = 'SELECT DISTINCT loc.LOCN_NAME AS locn_name, 
+        $sql = 'SELECT DISTINCT loc.LOCN_NAME AS locn_name,
                     h.LOCATION AS holdings_locn_code, h.call_number_prefix AS holding_call_number_prefix, h.call_number AS holding_call_number, 
                     i.LOCATION AS item_locn_code, i.call_number_prefix AS item_call_number_prefix, i.call_number AS item_call_number, i.COPY_NUMBER AS item_copy_number,
                     status.ITEM_AVAIL_STAT_CD AS item_status_code, status.ITEM_AVAIL_STAT_NM AS item_status_name
@@ -907,6 +907,14 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $status = $row['item_status_code'];
                 $available = (in_array($status, $this->item_available_codes) ? true:false);
                 $location = $row['locn_name'];
+
+                /*BEGIN: Terrible Hack for Law and Paging Requests - REVERT THIS*/
+                $statusOverride = null;
+                if (strpos($row['locn_name'], 'D\'Angelo Law') !== false) {
+                    $statusOverride = 'LAW-STATUS-OVERRIDE';
+                    $item['statusOverride'] = $statusOverride;
+                }
+                /*END: Terrible Hack for Law and Paging Requests - REVERT THIS*/
 
                 /*Build item array*/ 
                 $item['id'] = $id;

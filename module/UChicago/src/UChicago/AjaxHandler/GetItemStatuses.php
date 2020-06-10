@@ -119,6 +119,13 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
             $availability_message = '';
         }
 
+        /* BEGIN: Terrible Hack for Law Status Override - REVERT THIS */
+        if ($info['statusOverride'] == 'LAW-STATUS-OVERRIDE') {
+            $available = false;
+            $availability_message = $messages['unavailable'];
+        }
+        /* END: Terrible Hack for Law Status Override - REVERT THIS */
+
         // Send back the collected details:
         return [
             'id' => $record[0]['id'],
