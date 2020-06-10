@@ -910,7 +910,11 @@ class ServiceLinks extends AbstractHelper {
      */
     public function getGrouperGroups() {
         if (array_key_exists('ucisMemberOf', $_SERVER)) {
-            return  explode(';', $_SERVER['ucisMemberOf']);
+            $groups = explode(';', $_SERVER['ucisMemberOf']);
+            $_SESSION['Grouper'] = $groups;
+            return  $groups;
+        } else if (isset($_SESSION['Grouper'])) {
+            return $_SESSION['Grouper'];
         }
         else {
             return [];
