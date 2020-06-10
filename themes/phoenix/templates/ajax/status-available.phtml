@@ -1,6 +1,6 @@
 <? $emergency_closure = $this->GetConfig()->getEmergencyClosure() ?>
 <? if ($emergency_closure): ?>
-  <span class="text-danger"><?=$this->transEsc($emergency_closure)?></span>
+  <span class="<?=$this->GetConfig()->getECTextColor()?>"><?=$this->transEsc($emergency_closure)?></span>
 <? else: ?>
   <span class="text-success"><?=$this->transEsc("Available")?></span>
 <? endif; ?>

@@ -187,6 +187,7 @@
 <?php $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos) || trim(strtolower($locationText)) == 'on order'): ?>
 
 <?php $hasCallNos = !empty($callNos['display']); ?>
+<?php if ($hasCallNos):?>
 <?foreach ($callNos['display'] as $numKey => $callNo): ?>
    <?=$this->ServiceLinks()->maps(trim($locationText), $this->escapeHtml(trim($callNos['sort'][$numKey])), trim($callNos['prefix']))?>
    <br/><h3><span><?=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></span> <?=$this->escapeHtml($callNo)?></h3>
@@ -195,6 +196,7 @@
       class="ablink"><?=$callNumDisplayText?></a><br/>
  <?php endforeach; ?>
 </div><!--/.locpanel-heading-->
+<?php endif; ?>
 
 <div class="holdings-unit">
 <?php if ($isFullTextOnline):?>
@@ -329,13 +331,13 @@
 <table class="holdings-table table" data-display="<?=$this->tab->getDisplayNumber()?>">
   <caption><?=$this->transEsc('Holdings details from')?> <?=$this->transEsc($locationText)?></caption>
   <!--<tr>
-    <th><?=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></th>
+    <th><?//=$hasCallNos ? $this->transEsc($callNumLabel) . ' ' : ''?></th>
     <td>
-      <?foreach ($callNos['display'] as $numKey => $callNo): ?>
-        <?=$this->escapeHtml($callNo)?>
-        <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
-           class="ablink"><?=$callNumDisplayText?></a><br/>
-      <?php endforeach; ?>
+      <?//foreach ($callNos['display'] as $numKey => $callNo): ?>
+        <?//=$this->escapeHtml($callNo)?>
+        <a href="<?//= $this->url('home')?>alphabrowse/Home?source=lcc&from=<?//=$this->escapeHtml($callNos['sort'][$numKey])?>"
+           class="ablink"><?//=$callNumDisplayText?></a><br/>
+      <?php //endforeach; ?>
     </td>
   </tr>-->
   <?php endif; ?>
@@ -368,7 +370,7 @@
 
                <?php if ($emergency_closure): ?>
                  <?php $display_status = $this->transEsc($emergency_closure); ?>
-                 <span class="text-danger">
+                 <span class="<?=$this->GetConfig()->getECTextColor()?>">
                <?php else: ?>
                  <?php $display_status = $this->transEsc($row['status'] == 'AVAILABLE-AT-MANSUETO' ? 'Available' : $row['status_name'])?>
                  <span class="text-success">
@@ -382,6 +384,7 @@
                <?=$this->ServiceLinks()->asr($row)?>
                <?=$this->ServiceLinks()->dllStorage($row)?>
                <?=$this->ServiceLinks()->cantFindIt($row)?>
+               <?=$this->ServiceLinks()->requestPickupAtReg($row)?>
                <?=$this->ServiceLinks()->inProcessAtMansueto($row)?>
                <?=$this->ServiceLinks()->debugging($row)?>
               <?php if (isset($row['link']) && $row['link']): ?>
