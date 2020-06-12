@@ -1054,7 +1054,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         ];
 
         if (($status == 'AVAILABLE' || $status == 'RECENTLY-RETURNED') && (in_array($shelvingLocCode, $holdLocationCodes))) {
-            $holdtype = 'hold';
+            // Changed to page for COVID-19 implementation of paging service.
+            //$holdtype = 'hold';
+            $holdtype = 'page';
         } elseif (in_array($status, $holdStatuses)) {
             $holdtype = 'hold';
         } elseif (in_array($status, $pageStatuses)) {
