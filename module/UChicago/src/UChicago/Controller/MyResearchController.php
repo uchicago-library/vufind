@@ -154,8 +154,8 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                     $victories = $storagerequest->getVictories();
 
                     switch ($this->params()->fromPost('location')) {
-                        case 'REG':
-                            $pickup_info = 'Regenstein within 1 business day';
+                        case 'JRLMAIN':
+                            $pickup_info = 'Regenstein Lib, within 3 business days';
                             break;
                         case 'CRERAR':
                             $pickup_info = 'Crerar within 1 business day';
