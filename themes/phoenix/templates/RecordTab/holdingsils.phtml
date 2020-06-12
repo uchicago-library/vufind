@@ -368,12 +368,15 @@
             <?php if ($row['availability']): ?>
               <?php /* Begin Available Items (Holds) */ ?>
                <?php if ($emergency_closure): ?>
-                 <?php /* Begin: Disable Configurable EC Status for Law Only (Revert Later) */ ?>
+
+                 <?php /* Begin: Disable Configurable EC Status for Specific Locations (Revert Later) */ ?>
                  <?php $building = $this->ServiceLinks()->getLocation($row['locationCodes'], 'library')?>
-                 <?php if ($building == 'dll'): ?>
+                 <?php $blacklist = ['dll', 'eck', 'ssad', 'jcl']?>
+                 <?php if (!in_array($building, $blacklist)): ?>
                    <?php $display_status ='Unavailable - Building Closed'; ?>
                    <span class="text-danger">
-                 <?php /* END: Disable Configurable EC Status for Law Only (Revert Later) */ ?>
+                 <?php /* END: Disable Configurable EC Status for Specific Locations (Revert Later) */ ?>
+
                  <?php else: ?>
                    <?php $display_status = $this->transEsc($emergency_closure); ?>
                    <span class="<?=$this->GetConfig()->getECTextColor()?>">

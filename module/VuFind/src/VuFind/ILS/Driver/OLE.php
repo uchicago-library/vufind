@@ -908,13 +908,17 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $available = (in_array($status, $this->item_available_codes) ? true:false);
                 $location = $row['locn_name'];
 
-                /*BEGIN: Terrible Hack for Law and Paging Requests - REVERT THIS*/
+                /*BEGIN: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
                 $statusOverride = null;
-                if (strpos($row['locn_name'], 'D\'Angelo Law') !== false) {
-                    $statusOverride = 'LAW-STATUS-OVERRIDE';
-                    $item['statusOverride'] = $statusOverride;
+                $blacklist = ['D\'Angelo Law', 'Eckhart', 'Social Service Administration', 'Crerar'];
+                foreach ($blacklist as $building) {
+                    if (strpos($row['locn_name'], $building) !== false) {
+                        $statusOverride = 'DISABLE-STATUS-OVERRIDE';
+                        $item['statusOverride'] = $statusOverride;
+                        $break;
+                    }
                 }
-                /*END: Terrible Hack for Law and Paging Requests - REVERT THIS*/
+                /*END: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
 
                 /*Build item array*/ 
                 $item['id'] = $id;

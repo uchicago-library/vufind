@@ -602,15 +602,21 @@ class ServiceLinks extends AbstractHelper {
         }
         $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
         $serviceLink = $this->fillPlaceholders($this->getLinkConfig('requestPickupAtReg', $defaultUrl), $row);
+
         $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request for Pickup at Regenstein';
         $closedStacks = array_map('strtolower', $this->lookupLocation['hold']);
         $location = $this->getLocation($row['locationCodes'], 'shelving');
+
+        /* BEGIN: Hack for disabling service for some buildings during COVID closure */
+        $blacklist = ['dll', 'eck', 'ssad', 'jcl'];
         $building = $this->getLocation($row['locationCodes'], 'library');
-        if ($serviceLink and $this->isCantFindIt($row) and $building != 'dll') {
+        /* END: Hack for disabling service for some buildings during COVID closure (Remove condition from both IF statments too) */
+
+        if ($serviceLink and $this->isCantFindIt($row) and !in_array($building, $blacklist)) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
         /*For XClosedGen and XClosedCJK*/
-        elseif (in_array(strtolower($location), $closedStacks) and $building != 'dll') {
+        elseif (in_array(strtolower($location), $closedStacks) and !in_array($building, $blacklist)) {
             $statusBlacklist = $this->lookupStatus['hold']; // Unavailable
             $item_status_blacklist = array_merge($statusBlacklist, ['LOANED']);
             if (!in_array($row['status'], $item_status_blacklist)) {
@@ -878,8 +884,13 @@ class ServiceLinks extends AbstractHelper {
         $serviceLink = $this->getLinkConfig('scanAndDeliver', $defaultUrl); 
         $displayText = '<i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Scan and Deliver';
         $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
+
+        /* BEGIN: Hack for disabling service for some buildings during COVID closure */
+        $blacklist = ['dll', 'eck', 'ssad', 'jcl'];
         $building = $this->getLocation($row['locationCodes'], 'library');
-        if (($serviceLink) and $building != 'dll' and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
+        /* END: Hack for disabling service for some buildings during COVID closure (Remove condition from IF statment too) */
+
+        if (($serviceLink) and !in_array($building, $blacklist) and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
             (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
                 return $this->getServiceLinkTemplate($serviceLink, $displayText, [], []);
         }
