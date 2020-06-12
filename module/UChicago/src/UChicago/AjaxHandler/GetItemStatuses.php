@@ -119,13 +119,6 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses
             $availability_message = '';
         }
 
-        /*BEGIN: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/ 
-        if ($info['statusOverride'] == 'DISABLE-STATUS-OVERRIDE') {
-            $available = false;
-            $availability_message = $messages['unavailable'];
-        }
-        /*END: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
-
         // Send back the collected details:
         return [
             'id' => $record[0]['id'],

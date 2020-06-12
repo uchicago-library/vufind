@@ -908,18 +908,6 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 $available = (in_array($status, $this->item_available_codes) ? true:false);
                 $location = $row['locn_name'];
 
-                /*BEGIN: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
-                $statusOverride = null;
-                $blacklist = ['D\'Angelo Law', 'Eckhart', 'Social Service Administration', 'Crerar'];
-                foreach ($blacklist as $building) {
-                    if (strpos($row['locn_name'], $building) !== false) {
-                        $statusOverride = 'DISABLE-STATUS-OVERRIDE';
-                        $item['statusOverride'] = $statusOverride;
-                        $break;
-                    }
-                }
-                /*END: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
-
                 /*Build item array*/ 
                 $item['id'] = $id;
                 $item['status'] = $status;
@@ -930,6 +918,15 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 if ($item['status'] == 'ANAL') {
                     $item['availability'] = null;
                 }
+
+                /*BEGIN: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
+                $blacklist = ['dll', 'eck', 'ssad', 'jcl'];
+                $building = strtolower(explode('/', $row['holdings_locn_code'])[1]);
+                if (in_array($building, $blacklist)) {
+                    $item['status'] = 'UNAVAILABLE';
+                    $item['availability'] = false;
+                }
+                /*END: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
 
                 $items[] = $item; 
             }
