@@ -64,6 +64,7 @@ class GetConfig extends \Zend\View\Helper\AbstractHelper
         $this->alphabrowseSearchTypes = isset($siteConfig->AlphaBrowse_Types) ? $siteConfig->AlphaBrowse_Types : false;
         $this->dueSoonInterval = isset($siteConfig->MyAccount->due_soon) ? $siteConfig->MyAccount->due_soon : false;
         $this->emergencyClosure = isset($siteConfig->Catalog->emergency_closure) ? $siteConfig->Catalog->emergency_closure : false;
+        $this->emergencyClosureAvailable = isset($siteConfig->Catalog->emergency_closure_available) ? $siteConfig->Catalog->emergency_closure_available : false;
     }
 
     /**
@@ -104,6 +105,27 @@ class GetConfig extends \Zend\View\Helper\AbstractHelper
     public function getEmergencyClosure()
     {
         return $this->emergencyClosure;
+    }
+
+    /**
+     * Emergency building closure availability color in the templates.
+     *
+     * @return string
+     */
+    public function getEmergencyClosureAvailable()
+    {
+        return $this->emergencyClosureAvailable;
+    }
+
+    /**
+     * Emergency building closure text color in the templates.
+     *
+     * @return string
+     */
+    public function getECTextColor()
+    {
+        $ECTextColor = $this->emergencyClosureAvailable == true ? 'text-success' : 'text-danger';
+        return $ECTextColor;
     }
 
 }

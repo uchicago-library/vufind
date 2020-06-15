@@ -54,7 +54,7 @@ class ServiceLinks extends AbstractHelper {
      *        	
      * @return a simple location string converted to lower case for matching
      */
-    protected function getLocation($locationString, $level) {
+    public function getLocation($locationString, $level) {
         $blocks = explode('/', $locationString);
         if($level == 'institution') {
             $location = $blocks[0];
@@ -507,7 +507,8 @@ class ServiceLinks extends AbstractHelper {
     public function asr($row) {
         $defaultUrl = '/vufind/MyResearch/Storagerequest?bib=' .  $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;action=add';
         $serviceLink = $this->getLinkConfig('mansueto', $defaultUrl); 
-        $displayText = '<i class="fa fa-fw fa-shopping-basket" aria-hidden="true"></i> Request from Mansueto Library';
+        //$displayText = '<i class="fa fa-fw fa-shopping-basket" aria-hidden="true"></i> Request from Mansueto Library';
+        $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request for Pickup at Regenstein';
         $blacklist = array_map('strtolower', $this->lookupLocation['scrcInMansueto']);
         if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['asr']) and $this->getLocation($row['locationCodes'], 'library') != 'spcl') and 
             (!in_array(strtolower($this->getLocation($row['locationCodes'], 'shelving')), $blacklist))) {
@@ -583,6 +584,44 @@ class ServiceLinks extends AbstractHelper {
         $displayText = '<i class="fa fa-search-plus" aria-hidden="true"></i> Can\'t find it?';
         if ($serviceLink and $this->isCantFindIt($row)) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+    }
+
+    /**
+     * Creates a Request for Pickup at Regenstein link
+     *
+     * @param row, array of holdings and item information
+     *
+     * @return html string
+     */
+    public function requestPickupAtReg($row) {
+        // Add a special url param to differentiate pickup at Reg page
+        // requests from regular (Can't find it?) page/holds. 
+        if(isset($row['link']['query'])) {
+            $row['link']['query'] = 'isPickupAtReg=true&' . $row['link']['query'];
+        }
+        $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
+        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('requestPickupAtReg', $defaultUrl), $row);
+
+        $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request for Pickup at Regenstein';
+        $closedStacks = array_map('strtolower', $this->lookupLocation['hold']);
+        $location = $this->getLocation($row['locationCodes'], 'shelving');
+
+        /* BEGIN: Hack for disabling service for some buildings during COVID closure */
+        $blacklist = ['dll', 'eck', 'ssad', 'jcl'];
+        $building = $this->getLocation($row['locationCodes'], 'library');
+        /* END: Hack for disabling service for some buildings during COVID closure (Remove condition from both IF statments too) */
+
+        if ($serviceLink and $this->isCantFindIt($row) and !in_array($building, $blacklist)) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+        /*For XClosedGen and XClosedCJK*/
+        elseif (in_array(strtolower($location), $closedStacks) and !in_array($building, $blacklist)) {
+            $statusBlacklist = $this->lookupStatus['hold']; // Unavailable
+            $item_status_blacklist = array_merge($statusBlacklist, ['LOANED']);
+            if (!in_array($row['status'], $item_status_blacklist)) {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText);
+            }
         }
     }
 
@@ -762,6 +801,7 @@ class ServiceLinks extends AbstractHelper {
         /*Status whitelist*/
         $whitelist = $this->lookupStatus['hold']; // Unavailable
         $location_whitelist = array_map('strtolower', $this->lookupLocation['hold']);
+        $location_whitelist = []; // IMPORTANT!: this line temporarily disables place hold link for Hathi ETAS implementation. Delete this line to revert
 
         /*Normal Place Hold logic*/
         if (($serviceLink) && (!empty($row['status'])) && (in_array($row['status'], $whitelist)) && (!in_array($location, $blacklist))) {
@@ -844,7 +884,13 @@ class ServiceLinks extends AbstractHelper {
         $serviceLink = $this->getLinkConfig('scanAndDeliver', $defaultUrl); 
         $displayText = '<i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Scan and Deliver';
         $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
-        if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
+
+        /* BEGIN: Hack for disabling service for some buildings during COVID closure */
+        $blacklist = ['dll', 'eck', 'ssad', 'jcl'];
+        $building = $this->getLocation($row['locationCodes'], 'library');
+        /* END: Hack for disabling service for some buildings during COVID closure (Remove condition from IF statment too) */
+
+        if (($serviceLink) and !in_array($building, $blacklist) and (in_array($row['status'], $this->lookupStatus['scanAndDeliver'])) and 
             (in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations))) {
                 return $this->getServiceLinkTemplate($serviceLink, $displayText, [], []);
         }
@@ -874,9 +920,13 @@ class ServiceLinks extends AbstractHelper {
      *
      * @return array of grouper groups
      */
-    protected function getGrouperGroups() {
+    public function getGrouperGroups() {
         if (array_key_exists('ucisMemberOf', $_SERVER)) {
-            return  explode(';', $_SERVER['ucisMemberOf']);
+            $groups = explode(';', $_SERVER['ucisMemberOf']);
+            $_SESSION['Grouper'] = $groups;
+            return  $groups;
+        } else if (isset($_SESSION['Grouper'])) {
+            return $_SESSION['Grouper'];
         }
         else {
             return [];

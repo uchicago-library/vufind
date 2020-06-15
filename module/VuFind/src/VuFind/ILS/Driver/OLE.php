@@ -881,7 +881,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
      */
     public function getStatus($id)
     {
-        $sql = 'SELECT DISTINCT loc.LOCN_NAME AS locn_name, 
+        $sql = 'SELECT DISTINCT loc.LOCN_NAME AS locn_name,
                     h.LOCATION AS holdings_locn_code, h.call_number_prefix AS holding_call_number_prefix, h.call_number AS holding_call_number, 
                     i.LOCATION AS item_locn_code, i.call_number_prefix AS item_call_number_prefix, i.call_number AS item_call_number, i.COPY_NUMBER AS item_copy_number,
                     status.ITEM_AVAIL_STAT_CD AS item_status_code, status.ITEM_AVAIL_STAT_NM AS item_status_name
@@ -918,6 +918,15 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 if ($item['status'] == 'ANAL') {
                     $item['availability'] = null;
                 }
+
+                /*BEGIN: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
+                $blacklist = ['dll', 'eck', 'ssad', 'jcl'];
+                $building = strtolower(explode('/', $row['holdings_locn_code'])[1]);
+                if (in_array($building, $blacklist)) {
+                    $item['status'] = 'UNAVAILABLE';
+                    $item['availability'] = false;
+                }
+                /*END: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
 
                 $items[] = $item; 
             }
@@ -1042,7 +1051,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         ];
 
         if (($status == 'AVAILABLE' || $status == 'RECENTLY-RETURNED') && (in_array($shelvingLocCode, $holdLocationCodes))) {
-            $holdtype = 'hold';
+            // Changed to page for COVID-19 implementation of paging service.
+            //$holdtype = 'hold';
+            $holdtype = 'page';
         } elseif (in_array($status, $holdStatuses)) {
             $holdtype = 'hold';
         } elseif (in_array($status, $pageStatuses)) {
