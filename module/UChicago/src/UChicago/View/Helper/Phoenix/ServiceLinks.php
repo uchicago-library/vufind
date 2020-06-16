@@ -606,13 +606,14 @@ class ServiceLinks extends AbstractHelper {
         $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request for Pickup at Regenstein';
         $closedStacks = array_map('strtolower', $this->lookupLocation['hold']);
         $location = $this->getLocation($row['locationCodes'], 'shelving');
+        $isMapCollection = $location == 'mapcl';
 
         /* BEGIN: Hack for disabling service for some buildings during COVID closure */
         $blacklist = ['dll', 'eck', 'ssad', 'jcl'];
         $building = $this->getLocation($row['locationCodes'], 'library');
         /* END: Hack for disabling service for some buildings during COVID closure (Remove condition from both IF statments too) */
 
-        if ($serviceLink and $this->isCantFindIt($row) and !in_array($building, $blacklist)) {
+        if ($serviceLink and $this->isCantFindIt($row) and !in_array($building, $blacklist) and !$isMapCollection) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
         /*For XClosedGen and XClosedCJK*/
