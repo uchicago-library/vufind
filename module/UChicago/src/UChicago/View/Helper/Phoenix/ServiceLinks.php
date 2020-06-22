@@ -239,6 +239,7 @@ class ServiceLinks extends AbstractHelper {
                              'LawRR',
                              'LawStor',
                              'LawSupr',
+                             'MapCl',
                              'Mansueto',
                              'Pam',
                              'PerBio',
