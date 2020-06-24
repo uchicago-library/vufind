@@ -203,6 +203,65 @@ class ServiceLinks extends AbstractHelper {
                             ['SciASR'],
                         'offsite' =>
                             ['btaaspr'],
+                        /*Whitelist*/
+                        'paging' =>
+                            ['Art420',
+                             'ArtResA',
+                             'CDEV',
+                             'CJK',
+                             'CJKRef',
+                             'CJKRfHY',
+                             'CJKSPer',
+                             'CMC',
+                             'EckX',
+                             'Film',
+                             'Gen',
+                             'GenHY',
+                             'Law',
+                             'LawAid',
+                             'LawCity',
+                             'LawCS',
+                             'LawDisp',
+                             'LawPer',
+                             'LawRef',
+                             'LawResP',
+                             'LawRR',
+                             'MapRef',
+                             'Mic',
+                             'MidEMic',
+                             'Pam',
+                             'PerBio',
+                             'PerPhy',
+                             'RR',
+                             'RR2Per',
+                             'RR4',
+                             'RR4Cla',
+                             'RR4J',
+                             'RR5',
+                             'RR5EA',
+                             'RR5EPer',
+                             'RR5Per',
+                             'RRExp',
+                             'Sci',
+                             'SciDDC',
+                             'SciLg',
+                             'SciMicor',
+                             'SciRef',
+                             'SciHY',
+                             'SFilm',
+                             'Slav',
+                             'SMedia',
+                             'SMicDDC',
+                             'SOA',
+                             'SRefPer',
+                             'SSAdBdP',
+                             'SSAdMic',
+                             'SSAdPam',
+                             'SSAdPer',
+                             'SSAdRef',
+                             'SSAdX',
+                             'W',
+                             'WCJK'],
                         'scanAndDeliver' => 
                             ['ArtResA',
                              'CDEV',
@@ -403,6 +462,10 @@ class ServiceLinks extends AbstractHelper {
                             ['INPROCESS',
                              'INTRANSIT',
                              'ONORDER'],
+                        /*Whitelist*/
+                        'paging' =>
+                            ['AVAILABLE',
+                             'RECENTLY-RETURNED'],
                         /*Blacklist*/
                         'recall' => 
                             ['ANAL',
@@ -555,6 +618,27 @@ class ServiceLinks extends AbstractHelper {
         return false;
     }
 
+
+    /**
+     * Helper method used to test if the conditions are
+     * present for the paging link (Pickup at Regenstein).
+     *
+     * @param row, array of holdings and item information
+     *
+     * @return boolean
+     */
+    protected function isPaging($row){
+        $shelvingLocations = array_map('strtolower', $this->lookupLocation['paging']);
+        $isRightStatus = in_array($row['status'], $this->lookupStatus['paging']);
+        $location = $this->getLocation($row['locationCodes'], 'shelving');
+        $isMapCollection = $location == 'mapcl';
+        $isRightLocation = in_array($location, $shelvingLocations);
+        if ($isRightStatus && $isRightLocation) {
+                return true;
+        }
+        return false;
+    }
+
     /**
      * Helper method used to test if the conditions are
      * present for a dllStorage link.
@@ -607,14 +691,13 @@ class ServiceLinks extends AbstractHelper {
         $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request for Pickup at Regenstein';
         $closedStacks = array_map('strtolower', $this->lookupLocation['hold']);
         $location = $this->getLocation($row['locationCodes'], 'shelving');
-        $isMapCollection = $location == 'mapcl';
 
         /* BEGIN: Hack for disabling service for some buildings during COVID closure */
-        $blacklist = ['dll', 'eck', 'ssad', 'jcl'];
+        $blacklist = ['dll', 'ssad'];
         $building = $this->getLocation($row['locationCodes'], 'library');
         /* END: Hack for disabling service for some buildings during COVID closure (Remove condition from both IF statments too) */
 
-        if ($serviceLink and $this->isCantFindIt($row) and !in_array($building, $blacklist) and !$isMapCollection) {
+        if ($serviceLink and $this->isPaging($row) and !in_array($building, $blacklist)) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
         /*For XClosedGen and XClosedCJK*/
@@ -888,7 +971,7 @@ class ServiceLinks extends AbstractHelper {
         $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
 
         /* BEGIN: Hack for disabling service for some buildings during COVID closure */
-        $blacklist = ['dll', 'eck', 'ssad', 'jcl'];
+        $blacklist = ['dll', 'ssad'];
         $building = $this->getLocation($row['locationCodes'], 'library');
         /* END: Hack for disabling service for some buildings during COVID closure (Remove condition from IF statment too) */
 
