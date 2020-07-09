@@ -371,7 +371,7 @@
 
                  <?php /* Begin: Disable Configurable EC Status for Specific Locations (Revert Later) */ ?>
                  <?php $building = $this->ServiceLinks()->getLocation($row['locationCodes'], 'library')?>
-                 <?php $blacklist = ['dll', 'spcl', 'ssad']?>
+                 <?php $blacklist = ['spcl', 'ssad']?>
                  <?php if (in_array($building, $blacklist)): ?>
                    <?php $display_status ='Unavailable - Building Closed'; ?>
                    <span class="text-danger">

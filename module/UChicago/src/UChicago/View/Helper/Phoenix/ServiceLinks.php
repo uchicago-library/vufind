@@ -227,6 +227,12 @@ class ServiceLinks extends AbstractHelper {
                              'LawRef',
                              'LawResP',
                              'LawRR',
+                             'LawA',
+                             'LawC',
+                             'LawAnxN',
+                             'LawAnxS',
+                             'LawStor',
+                             'LawMic',
                              'MapRef',
                              'Mic',
                              'MidEMic',
@@ -288,15 +294,15 @@ class ServiceLinks extends AbstractHelper {
                              'LawAnxN',
                              'LawAnxS',
                              'LawASR',
-                             'LawASR',
                              'LawC',
                              'LawCity',
                              'LawCS',
                              'LawDisp',
                              'LawFul',
+                             'LawMic',
                              'LawPer',
-                             'LawRar',
                              'LawRef',
+                             'LawResP',
                              'LawRR',
                              'LawStor',
                              'LawSupr',
@@ -695,7 +701,7 @@ class ServiceLinks extends AbstractHelper {
         $location = $this->getLocation($row['locationCodes'], 'shelving');
 
         /* BEGIN: Hack for disabling service for some buildings during COVID closure */
-        $blacklist = ['dll', 'ssad'];
+        $blacklist = ['ssad'];
         $building = $this->getLocation($row['locationCodes'], 'library');
         /* END: Hack for disabling service for some buildings during COVID closure (Remove condition from both IF statments too) */
 
@@ -973,7 +979,7 @@ class ServiceLinks extends AbstractHelper {
         $shelvingLocations =  array_map('strtolower', $this->lookupLocation['scanAndDeliver']);
 
         /* BEGIN: Hack for disabling service for some buildings during COVID closure */
-        $blacklist = ['dll', 'ssad'];
+        $blacklist = ['ssad'];
         $building = $this->getLocation($row['locationCodes'], 'library');
         /* END: Hack for disabling service for some buildings during COVID closure (Remove condition from IF statment too) */
 
