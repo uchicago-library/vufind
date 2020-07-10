@@ -920,7 +920,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                 }
 
                 /*BEGIN: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
-                $blacklist = ['spcl', 'ssad'];
+                $blacklist = ['ssad'];
                 $building = strtolower(explode('/', $row['holdings_locn_code'])[1]);
                 if (in_array($building, $blacklist)) {
                     $item['status'] = 'UNAVAILABLE';

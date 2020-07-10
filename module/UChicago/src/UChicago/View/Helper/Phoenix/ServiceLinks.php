@@ -941,9 +941,31 @@ class ServiceLinks extends AbstractHelper {
         if (!empty($patron)) {
             $defaultUrl = $defaultUrl . '&amp;' . $patron;
         }
+        $building = $this->getLocation($row['locationCodes'], 'library');
         $serviceLink = $this->getLinkConfig('requestHelp', $defaultUrl);
         $displayText = '<i class="fa fa-comment" aria-hidden="true"></i> Need help? - Ask a Librarian';
-        if ($serviceLink) {
+        if ($serviceLink && $building != 'spcl') {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+    }
+
+
+    /**
+     * Creates a link to a form where users can request help
+     * from an SCRC librarian.
+     *
+     * @return html string
+     */
+    public function requestHelpSCRC($row) {
+        $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
+        $defaultUrl = 'https://www.lib.uchicago.edu/search/forms/ask-scrc-or-request-scan/?bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
+        if (!empty($patron)) {
+            $defaultUrl = $defaultUrl . '&amp;' . $patron;
+        }
+        $building = $this->getLocation($row['locationCodes'], 'library');
+        $serviceLink = $this->getLinkConfig('requestHelpSCRC', $defaultUrl);
+        $displayText = '<i class="fa fa-comment" aria-hidden="true"></i> Need help? - Ask SCRC or Request Scans';
+        if ($serviceLink && $building == 'spcl') {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
