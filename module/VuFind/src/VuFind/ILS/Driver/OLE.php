@@ -919,15 +919,6 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
                     $item['availability'] = null;
                 }
 
-                /*BEGIN: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
-                $blacklist = ['ssad'];
-                $building = strtolower(explode('/', $row['holdings_locn_code'])[1]);
-                if (in_array($building, $blacklist)) {
-                    $item['status'] = 'UNAVAILABLE';
-                    $item['availability'] = false;
-                }
-                /*END: Hack for Disallowing Paging Requests for Some Locations - REVERT THIS*/
-
                 $items[] = $item; 
             }
         }
