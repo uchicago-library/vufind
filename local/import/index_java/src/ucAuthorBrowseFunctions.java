@@ -66,15 +66,29 @@ public class ucAuthorBrowseFunctions {
 			Collection sfColl = (Collection)tagMap.get(tag);
 			if (sfColl == null) continue;
 			for ( String sfSpec : (Collection<String>)sfColl ) {
-				if (tag.equals("100") || tag.equals("400") || tag.equals("700") || tag.equals("800")) {
+		/*		if (tag.equals("100") || tag.equals("400") || tag.equals("700") || tag.equals("800")) {
 					result.add(getPersonalName(df, sfSpec));
 				} else if (tag.equals("110") || tag.equals("410") || tag.equals("710") || tag.equals("810")) {
 					result.add(getCorporateName(df, sfSpec));
 				} else if (tag.equals("111") || tag.equals("411") || tag.equals("711") || tag.equals("811")) {
 					result.add(getMeetingName(df, sfSpec));
 				} else {
-					result.add(getSubfields(df, sfSpec));
+                                        String string = getSubfields(df,sfSpec); 
+                                        System.out.println("   STRING:  -->" + string + "<--"); 
+                                       // if ( !string.isEmpty() ){
+ 					if (!getSubfields(df, sfSpec).isEmpty()){
+						result.add(getSubfields(df, sfSpec));
+					System.out.println("  ~~ else result:   " + result);
+					}
 				}
+                   */ 
+	
+			        String string = getSubfields(df,sfSpec);
+	                        if (!getSubfields(df, sfSpec).isEmpty()){
+        	                        result.add(getSubfields(df, sfSpec));
+                                        }
+
+
 			}
 		}
 		return result;
