@@ -920,7 +920,11 @@ class ServiceLinks extends AbstractHelper {
      */
     public function reportRecord($id)
     {
-        $url='http://forms2.lib.uchicago.edu/lib/problemreport/problemreport.php?bib=' . $id;
+        $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
+        $url='https://www.lib.uchicago.edu/search/forms/online-catalog-report-problem-record/?bib=' . $id;
+        if (!empty($patron)) {
+            $url = $url . '&amp;' . $patron;
+        }
         return $url;
     }
 
@@ -931,9 +935,10 @@ class ServiceLinks extends AbstractHelper {
      *
      * @return html string
      */
-    public function requestHelp($row) {
+    public function requestHelp($row, $title='') {
         $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
-        $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/request/help.php?bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'];
+        $title = urlencode('Catalog Record Problem: ' . $title);
+        $defaultUrl = 'https://www.lib.uchicago.edu/search/forms/need-help-ask-librarian/?bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;subject=' . $title;
         if (!empty($patron)) {
             $defaultUrl = $defaultUrl . '&amp;' . $patron;
         }

@@ -1,4 +1,6 @@
 <?php
+    $recordTitle = $this->escapeHtml($this->driver->getShortTitle() . ' ' . $this->driver->getSubtitle() . ' ' . $this->driver->getTitleSection());
+    $cleanTitle = trim($recordTitle, ' /.');
     // Set up convenience variables:
     $account = $this->auth()->getManager();
     $user = $account->isLoggedIn();
@@ -447,7 +449,7 @@
                 <?=$this->ServiceLinks()->request($row)?>
                 <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                 <?=$this->ServiceLinks()->offsite($row)?>
-                <?=$this->ServiceLinks()->requestHelp($row)?>
+                <?=$this->ServiceLinks()->requestHelp($row, $cleanTitle)?>
                 <?=$this->ServiceLinks()->requestHelpSCRC($row)?>
                 </span><?php /* END .service-links */?>
 
