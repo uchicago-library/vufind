@@ -937,7 +937,7 @@ class ServiceLinks extends AbstractHelper {
      */
     public function requestHelp($row, $title='') {
         $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
-        $title = urlencode('Catalog Record Problem: ' . $title);
+        $title = urlencode('Request Help Finding an Online Copy: ' . $title);
         $defaultUrl = 'https://www.lib.uchicago.edu/search/forms/need-help-ask-librarian/?bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;subject=' . $title;
         if (!empty($patron)) {
             $defaultUrl = $defaultUrl . '&amp;' . $patron;
