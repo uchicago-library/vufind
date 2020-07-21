@@ -1534,10 +1534,9 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         }
 
         // Get bound-withs
-        if ($stmt->fetch()===false) {
+        if ($stmt->fetch() === false) {
             $item = array();
             /*Convenience variables.*/
-            $shelvingLocation = $row['locn_name'];
             $boundwiths = $this->lookupBoundWith($id);
             $callNumber = $this->getCallNumberForBoundWithBib($id);
             $item['boundwiths']=$boundwiths;
