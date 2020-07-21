@@ -47,18 +47,27 @@
       <li><strong>You will receive an email notification when an item is available for pickup</strong>, which will include a link to reserve a 30-minute time slot to pick up your item(s). Items will be held for up to 7 days.</li>
       <li>Procedures for pickup will be sent to you when you reserve a time slot.</li>
     </ul>
-  <?php elseif ($isILLAuthorized == false && $isPickupAtReg):?>
+  <?php elseif ($isILLAuthorized == false && ($isPickupAtReg || $isHold)):?>
     <div class="alert alert-danger">
     <p>At this time, paging services are limited to current students, faculty, and staff of University of Chicago. Please monitor the Library website for changes to services as we reopen.</p>
     </div>
   <?php elseif ($isHold):?>
-    <ul>
+    <?php # Is a regular hold type from the Place Hold link ?>
+    <?php # All Place Hold links lead here because they will never have the isPickupAtReg GET paramater and $isPickupAtReg will be false ?>
+    <?php # Commented out the following and replaced with below due to COVID-19 ?>
+    <!--<ul>
       <li>Placing a hold request on an item will cause the item to be held for pickup for you as soon as it is available.</li>
       <li><strong>Regenstein Closed Stack</strong> items will typically be available within <strong>1 business day</strong>.</li>
       <li><strong>In Transit</strong> items will typically be available within <strong>2-3 days</strong>.</li>
       <li><strong>In Process</strong> items will typically be available within <strong>7-10 days</strong>.</li>
       <li><strong>On Order</strong> items will typically be available for pickup within <strong>30-60 days</strong>, though some may take longer. <br/>Items ordered from outside North America and Europe may take as long as three to six months to arrive.</li>
       <li>Multiple requests for the same item are fulfilled in the order in which they are received.</li>
+      <li>You will receive an email notice when the item is available for pickup.</li>
+    </ul>-->
+    <ul>
+      <li>Placing a hold request on an item will cause the item to be held for pickup for you as soon as it is available.</li>
+      <li><strong>In Process</strong> items will typically be available withing <strong>7-14 days</strong>.</li>
+      <li><strong>On Order</strong> items will typically be available within <strong>30-60 days</strong>, though some may take longer. Items ordered from outside North America and Europe may take as long as three to six months to arrive.</li>
       <li>You will receive an email notice when the item is available for pickup.</li>
     </ul>
   <?php elseif ($isPage):?>
@@ -94,7 +103,7 @@
     </ul>
   <?php endif; ?>
 
-  <?php if (!($isILLAuthorized == false && $isPickupAtReg)): ?>
+  <?php if (!($isILLAuthorized == false && ($isPickupAtReg || $isHold))): ?>
     <div class="alert alert-info">
     <p>Requests can take sixty seconds to process. Please be patient when
     submitting this form.</p>
@@ -197,10 +206,12 @@
                     <?=$this->transEsc('select_pickup_location')?>
                   </option>
                 <?php endif; ?>
+                <option value="JRLMAIN" selected="selected">Regenstein</option>
+                <?php # Added the above line and commented out the below to support holds during COVID-19 ?>
                 <?php foreach ($this->pickup as $lib): ?>
-                  <option value="<?=$this->escapeHtmlAttr($lib['locationID'])?>"<?=($selected == $lib['locationID']) ? ' selected="selected"' : ''?>>
+                  <!--<option value="<?=$this->escapeHtmlAttr($lib['locationID'])?>"<?=($selected == $lib['locationID']) ? ' selected="selected"' : ''?>>
                     <?=$this->transEsc('location_' . $lib['locationDisplay'], null, $lib['locationDisplay'])?>
-                  </option>
+                  </option>-->
                 <?php endforeach; ?>
                 </select>
               </div>

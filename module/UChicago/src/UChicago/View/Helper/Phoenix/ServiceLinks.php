@@ -469,7 +469,7 @@ class ServiceLinks extends AbstractHelper {
                         /*Whitelist*/
                         'hold' =>
                             ['INPROCESS',
-                             'INTRANSIT',
+                             //'INTRANSIT', //Commented out for COVID-19 implementation
                              'ONORDER'],
                         /*Whitelist*/
                         'paging' =>
@@ -890,7 +890,7 @@ class ServiceLinks extends AbstractHelper {
         /*Status whitelist*/
         $whitelist = $this->lookupStatus['hold']; // Unavailable
         $location_whitelist = array_map('strtolower', $this->lookupLocation['hold']);
-        $location_whitelist = []; // IMPORTANT!: this line temporarily disables place hold link for Hathi ETAS implementation. Delete this line to revert
+        $location_whitelist = []; // IMPORTANT!: this line temporarily disables place hold link on CLOSED STACK items for Hathi ETAS implementation. Delete this line to revert
 
         /*Normal Place Hold logic*/
         if (($serviceLink) && (!empty($row['status'])) && (in_array($row['status'], $whitelist)) && (!in_array($location, $blacklist))) {
