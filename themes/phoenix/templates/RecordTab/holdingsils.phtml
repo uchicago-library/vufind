@@ -186,8 +186,9 @@
 <?php $firstBarcode = $this->tab->getFirstBarcode($holding);?>
 
 <?/*Callnumbers*/?>
-<?php $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos) || trim(strtolower($locationText)) == 'on order'): ?>
-
+<?php $lowerLoc = trim(strtolower($locationText)) ?>
+<?php $isSpecial = $lowerLoc == 'on order' || $lowerLoc == 'received; in process'; ?>
+<?php $callNos = $this->tab->getUniqueCallNumbersPhoenix($holding['items']); if (!empty($callNos) || $isSpecial): ?>
 <?php $hasCallNos = !empty($callNos['display']); ?>
 <?php if ($hasCallNos):?>
 <?foreach ($callNos['display'] as $numKey => $callNo): ?>
@@ -197,8 +198,8 @@
    <a href="<?= $this->url('home')?>alphabrowse/Home?source=lcc&amp;from=<?=$this->escapeHtml($callNos['sort'][$numKey])?>"
       class="ablink"><?=$callNumDisplayText?></a><br/>
  <?php endforeach; ?>
-</div><!--/.locpanel-heading-->
 <?php endif; ?>
+</div><!--/.locpanel-heading-->
 
 <div class="holdings-unit">
 <?php if ($isFullTextOnline):?>
