@@ -8,6 +8,8 @@
   $id = $this->driver->getUniqueId();
   $cart = $this->cart();
   $cartId = $this->driver->getResourceSource() . '|' . $id;
+  $recordTitle = $this->escapeHtml($this->driver->getShortTitle() . ' ' . $this->driver->getSubtitle() . ' ' . $this->driver->getTitleSection());
+  $cleanTitle = trim($recordTitle, ' /.');
 ?>
 <ul class="nav nav-pills hidden-print">
   <?php if (count($this->driver->getCitationFormats()) > 0): ?>
@@ -53,5 +55,5 @@
       </noscript>
     </li>
   <?php endif; ?>
-  <li><a href="<?=$this->ServiceLinks()->reportRecord($id)?>" class="report-a-record"><i class="fa fa-external-link"></i> <?=$this->transEsc('Report a Record Problem')?></a></li>
+  <li><a href="<?=$this->ServiceLinks()->reportRecord($id, $cleanTitle)?>" class="report-a-record"><i class="fa fa-external-link"></i> <?=$this->transEsc('Report a Record Problem')?></a></li>
 </ul>

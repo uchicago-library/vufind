@@ -918,10 +918,11 @@ class ServiceLinks extends AbstractHelper {
      *
      * @returns string
      */
-    public function reportRecord($id)
+    public function reportRecord($id, $title='')
     {
         $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
-        $url='https://www.lib.uchicago.edu/search/forms/online-catalog-report-problem-record/?bib=' . $id;
+        $subject = urlencode('Catalog Record Problem: ' . $title);
+        $url='https://www.lib.uchicago.edu/search/forms/online-catalog-report-problem-record/?bib=' . $id . '&amp;subject=' . $subject;
         if (!empty($patron)) {
             $url = $url . '&amp;' . $patron;
         }
