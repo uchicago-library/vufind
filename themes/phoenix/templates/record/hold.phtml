@@ -13,7 +13,7 @@
     $isPickupAtReg = isset($_GET['isPickupAtReg']);
 
     $grouperGroups = $this->ServiceLinks()->getGrouperGroups();
-    $isILLAuthorized = $this->ServiceLinks()->isMemberOf('uc:applications:library:ill:authorized');
+    $canPage = $this->ServiceLinks()->isMemberOf('uc:applications:library:paging:authorized');
 ?>
 <h2>
   <?php if ($isHold):?>
@@ -39,7 +39,7 @@
 <?php endif; ?>
 
 <div class="hold-form">
-  <?php if (($isHold || $isPage) && $isPickupAtReg && $isILLAuthorized == true):?>
+  <?php if (($isHold || $isPage) && $isPickupAtReg && $canPage == true):?>
     <p>Requested items will be retrieved by Library staff and made available for pickup at Regenstein.</p>
     <ul>
       <li>Most items will be available for pickup <strong>within 3 business days</strong>.</li>
@@ -47,7 +47,7 @@
       <li><strong>You will receive an email notification when an item is available for pickup</strong>, which will include a link to reserve a 30-minute time slot to pick up your item(s). Items will be held for up to 7 days.</li>
       <li>Procedures for pickup will be sent to you when you reserve a time slot.</li>
     </ul>
-  <?php elseif ($isILLAuthorized == false && ($isPickupAtReg || $isHold)):?>
+  <?php elseif ($canPage == false && ($isPickupAtReg || $isHold)):?>
     <div class="alert alert-danger">
     <p>At this time, paging services are limited to current students, faculty, and staff of University of Chicago. Please monitor the Library website for changes to services as we reopen.</p>
     </div>
@@ -103,7 +103,7 @@
     </ul>
   <?php endif; ?>
 
-  <?php if (!($isILLAuthorized == false && ($isPickupAtReg || $isHold))): ?>
+  <?php if (!($canPage == false && ($isPickupAtReg || $isHold))): ?>
     <div class="alert alert-info">
     <p>Requests can take sixty seconds to process. Please be patient when
     submitting this form.</p>
@@ -226,7 +226,7 @@
           </div>
         </div>
       </form>
-  <?php endif; ?> <!--./if (!($isILLAuthorized == false && $isPickupAtReg))-->
+  <?php endif; ?> <!--./if (!($canPage == false && $isPickupAtReg))-->
 </div>
 
 <?
