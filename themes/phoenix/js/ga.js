@@ -329,12 +329,7 @@ $(document).ready(function() {
 	    }
 	
 		/* User clicked a facet. */
-        $('ul.facet a').on('click', function(e) {
-            /* Skip the facet containing the year of publication slider. */
-            if ($(this).find('form#publishDateFilter').length > 0) {
-                return;
-            }
-
+        $('li.facet a, #search-sidebar .facet-group .collapse > a').on('click', function(e) {
             /* If the user clicked the "x" to exclude a facet, the
              * target would have been an <i> element. In that case, go up in the
              * element hierarchy to get to the actual anchor. */
@@ -362,7 +357,7 @@ $(document).ready(function() {
 	        e.preventDefault();
 	        $(this).unbind('submit.googleAnalytics');
 
-	        var f = $(this).parents('ul.facet:first').find('li:first').text().trim();
+	        var f = $(this).parents('li.facet:first').text().trim();
 			catalogevent('send', 'event', 'moreFacets', f);
 	
 	        /* Short delay for analytics. */
@@ -681,7 +676,7 @@ $(document).ready(function() {
 	     * and bind one change event. */
 
 	    setInterval(function() {
-	        $('.openurls a[href]:not(.clickEventBound)').each(function() {
+	        $('div.deduped-eholdings a[href]:not(.clickEventBound), #e-links > a[href]:not(.clickEventBound), .e-list > a[href]:not(.clickEventBound)').each(function() {
 	            $(this).addClass('clickEventBound');
 	            $(this).on('click', function(e) {
                     /* Get the text of the link. "Find It!" button links
@@ -692,7 +687,7 @@ $(document).ready(function() {
                     if (t == '' && $(this).find('img.findit')) {	
                         t = 'Find It!';
                     }
-                    cataloglinkclick('send', 'event', 'SFXLink', t, $(this), e);
+                    cataloglinkclick('send', 'event', 'preview', t, $(this), e);
 	            });
 	        });
 	    }, 250);

@@ -101,7 +101,7 @@
       <?php else: ?>
         <?php $this->layout()->srmessage = $this->translate('nohit_lookfor_html', ['%%lookfor%%' => $this->escapeHtml($lookfor)]); ?>
         <?=$this->layout()->srmessage ?>
-          <br/><br/><a class="btn btn-primary" href="http://forms2.lib.uchicago.edu/lib/worldcatlookup/?<?php echo $_SERVER['QUERY_STRING']; ?>">Repeat search in WorldCat</a><br/><br/>
+          <br/><br/><a class="btn btn-primary mini-worldcat-link" href="http://forms2.lib.uchicago.edu/lib/worldcatlookup/?<?php echo $_SERVER['QUERY_STRING']; ?>">Repeat search in WorldCat</a><br/><br/>
       <?php endif; ?>
     </p>
     <?php if (isset($this->parseError)): ?>
