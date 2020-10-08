@@ -356,9 +356,10 @@ $(document).ready(function() {
         $('form#publishDateFilter').on('submit.googleAnalytics', function(e) {
 	        e.preventDefault();
 	        $(this).unbind('submit.googleAnalytics');
-
-	        var f = $(this).parents('li.facet:first').text().trim();
-			catalogevent('send', 'event', 'moreFacets', f);
+	        var f = $(this).parents('.facet:first').find('#publishDatefrom').val().trim();
+	        var t = $(this).parents('.facet:first').find('#publishDateto').val().trim();
+            var txt = f + '-' + t;
+            catalogevent('send', 'event', 'moreFacets', txt);
 	
 	        /* Short delay for analytics. */
 	        var form = this;
