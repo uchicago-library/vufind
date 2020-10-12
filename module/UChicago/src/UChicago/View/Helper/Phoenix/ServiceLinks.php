@@ -304,6 +304,7 @@ class ServiceLinks extends AbstractHelper {
                              'LawMic',
                              'LawPer',
                              'LawRef',
+                             'LawResC',
                              'LawResP',
                              'LawRR',
                              'LawStor',
