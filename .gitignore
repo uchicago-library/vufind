@@ -18,3 +18,12 @@ lessphp_*.list
 module/VuFind/tests/.phpunit.result.cache
 node_modules
 public/swagger-ui
+
+### UChicago changes ###
+nohup.out
+*.orig
+*.swp
+*.htaccess
+public/shibtest
+phing.sh
+local/config/vufind
