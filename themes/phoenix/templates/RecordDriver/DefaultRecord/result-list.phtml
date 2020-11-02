@@ -4,7 +4,7 @@
   $thumbnail = false;
   $thumbnailAlignment = $this->record($this->driver)->getThumbnailAlignment('result');
   $isMarc = isset($this->driver->isMarc) ? $this->driver->isMarc : false;
-  $hathiLink = $this->HathiLink()->getHathiLink();
+  $hathiLink = $this->HathiLink()->getHathiLink(true);
   $bib = $this->driver->getUniqueID();
   $isSfxStub = strtolower(substr($bib, 0, 3)) == 'sfx';
   $sfxNum = $isSfxStub ? substr($bib, 4) : '';

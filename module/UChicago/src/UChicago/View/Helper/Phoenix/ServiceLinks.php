@@ -941,9 +941,15 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function requestHelp($row, $title='') {
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
+            $currentUrl = "https://";
+        } else {
+            $currentUrl = "http://";
+        }
+        $currentUrl .= $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
         $title = urlencode('Request Help Finding an Online Copy: ' . $title);
-        $defaultUrl = 'https://www.lib.uchicago.edu/search/forms/need-help-ask-librarian/?bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;subject=' . $title;
+        $defaultUrl = 'https://www.lib.uchicago.edu/search/forms/need-help-ask-librarian/?bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;subject=' . $title . '&amp;referrer=' . urlencode($currentUrl);
         if (!empty($patron)) {
             $defaultUrl = $defaultUrl . '&amp;' . $patron;
         }
