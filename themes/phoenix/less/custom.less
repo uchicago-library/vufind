@@ -6,28 +6,119 @@
 @dark-green: #137752;
 /* Bootstrap variables as well */
 @brand-primary: #0045a1;
-@body-bg: #5ab48a;
+@body-bg: #f8f8f8;
 @grid-gutter-width: 20px;
 
-/* Change specific styles below */
+/*
+/ Global
+*/
 body {
   font-size: 14px;
   color: #333;
 }
-header {
-  font-size: 16px;
-  color: @dark-green;
+
+a {
+  color: #155f83;
 }
+
+.alert {
+  padding: 8px;
+}
+
+#content {
+  padding-bottom: 2rem;
+}
+
 .container {
   padding-left: 2rem;
   padding-right: 2rem;
-  border-left: 2px solid @dark-green;
-  border-right: 2px solid @dark-green;
-  background-color: #fff;
   border-radius: 0;
+  background: #fff;
 }
-footer .container { border-bottom: 2px solid #137752; }
-.alert { padding: 8px; }
 
-/* You can also organize these styles in separate files and @import them */
+
+/*
+/ Navbar
+*/
+.navbar-brand {
+  height: unset;
+  padding: unset;
+  img {
+    max-width: 300px;
+  }
+}
+
+.navbar-right {
+  font-size: 1rem;
+  & > li > a {
+    color: #fff;
+    &:hover, &:focus {
+      text-decoration: none;
+      color: #c4c3d0;
+      background: transparent;
+    }
+  }
+}
+
+.nav {
+  a.btn.btn-link {
+    color: #fff;
+  }
+}
+
+header {
+  font-size: 16px;
+  color: @dark-green;
+  .container.navbar {
+    background: #800000;
+  }
+}
+
+.btn-primary {
+  background: #5e5e5e;
+  color: #fff;
+}
+
+.search.container.navbar {
+  background: #670000;
+  padding: 15px;
+}
+
+.fa-bars {
+  color: white;
+}
+
+/*
+/ Footer
+*/
+footer {
+  background: #670000;
+  ul {
+    list-style: none;
+    padding-left: 0;
+    li[role=header] {
+      color: #fff;
+      font-weight: 600;
+    }
+    li > a {
+      color: #fff;
+      &:hover, &:focus {
+        text-decoration: none;
+        color: #c4c3d0;
+        background: transparent;
+      }
+    }
+  }
+  .footer-container {
+    justify-content: space-between;
+    padding-right: 2rem;
+    .footer-column {
+      flex: unset;
+    }
+  }
+}
+
+
+/* Imports */
 @import "home-page";
+@import "record";

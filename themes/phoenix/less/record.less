@@ -1,0 +1,123 @@
+/*
+/ Results Page
+*/
+.search-header {
+	padding-top: 1em;
+}
+
+.result + .result {
+    border-top: 1px dotted #eee;
+}
+
+.result:nth-child(2n+1) {
+    background: #f9f9f9;
+    margin-left: -15px;
+    .record-checkbox {
+    	padding-left: 15px;
+    }
+}
+
+.result-body {
+	.callnumAndLocation {
+		font-size: 0.95rem;
+		margin-top: 1em;
+		margin-bottom: -10px;
+	}
+}
+
+.active-filters {
+	margin-top: 10px;
+	margin-bottom: -15px;
+	a {
+		color: #fff;
+	}
+	.filters-title {
+		color: #fff;
+		font-weight: 600;
+		padding-left: 15px;
+	}
+	.facet, .filters .filter-value {
+		font-weight: 400;
+	    background-color: transparent;
+	}
+}
+
+
+.facet {
+    font-size: 0.95rem;
+}
+
+.facet-group {
+	a {
+		text-decoration: none;
+	}
+	.fa.fa-square-o {
+	    color: #575757;
+	}
+	button.title {
+	    background-color: #f9f9f9;
+	}
+	.active {
+		background-color: #806362;
+	}
+}
+
+.badge {
+	font-weight: 400;
+	background-color: #d5d5de;
+	color: black;
+	text-decoration: none;
+}
+
+.result .format { //media type badges
+	font-weight: 400;
+	padding: 0.5em;
+}
+
+/*
+/ Record Holdings
+*/
+.tab-content {
+	h3 {
+		background: #d0d2b4;
+		padding: 0.5em 0.5em 0.25em 0.5em;
+		margin-bottom: 0;
+	}
+	table {
+		table-layout: unset;
+		border-right: 1px solid #ddd;
+		border-bottom: 1px solid #ddd;
+		border-left: 1px solid #ddd;
+		th {
+			width: 15%;
+			border-top: none!important;
+		}
+		td {
+			border-top: none!important;
+		}
+	}
+	// Call number and issue rows
+	tr {
+		&:first-of-type {
+			background: #d0d2b4!important;
+			border-top: none!important;
+			td {
+				font-size: 1.1rem;
+			}
+		}
+		// &:nth-of-type(2) {
+		// 	background: #f3f3ec!important;
+		// 	border-bottom: 10px solid transparent;
+		// 	th {
+		// 		padding-bottom: 0;
+		// 		border-top: none;
+		// 	}
+		// 	td {
+		// 		border-top: none;
+		// 	}
+		// }
+		span {
+			display: block;
+		}
+	}
+}

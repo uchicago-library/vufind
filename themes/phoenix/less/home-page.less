@@ -1,32 +1,35 @@
 .searchHomeContent {
   margin-left: -@grid-gutter-width;
   margin-right: -@grid-gutter-width;
-}
-.search-hero {
-  &:extend(.clearfix all);
-
-  position: relative;
-  padding: 16rem 8rem;
-  font-size: 2rem;
-  color: #fff;
-  background-image: url('@{image-path}/yosemite.jpg');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-
-  a { color: #eef; }
-
-  .image-credit {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    padding: 1rem;
-    font-size: .8rem;
-    color: rgba(255,255,255,.5);
-    background-color: rgba(0,0,0,.5);
-
-    a { color: #fff; }
+  .searchForm {
+    width: 100%!important;
+  }
+  #searchForm_lookfor {
+    width: inherit;
   }
 }
+
+.search-hero {
+  &:extend(.clearfix all);
+  background: #fff;
+  position: relative;
+  padding: 2rem;
+  margin: 2rem;
+  font-size: 2rem;
+  color: #000;
+  a {
+    color: #155f83;
+  }
+  @media (min-width: 768px) {
+    margin-top: 5rem;
+    margin-bottom: 10rem;
+  }
+}
+
+.reset-filters-btn {
+    background: #107180;
+    font-size: 1rem;
+}
+
 /* Hide search bar */
 .template-dir-search.template-name-home .search.container { display: none; }
