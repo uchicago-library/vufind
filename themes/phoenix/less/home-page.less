@@ -1,28 +1,98 @@
+/*
+ Basic search
+*/
+
+.search-hero {
+  &:extend(.clearfix all);
+  background: #eeeeee;
+  position: relative;
+  padding: 1em 2em;
+  margin: 2rem;
+  font-size: 2rem;
+  color: #000;
+  @media (min-width: 768px) {
+    padding: 3.5rem 3em 1em 3em;
+    margin: 5rem 2rem;
+  }
+  a {
+    color: #155f83;
+  }
+  .power-searching {
+    font-size: 0.9rem;
+    @media (min-width: 768px) {
+      float: right;
+    }
+  }
+  .active-filters { // filters that are active when user returns to home screen
+    .filters-title {
+      color: #000000;
+      font-size: 1rem;
+      font-weight: 600;
+      padding-left: 15px;
+    }
+    .filter-value, .filter-value a {
+      color: #155f83;
+      font-size: 1.1rem;
+      font-weight: 400;
+      background-color: transparent;
+    }
+    .filters-toggle-bar {
+      margin-top: 1em;
+    }
+    .filters-toggle {
+      font-size: 1rem;
+    }
+  }
+}
+
 .searchHomeContent {
   margin-left: -@grid-gutter-width;
   margin-right: -@grid-gutter-width;
   .searchForm {
-    width: 100%!important;
+    width: 100%;
+      @media (min-width: 768px) {
+        display: grid;
+        grid-template-columns: 50% 30% 20%;
+        grid-gap:  5px;
+     }
+    .btn.btn-link { // Super fragile - Advanced Search link
+      padding: 0;
+      text-align: left;
+      @media (min-width: 768px) {
+        font-size: 0.9rem;
+        grid-column: span 3;
+        align-self: flex-start;
+      }
+    }
+    .power-searching {
+      font-size: 0.9rem;
+    }
   }
   #searchForm_lookfor {
-    width: inherit;
+    @media (min-width: 768px) {
+      max-width: 500px;
+    }
   }
-}
-
-.search-hero {
-  &:extend(.clearfix all);
-  background: #fff;
-  position: relative;
-  padding: 2rem;
-  margin: 2rem;
-  font-size: 2rem;
-  color: #000;
-  a {
-    color: #155f83;
+  #searchForm_type {
+    margin-top: 0.5rem;
+    @media (min-width: 768px) {
+      margin-top: unset;
+      margin-right: 10px;
+    }
   }
-  @media (min-width: 768px) {
-    margin-top: 5rem;
-    margin-bottom: 10rem;
+  .btn-primary {
+    background-color: #670000;
+    &:hover, &:focus {
+      color: #ffffff;
+      background-color: #5e5e5e;
+    }
+    @media (min-width: 768px) {
+      max-width: 150px;
+    }
+  }
+  .about-catalog {
+    font-size: 0.9rem;
+    padding-left: 2em;
   }
 }
 
@@ -31,5 +101,73 @@
     font-size: 1rem;
 }
 
-/* Hide search bar */
-.template-dir-search.template-name-home .search.container { display: none; }
+/*
+ Advanced search
+*/
+#advSearchForm {
+  .adv-group {
+    background: #eeeeee;
+  }
+  .range { // Year of Publication
+    width: unset;
+  }
+}
+
+.adv-submit {
+  display: flex;
+  justify-content: flex-end;
+  .btn-primary {
+    background-color: #670000;
+    margin-left: 2em;
+    padding: 10px 24px;
+    margin-right: 1em;
+    &:hover, &:focus {
+      color: #ffffff;
+      background-color: #5e5e5e;
+    }
+  }
+}
+
+.solr-facet-container {
+  display: grid;
+  grid-gap: 15px;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 1em;
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
+}
+
+
+/*
+ Results page search bar div
+*/
+
+.nav.searchbox {
+  .searchForm_lookfor, .searchForm_type {
+    margin-bottom: 1em;
+    @media (min-width: 768px) {
+      margin-bottom: 0;
+    }
+  }
+  &.power-searching {
+    display: none;
+  }
+  .filters-toggle {
+    color: white;
+    font-size: 1rem;
+    margin-left: 1em;
+  }
+  .btn-primary {
+    @media (min-width: 768px) {
+      margin-left: 1em;      
+    }
+  }
+}
+
+
+.template-dir-search.template-name-home .search.container {  // Hiding search box from some pages
+  display: none;
+}
+
+

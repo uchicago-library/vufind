@@ -19,10 +19,75 @@
 
 .result-body {
 	.callnumAndLocation {
-		font-size: 0.95rem;
-		margin-top: 1em;
-		margin-bottom: -10px;
+		font-size: 1rem;
+		margin-top: 0.75em;
+		.callnumber {
+			font-size: 1.1rem;
+			font-weight: 600;
+		}
 	}
+}
+
+.result-formats { // media badge wrapper
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: flex-end;
+	align-items: center;
+	flex-wrap: wrap;
+	@media (min-width: 768px) {
+		display: grid;
+		width: 130%;
+		justify-content: flex-end;
+		position: relative;
+		padding-bottom: 0;
+	}
+}
+
+.result-formats .format { //media type badges in record summary
+	color: #5e5e5e;
+	font-weight: 400;
+	padding: 0 0.5em 0 0;
+	background-color: transparent;
+	@media (min-width: 768px) {
+		position: relative;
+		bottom: 20px;
+		text-align: right;
+		padding: 2px 0;
+	}
+}
+
+.status {
+	@media (min-width: 768px) {
+	    position: absolute;
+	    left: 0;
+	    margin: 0.35em 0;
+	}
+    .label {
+		font-weight: 400;
+		padding-left: 0;
+		&.label-danger {
+			font-size: 1rem;
+			color: #a41915;
+		    background-color: transparent;
+		}
+		&.label-success {
+			font-size: 1.1rem;
+			color: #016801;
+		    background-color: transparent;
+		}
+	}
+}
+
+.result-links.hidden-print {
+    padding-bottom: 1em;
+}
+
+.result-link-icon.fa-star {
+	display: none;
+}
+
+.highlight, mark {
+  background-color: rgba(148,187,233,.3);
 }
 
 .active-filters {
@@ -37,6 +102,7 @@
 		padding-left: 15px;
 	}
 	.facet, .filters .filter-value {
+		font-size: 1rem;
 		font-weight: 400;
 	    background-color: transparent;
 	}
@@ -58,20 +124,15 @@
 	    background-color: #f9f9f9;
 	}
 	.active {
-		background-color: #806362;
+		background-color: #107180;
 	}
 }
 
 .badge {
 	font-weight: 400;
-	background-color: #d5d5de;
+	background-color: rgba(148,187,233,.3);
 	color: black;
 	text-decoration: none;
-}
-
-.result .format { //media type badges
-	font-weight: 400;
-	padding: 0.5em;
 }
 
 /*

@@ -27,19 +27,23 @@ a {
 
 #content {
   padding-bottom: 2rem;
-}
-
-.container {
-  padding-left: 2rem;
-  padding-right: 2rem;
-  border-radius: 0;
-  background: #fff;
+  &.container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+    border-radius: 0;
+    background: #fff;
+  }
 }
 
 
 /*
 / Navbar
 */
+
+.navbar {
+  border-radius: unset;
+}
+
 .navbar-brand {
   height: unset;
   padding: unset;
@@ -48,7 +52,17 @@ a {
   }
 }
 
-.navbar-right {
+.top-navbar {
+  background-color: #670000;
+  margin-left: -10px;
+  margin-right: -10px;
+  padding: 0 15px;
+  ul > li > a {
+    padding: 10px;
+  }
+}
+
+.navbar-right { // Both top navs have this class
   font-size: 1rem;
   & > li > a {
     color: #fff;
@@ -88,6 +102,7 @@ header {
   color: white;
 }
 
+
 /*
 / Footer
 */
@@ -110,10 +125,18 @@ footer {
     }
   }
   .footer-container {
+    color: #ffffff;
     justify-content: space-between;
     padding-right: 2rem;
     .footer-column {
       flex: unset;
+    }
+  }
+  .footer-brand {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    @media (min-width: 768px) {
+      padding-bottom: 0;
     }
   }
 }
@@ -122,3 +145,4 @@ footer {
 /* Imports */
 @import "home-page";
 @import "record";
+@import "myaccount";
