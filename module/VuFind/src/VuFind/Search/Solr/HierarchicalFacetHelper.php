@@ -85,7 +85,7 @@ class HierarchicalFacetHelper implements TranslatorAwareInterface
         // Parse level from each facet value so that the sort function
         // can run faster
         foreach ($facetList as &$facetItem) {
-            list($facetItem['level']) = explode('/', $facetItem['value'], 2);
+            [$facetItem['level']] = explode('/', $facetItem['value'], 2);
             if (!is_numeric($facetItem['level'])) {
                 $facetItem['level'] = 0;
             }
@@ -229,7 +229,7 @@ class HierarchicalFacetHelper implements TranslatorAwareInterface
     {
         $parts = explode('/', $filter);
         if (count($parts) <= 1 || !is_numeric($parts[0])) {
-            return [$filter];
+            return [new TranslatableString($filter, $filter)];
         }
         $result = [];
         for ($level = 0; $level <= $parts[0]; $level++) {
@@ -308,7 +308,9 @@ class HierarchicalFacetHelper implements TranslatorAwareInterface
                 ->getDisplayString();
         }
 
-        list($level, $value) = explode('/', $item['value'], 2);
+        $parts = explode('/', $item['value'], 2);
+        $level = $parts[0];
+        $value = $parts[1] ?? $item['value'];
         if (!is_numeric($level)) {
             $level = 0;
         }

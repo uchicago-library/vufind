@@ -68,8 +68,7 @@ class PaginationHelper
         if (isset($functionConfig['default_sort'])) {
             return $functionConfig['default_sort'];
         }
-        reset($functionConfig['sort']);
-        return key($functionConfig['sort']);
+        return array_key_first($functionConfig['sort']);
     }
 
     /**
@@ -122,12 +121,15 @@ class PaginationHelper
             $ilsPaging = false;
         }
         // Collect ILS call params
-        $ilsParams = ['sort' => $this->validateSort($functionConfig, $sort)];
+        $ilsParams = [];
+        if ($sort = $this->validateSort($functionConfig, $sort)) {
+            $ilsParams['sort'] = $sort;
+        }
         if ($ilsPaging) {
             $ilsParams['page'] = $page >= 1 ? $page : 1;
             $ilsParams['limit'] = $limit;
         }
-        $sortList = $this->getSortList($functionConfig, $ilsParams['sort']);
+        $sortList = $this->getSortList($functionConfig, $sort);
         return compact('page', 'limit', 'ilsPaging', 'ilsParams', 'sortList');
     }
 

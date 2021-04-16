@@ -28,6 +28,9 @@
 namespace VuFind\Db\Row;
 
 use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 
 /**
  * Generic row gateway factory.
@@ -58,6 +61,6 @@ class RowGatewayFactory implements \Laminas\ServiceManager\Factory\FactoryInterf
         array $options = null
     ) {
         $adapter = $container->get(\Laminas\Db\Adapter\Adapter::class);
-        return new $requestedName($adapter, ...($options !== null ? $options : []));
+        return new $requestedName($adapter, ...($options ?? []));
     }
 }

@@ -28,7 +28,11 @@
 namespace VuFind\ChannelProvider;
 
 use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use VuFind\I18n\Locale\LocaleSettings;
 
 /**
  * Factory for channel loader.
@@ -66,7 +70,8 @@ class ChannelLoaderFactory implements FactoryInterface
             $container->get(\VuFind\Cache\Manager::class),
             $container->get(\VuFind\ChannelProvider\PluginManager::class),
             $container->get(\VuFind\Search\SearchRunner::class),
-            $container->get(\VuFind\Record\Loader::class)
+            $container->get(\VuFind\Record\Loader::class),
+            $container->get(LocaleSettings::class)->getUserLocale()
         );
     }
 }

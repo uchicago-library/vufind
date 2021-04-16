@@ -81,6 +81,13 @@ class ChannelLoader
     protected $searchRunner;
 
     /**
+     * Current locale (used for caching)
+     *
+     * @var string
+     */
+    protected $locale;
+
+    /**
      * Constructor
      *
      * @param Config         $config Channels configuration
@@ -88,15 +95,18 @@ class ChannelLoader
      * @param ChannelManager $cm     Channel manager
      * @param SearchRunner   $runner Search runner
      * @param RecordLoader   $loader Record loader
+     * @param string         $locale Current locale (used for caching)
      */
     public function __construct(Config $config, CacheManager $cache,
-        ChannelManager $cm, SearchRunner $runner, RecordLoader $loader
+        ChannelManager $cm, SearchRunner $runner, RecordLoader $loader,
+        string $locale = ''
     ) {
         $this->config = $config;
         $this->cacheManager = $cache;
         $this->channelManager = $cm;
         $this->searchRunner = $runner;
         $this->recordLoader = $loader;
+        $this->locale = $locale;
     }
 
     /**
@@ -173,7 +183,7 @@ class ChannelLoader
     {
         // The provider ID consists of a service name and an optional config
         // section -- break out the relevant parts:
-        list($serviceName, $configSection) = explode(':', $providerId . ':');
+        [$serviceName, $configSection] = explode(':', $providerId . ':');
 
         // Load configuration, using default value if necessary:
         if (empty($configSection)) {
@@ -211,11 +221,12 @@ class ChannelLoader
         // Set up the cache, if appropriate:
         if ($this->config->General->cache_home_channels ?? false) {
             $providerIds = array_map('get_class', $providers);
-            $parts = [implode(',', $providerIds), $source, $token];
+            $parts = [implode(',', $providerIds), $source, $token, $this->locale];
             $cacheKey = md5(implode('-', $parts));
             $cache = $this->cacheManager->getCache('object', 'homeChannels');
         } else {
             $cacheKey = false;
+            $cache = null;
         }
 
         // Fetch channel data from cache, or populate cache if necessary:

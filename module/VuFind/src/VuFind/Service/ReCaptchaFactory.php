@@ -28,7 +28,11 @@
 namespace VuFind\Service;
 
 use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use VuFind\I18n\Locale\LocaleSettings;
 
 /**
  * ReCaptcha factory.
@@ -90,8 +94,8 @@ class ReCaptchaFactory implements FactoryInterface
         $secretKey = $recaptchaConfig['recaptcha_secretKey'] ?? '';
         $httpClient = $container->get(\VuFindHttp\HttpService::class)
             ->createClient();
-        $translator = $container->get(\Laminas\Mvc\I18n\Translator::class);
-        $rcOptions = ['lang' => $translator->getLocale()];
+        $language = $container->get(LocaleSettings::class)->getUserLocale();
+        $rcOptions = ['lang' => $language];
         if (isset($recaptchaConfig['recaptcha_theme'])) {
             $rcOptions['theme'] = $recaptchaConfig['recaptcha_theme'];
         }

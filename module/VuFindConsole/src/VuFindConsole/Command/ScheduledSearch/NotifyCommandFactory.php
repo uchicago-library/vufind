@@ -28,6 +28,9 @@
 namespace VuFindConsole\Command\ScheduledSearch;
 
 use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
@@ -79,6 +82,7 @@ class NotifyCommandFactory implements FactoryInterface
             $container->get(\VuFind\Mailer\Mailer::class),
             $tableManager->get(\VuFind\Db\Table\Search::class),
             $tableManager->get(\VuFind\Db\Table\User::class),
+            $container->get(\VuFind\I18n\Locale\LocaleSettings::class),
             ...($options ?? [])
         );
     }
