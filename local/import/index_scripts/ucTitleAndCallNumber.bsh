@@ -1,0 +1,108 @@
+/*
+ * Custom format determination script.
+ *
+ * This can be used to override built-in SolrMarc custom functions.  If you change
+ * this script, you will need to activate it in import/marc_local.properties before
+ * it will be applied during indexing.
+ */
+
+import org.marc4j.marc.Record;
+import org.marc4j.marc.ControlField;
+import org.marc4j.marc.DataField;
+import org.marc4j.marc.Subfield;
+import  java.lang.*;
+
+
+
+
+/*
+ * Determine Record Format(s)
+ *
+ * @param  Record          record
+ * @return Set     format of record
+ */
+ 
+ 
+ 
+ 
+public Set getHznTitleAndCallNumber(Record record)
+{
+     
+     return getHznTitleAndCallNumber(record, "display");
+}
+
+
+public Set getHznTitleAndCallNumber(Record record, String mode)
+{
+    Set result = new LinkedHashSet();
+    List items  = record.getVariableFields("929"); 
+    
+    char sep = '\t';
+    
+
+    if (mode.equals("display") && mode.equals("sort")) 
+    {
+    	System.err.println("Illegal mode: " + mode + 
+    	    "; allowed values are 'display' or 'sort'");
+    	// Throw an error with corrective message
+	
+    }
+    
+    //NB: indexer is a magic reference to the current SolrIndexer instance
+    String title = indexer.getTitle(record);
+ 
+    // pull 929a sublield from each record
+    Set callNos = indexer.getFieldList(record, "929a");
+    
+    for (String call : callNos) 
+    {
+           // it's a "switch" if statement between sort browse and display browse  
+    	    if(mode.equals("sort"))
+    	    {
+                call=CallNumberTrim(call); 
+            }
+            else
+            {
+            	    // some records had <U+0018> and <U+0019> in display mode ( <U+0018>Aud<U+0019> ). They had to be picked up and stripped off control characters <U+0018> and <U+0019> 
+            	    if ( call.charAt(0) == '<')
+            	   call = call.replaceAll("<U[+]001[89]>", "");
+            }
+            
+     result.add(call + sep + title);
+    }
+    
+    return result;
+
+}
+
+public static String CallNumberTrim (String callNum)
+{
+
+	// <U+0018> is '\u0018' and <U+0019> is '\u0019'
+	char beginPrefix = '\u0018';
+        char endPrefix = '\u0019'; 
+        //  String ch   for matching whether there is still a prefix with <U+0018>Aud<U+0019>; looks for 0019> string and dispays callNum after 0019>
+        String ch = "0019>";
+        String prefixes;
+        
+        int prefixStartIdx = callNum.indexOf(beginPrefix);
+        int prefixEndIdx = callNum.indexOf(endPrefix); 
+                                     
+        if (prefixEndIdx >= 0)
+         	 {
+                 prefixes = callNum.substring(0,prefixEndIdx);
+                 callNum = callNum.substring(prefixEndIdx).trim() + "  " + prefixes;
+                 }
+                 // is sort starts with " < " then it has to be stripped off of <U+0018>Aud<U+0019>
+                 else if ('<' == callNum.charAt(0))
+                 {
+                 	 int prefix = callNum.indexOf(ch) + 5;
+                         prefixes = callNum.substring(8, prefix-8).trim();
+                         callNum = callNum.substring(prefix).trim() + "  " + prefixes;
+
+                 }
+                 
+        return callNum;
+   
+}
+

@@ -1,0 +1,48 @@
+import org.marc4j.marc.Record;
+import org.marc4j.marc.DataField;
+import org.marc4j.marc.Subfield;
+import org.marc4j.marc.VariableField;
+
+//import java.lang.Object
+
+/*
+ * Determine Record location(s)
+ *
+	 * @param  Record          record
+	 * @return Set  "collections" of record
+	 * Indexes on  "929 c" and "929 l" to look for all collection and checks with the local/import/traslation_map.properties for all the possible collections that we want to display
+	 */
+public Set getCollection(Record record)
+{
+    Set result = new LinkedHashSet(); 
+    List items  = record.getVariableFields("929");
+    
+    for (DataField item : items)     
+    {
+    	    Subfield a = item.getSubfield('a');
+    	    if( a != null)
+    	    {
+    	    	    String collection = a.getData(); 
+    	    	    if( collection.equals("MSS") || collection.equals("ARCH"))
+    	    	    {
+    	    	    	    result.add(collection);
+    	    
+    	    	    }
+    	    }
+    	    
+    	    Subfield c = item.getSubfield('c');
+    	    if( c != null)
+    	    {
+    	    	    String collection = c.getData();
+    	    	    result.add(collection);
+    	    }
+    	    
+    	    Subfield l = item.getSubfield('l');
+    	    if( l != null)
+    	    {
+    	    	    String collection = l.getData();
+    	    	    result.add(collection);
+    	    }
+    }   
+        return result;
+}

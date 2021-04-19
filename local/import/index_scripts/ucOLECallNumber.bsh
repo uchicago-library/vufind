@@ -1,0 +1,232 @@
+/*
+ * Custom format determination script.
+ *
+ * This can be used to override built-in SolrMarc custom functions.  If you change
+ * this script, you will need to activate it in import/marc_local.properties before
+ * it will be applied during indexing.
+ */
+
+import org.marc4j.marc.Record;
+import org.marc4j.marc.ControlField;
+import org.marc4j.marc.DataField;
+import org.marc4j.marc.Subfield;
+import org.marc4j.marc.VariableField;
+import org.solrmarc.callnum.DeweyCallNumber;
+import org.solrmarc.callnum.LCCallNumber;
+import java.lang.String;
+import  java.lang.*;
+import java.util.regex.*;
+
+
+/*
+ * Get call number from OLE export
+ *
+ * @param  Record          record
+ * @return Set     format of record
+ */
+ 
+public Set getOLEcallNumber(Record record)
+{
+    return getOLEcallNumber(record, "display");
+}
+
+public Set getOLEcallNumber(Record record, String mode)
+{
+	
+    Set result = new LinkedHashSet();
+    List items  = record.getVariableFields("929"); 
+    String [] res = new String[2];
+    
+ 
+    
+    
+    if (!mode.equals("display") && !mode.equals("sort")) 
+    {
+    	// Throw an error with corrective message
+    	System.err.println("Illegal mode: " + mode + 
+    	    "; allowed values are 'display' or 'sort'");
+    }
+ 
+    // pull 099a sublield from each record
+    Set callNos = indexer.getFieldList(record, "929a");
+    if (callNos.isEmpty())
+    {
+    	    Set callNos = indexer.getFieldList(record, "928a");
+    	    
+    	    List items098  = record.getVariableFields("928"); 
+    	    Iterator iter = items098.iterator();
+            DataField fld098;
+            while (iter.hasNext())
+            {
+            	    fld098 = (DataField) iter.next();
+    	  
+            	    // Reject only DDC and SuDoc call numbers
+            	    if(fld098.getSubfield('t') != null) 
+            	    {
+            	    	    String str_t = fld098.getSubfield('t').getData().trim();
+
+            	    	    if (str_t.equals("DDC"))
+            	    	    continue;
+            	    }   
+    	    }
+    
+    	    for (String call : callNos) 
+    	    {
+    	    	    // it's a "switch" if statement between sort browse and display browse  
+    	    	    if(mode.equals("sort"))
+    	    	    {
+    	    	    	    result.add(new LCCallNumber(call).getShelfKey());
+    	    	    }
+    	    	    else
+    	    	    {
+    	    	    	    result.add(call);
+    	    	    }
+    	    }
+     } 
+
+    
+    List items099  = record.getVariableFields("929"); 
+    Iterator iter = items929.iterator();
+    DataField fld929;
+    while (iter.hasNext())
+    {
+    	    fld099 = (DataField) iter.next();
+    	  
+    	    // Reject only DDC and SuDoc call numbers
+    	    if(fld929.getSubfield('t') != null) 
+    	    {
+    	    	    String str_t = fld929.getSubfield('t').getData().trim();
+
+        	    if ( str_t.equals("DDC") || str_t.equals("SuDoc"))
+      	    	    continue;
+      	    }   
+     
+      	    for (String call : callNos) 
+      	    {
+      	    	    // it's a "switch" if statement between sort browse and display browse  
+      	    	    if(mode.equals("sort"))
+      	    	    {
+    	    	    	    result.add(new LCCallNumber(call).getShelfKey());
+    	            }
+    	            else
+    	            {
+    	            	    result.add(call);
+    	            }
+    	    }
+    }
+      return result;
+    
+}
+
+
+
+
+ // dewey-raw: in 099 field look for subfield "t" with "DDC" in that subfield. if there is a subfield  with DDC, use subfield "a" to populate and 
+ //trim any possible #0018 and #0019"deweyRaw" in alphabetical browse.
+public Set getOLEdeweyRaw (Record record)
+{
+   List fld929List = record.getVariableFields("929");
+   Iterator iter = fld929List.iterator();
+   Set result = new LinkedHashSet();
+
+    DataField fld929;
+   
+    while (iter.hasNext())
+    {
+            fld929 = (DataField) iter.next();
+            
+            if(fld929.getSubfield('t') != null && 
+            fld929.getSubfield('t').getData().toUpperCase().contains("DDC")) 
+            {  	    
+                  String deweyRaw = fld929.getSubfield('a').getData();
+                  result.add(deweyRaw);
+            } 
+    }
+    return result;   
+}
+
+public Set getOLEdeweySort (Record record)
+
+{
+   List fld929List = record.getVariableFields("929");
+   Iterator iter = fld929List.iterator();
+   Set result = new LinkedHashSet();
+
+    DataField fld929;
+    while (iter.hasNext())
+    {
+
+            fld099 = (DataField) iter.next();
+            
+            if(fld929.getSubfield('t') != null && 
+            fld099.getSubfield('t').getData().toUpperCase().contains("DDC")) 
+            { 
+		result.add(new DeweyCallNumber(fld929.getSubfield('a').getData()).getShelfKey());
+            } 
+    }
+    return result;
+    
+}
+
+
+
+/**
+ * Normalize LC numbers for searching purposes (uppercase/stripped spaces)
+ *
+ * Can return null
+ *
+ * @param record current MARC record
+ * @param fieldSpec - which MARC fields / subfields need to be analyzed
+ * @return Set containing normalized Dewey numbers extracted from specified fields.
+ */
+public Set getLCSearchable(Record record, String fieldSpec) {
+    // Initialize our return value:
+    Set result = new LinkedHashSet();
+
+    // Loop through the specified MARC fields:
+    Set input = indexer.getFieldList(record, fieldSpec);
+    for (String current : input) {
+        // Add valid strings to the set, normalizing them to be all uppercase
+        // and free from whitespace.
+        LCCallNumber callNum = new LCCallNumber(current);
+	result.add(callNum.toString().toUpperCase().replaceAll(" ", ""));
+    }	
+
+    // If we found no call numbers, return null; otherwise, return our results:
+    if (result.isEmpty())
+        return null;
+    return result;
+}
+
+
+/**
+ * Normalize LC numbers for sorting purposes (use only the first valid number)
+ *
+ * Can return null
+ *
+ * @param record current MARC record
+ * @param fieldSpec - which MARC fields / subfields need to be analyzed
+ * @return Set containing normalized Dewey numbers extracted from specified fields.
+ */
+public String getLCSortable(Record record, String fieldSpec) {
+    LCCallNumber bestCall = null;
+    String shelfKey = null;
+    // Loop through the specified MARC fields:
+    Set input = indexer.getFieldList(record, fieldSpec);
+    for (String current : input) {
+        LCCallNumber callNum = new LCCallNumber(current);
+System.out.println("callNUM: " + callNum);
+	if (bestCall == null) {
+	    // Save first in case none are valid
+	    bestCall = callNum;
+	}
+	if (callNum.isValid()) {
+	    bestCall = callNum;
+	    break;
+	}
+    }	
+    if (bestCall != null) {
+	shelfKey = bestCall.getShelfKey();
+    }
+    return shelfKey;
+}
