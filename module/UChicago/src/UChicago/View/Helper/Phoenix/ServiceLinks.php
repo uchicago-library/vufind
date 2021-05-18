@@ -464,6 +464,7 @@ class ServiceLinks extends AbstractHelper {
                         'scanAndDeliver' =>
                             ['AVAILABLE',
                              'AVAILABLE-AT-MANSUETO',
+                             'ETAS',
                              'INPROCESS-MANSUETO',
                              'RECENTLY-RETURNED'],
                         'dllStorage' =>
