@@ -215,6 +215,7 @@ class ServiceLinks extends AbstractHelper {
                              'CMC',
                              'EckX',
                              'Film',
+                             'Games',
                              'Gen',
                              'GenHY',
                              'JRLRES',
@@ -254,6 +255,7 @@ class ServiceLinks extends AbstractHelper {
                              'SciLg',
                              'SciMicor',
                              'SciRef',
+                             'SciRR',
                              'SciHY',
                              'SFilm',
                              'Slav',
@@ -262,10 +264,10 @@ class ServiceLinks extends AbstractHelper {
                              'SOA',
                              'SRefPer',
                              'SSAdBdP',
+                             'SSAdMed',
                              'SSAdMic',
                              'SSAdPam',
                              'SSAdPer',
-                             'SSAdRef',
                              'SSAdX',
                              'W',
                              'WCJK'],
@@ -302,10 +304,12 @@ class ServiceLinks extends AbstractHelper {
                              'LawMic',
                              'LawPer',
                              'LawRef',
+                             'LawResC',
                              'LawResP',
                              'LawRR',
                              'LawStor',
                              'LawSupr',
+                             'LawWell',
                              'MapCl',
                              'Mansueto',
                              'Pam',
@@ -327,12 +331,13 @@ class ServiceLinks extends AbstractHelper {
                              'SciDDC',
                              'SciLg',
                              'SciRef',
+                             'SciRes',
+                             'SciRR',
                              'SciHY',
                              'SOA',
                              'SRefPer',
                              'SSAdBdP',
                              'SSAdDpY',
-                             'SSAdMed',
                              'SSAdMic',
                              'SSAdPam',
                              'SSAdPer',
@@ -459,6 +464,7 @@ class ServiceLinks extends AbstractHelper {
                         'scanAndDeliver' =>
                             ['AVAILABLE',
                              'AVAILABLE-AT-MANSUETO',
+                             'ETAS',
                              'INPROCESS-MANSUETO',
                              'RECENTLY-RETURNED'],
                         'dllStorage' =>
@@ -937,9 +943,15 @@ class ServiceLinks extends AbstractHelper {
      * @return html string
      */
     public function requestHelp($row, $title='') {
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on'){
+            $currentUrl = "https://";
+        } else {
+            $currentUrl = "http://";
+        }
+        $currentUrl .= $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
         $title = urlencode('Request Help Finding an Online Copy: ' . $title);
-        $defaultUrl = 'https://www.lib.uchicago.edu/search/forms/need-help-ask-librarian/?bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;subject=' . $title;
+        $defaultUrl = 'https://www.lib.uchicago.edu/search/forms/need-help-ask-librarian/?bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;subject=' . $title . '&amp;referrer=' . urlencode($currentUrl);
         if (!empty($patron)) {
             $defaultUrl = $defaultUrl . '&amp;' . $patron;
         }

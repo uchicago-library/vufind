@@ -13,12 +13,16 @@
 <div class="row">
   <div class="<?=$this->layoutClass('mainbody')?> col-sm-9">
     <h2><?=$this->transEsc('Requested Items') ?></h2>
-
     <?=$this->flashmessages()?>
 
     <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
 
     <?php if (!empty($this->recordList)): ?>
+      <ul>
+        <li>Requested items listed below are not yet available.</li>
+        <li>When items are available for pickup, you will receive an email notification, including a link to reserve a time to pick up materials from the outer lobby of Regenstein.</li>
+        <li>Items available for pickup will appear on your list of Checked Out Items.</li>
+      </ul>
       <form>
         <div class="toolbar">
           <?
@@ -98,9 +102,15 @@
 
             <?php if (count($resource->getFormats()) > 0): ?>
               <?=$this->record($resource)->getFormatList() ?>
-              <br/>
             <?php endif; ?>
-            <?php if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
+
+            <?php if (isset($ilsDetails['available']) && $ilsDetails['available'] == true && (!(isset($ilsDetails['position']) && $ilsDetails['position'] > 1))): ?>
+              <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc("hold_available") ?></div>
+            <?php else: ?>
+              <div class="text-danger"><strong>Item Status:</strong> Not Yet Available</div>
+            <?php endif; ?>
+
+            <?php if (isset($ilsDetails['volume']) && !empty(trim($ilsDetails['volume']))): ?>
               <strong><?=$this->transEsc('Volume')?>:</strong> <?=$this->escapeHtml($ilsDetails['volume'])?>
               <br />
             <?php endif; ?>
@@ -109,11 +119,6 @@
               <?=$this->escapeHtml($ilsDetails['shelvingLocation'])?>
               <br />
             <?php endif; ?>
-
-              <?php if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
-                <strong><?=$this->transEsc('Volume')?>:</strong> <?=$this->escapeHtml($ilsDetails['volume'])?>
-                <br />
-              <?php endif; ?>
 
             <?php /* Depending on the ILS driver, the "location" value may be a string or an ID; figure out the best
                value to display... */ ?>
@@ -138,15 +143,10 @@
               <br />
             <?php endif; ?>
 
-            <?php if (isset($ilsDetails['available']) && $ilsDetails['available'] == true && (!(isset($ilsDetails['position']) && $ilsDetails['position'] > 1))): ?>
-              <div class="text-success"><strong>Item Status:</strong> <?=$this->transEsc("hold_available") ?></div>
-            <?php else: ?>
-              <div class="text-danger"><strong>Item Status:</strong> Not Yet Available</div>
-            <?php endif; ?>
             <div><?=$this->transEsc("hold_queue_position") ?>: <?=$this->escapeHtml($ilsDetails['position']) ?></div>
 
             </div>
-            <div class="col-sm-4 col-xs-12">
+            <div class="media-body">
             <?php $callNumbers = $resource->getCallNumbers(); ?>
             <?php if (!empty($callNumbers)): ?>
                 <?=$this->transEsc('Call Number') ?>:
@@ -158,8 +158,9 @@
 
             <?php if (!empty($ilsDetails['expire']) && $ilsDetails['status'] != 'ONHOLD'): ?>
               <strong>Request expires:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
-            <?php elseif (!empty($ilsDetails['hold_until_date'])): ?>
-               <strong>On Hold Until:</strong> <?=$this->escapeHtml($ilsDetails['hold_until_date']) ?><br/>
+            <?php //elseif (!empty($ilsDetails['hold_until_date'])): ?>
+               <?php // Commented out for COVID-19 ?>
+               <!--<strong>On Hold Until:</strong> <?//=$this->escapeHtml($ilsDetails['hold_until_date']) ?><br/>-->
             <?php endif; ?>
 
             <?php if (!empty($ilsDetails['loan_type'])): ?>
@@ -176,7 +177,11 @@
     <?php endforeach; ?>
     <?php if ($this->cancelForm): ?></form><?php endif; ?>
   <?php else: ?>
-    <?=$this->transEsc('You have no outstanding requests') ?>.
+    <ul>
+      <li><?=$this->transEsc('You have no outstanding requests') ?>.</li>
+      <li>Items available for pickup will appear on your list of Checked Out Items.</li>
+      <li>If you have items awaiting pickup, check your email for an email notification, including a link to reserve a time to pick up materials from the outer lobby of Regenstein.</li>
+    </ul>
   <?php endif; ?>
 </div>
 

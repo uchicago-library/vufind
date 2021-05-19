@@ -137,9 +137,10 @@ class HathiLink extends AbstractHelper
      * Returns false if the bib number does not have the "ocm" or "ocn" prefix or if 
      * a 903a is not present.
      *
+     * @param $results, boolean, is it a results view.
      * @return string, link to full text in HathiTrust or false.
      */ 
-    public function getHathiLink()
+    public function getHathiLink($results=false)
     {
         $bibId = $this->view->driver->getUniqueID();
         //Handle hathi links with proxy for https
@@ -162,7 +163,12 @@ class HathiLink extends AbstractHelper
             } else {
                 $linkText = 'HathiTrust Digital Library';
             }
-            $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . '" class="hathi eLink">' . $linkText . '</a>' . $helpLink . '</div>';
+            if ($results === true) {
+                $helpText = '';
+            } else {
+                $helpText = '<br/><br/><div class="etas-help-text"><i class="fa fa-lg fa-exclamation-triangle" aria-hidden="true"></i> If the volume you need is not online, find the volume below and click "Need help?" to start a request.</div>';
+            }
+            $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . '" class="hathi eLink">' . $linkText . '</a>' . $helpLink . $helpText . '</div>';
         }
         return $hathiLink;
     }
