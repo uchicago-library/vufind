@@ -264,6 +264,7 @@ class ServiceLinks extends AbstractHelper {
                              'SOA',
                              'SRefPer',
                              'SSAdBdP',
+                             'SSADiss',
                              'SSAdMed',
                              'SSAdMic',
                              'SSAdPam',
