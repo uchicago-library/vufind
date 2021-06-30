@@ -155,7 +155,7 @@ class HathiLink extends AbstractHelper
             $oclcNumber = $this->getOCLCNumbers();
             $url = $baseUrl . $oclcNumber;
             if($this->isETAS()) {
-                $linkText = 'HathiTrust Emergency Access [Login Required]';
+                $linkText = 'HathiTrust Emergency Access [Emergency Access Ends August 1]';
                 $url = $baseUrl . $oclcNumber . '&sso=true';
                 if($helpLinkUrl) {
                     $helpLink = '<a href="'. $helpLinkUrl . '" class="login-directions">Login Directions</a>';
