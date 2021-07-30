@@ -85,12 +85,22 @@ class ServiceLinks extends AbstractHelper {
      * Make sure you know what the conditional logic requires before you update.
      */
     protected $lookupLocation = [
+                        /*Whitelist*/
+                        'asr' =>
+                            ['GameASR',
+                             'HarpASR',
+                             'JRLASR',
+                             'LawASR',
+                             'LawSupr',
+                             'RecASR',
+                             'RRADiss',
+                             'SciASR'],
                         'scrcManuscript' =>
                             ['Arch',
                              'ArcSer',
                              'Mss',
                              'MssCdx'],
-                        'scrcInMansueto' => 
+                        'scrcInMansueto' =>
                             ['ACASA',
                              'ATK',
                              'amdrama',
@@ -136,65 +146,6 @@ class ServiceLinks extends AbstractHelper {
                              'ResupS',
                              'SSAdRes',
                              'SciRes'],
-                        'cantFindIt' =>
-                            ['Art420',
-                             'ArtResA',
-                             'CDEV',
-                             'CJK',
-                             'CJKRef',
-                             'CJKRfHY',
-                             'CJKSPer',
-                             'CMC',
-                             'EckX',
-                             'Film',
-                             'Gen',
-                             'GenHY',
-                             'Law',
-                             'LawAid',
-                             'LawCity',
-                             'LawCS',
-                             'LawDisp',
-                             'LawPer',
-                             'LawRef',
-                             'LawResP',
-                             'LawRR',
-                             'MapCl',
-                             'MapRef',
-                             'Mic',
-                             'MidEMic',
-                             'Pam',
-                             'PerBio',
-                             'PerPhy',
-                             'RR',
-                             'RR2Per',
-                             'RR4',
-                             'RR4Cla',
-                             'RR4J',
-                             'RR5',
-                             'RR5EA',
-                             'RR5EPer',
-                             'RR5Per',
-                             'RRExp',
-                             'Sci',
-                             'SciDDC',
-                             'SciLg',
-                             'SciMicor',
-                             'SciRef',
-                             'SciHY',
-                             'SFilm',
-                             'Slav',
-                             'SMedia',
-                             'SMicDDC',
-                             'SOA',
-                             'SRefPer',
-                             'SSAdBdP',
-                             'SSAdMic',
-                             'SSAdPam',
-                             'SSAdPer',
-                             'SSAdRef',
-                             'SSAdX',
-                             'W',
-                             'WCJK'],
                         /* Whitelist */
                         'hold' =>
                             ['XClosedCJK',
@@ -205,73 +156,35 @@ class ServiceLinks extends AbstractHelper {
                             ['btaaspr'],
                         /*Whitelist*/
                         'paging' =>
-                            ['Art420',
-                             'ArtResA',
-                             'CDEV',
+                            ['CDEV',
                              'CJK',
-                             'CJKRef',
-                             'CJKRfHY',
-                             'CJKSPer',
                              'CMC',
                              'EckX',
                              'Film',
-                             'Games',
                              'Gen',
                              'GenHY',
-                             'JRLRES',
                              'Law',
                              'LawAid',
                              'LawCity',
                              'LawCS',
                              'LawDisp',
-                             'LawPer',
-                             'LawRef',
-                             'LawResP',
-                             'LawRR',
-                             'LawA',
-                             'LawC',
-                             'LawAnxN',
-                             'LawAnxS',
-                             'LawStor',
-                             'LawMic',
-                             'MapRef',
-                             'Mic',
-                             'MidEMic',
+                             'LawWell',
                              'Pam',
-                             'PerBio',
-                             'PerPhy',
-                             'RR',
-                             'RR2Per',
-                             'RR4',
-                             'RR4Cla',
-                             'RR4J',
-                             'RR5',
-                             'RR5EA',
-                             'RR5EPer',
-                             'RR5Per',
-                             'RRExp',
                              'Sci',
                              'SciDDC',
                              'SciLg',
-                             'SciMicor',
-                             'SciRef',
-                             'SciRR',
                              'SciHY',
                              'SFilm',
-                             'Slav',
                              'SMedia',
-                             'SMicDDC',
-                             'SOA',
-                             'SRefPer',
-                             'SSAdBdP',
-                             'SSADiss',
-                             'SSAdMed',
-                             'SSAdMic',
-                             'SSAdPam',
-                             'SSAdPer',
                              'SSAdX',
-                             'W',
-                             'WCJK'],
+                             'WCJK',
+                             'LawA',
+                             'LawAnxS',
+                             'LawC',
+                             'LawStor',
+                             'LawAnxN',
+                             'XClosedGen',
+                             'XClosedCJK'],
                         'scanAndDeliver' => 
                             ['ArtResA',
                              'CDEV',
@@ -350,29 +263,6 @@ class ServiceLinks extends AbstractHelper {
                              'WCJK',
                              'XClosedCJK',
                              'XClosedGen'],
-                        'dllStorage' => 
-                            ['LawA',
-                             'LawAnxS',
-                             'LawC',
-                             'LawMic',
-                             'LawRar',
-                             'LawStor',
-                             'LawAnxN'],
-                        'recall' => 
-                            ['Art420',
-                             'EckRes',
-                             'JRLRES',
-                             'LawRes',
-                             'LawResC',
-                             'LawResP',
-                             'Res',
-                             'Resup',
-                             'ResupC',
-                             'ResupD',
-                             'ResupE',
-                             'ResupS',
-                             'SSAdRes',
-                             'SciRes'],
                         /*Whitelist*/
                         'uBorrow' => 
                              ['ArtResA',
@@ -457,9 +347,9 @@ class ServiceLinks extends AbstractHelper {
                              'ONORDER',
                              'RETRIEVING-FROM-MANSUETO',
                              'UNAVAILABLE'],
-                        'cantFindIt' =>
+                        /*'cantFindIt' =>
                             ['AVAILABLE',
-                             'RECENTLY-RETURNED'],
+                             'RECENTLY-RETURNED'],*/
                         'inProcessAtMansueto' =>
                             ['INPROCESS-MANSUETO'],
                         'scanAndDeliver' =>
@@ -468,38 +358,17 @@ class ServiceLinks extends AbstractHelper {
                              'ETAS',
                              'INPROCESS-MANSUETO',
                              'RECENTLY-RETURNED'],
-                        'dllStorage' =>
-                            ['AVAILABLE',
-                             'RECENTLY-RETURNED'], 
                         'asr' =>
                             ['AVAILABLE-AT-MANSUETO'],
                         /*Whitelist*/
                         'hold' =>
                             ['INPROCESS',
-                             //'INTRANSIT', //Commented out for COVID-19 implementation
+                             'INTRANSIT',
                              'ONORDER'],
                         /*Whitelist*/
                         'paging' =>
                             ['AVAILABLE',
-                             'RECENTLY-RETURNED'],
-                        /*Blacklist*/
-                        'recall' => 
-                            ['ANAL',
-                             'AVAILABLE',
-                             'BTAASPR',
-                             'DECLARED-LOST',
-                             'FLAGGED-FOR-RESERVE',
-                             'INPROCESS',
-                             'INPROCESS-MANSUETO',
-                             'INTRANSIT',
-                             'LOST',
-                             'LOST-AND-PAID',
-                             'MISSING',
-                             'MISSING-FROM-MANSUETO',
-                             'ONORDER',
-                             'RECENTLY-RETURNED',
-                             'RETRIEVING-FROM-MANSUETO',
-                             'UNAVAILABLE']]; 
+                             'RECENTLY-RETURNED']]; 
  
     /**
      * Method fills all placeholders with their values from $row for 
@@ -587,11 +456,10 @@ class ServiceLinks extends AbstractHelper {
     public function asr($row) {
         $defaultUrl = '/vufind/MyResearch/Storagerequest?bib=' .  $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;action=add';
         $serviceLink = $this->getLinkConfig('mansueto', $defaultUrl); 
-        //$displayText = '<i class="fa fa-fw fa-shopping-basket" aria-hidden="true"></i> Request from Mansueto Library';
-        $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request for Pickup at Regenstein';
-        $blacklist = array_map('strtolower', $this->lookupLocation['scrcInMansueto']);
-        if (($serviceLink) and (in_array($row['status'], $this->lookupStatus['asr']) and $this->getLocation($row['locationCodes'], 'library') != 'spcl') and 
-            (!in_array(strtolower($this->getLocation($row['locationCodes'], 'shelving')), $blacklist))) {
+        $displayText = '<i class="fa fa-fw fa-shopping-basket" aria-hidden="true"></i> Request from Mansueto';
+        $whitelist = array_map('strtolower', $this->lookupLocation['asr']);
+        if ($serviceLink and (in_array($row['status'], $this->lookupStatus['asr']) and $this->getLocation($row['locationCodes'], 'library') != 'spcl') and 
+            (in_array(strtolower($this->getLocation($row['locationCodes'], 'shelving')), $whitelist))) {
             return $this->getServiceLinkTemplate($serviceLink, $displayText);
         }
     }
@@ -619,24 +487,6 @@ class ServiceLinks extends AbstractHelper {
 
     /**
      * Helper method used to test if the conditions are
-     * present for a can't find it link.
-     *
-     * @param row, array of holdings and item information
-     *
-     * @return boolean
-     */
-    protected function isCantFindIt($row){
-        $shelvingLocations = array_map('strtolower', $this->lookupLocation['cantFindIt']);
-        if (in_array($row['status'], $this->lookupStatus['cantFindIt']) and
-            in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations)) {
-                return true;
-        }
-        return false;
-    }
-
-
-    /**
-     * Helper method used to test if the conditions are
      * present for the paging link (Pickup at Regenstein).
      *
      * @param row, array of holdings and item information
@@ -647,7 +497,6 @@ class ServiceLinks extends AbstractHelper {
         $shelvingLocations = array_map('strtolower', $this->lookupLocation['paging']);
         $isRightStatus = in_array($row['status'], $this->lookupStatus['paging']);
         $location = $this->getLocation($row['locationCodes'], 'shelving');
-        $isMapCollection = $location == 'mapcl';
         $isRightLocation = in_array($location, $shelvingLocations);
         if ($isRightStatus && $isRightLocation) {
                 return true;
@@ -655,56 +504,23 @@ class ServiceLinks extends AbstractHelper {
         return false;
     }
 
-    /**
-     * Helper method used to test if the conditions are
-     * present for a dllStorage link.
-     *
-     * @param row, array of holdings and item information
-     *
-     * @return boolean
-     */
-    protected function isDllStorage($row){
-        $shelvingLocations = array_map('strtolower', $this->lookupLocation['dllStorage']); 
-        if (in_array($row['status'], $this->lookupStatus['dllStorage']) and 
-            in_array($this->getLocation($row['locationCodes'], 'shelving'), $shelvingLocations)) {
-                return true;
-        }
-        return false;
-    }
 
     /**
-     * Method creates a link to the Can't find it service
+     * Creates a Request for Pickup link (Paging)
      *
      * @param row, array of holdings and item information
      *
      * @return html string
      */
-    public function cantFindIt($row) {
-        $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
-        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('cantFindIt', $defaultUrl), $row);
-        $displayText = '<i class="fa fa-search-plus" aria-hidden="true"></i> Can\'t find it?';
-        if ($serviceLink and $this->isCantFindIt($row)) {
-            return $this->getServiceLinkTemplate($serviceLink, $displayText);
-        }
-    }
-
-    /**
-     * Creates a Request for Pickup at Regenstein link
-     *
-     * @param row, array of holdings and item information
-     *
-     * @return html string
-     */
-    public function requestPickupAtReg($row) {
-        // Add a special url param to differentiate pickup at Reg page
-        // requests from regular (Can't find it?) page/holds. 
+    public function paging($row) {
+        // Add a special url param to differentiate paging requests from others. 
         if(isset($row['link']['query'])) {
-            $row['link']['query'] = 'isPickupAtReg=true&' . $row['link']['query'];
+            $row['link']['query'] = 'isPickup=true&' . $row['link']['query'];
         }
         $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
-        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('requestPickupAtReg', $defaultUrl), $row);
+        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('paging', $defaultUrl), $row);
 
-        $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request for Pickup at Regenstein';
+        $displayText = '<i class="fa fa-truck fa-flip-horizontal" aria-hidden="true"></i> Request for Pickup';
         $closedStacks = array_map('strtolower', $this->lookupLocation['hold']);
         $location = $this->getLocation($row['locationCodes'], 'shelving');
 
@@ -736,26 +552,6 @@ class ServiceLinks extends AbstractHelper {
         }
     }
 
-    /**
-     * Method creates a link to the DLL Storage service for D'Angelo Law
-     *
-     * @param row, array of holdings and item information 
-     *        	
-     * @return html string
-     */
-    public function dllStorage($row) {
-        // Add a special url param to differentiate DLL Storage page/holds
-        // from regular (Can't find it?) page/holds. 
-        if(isset($row['link']['query'])) {
-            $row['link']['query'] = 'isDllStorage=true&' . $row['link']['query'];
-        }
-        $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
-        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('dllStorage', $defaultUrl), $row);
-        $displayText = 'Request from DLL Storage';
-        if ($serviceLink and $this->isDllStorage($row)) {
-            return $this->getServiceLinkTemplate($serviceLink, $displayText);
-        }
-    }
 
     /**
      * Method creates a GetIt link to the Relais service  
@@ -855,67 +651,6 @@ class ServiceLinks extends AbstractHelper {
         }
     }
 
-    /**
-     * Method creates a recall link.
-     *
-     * @param row, array of holdings and item information 
-     *        	
-     * @return html string 
-     */
-    public function recall($row) {
-        $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
-        //$serviceLink = 'http://forms2.lib.uchicago.edu/lib/searchform/recall-template.php?barcode=' . $row['barcode'] . '&bib=' . $row['id'];
-        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('recall', $defaultUrl), $row);
-        $displayText = '<i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Recall This';
-
-        /*Combined statuses and locations to make a blacklist*/
-        $blacklist = array_map('strtolower', array_merge($this->lookupStatus['recall'], $this->lookupLocation['recall']));
-
-        if (($serviceLink) && (!empty($row['status'])) && (!in_array(strtolower($row['status']), $blacklist)) && (!in_array($this->getLocation($row['locationCodes'], 'shelving'), $blacklist)) 
-            && !empty($row['barcode'])) {
-            return $this->getServiceLinkTemplate($serviceLink, $displayText);
-        }
-    }
-
-   /**
-     * Method creates a request link for items IN PROCESS or ON ORDER.
-     *
-     * @param row, array of holdings and item information
-     *
-     * @return html string
-     */
-    public function request($row) {
-        $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
-        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('request', $defaultUrl), $row);
-        $displayText = '<i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Place Hold';
-
-        $location = $this->getLocation($row['locationCodes'], 'shelving');
-
-        /*Locations blacklist*/
-        $blacklist = $this->lookupLocation['recall'];
-
-        /*Status whitelist*/
-        $whitelist = $this->lookupStatus['hold']; // Unavailable
-        $location_whitelist = array_map('strtolower', $this->lookupLocation['hold']);
-        $location_whitelist = []; // IMPORTANT!: this line temporarily disables place hold link on CLOSED STACK items for Hathi ETAS implementation. Delete this line to revert
-
-        /*Normal Place Hold logic*/
-        if (($serviceLink) && (!empty($row['status'])) && (in_array($row['status'], $whitelist)) && (!in_array($location, $blacklist))) {
-            return $this->getServiceLinkTemplate($serviceLink, $displayText);
-        }
-        /*For XClosedGen and XClosedCJK*/
-        elseif (in_array(strtolower($location), $location_whitelist)) {
-            // Whitelist becomes blacklist. While normally the "Place Hold" link
-            // is only displayed for certain *unavailable* statuses, we show it
-            // for XClosedGen and XClosedCJK when the item staus is *Available* or
-            // *Recently Returned* (also Available from VuFind's perspective). 
-            // That's why the whitelist becomes a blacklist.
-            $item_status_blacklist = array_merge($whitelist, ['LOANED']);
-            if (!in_array($row['status'], $item_status_blacklist)) {
-                return $this->getServiceLinkTemplate($serviceLink, $displayText);
-            }
-        }
-    }
 
     /**
      * Generates a link to the report a record form and forwards

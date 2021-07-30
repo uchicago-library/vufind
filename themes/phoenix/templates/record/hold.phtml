@@ -9,24 +9,23 @@
 
     $isHold = $this->gatheredDetails['holdtype'] == 'hold';
     $isPage = $this->gatheredDetails['holdtype'] == 'page';
-    $isDllStorage = isset($_GET['isDllStorage']);
-    $isPickupAtReg = isset($_GET['isPickupAtReg']);
+    $isPickup = isset($_GET['isPickup']);
 
     $grouperGroups = $this->ServiceLinks()->getGrouperGroups();
     $canPage = $this->ServiceLinks()->isMemberOf('uc:applications:library:paging:authorized');
+    $isLawPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:lawlibrary:authorized');
+    $isSWLPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:swl:authorized');
 ?>
 <h2>
   <?php if ($isHold):?>
-      <?php if($isPickupAtReg):?>
-        <?=$this->transEsc('pick_up_at_reg_place_text')?>
+      <?php if($isPickup):?>
+        <?=$this->transEsc('pick_up_place_text')?>
       <?php else:?>
         <?=$this->transEsc('hold_place_text')?>
       <?php endif;?>
   <?php elseif ($isPage):?>
-      <?php if($isDllStorage):?>
-        <?=$this->transEsc('dll_page_place_text')?>
-      <?php elseif($isPickupAtReg):?>
-        <?=$this->transEsc('pick_up_at_reg_place_text')?>
+      <?php if($isPickup):?>
+        <?=$this->transEsc('pick_up_place_text')?>
       <?php else:?>
         <?=$this->transEsc('page_place_text')?>
       <?endif;?>
@@ -39,21 +38,20 @@
 <?php endif; ?>
 
 <div class="hold-form">
-  <?php if (($isHold || $isPage) && $isPickupAtReg && $canPage == true):?>
-    <p>Requested items will be retrieved by Library staff and made available for pickup at Regenstein.</p>
+  <?php if (($isHold || $isPage) && $isPickup && $canPage == true):?>
+    <p>Requested items will be retrieved by Library staff and made available for pickup at your selected pickup location.</p>
     <ul>
       <li>Most items will be available for pickup <strong>within 3 business days</strong>.</li>
       <li>You may place up to 200 requests per quarter, but the paging service may only be able to fill <strong>5 requests per person per day</strong>, depending on staffing and overall request volume.</li>
-      <li><strong>You will receive an email notification when an item is available for pickup</strong>, which will include a link to reserve a 30-minute time slot to pick up your item(s). Items will be held for up to 7 days.</li>
-      <li>Procedures for pickup will be sent to you when you reserve a time slot.</li>
+      <li><strong>You will receive an email notification when an item is available for pickup</strong>.</li>
     </ul>
-  <?php elseif ($canPage == false && ($isPickupAtReg || $isHold)):?>
+  <?php elseif ($canPage == false && ($isPickup || $isHold)):?>
     <div class="alert alert-danger">
     <p>At this time, paging services are limited to current students, faculty, and staff of University of Chicago. Please monitor the Library website for changes to services as we reopen.</p>
     </div>
   <?php elseif ($isHold):?>
     <?php # Is a regular hold type from the Place Hold link ?>
-    <?php # All Place Hold links lead here because they will never have the isPickupAtReg GET paramater and $isPickupAtReg will be false ?>
+    <?php # All Place Hold links lead here because they will never have the isPickup GET paramater and $isPickup will be false ?>
     <?php # Commented out the following and replaced with below due to COVID-19 ?>
     <!--<ul>
       <li>Placing a hold request on an item will cause the item to be held for pickup for you as soon as it is available.</li>
@@ -71,29 +69,18 @@
       <li>You will receive an email notice when the item is available for pickup.</li>
     </ul>
   <?php elseif ($isPage):?>
-    <?php if($isDllStorage):?>
-      <ul>
-        <li>Requested items will be available for pickup at the D'Angelo Law Library circulation desk <strong>by 5 p.m. the following business day</strong>.</li>
-        <li>Items requested for pickup at other libraries are typically available <strong>after two business days.</strong></li>
-        <li> Building Use Only items may only be picked up at the D'Angelo Law Library.</li>
-        <li>If a requested item is missing or otherwise unavailable, you will be notified by library staff.</li>
-        <li>If you would like immediate assistance, please contact the D’Angelo Law Library circulation desk at (773) 702-0213 during our regular business <a href="https://www.lib.uchicago.edu/libraries/libraries-hours/">hours</a>.</li>
-      </ul>
-      <p>See <a href="https://www.lib.uchicago.edu/law/collections/storage/">D'Angelo Law Library Storage Collections</a> for more information.</p>
-    <?php else:?>
-      <p>If you can't find an item on the shelf, you can request that Library staff search for it.</p>
-      <ul>
-        <li>Most searches are resolved within two business days.</li>
-        <li>If found, the item will be made available for pick up and you will be notified by email.
-          <ul>
-            <li>Items requested for pickup at their home location will be available as soon as they are located.</li>
-            <li>Items requested for pickup at another location will be available within one business day after they are located.  </li>
-          </ul>
-        </li>
-        <li>If not found, staff will notify you that it has been declared missing.</li>
-        <li>If you would like immediate assistance, ask at any reference or circulation desk.</li>
-      </ul>
-    <?php endif; ?>
+    <p>If you can't find an item on the shelf, you can request that Library staff search for it.</p>
+    <ul>
+      <li>Most searches are resolved within two business days.</li>
+      <li>If found, the item will be made available for pick up and you will be notified by email.
+        <ul>
+          <li>Items requested for pickup at their home location will be available as soon as they are located.</li>
+          <li>Items requested for pickup at another location will be available within one business day after they are located.  </li>
+        </ul>
+      </li>
+      <li>If not found, staff will notify you that it has been declared missing.</li>
+      <li>If you would like immediate assistance, ask at any reference or circulation desk.</li>
+    </ul>
   <?php else: ?>
     <ul>
       <li>Recalling a <strong>loaned</strong> item from another user will cause the item to be due <strong>7 days after the date it is recalled</strong>.</li>
@@ -103,7 +90,7 @@
     </ul>
   <?php endif; ?>
 
-  <?php if (!($canPage == false && ($isPickupAtReg || $isHold))): ?>
+  <?php if (!($canPage == false && ($isPickup || $isHold))): ?>
     <div class="alert alert-info">
     <p>Requests can take sixty seconds to process. Please be patient when
     submitting this form.</p>
@@ -187,16 +174,7 @@
                 </select>
               </div>
             </div>
-          <?php elseif ($isPickupAtReg): ?>
-            <div class="form-group hold-pickup-location">
-              <label class="col-sm-3 control-label"><?=$this->transEsc("pick_up_location")?>:</label>
-              <div class="col-sm-9">
-                <select id="pickUpLocation" name="gatheredDetails[pickUpLocation]" class="form-control">
-                  <option value="JRLMAIN" selected="selected">Regenstein</option>
-                </select>
-              </div>
-            </div>
-          <?php elseif ($this->pickup): ?>
+          <?php elseif ($isPickup || $this->pickup): ?>
             <div class="form-group hold-pickup-location">
               <label class="col-sm-3 control-label"><?=$this->transEsc("pick_up_location")?>:</label>
               <div class="col-sm-9">
@@ -207,6 +185,14 @@
                   </option>
                 <?php endif; ?>
                 <option value="JRLMAIN" selected="selected">Regenstein</option>
+                <option value="CRERAR">Crerar</option>
+                <option value="ECKHART">Eckhart</option>
+                <?php if ($isLawPatron == true): ?>
+                    <option value="LAW" selected="selected">D'Angelo Law (Law Only)</option>
+                <?php endif; ?>
+                <?php if ($isSWLPatron == true): ?>
+                    <option value="SSAd" selected="selected">Social Work Library (Crown only)</option>
+                <?php endif; ?>
                 <?php # Added the above line and commented out the below to support holds during COVID-19 ?>
                 <?php foreach ($this->pickup as $lib): ?>
                   <!--<option value="<?=$this->escapeHtmlAttr($lib['locationID'])?>"<?=($selected == $lib['locationID']) ? ' selected="selected"' : ''?>>
@@ -226,7 +212,7 @@
           </div>
         </div>
       </form>
-  <?php endif; ?> <!--./if (!($canPage == false && $isPickupAtReg))-->
+  <?php endif; ?> <!--./if (!($canPage == false && $isPickup))-->
 </div>
 
 <?

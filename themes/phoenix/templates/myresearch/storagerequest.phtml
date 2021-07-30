@@ -4,7 +4,8 @@
 
     $grouperGroups = $this->ServiceLinks()->getGrouperGroups();
     $canPage = $this->ServiceLinks()->isMemberOf('uc:applications:library:paging:authorized');
-
+    $isLawPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:lawlibrary:authorized');
+    $isSWLPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:swl:authorized');
 ?>
 
 <div class="<?=$this->layoutClass('mainbody')?> col-sm-9">
@@ -22,13 +23,6 @@
 submitted. For the status of requested Mansueto items, check <a
 href="/vufind/MyResearch/Holds">Requested Items</a>.</p>
     <? else: ?>
-            <p>Requested items will be retrieved by Library staff and made available for pickup at Regenstein.</p>
-            <ul>
-              <li>Most items will be available for pickup <strong>within 3 business days</strong>.</li>
-              <li>You may place up to 200 requests per quarter, but the paging service may only be able to fill <strong>5 requests per person per day</strong>, depending on staffing and overall request volume.</li>
-              <li><strong>You will receive an email notification when an item is available for pickup</strong>, which will include a link to reserve a 30-minute time slot to pick up your item(s). Items will be held for up to 7 days.</li>
-              <li>Procedures for pickup will be sent to you when you reserve a time slot.</li>
-            </ul>
 	        <form action='/vufind/MyResearch/Storagerequest' method='post' name="mansuetoRequests">
             <p>
             <span id="asrselectallornone"></span>
@@ -69,13 +63,17 @@ href="/vufind/MyResearch/Holds">Requested Items</a>.</p>
 
 	        <label for='asrpickuplocation'>Select Pickup Location</label>
             <select id='asrpickuplocation' name='location'>
-	            <!--<option value=''>Select...</option>-->
-	            <option value='JRLMAIN'>Regenstein Lib, within 3 business days</option>
-	            <!--<option value='MANSUETO'>Mansueto within 15 min during open hours</option>
-	            <option value='CRERAR'>Crerar Lib, within 1 business day</option>
-	            <option value='LAW'>D'Angelo Law Lib, within 1 business day</option>
+	            <option value=''>Select...</option>
+	            <!--<option value='JRLMAIN'>Regenstein Lib, within 3 business days</option>-->
+	            <option value='MANSUETO'>Mansueto (within 15 minutes)</option>
+	            <option value='CRERAR'>Crerar (within 1 business day)</option>
 	            <option value='ECKHART'>Eckhart Lib, within 1 business day</option>
-	            <option value='SSAd'>Soc Serv Admin Lib within 1 business day</option>-->
+                <?php if ($isLawPatron == true): ?>
+	              <option value='LAW' selected="selected">D'Angelo Law (Law Only)</option>
+                <?php endif; ?>
+                <?php if ($isSWLPatron == true): ?>
+	              <option value='SSAd' selected="selected">Social Work Library (Crown only)</option>
+                <?php endif; ?>
 	        </select>
 
             <p style="text-align: right;">	

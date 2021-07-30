@@ -384,9 +384,7 @@
                </span>
                <span class="service-links">
                <?=$this->ServiceLinks()->asr($row)?>
-               <?=$this->ServiceLinks()->dllStorage($row)?>
-               <?=$this->ServiceLinks()->cantFindIt($row)?>
-               <?=$this->ServiceLinks()->requestPickupAtReg($row)?>
+               <?=$this->ServiceLinks()->paging($row)?>
                <?=$this->ServiceLinks()->inProcessAtMansueto($row)?>
                <?=$this->ServiceLinks()->debugging($row)?>
               <?php if (isset($row['link']) && $row['link']): ?>
@@ -439,15 +437,11 @@
               <?=$this->ServiceLinks()->debugging($row)?>
               <?php if (isset($row['link']) && $row['link'] && !$row['claimsReturned']): ?>
                 <!--<a class="<?//=$check ? 'checkRequest' : ''?> modal-link inlineblock placehold" href="<?//=$this->recordLink()->getRequestUrl($row['link'])?>"><i class="fa fa-flag"></i>&nbsp;<?//=$this->transEsc($check ? "Check Recall" : "Recall This")?></a>-->
-                <?=$this->ServiceLinks()->recall($row)?>
               <?php endif; ?>
             <?php endif; ?>
               <?php /* Begin Items that are either Available or Unavailable */ ?>
                 <?=$this->ServiceLinks()->aeon($row)?>
                 <?=$this->ServiceLinks()->altText($this->driver->getFormats(), $bib, $row)?>
-                <?=$this->ServiceLinks()->borrowDirect($row)?>
-                <?=$this->ServiceLinks()->uBorrow($row)?>
-                <?=$this->ServiceLinks()->request($row)?>
                 <?=$this->ServiceLinks()->scanAndDeliver($row)?>
                 <?=$this->ServiceLinks()->offsite($row)?>
                 <?=$this->ServiceLinks()->requestHelp($row, $cleanTitle)?>
