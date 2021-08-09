@@ -411,9 +411,6 @@ public class ucFormat
                                                                break;
                                                        }
                                                }
-  
-
-                                               System.out.println(" ~~~~!!!!     Inside 903 A ");
 						result.add("Eresource");
 					}
 				}
