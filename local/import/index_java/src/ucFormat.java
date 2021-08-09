@@ -402,8 +402,18 @@ public class ucFormat
 
 				if(fld903.getSubfield('a') != null)
 				{
-					if ( fld903.getSubfield('a').getData().contains("Hathi"))
-					{
+				 	if ( fld903.getSubfield('a').getData().contains("Hathi"))
+			                {
+                                               if(fld903.getSubfield('r') != null)
+                                               {
+                                                       if ( fld903.getSubfield('r').getData().toUpperCase().contains("ETAS"))
+                                                       {
+                                                               break;
+                                                       }
+                                               }
+  
+
+                                               System.out.println(" ~~~~!!!!     Inside 903 A ");
 						result.add("Eresource");
 					}
 				}
