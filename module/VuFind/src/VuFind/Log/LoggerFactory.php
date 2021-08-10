@@ -409,7 +409,7 @@ class LoggerFactory implements FactoryInterface
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when
      * creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws ContainerException&\Throwable if any other error occurs
      */
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
@@ -425,11 +425,9 @@ class LoggerFactory implements FactoryInterface
             $proxy->setProxyInitializer(null);
 
             // Now build the actual service:
-            $loggerOptions = [
-                'vufind_ip_reader' =>
-                    $container->get(\VuFind\Net\UserIpReader::class)
-            ];
-            $wrapped = new $requestedName($loggerOptions);
+            $wrapped = new $requestedName(
+                $container->get(\VuFind\Net\UserIpReader::class)
+            );
             $this->configureLogger($container, $wrapped);
         };
         $cfg = $container->get(\ProxyManager\Configuration::class);
