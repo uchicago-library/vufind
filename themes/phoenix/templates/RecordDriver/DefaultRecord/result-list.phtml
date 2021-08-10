@@ -1,4 +1,7 @@
 <?php
+  ### UChicago customization ###
+  $isbns = $this->driver->getISBNs();
+  ### ./UChicago customization ###
   $coverDetails = $this->record($this->driver)->getCoverDetails('result-list', 'medium', $this->recordLink()->getUrl($this->driver));
   $cover = $coverDetails['html'];
   $thumbnail = false;
@@ -174,6 +177,11 @@
       <div class="result-previews">
         <?=$this->record($this->driver)->getPreviews()?>
       </div>
+      <?php ### UChicago customization ### ?>
+        <?php if ($isbns): ?>
+          <div class="holdings-unit online" data-isbns='<?=json_encode($isbns)?>'></div>
+        <?php endif; ?>
+      <?php ### ./UChicago customization ### ?>
     </div>
     <div class="result-links hidden-print">
       <?php /* Display qrcode if appropriate: */ ?>

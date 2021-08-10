@@ -56,6 +56,30 @@ function updateSearchPlaceholderText(select) {
   select.prevAll('input').eq(0).attr('placeholder', placeholder);
 }
 
+/*
+ * Get all e-holdings and e-links from the holdings
+ * mega service. Responsible for generating the "Intranet"
+ * box with e-holdings links on full record page and the
+ * same links on results pages.
+ */
+const eholdingsMegaService = (isbns, target, onlineHeader = false) => {
+  let url ='https://www.lib.uchicago.edu/cgi-bin/megaholdings?function=megaholdings&callback=x&nums=';
+  url += isbns.map(x => `isbn:${x}`).join(',');
+  $.get(url, function(data, status, xhr) {
+    const response = JSON.parse(data);
+    const links = response.oks;
+    if (links !== undefined && links.length != 0) {
+      let html = '';
+      if (onlineHeader) {
+        html = '<h3>Online</h3>';
+      }
+      html += links.map(l => {
+        return `<div><a href="${l.link}">${l.linktext}</a></div>`;
+      }).join('');
+      target.append(html);
+    }
+  }, 'text'); // Not JSON?
+}
 
 $(document).ready(function() {
   // Better RSS icon
@@ -81,4 +105,11 @@ $(document).ready(function() {
   // Add Bootstrap 'from-control' to homepage search button 
   var homeSearchButton = $('.template-name-home #searchForm .btn-primary');
   homeSearchButton.addClass('form-control');
+
+  // E-holdings Mega Service
+  $('[data-isbns]').each(function() {
+    const isbns = $(this).data('isbns');
+    const showOnlineHeader = $(this).data('online-header');
+    eholdingsMegaService(isbns, $(this), showOnlineHeader);
+  });
 });
