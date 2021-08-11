@@ -682,8 +682,7 @@ class OLE extends AbstractBase implements \VuFindHttp\HttpServiceAwareInterface
         $available = ($availableDateTime <= date('Y-m-d')) ? true:false;
         // JEJ CHANGE
         // Did the API change to return a string instead of date? (DL)
-        //$available = ((string) $itemXml->availableStatus == 'ONHOLD') ?  true:false;
-        $available = false; // COVID-19 Change: Above line commented out and this one added        
+        $available = ((string) $itemXml->availableStatus == 'ONHOLD') ?  true:false;
 
         /* Get stuff from the DB that we should be getting from the
            circ API but can't */

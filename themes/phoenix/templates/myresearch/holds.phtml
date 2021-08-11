@@ -18,11 +18,8 @@
     <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
 
     <?php if (!empty($this->recordList)): ?>
-      <ul>
-        <li>Requested items listed below are not yet available.</li>
-        <li>When items are available for pickup, you will receive an email notification, including a link to reserve a time to pick up materials from the outer lobby of Regenstein.</li>
-        <li>Items available for pickup will appear on your list of Checked Out Items.</li>
-      </ul>
+      <p>Items listed as "Available for pickup" will be held at their selected pickup location until the date listed.<br/>
+      See <a href="https://hours.lib.uchicago.edu">hours.lib.uchicago.edu</a> for circulation hours at your selected pickup location.</p>
       <form>
         <div class="toolbar">
           <?
@@ -158,9 +155,8 @@
 
             <?php if (!empty($ilsDetails['expire']) && $ilsDetails['status'] != 'ONHOLD'): ?>
               <strong>Request expires:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?><br/>
-            <?php //elseif (!empty($ilsDetails['hold_until_date'])): ?>
-               <?php // Commented out for COVID-19 ?>
-               <!--<strong>On Hold Until:</strong> <?//=$this->escapeHtml($ilsDetails['hold_until_date']) ?><br/>-->
+            <?php elseif (!empty($ilsDetails['hold_until_date'])): ?>
+               <strong>On Hold Until:</strong> <?=$this->escapeHtml($ilsDetails['hold_until_date']) ?><br/>
             <?php endif; ?>
 
             <?php if (!empty($ilsDetails['loan_type'])): ?>
@@ -177,11 +173,7 @@
     <?php endforeach; ?>
     <?php if ($this->cancelForm): ?></form><?php endif; ?>
   <?php else: ?>
-    <ul>
-      <li><?=$this->transEsc('You have no outstanding requests') ?>.</li>
-      <li>Items available for pickup will appear on your list of Checked Out Items.</li>
-      <li>If you have items awaiting pickup, check your email for an email notification, including a link to reserve a time to pick up materials from the outer lobby of Regenstein.</li>
-    </ul>
+    <p><?=$this->transEsc('You have no outstanding requests') ?>.</p>
   <?php endif; ?>
 </div>
 
