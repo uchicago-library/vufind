@@ -166,7 +166,7 @@ class HathiLink extends AbstractHelper
             if ($results === true) {
                 $helpText = '';
             } else {
-                $helpText = '<br/><br/><div class="etas-help-text"><i class="fa fa-lg fa-exclamation-triangle" aria-hidden="true"></i> If the volume you need is not online, find the volume below and click "Need help?" to start a request.</div>';
+                $helpText = '';
             }
             $hathiLink = '<div class="hathiPreviewDiv"><a href="' . $url . '" class="hathi eLink">' . $linkText . '</a>' . $helpLink . $helpText . '</div>';
         }
