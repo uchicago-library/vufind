@@ -701,7 +701,7 @@ class ServiceLinks extends AbstractHelper {
         }
         $currentUrl .= $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         $patron = $this->urlEncodeArrayAsString($this->getServerVars(array('cn', 'mail')));
-        $title = urlencode('Request Help Finding an Online Copy: ' . $title);
+        $title = urlencode('Ask a Librarian Library Catalog: ' . $title);
         $defaultUrl = 'https://www.lib.uchicago.edu/search/forms/need-help-ask-librarian/?bib=' . $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;subject=' . $title . '&amp;referrer=' . urlencode($currentUrl);
         if (!empty($patron)) {
             $defaultUrl = $defaultUrl . '&amp;' . $patron;
