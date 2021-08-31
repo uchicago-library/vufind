@@ -185,6 +185,21 @@ class ServiceLinks extends AbstractHelper {
                              'LawAnxN',
                              'XClosedGen',
                              'XClosedCJK'],
+                        'recall' =>
+                            ['Art420',
+                             'EckRes',
+                             'JRLRES',
+                             'LawRes',
+                             'LawResC',
+                             'LawResP',
+                             'Res',
+                             'Resup',
+                             'ResupC',
+                             'ResupD',
+                             'ResupE',
+                             'ResupS',
+                             'SSAdRes',
+                             'SciRes'],
                         'scanAndDeliver' => 
                             ['ArtResA',
                              'CDEV',
@@ -805,6 +820,45 @@ class ServiceLinks extends AbstractHelper {
     public function isMemberOf($groupName) {
         $groups = $this->getGrouperGroups();
         return in_array($groupName, $groups);
+    }
+
+   /**
+     * Method creates a request link for items IN PROCESS or ON ORDER.
+     *
+     * @param row, array of holdings and item information
+     *
+     * @return html string
+     */
+    public function hold($row) {
+        $defaultUrl = $this->view->recordLink()->getHoldUrl($row['link']);
+        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('request', $defaultUrl), $row);
+        $displayText = '<i class="fa fa-chevron-circle-down" aria-hidden="true"></i> Place Hold';
+
+        $location = $this->getLocation($row['locationCodes'], 'shelving');
+
+        /*Locations blacklist*/
+        $blacklist = $this->lookupLocation['recall'];
+
+        /*Status whitelist*/
+        $whitelist = $this->lookupStatus['hold']; // Unavailable
+        $location_whitelist = array_map('strtolower', $this->lookupLocation['hold']);
+
+        /*Normal Place Hold logic*/
+        if (($serviceLink) && (!empty($row['status'])) && (in_array($row['status'], $whitelist)) && (!in_array($location, $blacklist))) {
+            return $this->getServiceLinkTemplate($serviceLink, $displayText);
+        }
+        /*For XClosedGen and XClosedCJK*/
+        elseif (in_array(strtolower($location), $location_whitelist)) {
+            // Whitelist becomes blacklist. While normally the "Place Hold" link
+            // is only displayed for certain *unavailable* statuses, we show it
+            // for XClosedGen and XClosedCJK when the item staus is *Available* or
+            // *Recently Returned* (also Available from VuFind's perspective).
+            // That's why the whitelist becomes a blacklist.
+            $item_status_blacklist = array_merge($whitelist, ['LOANED']);
+            if (!in_array($row['status'], $item_status_blacklist)) {
+                return $this->getServiceLinkTemplate($serviceLink, $displayText);
+            }
+        }
     }
 
     /**

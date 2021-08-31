@@ -432,6 +432,7 @@
               <?php endif; ?>
               <?php endif; //end if/else for row['status'] == 'ANAL'?>
               <span class="service-links">
+              <?=$this->ServiceLinks()->hold($row)?>
               <?=$this->ServiceLinks()->asr($row)?>
               <?=$this->ServiceLinks()->getIt($row)?>
               <?=$this->ServiceLinks()->debugging($row)?>
