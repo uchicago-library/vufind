@@ -168,6 +168,7 @@ class ServiceLinks extends AbstractHelper {
                              'LawCity',
                              'LawCS',
                              'LawDisp',
+                             'LawDVD',
                              'LawWell',
                              'Pam',
                              'Sci',
