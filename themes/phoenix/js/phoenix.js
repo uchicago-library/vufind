@@ -81,9 +81,34 @@ const eholdingsMegaService = (isbns, target, onlineHeader = false) => {
   }, 'text'); // Not JSON?
 }
 
+/*
+ * Use AJAX to generate a friendlier version of the map link with location text.
+ */
+function getMapLink(loc, callnum, prefix, target) {
+  var urlparams = '&location=' + loc + '&callnum=' + callnum + '&callnumPrefix=' + prefix;
+  var maplookupurl = 'https://forms2.lib.uchicago.edu/lib/maplookup/maplookup.php?json=true' + encodeURI(urlparams);
+  $.get(maplookupurl, function(data, status, xhr) {
+    var response = JSON.parse(data);
+    if(response == null) {
+        $(target).addClass('hide');
+    } else {
+        target.html('<i class="fa fa-map-marker" aria-hidden="true"></i> ' + response.location);
+        target.attr("href", response.url);
+    }
+  }, 'html');
+}
+
 $(document).ready(function() {
   // Better RSS icon
   $('.fa-bell').addClass('fa-rss').removeClass('fa-bell');
+
+  /*** Maplookup service link ***/
+  $('.maplookup').each(function() {
+    var loc = $(this).data('location');
+    var callnum = $(this).data('callnum');
+    var prefix = $(this).data('prefix');
+    getMapLink(loc, callnum, prefix, $(this));
+  });
 
   // Update searchbox placeholder text on page load and
   // when the select pulldown changes.

@@ -93,6 +93,11 @@
 <table class="table table-striped">
   <caption class="sr-only"><?=$this->transEsc('holdings_details_from', ['%%location%%' => $this->transEsc($holding['location'])]) ?></caption>
   <?php $callNos = $this->tab->getUniqueCallNumbers($holding['items'], true); if (!empty($callNos)): ?>
+  <? ### UChicago customization ### ?>
+  <? foreach ($callNos as $callNo): ?>
+    <?=$this->ServiceLinks()->maps($locationText, $callNo['callnumber'], $callNo['prefix']);?>
+  <?php endforeach; ?>
+  <? ### ./UChicago customization ### ?>
   <tr>
     <th><?=$this->transEsc("Call Number")?>: </th>
     <td width="50%">

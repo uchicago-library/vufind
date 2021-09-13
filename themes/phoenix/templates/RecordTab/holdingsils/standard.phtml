@@ -1,3 +1,4 @@
+<?=$this->ServiceLinks()->hold($holding)?>
 <?php if (strlen($holding['barcode'] ?? '') > 0): ?>
   <?php
     $check = $holding['check'] ?? false;
@@ -22,7 +23,9 @@
           <?php /* Begin Available Items (Holds) */ ?>
            <span class="text-success"><?=$this->transEsc("Available")?><link property="availability" href="http://schema.org/InStock" /></span>
           <?php if ($holding['link'] ?? false): ?>
-            <a class="<?=$check ? 'checkRequest ' : ''?>placehold" <?php if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php endif; ?>href="<?=$this->recordLink()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>
+            <? ### UChicago customization ### ?>
+            <!--<a class="<?//=$check ? 'checkRequest ' : ''?>placehold" <?php //if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php //endif; ?>href="<?//=$this->recordLink()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?//=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>-->
+            <? ### ./UChicago customization ### ?>
           <?php endif; ?>
           <?php if ($holding['storageRetrievalRequestLink'] ?? false): ?>
             <a class="<?=$checkStorageRetrievalRequest ? 'checkStorageRetrievalRequest ' : ''?> placeStorageRetrievalRequest" data-lightbox href="<?=$this->recordLink()->getRequestUrl($holding['storageRetrievalRequestLink'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc($checkStorageRetrievalRequest ? "storage_retrieval_request_check_text" : "storage_retrieval_request_place_text")?></a>
@@ -41,12 +44,23 @@
             <span><?=$this->transEsc("Requests")?>: <?=$this->escapeHtml($holding['requests_placed'])?></span>
           <?php endif; ?>
           <?php if ($holding['link'] ?? false): ?>
-            <a class="<?=$check ? 'checkRequest' : ''?> placehold" <?php if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php endif; ?>href="<?=$this->recordLink()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc($check ? "Check Recall" : "Recall This")?></a>
+            <? ### UChicago customization ### ?>
+            <!--<a class="<?//=$check ? 'checkRequest' : ''?> placehold" <?php //if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php //endif; ?>href="<?//=$this->recordLink()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?//=$this->transEsc($check ? "Check Recall" : "Recall This")?></a>-->
+            <? ### ./UChicago customization ### ?>
           <?php endif; ?>
           <?=$this->relais()->renderButtonIfActive($this->driver ?? null)?>
         <?php endif; ?>
         <span class="service-links">
-          <?=$this->ServiceLinks()->test($holding)?>
+          <?=$this->ServiceLinks()->mansueto($holding)?>
+          <?=$this->ServiceLinks()->ill($holding)?>
+          <?=$this->ServiceLinks()->scrc($holding)?>
+          <?=$this->ServiceLinks()->alttext($this->driver->getFormats(), $this->driver->getUniqueID(), $holding)?>
+          <?=$this->ServiceLinks()->scanAndDeliver($holding)?>
+          <?=$this->ServiceLinks()->offsite($holding)?>
+          <?=$this->ServiceLinks()->paging($holding)?>
+          <?=$this->ServiceLinks()->ask($holding)?>
+          <?=$this->ServiceLinks()->askSCRC($holding)?>
+          <?=$this->ServiceLinks()->itemServlet($holding)?>
         </span>
         <?php if (isset($holding['item_notes'])): ?>
           <div class="item-notes">
