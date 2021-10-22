@@ -83,19 +83,22 @@
 
 <?php foreach ($holdings['holdings'] ?? [] as $holding): ?>
 <h3>
-  <?php $locationText = $this->transEscWithPrefix('location_', $holding['location']); ?>
+  <? ### UChicago customization ### ?>
+  <?php $holdingLoc = $holding['items'][0]['holding_location'] ?? '';?>
+  <?php $holdingLocationText = $this->transEscWithPrefix('location_', $holdingLoc); ?>
   <?php if ($holding['locationhref'] ?? false): ?>
-    <a href="<?=$holding['locationhref']?>" target="_blank"><?=$locationText?></a>
+    <a href="<?=$holding['locationhref']?>" target="_blank"><?=$holdingLocationText?></a>
   <?php else: ?>
-    <?=$locationText?>
+    <?=$holdingLocationText?>
   <?php endif; ?>
+  <? ### ./UChicago customization ### ?>
 </h3>
 <table class="table table-striped">
   <caption class="sr-only"><?=$this->transEsc('holdings_details_from', ['%%location%%' => $this->transEsc($holding['location'])]) ?></caption>
   <?php $callNos = $this->tab->getUniqueCallNumbers($holding['items'], true); if (!empty($callNos)): ?>
   <? ### UChicago customization ### ?>
   <? foreach ($callNos as $callNo): ?>
-    <?=$this->ServiceLinks()->maps($locationText, $callNo['callnumber'], $callNo['prefix']);?>
+    <?=$this->ServiceLinks()->maps($holdingLocationText, $callNo['callnumber'], $callNo['prefix']);?>
   <?php endforeach; ?>
   <? ### ./UChicago customization ### ?>
   <tr>
@@ -103,7 +106,12 @@
     <td width="50%">
       <?php foreach ($callNos as $callNo): ?>
         <?php if ($this->callnumberHandler): ?>
-          <a href="<?=$this->url('alphabrowse-home') ?>?source=<?=$this->escapeHtmlAttr($this->callnumberHandler) ?>&amp;from=<?=$this->escapeHtmlAttr($callNo['callnumber']) ?>"><?=$this->escapeHtml($callNo['display'])?></a>
+          <a href="<?=$this->url('alphabrowse-home') ?>?source=<?=$this->escapeHtmlAttr($this->callnumberHandler) ?>&amp;from=<?=$this->escapeHtmlAttr($callNo['callnumber']) ?>"><?=$this->escapeHtml($callNo['display'])?>
+            <? ### UChicago customization ### ?>
+            <?php if (!empty($holding['items'][0]['uc_copy_number'])): ?>
+                <?=' '. $holding['items'][0]['uc_copy_number']?>
+            <?php endif; ?>
+            <? ### ./UChicago customization ### ?></a>
         <?php else: ?>
           <?=$this->escapeHtml($callNo['display'])?>
         <?php endif; ?>
@@ -142,6 +150,12 @@
     <tr>
       <th><?=$this->transEsc("Most Recent Received Issues")?>:</th>
       <td>
+        <? ### UChicago customization ### ?>
+        <?php $unboundLocation = $holding['purchase_history'][0]['unbound_location']; ?>
+        <? if ($unboundLocation): ?>
+          <?=$unboundLocation;?><br/>
+        <?php endif; ?>
+        <? ### ./UChicago customization ### ?>
         <?php foreach ($holding['purchase_history'] as $current): ?>
           <?=$this->escapeHtml($current['issue'])?><br/>
         <?php endforeach; ?>

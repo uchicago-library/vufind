@@ -12,16 +12,17 @@ class HoldingsILS extends \VuFind\RecordTab\HoldingsILS
      *
      * @return array
      */
-    public function getUniqueCallNumbersPhoenix($items, $display=false)
+    public function getUniqueCallNumbers($items, $display=false)
     {
         $callNos = [];
         foreach ($items as $i => $item) {
-            if (isset($item['callnumber']) && strlen($item['callnumber']) > 0) {
-                $prefix = $item['callnumber_prefix'] ?? '';
-                $callnumber = $item['callnumber'];
+            if (isset($item['holding_callnumber']) && strlen($item['holding_callnumber']) > 0) {
+                $prefix = $item['holding_callnumber_prefix'] ?? '';
+                $callnumber = $item['holding_callnumber'];
                 $callNos[$i]['callnumber'] = $callnumber;
                 $callNos[$i]['display'] = $prefix ? $prefix . ' ' . $callnumber : $callnumber;
                 $callNos[$i]['prefix'] = $item['callnumber_prefix'] ?? '';
+                break;
             }
         }
 

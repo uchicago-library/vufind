@@ -6,7 +6,9 @@
     $checkILLRequest = $holding['checkILLRequest'] ?? false;
   ?>
   <tr vocab="http://schema.org/" typeof="Offer">
-    <th class="copy-number"><?=$this->transEsc("Copy")?> <?=$this->escapeHtml($holding['number'])?>
+    <? ### UChicago customization ### ?>
+    <th class="copy-number"><?=$this->escapeHtml($holding['number'])?>
+    <? ### ./UChicago customization ### ?>
       <?php if ($holding['enumchron'] ?? false): ?>
         <span class="enumchron">(<?=$this->escapeHtml($holding['enumchron'])?>)</span>
       <?php endif; ?>         
@@ -23,7 +25,7 @@
           <?php /* Begin Available Items (Holds) */ ?>
            <span class="text-success"><?=$this->transEsc("Available")?><link property="availability" href="http://schema.org/InStock" /></span>
           <?php if ($holding['link'] ?? false): ?>
-            <? ### UChicago customization ### ?>
+            <? ### uchicago customization ### ?>
             <!--<a class="<?//=$check ? 'checkRequest ' : ''?>placehold" <?php //if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php //endif; ?>href="<?//=$this->recordLink()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?//=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>-->
             <? ### ./UChicago customization ### ?>
           <?php endif; ?>
@@ -50,6 +52,7 @@
           <?php endif; ?>
           <?=$this->relais()->renderButtonIfActive($this->driver ?? null)?>
         <?php endif; ?>
+        <? ### UChicago customization ### ?>
         <span class="service-links">
           <?=$this->ServiceLinks()->mansueto($holding)?>
           <?=$this->ServiceLinks()->ill($holding)?>
@@ -62,6 +65,30 @@
           <?=$this->ServiceLinks()->askSCRC($holding)?>
           <?=$this->ServiceLinks()->itemServlet($holding)?>
         </span>
+        <? ### ./UChicago customization ### ?>
+        <? ### UChicago customization ### ?>
+        <?php if ($holding['holding_location'] != $holding['location']): ?>
+          <span class="location-change">
+              <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+              <strong>Shelved in:</strong> <?=$holding['location'];?>
+          </span>
+        <?php endif; ?>
+        <? ### ./UChicago customization ### ?>
+        <? ### UChicago customization ### ?>
+        <?php $itemCallnumDisplay = $holding['callnumber_prefix'] ?
+            $holding['callnumber_prefix'] . ' ' . $holding['callnumber'] :
+            $holding['callnumber'];?>
+        <?php $holdingCallnumDisplay = $holding['holding_callnumber_prefix'] ?
+            $holding['holding_callnumber_prefix'] . ' ' . $holding['holding_callnumber'] :
+            $holding['holding_callnumber'];?>
+        <?php if ($itemCallnumDisplay != $holdingCallnumDisplay): ?>
+          <span class="location-change">
+            <i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i>
+            <strong>Shelved as:</strong>
+            <?=$itemCallnumDisplay;?>
+          </span>
+        <?php endif; ?>
+        <? ### ./UChicago customization ### ?>
         <?php if (isset($holding['item_notes'])): ?>
           <div class="item-notes">
             <b><?=$this->transEsc("Item Notes")?>:</b>
