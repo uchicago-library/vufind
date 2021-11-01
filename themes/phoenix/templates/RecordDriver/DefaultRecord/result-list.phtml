@@ -1,6 +1,11 @@
 <?php
   ### UChicago customization ###
   $isbns = $this->driver->getISBNs();
+  $issns = $this->driver->getISSNs();
+  $oclc = $this->driver->getOCLC();
+  $bib = $this->driver->getUniqueID();
+  $isSfxStub = strtolower(substr($bib, 0, 3)) == 'sfx';
+  $sfxNum = $isSfxStub ? substr($bib, 4) : '';
   ### ./UChicago customization ###
   $coverDetails = $this->record($this->driver)->getCoverDetails('result-list', 'medium', $this->recordLink()->getUrl($this->driver));
   $cover = $coverDetails['html'];
@@ -187,9 +192,12 @@
         <?=$this->record($this->driver)->getPreviews()?>
       </div>
       <?php ### UChicago customization ### ?>
-        <?php if ($isbns): ?>
-          <div class="holdings-unit online" data-isbns='<?=json_encode($isbns)?>'></div>
+        <?php if ($isbns || $oclc): ?>
+          <div class="e-links holdings-unit online" data-isbns='<?=json_encode($isbns)?>' data-oclc-nums='<?=json_encode($oclc)?>'></div>
         <?php endif; ?>
+        <?php if ($issns || $sfxNum): ?>
+          <div class="deduped holdings-unit online" data-sfx="<?=$sfxNum?>" data-issns="<?=implode(',', $issns)?>"></div>
+        <? endif; ?>
       <?php ### ./UChicago customization ### ?>
     </div>
     <div class="result-links hidden-print">
