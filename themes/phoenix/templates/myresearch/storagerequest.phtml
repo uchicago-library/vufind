@@ -3,7 +3,6 @@
     $this->headTitle('Mansueto Cart');
 
     $grouperGroups = $this->ServiceLinks()->getGrouperGroups();
-    $canPage = $this->ServiceLinks()->isMemberOf('uc:applications:library:paging:authorized');
     $isLawPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:lawlibrary:authorized');
     $isSWLPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:swl:authorized');
 ?>
@@ -11,13 +10,6 @@
 <div class="<?=$this->layoutClass('mainbody')?> col-sm-9">
     <h2>Mansueto Cart</h2>
     <?=$this->flashmessages()?>
-
-    <?php if ($canPage == false):?>
-      <div class="alert alert-danger">
-        <p>At this time, paging services are limited to current students, faculty, and staff of University of Chicago. Please monitor the Library website for changes to services as we reopen.</p>
-      </div>
-    <?php else: ?>
-
     <? if (empty($this->storagerequests)): ?>
         <p>You do not have any Mansueto requests waiting to be
 submitted. For the status of requested Mansueto items, check <a
@@ -81,8 +73,6 @@ href="/vufind/MyResearch/Holds">Requested Items</a>.</p>
             </p>
 	    </form>
     <? endif; ?>
-
-    <?php endif; ?><? // END if $canPage == false ?>
 </div>
 
 <div class="<?=$this->layoutClass('sidebar')?> col-sm-3">
