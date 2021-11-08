@@ -537,6 +537,31 @@ class ServiceLinks extends AbstractHelper {
     }
 
     /**
+     * Generates a link to the report a record form and forwards
+     * along information about the record.
+     *
+     * @param id, record bib number
+     *
+     * @returns string
+     */
+    public function reportRecord($id, $title='')
+    {
+        $config = $this->getLinkConfig('report');
+        if (!$this->enabled($config)) {
+            return '';
+        }
+
+        $patron = $this->urlEncodeArrayAsString($this->getServerVars(['cn', 'mail']));
+        $subject = urlencode('Catalog Record Problem: ' . $title);
+        $defaultUrl = $config['url'] . '?bib=' . $id . '&amp;subject=' . $subject;
+        if (!empty($patron)) {
+            $defaultUrl = $defaultUrl . '&amp;' . $patron;
+        }
+        return $this->template($defaultUrl, $config['text'], $config['icon'], $config['classes'], [], $config['tagline']);
+    }
+
+
+    /**
      * Link to itemServlet for debugging.
      *
      * @param array $holding.
