@@ -35,6 +35,19 @@ return [
                     'VuFind\\Related\\Bookplate' => 'UChicago\\Related\\Bookplate',
                 ],
             ],
+            'recorddriver' => [
+                'factories' => [
+                    'UChicago\\RecordDriver\\SolrMarc' => 'VuFind\\RecordDriver\\SolrDefaultFactory',
+                ],
+                'aliases' => [
+                    'VuFind\\RecordDriver\\SolrMarc' => 'UChicago\\RecordDriver\\SolrMarc',
+                ],
+                'delegators' => [
+                    'UChicago\\RecordDriver\\SolrMarc' => [
+                        0 => 'VuFind\\RecordDriver\\IlsAwareDelegatorFactory',
+                    ],
+                ],
+            ],
         ],
     ],
 ];
