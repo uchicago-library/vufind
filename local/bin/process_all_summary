@@ -1,0 +1,33 @@
+#!/bin/bash
+
+scriptdir=$( (cd -P $(dirname $0) && pwd) )
+outputtmpdir=$( (cd -P $(dirname $0)/../tmpdata && pwd) )
+configdir=$( (cd -P $(dirname $0)/../import && pwd) )
+
+summary_update_directory=$1
+
+echo "Indexing directory $summary_update_directory into syndetics summary core"
+
+# Filenames look like this :   /home/vufind/syndetics_ice/data/summarys20130902_1.xml
+# Sort files based on portion after the last underscore.  
+# These lines count the underscores in the directory portion of the name
+underscore=`echo $summary_update_directory | sed -e 's/[^_]//g' | wc -c`
+key=$(( $underscore + 1 ))
+
+for file in `find $summary_update_directory -name 'summ*.xml' | sort -t '_' -k "$key,$key" -n` 
+do
+    echo "Indexing file $file"
+    fname=`basename $file .xml`
+    cat $file | $scriptdir/syn2marc - | 
+        $scriptdir/indexfile $configdir/summ_config.properties > $outputtmpdir/$fname.output.txt 2>&1
+done
+
+for file in `find $summary_update_directory -name 'sumschg*.xml' | sort `
+do
+    echo "Indexing file $file"
+    fname=`basename $file .xml`
+    cat $file | $scriptdir/syn2marc - | 
+        $scriptdir/indexfile $configdir/summ_config.properties > $outputtmpdir/$fname.output.txt 2>&1
+done
+
+echo "Done processing summary update directory $summary_update_directory"

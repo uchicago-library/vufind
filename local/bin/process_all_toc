@@ -1,0 +1,38 @@
+#!/bin/bash
+
+scriptdir=$( (cd -P $(dirname $0) && pwd) )
+solrmarcdir=$( (cd -P $(dirname $0)/.. && pwd) )
+if ! [ -e $solrmarcdir/SolrMarc.jar ]
+then
+  solrmarcdir=$( (cd -P $(dirname $0)/../../import && pwd) )
+fi
+outputtmpdir=$( (cd -P $(dirname $0)/../tmpdata && pwd) )
+configdir=$( (cd -P $(dirname $0)/../import && pwd) )
+
+toc_update_directory=$1
+
+echo "Indexing directory $toc_update_directory into syndetics toc core"
+
+# Filenames look like this: /home/vufind/syndetics_ice/data/trlntocs20130902_1.xml
+# Sort files based on portion after the last underscore
+# These lines count the underscores in the directory portion of the name
+underscore=`echo $toc_update_directory | sed -e 's/[^_]//g' | wc -c`
+key=$(( $underscore + 1 ))
+
+for file in `find $toc_update_directory -name 'trln*.xml' | sort -t '_' -k "$key,$key" -n`
+do
+    echo "Indexing file $file"
+    fname=`basename $file .xml`
+    cat $file | $scriptdir/noplace | $scriptdir/syn2marc - | 
+        $scriptdir/indexfile $configdir/toc_config.properties > $outputtmpdir/$fname.output.txt 2>&1
+done
+
+for file in `find $toc_update_directory -name 'tocschg*.xml' | sort `
+do
+    echo "Indexing file $file"
+    fname=`basename $file .xml`
+    cat $file | $scriptdir/noplace | $scriptdir/syn2marc - | 
+        $scriptdir/indexfile $configdir/toc_config.properties > $outputtmpdir/$fname.output.txt 2>&1
+done
+
+echo "Done processing toc update directory $toc_update_directory"
