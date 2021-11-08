@@ -25,7 +25,7 @@
           <?php /* Begin Available Items (Holds) */ ?>
            <span class="text-success"><?=$this->transEsc("Available")?><link property="availability" href="http://schema.org/InStock" /></span>
           <?php if ($holding['link'] ?? false): ?>
-            <? ### uchicago customization ### ?>
+            <? ### UChicago customization ### ?>
             <!--<a class="<?//=$check ? 'checkRequest ' : ''?>placehold" <?php //if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php //endif; ?>href="<?//=$this->recordLink()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?//=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>-->
             <? ### ./UChicago customization ### ?>
           <?php endif; ?>
@@ -37,6 +37,22 @@
           <?php endif; ?>
         <?php else: ?>
           <?php /* Begin Unavailable Items (Recalls) */ ?>
+          <? ### UChicago customization ### ?>
+          <?php if ($holding['status'] == 'Intellectual item'):?>
+            To check availability
+            <?php $callNumBreak = preg_split("/\s[a-zA-Z0-9]+\./", $holding['callnumber']); ?>
+            <?php if ($callNumBreak): ?>
+              <?php $c = $callNumBreak[0]; ?>
+            <?php else: ?>
+              <?php $c = $callNos['sort'][$numKey]; ?>
+            <?php endif; ?>
+            <?php // hAcK, handle bad data ?>
+            <?php if (isset($c)): ?>
+              <?php $c = explode(' ', $c)[0]; ?>
+            <?php endif;?>
+            <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc&consult=true">consult the series record</a>.
+          <?php endif; ?>
+          <? ### ./UChicago customization ### ?>
           <span class="text-danger"><?=$this->transEsc($holding['status'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
           <?php if ($holding['returnDate'] ?? false): ?>&ndash; <span class="small"><?=$this->escapeHtml($holding['returnDate'])?></span><?php endif; ?>
           <?php if ($holding['duedate'] ?? false): ?>
