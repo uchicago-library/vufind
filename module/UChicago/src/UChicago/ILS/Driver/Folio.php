@@ -19,6 +19,8 @@ class Folio extends \VuFind\ILS\Driver\Folio
         $limit = 1000;
         $offset = 0;
 
+        $eHoldingTypeId = $this->config['Holdings']['electronic_holding_type_id'] ?? '';
+
         do {
             $combinedQuery = array_merge($query, compact('offset', 'limit'));
             $response = $this->makeRequest(
@@ -32,7 +34,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 throw new ILSException($msg);
             }
             $total = $json->totalRecords ?? 0;
-            if ($total === 0) {
+            if (isset($holdings) && $total === 0 && $holdings->holdingsTypeId != $eHoldingTypeId) {
                 yield $holdings;
             }
             $previousCount = $count;
@@ -47,6 +49,31 @@ class Folio extends \VuFind\ILS\Driver\Folio
             // found, if count does not increase, something has gone
             // wrong. Stop so we don't loop forever.
         } while ($count < $total && $previousCount != $count);
+    }
+
+
+    /**
+     * Get loan data by item ID. There should only be 1 result
+     * but we loop over a generator.
+     *
+     * @param string $itemId
+     *
+     * @return string
+     */
+    protected function getDuedate($itemId)
+    {
+        $query = [
+            'query' => '(itemId=="' . $itemId
+                . '" NOT discoverySuppress==true)'
+        ];
+        foreach ($this->getPagedResults(
+            'loans', '/loan-storage/loans', $query
+        ) as $loan) {
+            return $this->dateConverter->convertToDisplayDate(
+                "Y-m-d H:i",
+                $loan->dueDate
+            );
+        }
     }
 
 
@@ -147,11 +174,23 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     $item->itemLevelCallNumber ?? ''
                 );
                 $enum = $item->enumeration ?? '';
+
+                // Get duedate
+                $dueDate = '';
+                if ($item->status->name == 'Checked out') {
+                    $dueDate = $this->getDuedate($item->id);
+                }
+
+                // Override holdings copy number with item copy number if it exists.
+                $itemCopyNumber = $item->copyNumber ?? '';
+                if (!empty($itemCopyNumber)) {
+                    $UCcopyNumber = $itemCopyNumber;
+                }
                 $items[] = $callNumberData + [
                     'id' => $bibId,
                     'item_id' => $item->id,
                     'holding_id' => $holding->id,
-                    'number' => $enum ? $UCcopyNumber . $enum : $UCcopyNumber,
+                    'number' => $enum ? $UCcopyNumber . ' : ' . $enum : $UCcopyNumber,
                     'barcode' => $item->barcode ?? '',
                     'status' => $item->status->name,
                     'availability' => $item->status->name == 'Available',
@@ -171,6 +210,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     'holding_location_code' => $holdingLocationCode,
                     'holding_callnumber_prefix' => $holdingCallNumberPrefix,
                     'holding_callnumber' => $holdingCallNumber,
+                    'duedate' => $dueDate,
                 ];
             }
         }
