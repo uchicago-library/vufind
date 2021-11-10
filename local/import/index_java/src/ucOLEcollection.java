@@ -122,11 +122,11 @@ public class ucOLEcollection {
 					if(str.equals("SSAdX") || str.equals("SSAdBdP") || str.equals("SSAdDep") || str.equals("SSAdDpY") || str.equals("SSAdMed") || 
 							str.equals("SSAdMic") || str.equals("SSAdPam") || str.equals("SSAdPer") || str.equals("SSAdRef") || str.equals("SSAdRes"))
 					{
-						result.add("SSA");
+						result.add("Social Work Library");
 					} 
 					if(str.equals("SSAdRes"))
 					{
-						result.add("SSA Reserves");
+						result.add("Social Work Reserves");
 					}                       
 				}               
 			}
