@@ -404,6 +404,13 @@ public class ucFormat
 				{
 					if ( fld903.getSubfield('a').getData().contains("Hathi"))
 					{
+                                                if(fld903.getSubfield('r') != null)
+                                                {
+                                                       if ( fld903.getSubfield('r').getData().toUpperCase().contains("ETAS"))
+                                                       {
+                                                               break;
+                                                       }
+                                                }
 						result.add("Eresource");
 					}
 				}
