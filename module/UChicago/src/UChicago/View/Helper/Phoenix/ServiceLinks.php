@@ -375,7 +375,6 @@ class ServiceLinks extends AbstractHelper {
                         /*Whitelist*/
                         'hold' =>
                             ['INPROCESS',
-                             'INTRANSIT',
                              'ONORDER'],
                         /*Whitelist*/
                         'paging' =>
