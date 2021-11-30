@@ -31,100 +31,100 @@ public class ucOLEcollection {
 				{      
 					String str = formatField.getSubfield('c').getData();
 
-					if(str.equals("PerPhy") || str.equals("ResupC") || str.equals("Sci") || str.equals("SciDDC") || str.equals("SciLg") || 
-							str.equals("SciMic") || str.equals("SciRef") || str.equals("SciRes") || str.equals("SciTecP") || str.equals("PerBio") ||
-							str.equals("SDDCLg") || str.equals("SFilm") || str.equals("SMedia") || str.equals("SMicDDC") ||  str.equals("Games") || 
-							str.equals("SRefPer") || str.equals("MssCr") || str.equals("RareCr") || str.equals("RaCrInc") || str.equals("SciASR"))
+					if(str.equals("JCL-PerPhy") || str.equals("JCL-ResupC") || str.equals("JCL-Sci") || str.equals("JCL-SciDDC") || str.equals("JCL-SciLg") || 
+							str.equals("JCL-SciMic") || str.equals("JCL-SciRef") || str.equals("JCL-SciRes") || str.equals("JCL-SciTecP") || str.equals("JCL-PerBio") ||
+							str.equals("JCL-SDDCLg") || str.equals("JCL-SFilm") || str.equals("JCL-SMedia") || str.equals("JCL-SMicDDC") ||  str.equals("JCL-Games") || 
+							str.equals("JCL-SRefPer") || str.equals("JCL-MssCr") || str.equals("JCL-RareCr") || str.equals("JCL-RaCrInc") || str.equals("JCL-SciASR"))
 					{               
 						result.add("Crerar Library");
 					}
-					if(str.equals("SciRef") || str.equals("SRefPer"))
+					if(str.equals("JCL-SciRef") || str.equals("JCL-SRefPer"))
 					{
 						result.add("Crerar Reference");
 					}
-					if(str.equals("SciRes"))
+					if(str.equals("JCL-SciRes"))
 					{
 						result.add("Crerar Reserves");        
 					}
-					if(str.equals("LawDisp") || str.equals("Law") || str.equals("LawA") || str.equals("LawAcq") || 
-							str.equals("LawAid") || str.equals("LawAnxN") || str.equals("LawAnxS") || str.equals("LawC") || 
-							str.equals("LawCat") || str.equals("LawCity") || str.equals("LawCS") || str.equals("LawFul") || 
-							str.equals("LawMic") || str.equals("LawMicG") || str.equals("LawPer") || str.equals("LawRar") ||
-							str.equals("LawRef") || str.equals("LawRes") || str.equals("LawResC") || str.equals("LawResP") || 
-							str.equals("LawRR") || str.equals("LawStor") || str.equals("ResupD") || str.equals("LawASR") || str.equals("LawSupr"))
+					if(str.equals("DLL-LawDisp") || str.equals("DLL-Law") || str.equals("DLL-LawA") || str.equals("DLL-LawAcq") || 
+							str.equals("DLL-LawAid") || str.equals("DLL-LawAnxN") || str.equals("DLL-LawAnxS") || str.equals("DLL-LawC") || 
+							str.equals("DLL-LawCat") || str.equals("DLL-LawCity") || str.equals("DLL-LawCS") || str.equals("DLL-LawFul") || 
+							str.equals("DLL-LawMic") || str.equals("DLL-LawMicG") || str.equals("DLL-LawPer") || str.equals("DLL-LawRar") ||
+							str.equals("DLL-LawRef") || str.equals("DLL-LawRes") || str.equals("DLL-LawResC") || str.equals("DLL-LawResP") || 
+							str.equals("DLL-LawRR") || str.equals("DLL-LawStor") || str.equals("DLL-ResupD") || str.equals("DLL-LawASR") || str.equals("DLL-LawSupr"))
 					{
 						result.add("D'Angelo Law Library");
 					}
-					if(str.equals("LawRes") || str.equals("LawResC") || str.equals("LawResP"))
+					if(str.equals("DLL-LawRes") || str.equals("DLL-LawResC") || str.equals("DLL-LawResP"))
 					{
 						result.add("Law Reserves");
 					}
-					if(str.equals("EckX") || str.equals("EckRef") || str.equals("EckRes") || str.equals("EMedia") || str.equals("ERes") || str.equals("ResupE"))
+					if(str.equals("Eck-EckX") || str.equals("Eck-EckRef") || str.equals("Eck-EckRes") || str.equals("Eck-EMedia") || str.equals("Eck-ERes") || str.equals("Eck-ResupE"))
 					{
 						result.add("Eckhart Library");
 					}
-					if(str.equals("EckRef"))
+					if(str.equals("Eck-EckRef"))
 					{
 						result.add("Eckhart Reference");
 					}
-					if(str.equals("EckRes"))
+					if(str.equals("Eck-EckRes"))
 					{
 						result.add("Eckhart Reserves");
 					}
-					if(str.equals("GameASR") || str.equals("HarpASR") || str.equals("JRLASR") || str.equals("LawASR") || 
-							str.equals("LawSupr") || str.equals("RRADiss") || str.equals("SciASR") || str.equals("RecASR"))
+					if(str.equals("ASR-JRLASR") || str.equals("ASR-LawASR") || 
+							str.equals("ASR-LawSupr") || str.equals("ASR-SciASR"))
 					{
 						result.add("Mansueto");
 					}       
-					if(str.equals("Harp") || str.equals("JzAr") || str.equals("MapCl") || str.equals("MapRef") || str.equals("Mic") || 
-							str.equals("MidEMic") || str.equals("MSRGen") || str.equals("Rec") || str.equals("RecHP") || str.equals("JRLRES") || 
-							str.equals("Resup") || str.equals("RR") || str.equals("RR2Per") || str.equals("RR4") || str.equals("RR4Cla") || 
-							str.equals("RR4J") || str.equals("RR5") || str.equals("RR5EA") || str.equals("RR5EPer") || str.equals("RR5Per") || 
-							str.equals("RRExp") || str.equals("SAsia") || str.equals("Ser") || str.equals("SerArr") || str.equals("SerCat") || 
-							str.equals("Slav") || str.equals("SOA") || str.equals("W") || str.equals("WCJK") || str.equals("BorDirc") || 
-							str.equals("Res") || str.equals("Stor") || str.equals("Acq") || str.equals("Art420") || str.equals("ArtResA") || 
-							str.equals("Cat") || str.equals("CircPer") || str.equals("CJK") || str.equals("CJKRar") || str.equals("CJKRef") || 
-							str.equals("CJKRfHY") || str.equals("CJKSem") || str.equals("CJKSPer") || str.equals("CJKSpHY") || str.equals("CJKSpl") || 
-							str.equals("CMC") || str.equals("Film") || str.equals("Gen") || str.equals("GenHY") || str.equals("JRLASR") || str.equals("RecASR"))
+					if(str.equals("JRL-Harp") || str.equals("JRL-JzAr") || str.equals("JRL-MapCl") || str.equals("JRL-MapRef") || str.equals("JRL-Mic") || 
+							str.equals("JRL-MidEMic") || str.equals("JRL-MSRGen") || str.equals("JRL-Rec") || str.equals("JRL-RecHP") || str.equals("JRL-JRLRES") || 
+							str.equals("JRL-Resup") || str.equals("JRL-RR") || str.equals("JRL-RR2Per") || str.equals("JRL-RR4") || str.equals("JRL-RR4Cla") || 
+							str.equals("JRL-RR4J") || str.equals("JRL-RR5") || str.equals("JRL-RR5EA") || str.equals("JRL-RR5EPer") || str.equals("JRL-RR5Per") || 
+							str.equals("JRL-RRExp") || str.equals("JRL-SAsia") || str.equals("JRL-Ser") || str.equals("JRL-SerArr") || str.equals("JRL-SerCat") || 
+							str.equals("JRL-Slav") || str.equals("JRL-SOA") || str.equals("JRL-W") || str.equals("JRL-WCJK") || str.equals("JRL-BorDirc") || 
+							str.equals("JRL-Res") || str.equals("JRL-Stor") || str.equals("JRL-Acq") || str.equals("JRL-Art420") || str.equals("JRL-ArtResA") || 
+							str.equals("JRL-Cat") || str.equals("JRL-CircPer") || str.equals("JRL-CJK") || str.equals("JRL-CJKRar") || str.equals("JRL-CJKRef") || 
+							str.equals("JRL-CJKRfHY") || str.equals("JRL-CJKSem") || str.equals("JRL-CJKSPer") || str.equals("JRL-CJKSpHY") || str.equals("JRL-CJKSpl") || 
+							str.equals("JRL-CMC") || str.equals("JRL-Film") || str.equals("JRL-Gen") || str.equals("JRL-GenHY") || str.equals("JRL-JRLASR") || str.equals("JRL-RecASR"))
 					{
 						result.add("Regenstein Library");
 					}       
-					if(str.equals("Rec"))
+					if(str.equals("JRL-Rec"))
 					{
 						result.add("Regenstein Recordings");
 					}     
-					if(str.equals("ArtResA") || str.equals("CJKRef") || str.equals("CJKRfHY") || str.equals("CJKSPer") || str.equals("MapRef") || 
-							str.equals("RR") || str.equals("RR2Per") || str.equals("RR4") || str.equals("RR4Cla") || str.equals("RR4J") || 
-							str.equals("RR5") || str.equals("RR5EA") || str.equals("RR5EPer") || str.equals("RR5Per") || str.equals("RRExp") || 
-							str.equals("Art420") || str.equals("SOA") || str.equals("Slav"))
+					if(str.equals("JRL-ArtResA") || str.equals("JRL-CJKRef") || str.equals("JRL-CJKRfHY") || str.equals("JRL-CJKSPer") || str.equals("JRL-MapRef") || 
+							str.equals("JRL-RR") || str.equals("JRL-RR2Per") || str.equals("JRL-RR4") || str.equals("JRL-RR4Cla") || str.equals("JRL-RR4J") || 
+							str.equals("JRL-RR5") || str.equals("JRL-RR5EA") || str.equals("JRL-RR5EPer") || str.equals("JRL-RR5Per") || str.equals("JRL-RRExp") || 
+							str.equals("JRL-Art420") || str.equals("JRL-SOA") || str.equals("JRL-Slav"))
 					{
 						result.add("Regenstein Reference");
 					}               
-					if(str.equals("JRLRES"))
+					if(str.equals("JRL-JRLRES"))
 					{
 						result.add("Regenstein Reserves");
 					} 
-					if(str.equals("ITSadap") || str.equals("ITScaco") || str.equals("ITSipad") || str.equals("ITSlap"))
+					if(str.equals("ITS-ITSadap") || str.equals("ITS-ITScaco") || str.equals("ITS-ITSipad") || str.equals("ITS-ITSlap"))
 					{
 						result.add("Regenstein TECHB@R");
 					}
-					if(str.equals("AmDrama") || str.equals("AmNewsp") || str.equals("Arch") || str.equals("ArcMon") || 
-							str.equals("ArcRef1") || str.equals("ArcSer") || str.equals("Aust") || str.equals("Drama") || 
-							str.equals("EB") || str.equals("French") || str.equals("Incun") || str.equals("JzMon") || str.equals("JzRec") || 
-							str.equals("Linc") || str.equals("MoPoRa") || str.equals("Mss") || str.equals("MssBG") || str.equals("MssCdx") || 
-							str.equals("MssCr") || str.equals("MssJay") || str.equals("MssLinc") || str.equals("MssMisc") || str.equals("MssSpen") || 
-							str.equals("RaCrInc") || str.equals("Rare") || str.equals("RareCr") || str.equals("RBMRef") || str.equals("RefA") || 
-							str.equals("Rege") || str.equals("Rosen") || str.equals("SpClAr") || str.equals("HCB") || str.equals("ACASA") || 
-							str.equals("ARCHASR") || str.equals("Lincke") || str.equals("MSSASR") || str.equals("RareASR") || str.equals("UCPress"))
+					if(str.equals("SPCL-AmDrama") || str.equals("SPCL-AmNewsp") || str.equals("SPCL-Arch") || str.equals("SPCL-ArcMon") || 
+							str.equals("SPCL-ArcRef1") || str.equals("SPCL-ArcSer") || str.equals("SPCL-Aust") || str.equals("SPCL-Drama") || 
+							str.equals("SPCL-EB") || str.equals("SPCL-French") || str.equals("SPCL-Incun") || str.equals("JSPCL-zMon") || str.equals("SPCL-JzRec") || 
+							str.equals("SPCL-Linc") || str.equals("SPCL-MoPoRa") || str.equals("SPCL-Mss") || str.equals("SPCL-MssBG") || str.equals("SPCL-MssCdx") || 
+							str.equals("SPCL-MssCr") || str.equals("SPCL-MssJay") || str.equals("SPCL-MssLinc") || str.equals("SPCL-MssMisc") || str.equals("SPCL-MssSpen") || 
+							str.equals("SPCL-RaCrInc") || str.equals("SPCL-Rare") || str.equals("SPCL-RareCr") || str.equals("SPCL-RBMRef") || str.equals("SPCL-RefA") || 
+							str.equals("SPCL-Rege") || str.equals("SPCL-Rosen") || str.equals("SPCL-SpClAr") || str.equals("SPCL-HCB") || str.equals("SPCL-ACASA") || 
+							str.equals("SPCL-ARCHASR") || str.equals("SPCL-Lincke") || str.equals("SPCL-MSSASR") || str.equals("SPCL-RareASR") || str.equals("SPCL-UCPress"))
 					{
 						result.add("Special Collections Research Center");
 					} 
-					if(str.equals("SSAdX") || str.equals("SSAdBdP") || str.equals("SSAdDep") || str.equals("SSAdDpY") || str.equals("SSAdMed") || 
-							str.equals("SSAdMic") || str.equals("SSAdPam") || str.equals("SSAdPer") || str.equals("SSAdRef") || str.equals("SSAdRes"))
+					if(str.equals("SWL-SSAdX") || str.equals("SWL-SSAdBdP") || str.equals("SWL-SSAdDep") || str.equals("SWL-SSAdDpY") || str.equals("SWL-SSAdMed") || 
+							str.equals("SWL-SSAdMic") || str.equals("SWL-SSAdPam") || str.equals("SWL-SSAdPer") || str.equals("SWL-SSAdRef") || str.equals("SWL-SSAdRes"))
 					{
 						result.add("Social Work Library");
 					} 
-					if(str.equals("SSAdRes"))
+					if(str.equals("SWL-SSAdRes"))
 					{
 						result.add("Social Work Reserves");
 					}                       
@@ -134,4 +134,3 @@ public class ucOLEcollection {
 		return result;                   
 	}
 }
-
