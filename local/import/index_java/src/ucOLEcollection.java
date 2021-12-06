@@ -104,7 +104,7 @@ public class ucOLEcollection {
 					{
 						result.add("Regenstein Reserves");
 					} 
-					if(str.equals("ITS-ITSadap") || str.equals("ITS-ITScaco") || str.equals("ITS-ITSipad") || str.equals("ITS-ITSlap"))
+					if(str.equals("ITS-TECHBAR"))
 					{
 						result.add("Regenstein TECHB@R");
 					}
@@ -119,12 +119,12 @@ public class ucOLEcollection {
 					{
 						result.add("Special Collections Research Center");
 					} 
-					if(str.equals("SWL-SSAdX") || str.equals("SWL-SSAdBdP") || str.equals("SWL-SSAdDep") || str.equals("SWL-SSAdDpY") || str.equals("SWL-SSAdMed") || 
-							str.equals("SWL-SSAdMic") || str.equals("SWL-SSAdPam") || str.equals("SWL-SSAdPer") || str.equals("SWL-SSAdRef") || str.equals("SWL-SSAdRes"))
+					if(str.equals("SWL-SWL") || str.equals("SWL-SWLBdP") || str.equals("SWL-SWLDep") || str.equals("SWL-SWLDpY") || str.equals("SWL-SWLMed") || 
+							str.equals("SWL-SWLMic") || str.equals("SWL-SWLPam") || str.equals("SWL-SWLPer") || str.equals("SWL-SWLRef") || str.equals("SWL-SWLRes"))
 					{
 						result.add("Social Work Library");
 					} 
-					if(str.equals("SWL-SSAdRes"))
+					if(str.equals("SWL-SWLRes"))
 					{
 						result.add("Social Work Reserves");
 					}                       
