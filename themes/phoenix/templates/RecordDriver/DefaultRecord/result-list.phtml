@@ -160,7 +160,9 @@
         $doiActive = $doi->isActive();
         // Account for replace_other_urls setting
         $urls = $this->record($this->driver)->getLinkDetails($openUrlActive);
-
+        ###UChicago customization ###
+        $urls = $openUrlAcive = $doiActive = false; // Disable elinks
+        ###./UChicago customization ###
         if ($openUrlActive || $doiActive || !empty($urls)): ?>
         <?php if ($openUrlActive): ?>
           <br/>
@@ -196,7 +198,7 @@
           <div class="e-links holdings-unit online" data-isbns='<?=json_encode($isbns)?>' data-oclc-nums='<?=json_encode($oclc)?>'></div>
         <?php endif; ?>
         <?php if ($issns || $sfxNum): ?>
-          <div class="deduped holdings-unit online" data-sfx="<?=$sfxNum?>" data-issns="<?=implode(',', $issns)?>"></div>
+          <div class="deduped holdings-unit online" data-sfx="<?=$sfxNum?>" data-issns="<?=implode(',', $issns)?>" data-bib="<?=$bib?>"</div>
         <? endif; ?>
       <?php ### ./UChicago customization ### ?>
     </div>

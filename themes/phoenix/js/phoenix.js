@@ -72,10 +72,10 @@ const eholdingsMegaService = (isbns, oclc, target, onlineHeader = false) => {
     if (links !== undefined && links.length != 0) {
       let html = '';
       if (onlineHeader) {
-        html = '<h3>Online</h3>';
+        html = '<div class="locpanel-heading online"><h2>Online</h2></div>';
       }
       html += links.map(l => {
-        return `<div><a href="${l.link}">${l.linktext}</a></div>`;
+        return `<div class="holdings-unit"><a href="${l.link}">${l.linktext}</a></div>`;
       }).join('');
       target.append(html);
     }
@@ -85,8 +85,8 @@ const eholdingsMegaService = (isbns, oclc, target, onlineHeader = false) => {
 /*
  * Get deduped eholdings, SFX.
  */
-function getDedupedEholdings(issns, sfx, target, onlineHeader = false) {
-  $.get( VuFind.path + '/AJAX/JSON?method=dedupedEholdings', 'issns=' + issns + '&sfx=' + sfx + '&header=' + onlineHeader, function(data, status, xhr) {
+function getDedupedEholdings(issns, sfx, bib, target, onlineHeader = false) {
+  $.get(VuFind.path + '/AJAX/JSON?method=dedupedEholdings', 'issns=' + issns + '&sfx=' + sfx + '&header=' + onlineHeader + '&bib=' + bib, function(data, status, xhr) {
     var response = JSON.parse(data);
 
     target.append(response.data);
@@ -95,7 +95,7 @@ function getDedupedEholdings(issns, sfx, target, onlineHeader = false) {
         target.parent().find('.local-eholding').hide();
     }
 
-    $(target).children('.toggle').click(function() {
+    $(target).find('.toggle').click(function() {
         $(this).toggleClass('open');
         $(this).parent().children('.e-list').toggleClass('hide');
     });
@@ -166,6 +166,72 @@ $(document).ready(function() {
     const issns = $(this).data('issns');
     const sfxNum = $(this).data('sfx');
     const showOnlineHeader = $(this).data('online-header');
-    getDedupedEholdings(issns, sfxNum, $(this), showOnlineHeader);
+    const bib = $(this).data('bib');
+    getDedupedEholdings(issns, sfxNum, bib, $(this), showOnlineHeader);
+  });
+
+  /**
+   * Collapse and expand bibliographic data 
+   */
+
+  // Re-stripe tables on the full record page so that successive tables display as if
+  // they are one, continuous table
+  $('#record').each(function(){
+    $(this).find('tr:odd').css('background-color','#f9f9f9');
+    $(this).find('tr:even').css('background-color','#ffffff');
+  });
+
+  $('table tr').each(function(){
+    var trcolor = $(this).css('backgroundColor');
+  });
+
+  // Text for various states
+  var viewMoreBibText = 'More details <i class="fa fa-arrow-circle-right"></i>';
+  var viewLessBibText = 'Fewer details <i class="fa fa-arrow-circle-down"></i>';
+
+  // Links to display for various states
+  var viewMoreBib = '<a href="#" class="bibToggle">' + viewMoreBibText + '</a>';
+  var viewLessBib = '<a href="#" class="bibToggle">' + viewLessBibText + '</a>';
+
+  // Number of rows in the additional bibliographic data table
+  var bibRowCount = 0;
+
+  // Number of rows to show by default
+  var configNum = 1;
+
+  // Table containing additonal bibliographic data
+  var addtionalBibData = '#top-hidden';
+
+  $(addtionalBibData).each(function(){
+    // Number of things to display by default
+    var bibDisplayNum = 2;
+
+    // Boolean, is there a toggle link appended
+    var hasBibToggleLink = false;
+
+   // Hidden additional biblographic data count
+    $(this).find('tr').each(function(){
+      bibRowCount++;
+    });
+
+    if (bibRowCount > 0 && bibRowCount > configNum) {
+      $(addtionalBibData).before(viewMoreBib);
+      $(addtionalBibData).hide();
+    }
+  });
+
+  // Toggle additional bibliographic data
+  $('.bibToggle').click(function(){
+    // Toggle the inner html of the link
+    var text = $(this).html();
+    if (text == viewMoreBibText) {
+      text = viewLessBibText;
+    } else {
+      text = viewMoreBibText;
+    }
+    $(this).html(text);
+
+    // Show/hide items
+    $(this).parent().find(addtionalBibData).toggle();
   });
 });

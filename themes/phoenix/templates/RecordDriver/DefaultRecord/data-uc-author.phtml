@@ -1,0 +1,6 @@
+<?php foreach ($data['displayData'] as $key => $val):?>
+  <a href="/vufind/Alphabrowse/Home?source=author&from=<?=urlencode($data['linkData'][$key])?>"><?=$val?></a><br/>
+<?php endforeach; ?>
+<?php foreach ($data['altData'] as $altVal):?>
+  <?=$altVal?><br/>
+<?php endforeach; ?> 

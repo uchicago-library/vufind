@@ -83,15 +83,20 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
      * More info: http://www2.lib.uchicago.edu/keith/tmp/dldc/kw/holdings.html
      *
      * @param string, $issns, comma separated issn numbers.
+     * @param string, $sfxNum
+     * @param string, $bib
      *
      * @return array
      */
-    public function getDedupedEholdings($issns, $sfxNum) {
+    public function getDedupedEholdings($issns, $sfxNum, $bib) {
         $config = $this->getConfig();
         $code = $config['DedupedEholdings']['code'];
         $function = $config['DedupedEholdings']['function'];
         $url = $config['DedupedEholdings']['url'] . '?code=' . $code . '&function=' . $function . '&callback=vufind';
 
+        if (strlen($bib) > 0) {
+            $url .= '&bib=' . $bib;
+        }
         if (strlen($issns) > 0) {
             $url .= '&issns=' . $issns;
         }
@@ -116,19 +121,22 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
      * Convert deduped e-holdings from Keith's e-holding deduping service to HTML.
      *
      * @param array, $issns, issn numbers.
+     * @param string, $sfxNum
+     * @param string, $bib
      *
      * @return string, html
      */
-    public function getDedupedEholdingsHtml($issns, $sfxNum, $header) {
+    public function getDedupedEholdingsHtml($issns, $sfxNum, $bib, $header) {
         $config = $this->getConfig();
-        $dedupedEholdings = $this->getDedupedEholdings($issns, $sfxNum);
+        $dedupedEholdings = $this->getDedupedEholdings($issns, $sfxNum, $bib);
         $coverageLabel = $config['DedupedEholdings']['coverage_label'];
         $format = '<a href="%s" class="eLink external">%s</a> %s %s<br/>%s';
         $retval = '';
-        if ($header === 'true') {
-          $retval .= '<h3>Deduped Eholdings</h3>';
+        if ($header === 'true' && !empty($dedupedEholdings)) {
+          $retval .= '<div class="locpanel-heading online"><h2>Deduped Eholdings</h2></div>';
         }
         if ($dedupedEholdings) {
+            $retval .= '<div class="holdings-unit">';
             $deduped = $dedupedEholdings['deduped'];
             $complete = $dedupedEholdings['complete'];
             foreach($deduped as $deh) {
@@ -144,6 +152,7 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
                     $retval .= '</div>';
                 }
             }
+            $retval .= '</div>';
         }
         return $retval;
     }
@@ -151,9 +160,9 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
     public function handleRequest(Params $params) {
         $issns = $_GET['issns'];
         $sfxNum = $_GET['sfx'];
+        $bib = $_GET['bib'];
         $header = $_GET['header'];
-
-        $html = $this->getDedupedEholdingsHtml($issns, $sfxNum, $header);
+        $html = $this->getDedupedEholdingsHtml($issns, $sfxNum, $bib, $header);
         return [ $html ];
     }
 

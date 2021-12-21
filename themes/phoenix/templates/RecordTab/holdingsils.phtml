@@ -34,6 +34,7 @@
   $bib = $this->driver->getUniqueID();
   $isSfxStub = strtolower(substr($bib, 0, 3)) == 'sfx';
   $sfxNum = $isSfxStub ? substr($bib, 4) : '';
+  $urls = $openUrlAcive = $doiActive = false; // Disable elinks
   /* ./UChicago customization */
 ?>
 
@@ -76,10 +77,10 @@
 
 <?php /* UChicago customization */ ?>
   <?php if ($isbns || $oclc): ?>
-    <div class="e-links holdings-unit online" data-isbns='<?=json_encode($isbns)?>' data-oclc-nums='<?=json_encode($oclc)?>' data-online-header="true"></div>
+    <div class="e-links holdings-unit holdings-locpanel online" data-isbns='<?=json_encode($isbns)?>' data-oclc-nums='<?=json_encode($oclc)?>' data-online-header="true"></div>
   <? endif; ?>
   <?php if ($issns || $sfxNum): ?>
-    <div class="deduped holdings-unit online" data-sfx="<?=$sfxNum?>" data-issns="<?=implode(',', $issns)?>" data-online-header="true"></div>
+    <div class="deduped holdings-unit holdings-locpanel online" data-sfx="<?=$sfxNum?>" data-issns="<?=implode(',', $issns)?>" data-bib="<?=$bib?>" data-online-header="true"></div>
   <? endif; ?>
 <?php /* ./UChicago customization */ ?>
 

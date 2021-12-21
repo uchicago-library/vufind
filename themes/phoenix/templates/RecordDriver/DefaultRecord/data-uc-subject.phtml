@@ -1,0 +1,12 @@
+<?php foreach ($data as $d):?>
+  <?php foreach ($d['displayData'] as $key => $val):?>
+    <?php if (!empty($d['linkData'][$key])): ?>
+       <a href="/vufind/Alphabrowse/Home?source=topic&from=<?=urlencode($d['linkData'][$key])?>"><?=$val?></a><br/>
+    <?php else: ?>
+        <?=$val?><br/>
+    <?php endif; ?>
+  <?php endforeach; ?>
+  <?php foreach ($d['altData'] as $altVal):?>
+    <?=$altVal?><br/>
+  <?php endforeach; ?>
+<?php endforeach; ?>
