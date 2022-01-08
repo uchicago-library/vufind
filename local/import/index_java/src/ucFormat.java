@@ -55,7 +55,7 @@ public class ucFormat
 		List df856List  = record.getVariableFields("856");
 		List df903List  = record.getVariableFields("903");
 	        List df928List  = record.getVariableFields("928");
-	        List df929List  = record.getVariableFields("929");
+	        List df927List  = record.getVariableFields("927");
 
 		String formatString;
 		char formatCode = ' ';
@@ -68,17 +68,27 @@ public class ucFormat
 		//   http://marc4j.tigris.org/doc/apidoc/index.html
 
 
-		// 929 $b is the prefix, which is separate in OLE. It has been moved from 929 field #0018 #0019 control field to 929$b just in OLE records 
-		Iterator iter929 = df929List.iterator();
+		// 929 $b is the prefix, which is separate in OLE. It has been moved from 929 field #0018 #0019 control field to 929$b just in OLE records. In FOLIO it's 928p and 927p. 
+		Iterator iter927 = df927List.iterator();
 		{
-			DataField fld929;
-			while (iter929.hasNext())
+			DataField fld927;
+			while (iter927.hasNext())
 			{
-				fld929 = (DataField) iter929.next();
+				fld927 = (DataField) iter927.next();
 
-				if(fld929.getSubfield('b') != null) 
+                                if(fld927.getSubfield('l') !=null)
+                                {
+
+                                        String str = fld927.getSubfield('l').getData();
+
+                                        if (str.equals("Online"))
+                                        {
+                                                result.add("Eresource");
+                                        }
+                                }
+				if(fld927.getSubfield('p') != null) 
 				{
-					String str = fld929.getSubfield('b').getData();
+					String str = fld927.getSubfield('p').getData();
 
 					if (str.equals("DVD"))
 					{
@@ -119,6 +129,65 @@ public class ucFormat
 			}
 		}
 
+                Iterator iter928 = df928List.iterator();
+                {
+                        DataField fld928;
+                        while (iter928.hasNext())
+                        {
+                                fld928 = (DataField) iter928.next();
+
+                                if(fld928.getSubfield('l') !=null)
+                                {
+ 
+                                        String str = fld928.getSubfield('l').getData();
+
+                                        if (str.equals("Online"))
+                                        {
+                                                result.add("Eresource");
+                                        }
+                                }
+                                if(fld928.getSubfield('p') != null)
+                                {
+                                        String str = fld928.getSubfield('p').getData();
+
+                                        if (str.equals("DVD"))
+                                        {
+                                                result.add("DVD");
+                                                result.add("Video");
+                                        }
+                                        if (str.equals("VidCass"))
+                                        {
+                                                result.add("tapeVideo");
+                                                result.add("Video");
+                                        }
+                                        if (str.equals("LasDisc"))
+                                        {
+                                                result.add("LaserDisc");
+                                                result.add("Video");
+                                        }
+                                        if (str.equals("AudCD"))
+                                        {
+                                                result.add("CD");
+                                                result.add("Audio");
+                                        }
+                                        if (str.equals("AudDisc"))
+                                        {
+                                                result.add("Phonograph");
+                                                result.add("Audio");
+                                        }
+                                        if (str.equals("AudCass"))
+                                        {
+                                                result.add("AudioCass");
+                                                result.add("Audio");
+                                        }
+                                        if (str.contains("micro"))
+                                        {
+                                                result.add("Microform");
+                                        }    
+
+                                }
+                        }
+                }
 
                 Iterator iter024 = df024List.iterator();
                 {
@@ -369,16 +438,12 @@ public class ucFormat
 
 
 
-		Iterator iter928 = df928List.iterator();
+		Iterator iter928g = df928List.iterator();
 		{
 			DataField fld928;
-			if (iter928.hasNext())
-			{
-				result.add("Eresource");
-			}
-                        while(iter928.hasNext())
+                        while(iter928g.hasNext())
                         {
-                                fld928 = (DataField) iter928.next(); 
+                                fld928 = (DataField) iter928g.next(); 
                                 if(fld928.getSubfield('g') != null)
 		        	{
 			        	if ( fld928.getSubfield('g').getData().contains("vidstream"))
@@ -409,7 +474,7 @@ public class ucFormat
 				}
 			}
 		}
-
+/*
 		List<DataField> l = new ArrayList<DataField>();
 		for (VariableField item : items) l.add((DataField)item); 
 		for (DataField item : l) 
@@ -505,7 +570,7 @@ public class ucFormat
 		}
 
 
-
+*/
 		// check the 006 - this is a repeating field
 
 		List fields006 = record.getVariableFields("006");
