@@ -466,7 +466,7 @@ class ServiceLinks extends AbstractHelper {
      */
     public function asr($row) {
         $defaultUrl = '/vufind/MyResearch/Storagerequest?bib=' .  $row['id'] . '&amp;barcode=' . $row['barcode'] . '&amp;action=add';
-        $serviceLink = $this->getLinkConfig('mansueto', $defaultUrl); 
+        $serviceLink = $this->fillPlaceholders($this->getLinkConfig('mansueto', $defaultUrl), $row);
         $displayText = '<i class="fa fa-fw fa-shopping-basket" aria-hidden="true"></i> Request from Mansueto';
         $whitelist = array_map('strtolower', $this->lookupLocation['asr']);
         if ($serviceLink and (in_array($row['status'], $this->lookupStatus['asr']) and $this->getLocation($row['locationCodes'], 'library') != 'spcl') and 
