@@ -79,9 +79,7 @@
   <?php if ($isbns || $oclc): ?>
     <div class="e-links holdings-unit holdings-locpanel online" data-isbns='<?=json_encode($isbns)?>' data-oclc-nums='<?=json_encode($oclc)?>' data-online-header="true"></div>
   <? endif; ?>
-  <?php if ($issns || $sfxNum): ?>
-    <div class="deduped holdings-unit holdings-locpanel online" data-sfx="<?=$sfxNum?>" data-issns="<?=implode(',', $issns)?>" data-bib="<?=$bib?>" data-online-header="true"></div>
-  <? endif; ?>
+  <div class="deduped holdings-unit holdings-locpanel online" data-sfx="<?=$sfxNum?>" data-issns="<?=implode(',', $issns)?>" data-bib="<?=$bib?>" data-online-header="true"></div>
 <?php /* ./UChicago customization */ ?>
 
 <?php if (!empty($holdings['electronic_holdings'])): ?>

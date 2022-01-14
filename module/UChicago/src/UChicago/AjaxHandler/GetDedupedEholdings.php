@@ -129,6 +129,9 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
     public function getDedupedEholdingsHtml($issns, $sfxNum, $bib, $header) {
         $config = $this->getConfig();
         $dedupedEholdings = $this->getDedupedEholdings($issns, $sfxNum, $bib);
+        if (count(array_filter($dedupedEholdings), COUNT_RECURSIVE) === 0) {
+            return '';
+        }
         $coverageLabel = $config['DedupedEholdings']['coverage_label'];
         $format = '<a href="%s" class="eLink external">%s</a> %s %s<br/>%s';
         $retval = '';
