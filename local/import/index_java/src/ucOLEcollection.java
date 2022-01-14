@@ -15,9 +15,9 @@ public class ucOLEcollection {
 
 	{
 		Set result = new LinkedHashSet();
-		String[] tags = {"927", "928", "929"};
+		String[] tags = {"927", "928"};
 
-		// check the 927 thru 929 # c to find proper location(building) for each book/record
+		// check the 927 thru 928 # c to find proper location(building) for each book/record
 		List fields = record.getVariableFields(tags);  
 		Iterator i = fields.iterator();
 		if (fields != null)
