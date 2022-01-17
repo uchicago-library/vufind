@@ -4,6 +4,7 @@ return [
     'js' => [
         'phoenix.js',
     ],
+    'favicon' => 'favicon.ico',
     'helpers' => [
         'factories' => [
             'UChicago\View\Helper\Phoenix\ServiceLinks' => 'UChicago\View\Helper\Phoenix\ServiceLinksFactory',
