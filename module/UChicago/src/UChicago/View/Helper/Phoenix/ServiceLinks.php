@@ -431,7 +431,7 @@ class ServiceLinks extends AbstractHelper {
      * @return sting representing a link.
      */
     public function mansueto($holding) {
-        $defaultLink = '/vufind/MyResearch/Storagerequest?bib=' .  $holding['id'] . '&amp;barcode=' . $holding['barcode'] . '&amp;action=add';
+        $defaultLink = $this->view->recordLink()->getHoldUrl($holding['link']);
         return $this->buildLink($holding, 'mansueto', $defaultLink, 'shelving', 'library');
     }
 
