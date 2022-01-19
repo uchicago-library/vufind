@@ -94,7 +94,7 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
         $function = $config['DedupedEholdings']['function'];
         $url = $config['DedupedEholdings']['url'] . '?code=' . $code . '&function=' . $function . '&callback=vufind';
 
-        if (strlen($bib) > 0) {
+        if (strlen($bib) > 0 && mb_substr($bib, 0, 4) != 'sfx_') {
             $url .= '&bib=' . $bib;
         }
         if (strlen($issns) > 0) {
