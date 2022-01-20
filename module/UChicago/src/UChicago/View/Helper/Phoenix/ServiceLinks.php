@@ -480,11 +480,12 @@ class ServiceLinks extends AbstractHelper {
         if (!$this->enabled($config)) {
             return '';
         }
+        $asr = ['asr', 'spclasr'];
         $locationCode = $holding['location_code'];
         $library = $this->getLocationCode($locationCode, 'library');
         $shelvingLoc = $this->getLocationCode($locationCode, 'shelving');
         $defaultLink = $this->replaceTokens('http://forms2.lib.uchicago.edu/lib/aon/aeon-array_OLE.php?bib={ID}&barcode={BARCODE}', $holding);
-        if ($library == 'spcl' || ($library == 'asr' && $this->hasCorrectLocation($locationCode, 'shelving', 'shelving', $config))) {
+        if ($library == 'spcl' || (in_array($library, $asr) && $this->hasCorrectLocation($locationCode, 'shelving', 'shelving', $config))) {
             $genre = (in_array($shelvingLoc, ['arch', 'arcser', 'mss', 'msscd']) ? 'manuscript' : 'monograph');
             $serviceLink = $defaultLink . '&genre=' . $genre;
             if ($this->isURL($config['url'])) {
