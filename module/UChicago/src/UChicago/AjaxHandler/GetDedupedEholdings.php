@@ -133,7 +133,7 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
             return '';
         }
         $coverageLabel = $config['DedupedEholdings']['coverage_label'];
-        $format = '<a href="%s" class="eLink external">%s</a> %s %s<br/>%s';
+        $format = '<a href="%s" class="eLink external">%s</a> %s %s %s<br/>';
         $retval = '';
         if ($header === 'true' && !empty($dedupedEholdings)) {
           $retval .= '<div class="locpanel-heading online"><h2>Deduped Eholdings</h2></div>';
