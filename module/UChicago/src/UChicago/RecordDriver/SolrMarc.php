@@ -404,6 +404,7 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
     public function getUCProvenance()
     {
         $fields = [
+            ['541', ['a', 'b', 'c', 'd', 'e', 'f', 'h', 'n', 'o']],
             ['561', ['3', 'a']],
             ['562', ['3', 'a', 'b', 'c', 'd', 'e']],
             ['563', ['3', 'a']],
