@@ -11,26 +11,27 @@ import java.util.*;
 
 public class ucOLEcollection {
 
-	public Set getCollection(Record record)
+        public Set getCollection(Record record)
 
-	{
-		Set result = new LinkedHashSet();
-		String[] tags = {"927", "928"};
+        {
+                Set result = new LinkedHashSet();
+                String[] tags = {"927", "928", "929"};
 
-		// check the 927 thru 928 # c to find proper location(building) for each book/record
-		List fields = record.getVariableFields(tags);  
-		Iterator i = fields.iterator();
-		if (fields != null)
-		{
-			while( i.hasNext())
-			{
-				DataField formatField = (DataField) i.next();
-				Subfield subfield = formatField.getSubfield('c');
+                // check the 927 thru 929 # c to find proper location(building) for each book/record
+                List fields = record.getVariableFields(tags);  
+                Iterator i = fields.iterator();  System.out.println("~~~~~I'm HERE -----");
+                if (fields != null)
+                {
+                        while( i.hasNext())
+                        {
+                                DataField formatField = (DataField) i.next();
+                                Subfield subfield = formatField.getSubfield('c');
+
 
 				if(subfield != null)
 				{      
-					String str = formatField.getSubfield('c').getData();
-
+					String str = formatField.getSubfield('c').getData(); 
+                                                                                            
 					if(str.equals("JCL-PerPhy") || str.equals("JCL-ResupC") || str.equals("JCL-Sci") || str.equals("JCL-SciDDC") || str.equals("JCL-SciLg") || 
 							str.equals("JCL-SciMic") || str.equals("JCL-SciRef") || str.equals("JCL-SciRes") || str.equals("JCL-SciTecP") || str.equals("JCL-PerBio") ||
 							str.equals("JCL-SDDCLg") || str.equals("JCL-SFilm") || str.equals("JCL-SMedia") || str.equals("JCL-SMicDDC") ||  str.equals("JCL-Games") || 
@@ -130,7 +131,8 @@ public class ucOLEcollection {
 					}                       
 				}               
 			}
-		} 
+		}
+                System.out.println("~~~~~Building result:  -->  " + result);
 		return result;                   
 	}
 }
