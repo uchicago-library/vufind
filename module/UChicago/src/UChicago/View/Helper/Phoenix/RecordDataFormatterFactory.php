@@ -293,7 +293,7 @@ class RecordDataFormatterFactory extends \VuFind\View\Helper\Root\RecordDataForm
             'Other uniform titles', 'getUCOtherUniformTitles', 'data-uc-uniform-title.phtml'
         );
         $spec->setTemplateLine(
-            'Other authors / contributors', 'getUCOtherAuthorsContributors', 'data-uc-author.phtml'
+            'Other authors / contributors', 'getUCOtherAuthorsContributors', 'data-uc-other-author.phtml'
         );
         $spec->setTemplateLine(
             'Frequency', 'getUCFrequency', 'data-uc-simple.phtml' 

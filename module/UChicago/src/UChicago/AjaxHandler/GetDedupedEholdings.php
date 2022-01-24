@@ -94,7 +94,7 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
         $function = $config['DedupedEholdings']['function'];
         $url = $config['DedupedEholdings']['url'] . '?code=' . $code . '&function=' . $function . '&callback=vufind';
 
-        if (strlen($bib) > 0) {
+        if (strlen($bib) > 0 && mb_substr($bib, 0, 4) != 'sfx_') {
             $url .= '&bib=' . $bib;
         }
         if (strlen($issns) > 0) {
@@ -133,7 +133,7 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
             return '';
         }
         $coverageLabel = $config['DedupedEholdings']['coverage_label'];
-        $format = '<a href="%s" class="eLink external">%s</a> %s %s<br/>%s';
+        $format = '<a href="%s" class="eLink external">%s</a> %s %s %s<br/>';
         $retval = '';
         if ($header === 'true' && !empty($dedupedEholdings)) {
           $retval .= '<div class="locpanel-heading online"><h2>Deduped Eholdings</h2></div>';

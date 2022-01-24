@@ -431,7 +431,7 @@ class ServiceLinks extends AbstractHelper {
      * @return sting representing a link.
      */
     public function mansueto($holding) {
-        $defaultLink = '/vufind/MyResearch/Storagerequest?bib=' .  $holding['id'] . '&amp;barcode=' . $holding['barcode'] . '&amp;action=add';
+        $defaultLink = $this->view->recordLink()->getHoldUrl($holding['link']);
         return $this->buildLink($holding, 'mansueto', $defaultLink, 'shelving', 'library');
     }
 
@@ -480,11 +480,12 @@ class ServiceLinks extends AbstractHelper {
         if (!$this->enabled($config)) {
             return '';
         }
+        $asr = ['asr', 'spclasr'];
         $locationCode = $holding['location_code'];
         $library = $this->getLocationCode($locationCode, 'library');
         $shelvingLoc = $this->getLocationCode($locationCode, 'shelving');
         $defaultLink = $this->replaceTokens('http://forms2.lib.uchicago.edu/lib/aon/aeon-array_OLE.php?bib={ID}&barcode={BARCODE}', $holding);
-        if ($library == 'spcl' || ($library == 'asr' && $this->hasCorrectLocation($locationCode, 'shelving', 'shelving', $config))) {
+        if ($library == 'spcl' || (in_array($library, $asr) && $this->hasCorrectLocation($locationCode, 'shelving', 'shelving', $config))) {
             $genre = (in_array($shelvingLoc, ['arch', 'arcser', 'mss', 'msscd']) ? 'manuscript' : 'monograph');
             $serviceLink = $defaultLink . '&genre=' . $genre;
             if ($this->isURL($config['url'])) {

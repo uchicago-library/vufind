@@ -65,6 +65,9 @@ function updateSearchPlaceholderText(select) {
 const eholdingsMegaService = (isbns, oclc, target, onlineHeader = false) => {
   let url ='https://www.lib.uchicago.edu/cgi-bin/megaholdings?function=megaholdings&callback=x&nums=';
   url += isbns.map(x => `isbn:${x}`).join(',');
+  if (isbns.length > 0 && oclc.length > 0) {
+    url += ',';
+  }
   url += oclc.map(x => `oclc:${x}`).join(',');
   $.get(url, function(data, status, xhr) {
     const response = JSON.parse(data);

@@ -116,7 +116,7 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
             $t = $this->getFieldArray($data[0], ['t']);
             $subfields = array_diff($data[1], ['t']);
             if (empty($t)) {
-                $retval += $this->authorParse($data[0], $subfields);
+                array_push($retval, $this->authorParse($data[0], $subfields));
             }
         }
         return $retval;
@@ -404,6 +404,7 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
     public function getUCProvenance()
     {
         $fields = [
+            ['541', ['a', 'b', 'c', 'd', 'e', 'f', 'h', 'n', 'o']],
             ['561', ['3', 'a']],
             ['562', ['3', 'a', 'b', 'c', 'd', 'e']],
             ['563', ['3', 'a']],

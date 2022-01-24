@@ -4,6 +4,10 @@
     $check = $holding['check'] ?? false;
     $checkStorageRetrievalRequest = $holding['checkStorageRetrievalRequest'] ?? false;
     $checkILLRequest = $holding['checkILLRequest'] ?? false;
+    ### UChicago customization ###
+    $recordTitle = $this->escapeHtml($this->driver->getShortTitle() . ' ' . $this->driver->getSubtitle() . ' ' . $this->driver->getTitleSection());
+    $cleanTitle = trim($recordTitle, ' /.');
+    ### ./UChicago customization ###
   ?>
   <tr vocab="http://schema.org/" typeof="Offer">
     <? ### UChicago customization ### ?>
@@ -77,7 +81,7 @@
           <?=$this->ServiceLinks()->scanAndDeliver($holding)?>
           <?=$this->ServiceLinks()->offsite($holding)?>
           <?=$this->ServiceLinks()->paging($holding)?>
-          <?=$this->ServiceLinks()->ask($holding)?>
+          <?=$this->ServiceLinks()->ask($holding, $cleanTitle)?>
           <?=$this->ServiceLinks()->askSCRC($holding)?>
           <?=$this->ServiceLinks()->itemServlet($holding)?>
         </span>
