@@ -32,7 +32,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
     -->
-  <luceneMatchVersion>7.7.3</luceneMatchVersion>
+  <luceneMatchVersion>7.3.1</luceneMatchVersion>
 
   <!-- Use the classic schema style by default for VuFind -->
   <schemaFactory class="ClassicIndexSchemaFactory"/>
@@ -42,6 +42,7 @@
        If replication is in use, this should match the replication configuration. -->
   <dataDir>${solr.solr.home:./solr}/biblio</dataDir>
 
+  <lib dir="../../lib" />
   <lib dir="../../vendor/contrib/analysis-extras/lib" regex=".*\.jar" />
   <lib dir="../../vendor/contrib/analysis-extras/lucene-libs" regex=".*\.jar" />
   <lib dir="../jars" regex=".*\.jar" />
@@ -298,6 +299,24 @@
 
   </query>
 
+
+
+
+<requestHandler name="/replication" class="solr.ReplicationHandler">
+  <lst name="master">
+    <str name="replicateAfter">optimize</str>
+    <str name="backupAfter">optimize</str>
+    <str name="confFiles">schema.xml,stopwords.txt,elevate.xml</str>
+  </lst>
+  <int name="maxNumberOfBackups">1</int>
+  <lst name="invariants">
+    <str name="maxWriteMBPerSec">16</str>
+  </lst>
+</requestHandler>
+
+
+
+
   <!--
     Let the dispatch filter handler /select?qt=XXX
     handleSelect=true will use consistent error handling for /select and /update
@@ -327,7 +346,7 @@
 
             etagSeed="..." is an option you can change to force the ETag
             header (and validation against If-None-Match requests) to be
-            different even if the index has not changed (ie: when making
+            differnet even if the index has not changed (ie: when making
             significant changes to your config file)
 
             lastModifiedFrom and etagSeed are both ignored if you use the
@@ -443,22 +462,25 @@
     <str name="seeAlsoHeadingField">see_also</str>
     <str name="scopeNoteField">scope_note</str>
 
-
-    <str name="sources">topic,author,title,lcc,dewey,hierarchy</str>
+     <!-- UChicago: added journal, series -->
+    <str name="sources">topic,author,title,lcc,dewey,hierarchy,journal,series</str>
 
     <lst name="topic">
       <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/topic_browse.db</str>
       <str name="field">topic_browse</str>
+      <str name="normalizer">org.vufind.util.NACONormalizer</str>
     </lst>
 
     <lst name="author">
       <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/author_browse.db</str>
       <str name="field">author_browse</str>
+      <str name="normalizer">org.vufind.util.NACONormalizer</str>
     </lst>
 
     <lst name="title">
       <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/title_browse.db</str>
-      <str name="field">title_fullStr</str>
+      <str name="field">title_browse</str>
+      <str name="normalizer">org.vufind.util.NACONormalizer</str>
     </lst>
 
     <lst name="lcc">
@@ -478,6 +500,20 @@
       <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/hierarchy_browse.db</str>
       <str name="field">hierarchy_browse</str>
     </lst>
+
+    <!-- Begin: UChicago additions -->
+    <lst name="journal">
+      <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/journal_browse.db</str>
+      <str name="field">journal_browse</str>
+      <str name="normalizer">org.vufind.util.NACONormalizer</str>
+    </lst>
+
+    <lst name="series">
+      <str name="DBpath">${solr.solr.home:./solr}/alphabetical_browse/series_browse.db</str>
+      <str name="field">series_browse</str>
+      <str name="normalizer">org.vufind.util.NACONormalizer</str>
+    </lst>
+    <!-- End: UChicago additions -->
   </requestHandler>
 
   <searchComponent name="spellcheck" class="org.apache.solr.handler.component.SpellCheckComponent">
@@ -681,6 +717,7 @@
       </formatter>
     </highlighting>
   </searchComponent>
+
 
   <!-- queryResponseWriter plugins... query responses will be written using the
     writer specified by the 'wt' request parameter matching the name of a registered
