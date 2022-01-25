@@ -470,7 +470,7 @@ public class ucFormat
                                 }
                         }
 		}
-
+/*
 		Iterator iter903 = df903List.iterator();
 		{
 			DataField fld903;
@@ -494,6 +494,7 @@ public class ucFormat
 				}
 			}
 		}
+*/
 /*
 		List<DataField> l = new ArrayList<DataField>();
 		for (VariableField item : items) l.add((DataField)item); 
