@@ -81,7 +81,7 @@ function eholdingsMegaService (isbns, oclc, target, onlineHeader) {
         html = '<div class="locpanel-heading online"><h2>Online</h2></div>';
       }
       function addLink (l) {
-	  return ('<div class="holdings-unit"><a href="' + l.link + '">${l.linktext}</a></div>');
+	  return ('<div class="holdings-unit"><a href="' + l.link + '">' + l.linktext + '</a></div>');
       }
       html += links.map(addLink).join('');
       target.append(html);
