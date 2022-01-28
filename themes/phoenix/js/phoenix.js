@@ -62,24 +62,28 @@ function updateSearchPlaceholderText(select) {
  * box with e-holdings links on full record page and the
  * same links on results pages.
  */
-const eholdingsMegaService = (isbns, oclc, target, onlineHeader = false) => {
-  let url ='https://www.lib.uchicago.edu/cgi-bin/megaholdings?function=megaholdings&callback=x&nums=';
-  url += isbns.map(x => `isbn:${x}`).join(',');
+function eholdingsMegaService (isbns, oclc, target, onlineHeader) {
+  if (!onlineHeader) { onlineHeader = false; }
+  var url ='https://www.lib.uchicago.edu/cgi-bin/megaholdings?function=megaholdings&callback=x&nums=';
+  function mapper1(x) { return ("isbn:" + x) }
+  url += isbns.map(mapper1).join(',');
   if (isbns.length > 0 && oclc.length > 0) {
     url += ',';
   }
-  url += oclc.map(x => `oclc:${x}`).join(',');
+  function mapper2(x) { return ("oclc:" + x) }
+  url += oclc.map(mapper2).join(',');
   $.get(url, function(data, status, xhr) {
-    const response = JSON.parse(data);
-    const links = response.oks;
+    var response = JSON.parse(data);
+    var links = response.oks;
     if (links !== undefined && links.length != 0) {
-      let html = '';
+      var html = '';
       if (onlineHeader) {
         html = '<div class="locpanel-heading online"><h2>Online</h2></div>';
       }
-      html += links.map(l => {
-        return `<div class="holdings-unit"><a href="${l.link}">${l.linktext}</a></div>`;
-      }).join('');
+      function addLink (l) {
+	  return ('<div class="holdings-unit"><a href="' + l.link + '">${l.linktext}</a></div>');
+      }
+      html += links.map(addLink).join('');
       target.append(html);
     }
   }, 'text'); // Not JSON?
@@ -88,7 +92,8 @@ const eholdingsMegaService = (isbns, oclc, target, onlineHeader = false) => {
 /*
  * Get deduped eholdings, SFX.
  */
-function getDedupedEholdings(issns, sfx, bib, target, onlineHeader = false) {
+function getDedupedEholdings(issns, sfx, bib, target, onlineHeader) {
+  if (!onlineHeader) { onlineHeader = false };
   $.get(VuFind.path + '/AJAX/JSON?method=dedupedEholdings', 'issns=' + issns + '&sfx=' + sfx + '&header=' + onlineHeader + '&bib=' + bib, function(data, status, xhr) {
     var response = JSON.parse(data);
 
@@ -150,7 +155,7 @@ $(document).ready(function() {
 
   // Add "back to basic search" link to advanced search page
   var basicSearchLink = '<a href="/vufind/">Basic Search</a>';
-  $('.template-name-advanced ul.breadcrumb').append(`<li>${basicSearchLink}</li>`);
+  $('.template-name-advanced ul.breadcrumb').append('<li>' + basicSearchLink + '</li>');
 
   // Add Bootstrap 'from-control' to homepage search button 
   var homeSearchButton = $('.template-name-home #searchForm .btn-primary');
@@ -158,18 +163,18 @@ $(document).ready(function() {
 
   // E-holdings Mega Service
   $('.e-links[data-isbns], .e-links[data-oclc-nums]').each(function() {
-    const isbns = $(this).data('isbns');
-    const oclc = $(this).data('oclc-nums');
-    const showOnlineHeader = $(this).data('online-header');
+    var isbns = $(this).data('isbns');
+    var oclc = $(this).data('oclc-nums');
+    var showOnlineHeader = $(this).data('online-header');
     eholdingsMegaService(isbns, oclc, $(this), showOnlineHeader);
   });
 
   /*** Deduped eholdings instead of sfx ***/
   $('.deduped[data-issns]').each(function() {
-    const issns = $(this).data('issns');
-    const sfxNum = $(this).data('sfx');
-    const showOnlineHeader = $(this).data('online-header');
-    const bib = $(this).data('bib');
+    var issns = $(this).data('issns');
+    var sfxNum = $(this).data('sfx');
+    var showOnlineHeader = $(this).data('online-header');
+    var bib = $(this).data('bib');
     getDedupedEholdings(issns, sfxNum, bib, $(this), showOnlineHeader);
   });
 
