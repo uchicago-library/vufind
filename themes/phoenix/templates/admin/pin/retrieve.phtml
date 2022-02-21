@@ -20,7 +20,15 @@
         <button type="submit" class="btn btn-primary">Create a new account for a patron without a CNetID</button>
     </div><!--/form-group-->
 </form>
-
+<br/>
+<form action="/vufind/Admin/Pin/update" method="get" class="form-inline">
+    <div class="form-group">
+	<label for="barcode">CNetID:</label>
+	<input type="text" id="barcode" name="barcode"></input>
+        <button type="submit" class="btn">Create or edit PIN for a CNetID</button>
+    </div><!--/form-group-->
+</form>
+<br/>
 <table>
 <tr>
     <th class="span1">id</th>

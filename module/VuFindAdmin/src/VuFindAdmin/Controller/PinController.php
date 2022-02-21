@@ -218,10 +218,10 @@ class PinController extends AbstractAdmin
 
         $config = $this->getConfig();
 
-	    $sql = 'SELECT * FROM user;';
-	    $sth = $this->db->prepare($sql);
-	    $sth->execute();
-	    $results = $sth->fetchAll();
+	$sql = 'SELECT * FROM user where auth_method != "shibboleth";';
+	$sth = $this->db->prepare($sql);
+	$sth->execute();
+        $results = $sth->fetchAll();
 
         $view = $this->createViewModel();
         $view->setTemplate('admin/pin/retrieve');
