@@ -1,0 +1,81 @@
+<?
+    // Set up page title:
+    $this->headTitle($this->translate('Update PIN'));
+
+    // Set up breadcrumbs:
+    /*$this->layout()->breadcrumbs = '<a href="' . $this->url('myresearch-home') . '">'
+        . $this->transEsc('Your Account') . '</a>' . '<span>&gt;</span><em>'
+        . $this->transEsc('Account') . '</em>';*/
+
+    // Set the searchbox based on user preference (past action for now)
+    //$this->render('/search/user-search-preferences.phtml');
+?>
+
+<div class="span10">
+<h2>Update VuFind PIN</h2>
+<?=$this->flashmessages()?>
+
+<? if ($this->barcode): ?>
+<form method="post" action="" name="updatePinForm" class="form-horizontal" id="updatePinForm">
+    <div class="row">
+        <label class="control-label col-sm-2" for="account_username">Barcode:</label>
+        <div class="col-sm-10">
+            <p style="margin-top: 8px;">
+                <?=$this->escapeHtml($this->barcode)?>
+            </p>
+        </div><!--/col-->
+    </div><!--/row-->
+    <div class="row">
+        <label class="control-label col-sm-2" for="account_lastname">First Name:</label>
+        <div class="col-sm-10">
+            <p style="margin-top: 8px;">
+                <?=$this->escapeHtml($this->firstname)?>
+            </p>
+        </div><!--/col-->
+    </div><!--/row-->
+    <div class="row">
+        <label class="control-label col-sm-2" for="account_lastname">Last Name:</label>
+        <div class="col-sm-10">
+            <p style="margin-top: 8px;">
+                <?=$this->escapeHtml($this->lastname)?>
+            </p>
+        </div><!--/col-->
+    </div><!--/row-->
+    <div class="row">
+        <label class="control-label col-sm-2" for="account_lastname">Current PIN:</label>
+        <div class="col-sm-10">
+            <p style="margin-top: 8px;">
+                <?=$this->escapeHtml($this->pin)?>
+            </p>
+        </div><!--/col-->
+    </div><!--/row-->
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="account_pin1">New PIN:</label>
+        <div class="col-sm-10">
+            <p>
+                <input class="form-control" type="password" name="pin1" autocomplete="off"/>
+            </p>
+        </div><!--/col-->
+    </div><!--/form-group-->
+    <div class="form-group">
+        <label class="control-label col-sm-2" for="account_pin2">New PIN (repeat):</label>
+        <div class="col-sm-10">
+            <p>
+                <input class="form-control" type="password" name="pin2" autocomplete="off"/>
+            </p>
+        </div><!--/col-->
+    </div><!--/form-group-->
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <p>
+                <input class="btn btn-primary" type="submit" name="submit" value="Update this PIN"/>
+            </p>
+        </div><!--/col-->
+    </div><!--/form-group-->
+</form>
+<? else: ?>
+<p><a href="/vufind/Admin/Pin">Return to accounts view.</a></p>
+<? endif; ?>
+
+</div>
+<br class="clear"/>

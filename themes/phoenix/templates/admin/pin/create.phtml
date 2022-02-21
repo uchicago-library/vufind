@@ -1,0 +1,55 @@
+<?
+    // Set up page title:
+    $this->headTitle($this->translate('Add a non-CNetID account to VuFind'));
+
+    // Set up breadcrumbs:
+    /*$this->layout()->breadcrumbs = '<a href="' . $this->url('myresearch-home') . '">'
+        . $this->transEsc('Your Account') . '</a>' . '<span>&gt;</span><em>'
+        . $this->transEsc('Account') . '</em>';*/
+
+    // Set the searchbox based on user preference (past action for now)
+    //$this->render('/search/user-search-preferences.phtml');
+?>
+
+<div class="span10">
+<h2>Add a non-CNetID account to VuFind</h2>
+<?=$this->flashmessages()?>
+
+<? if (!$this->success): ?>
+	<form method="post" action="" name="accountForm" class="form-horizontal" id="accountForm">
+        <div class="form-group">
+	        <label for="account_username" class="control-label col-sm-2">Barcode:</label>
+            <div class="col-sm-10">
+	            <input id="account_barcode" type="text" name="barcode" value="<?=$this->escapeHtml($this->barcode)?>" class="form-control" required />
+            </div><!--/col-->
+        </div><!--/form-group-->
+        <div class="form-group">
+	        <label for="account_lastname" class="control-label col-sm-2">Last Name:</label>
+            <div class="col-sm-10">
+	            <input id="account_lastname" type="text" name="lastname" value="<?=$this->escapeHtml($this->lastname)?>" class="form-control" required />
+            </div><!--/col-->
+        </div><!--/form-group-->
+        <div class="form-group">
+	        <label for="account_pin" class="control-label col-sm-2">PIN:</label>
+            <div class="col-sm-10">
+	            <input id="account_pin" type="password" autocomplete="off" name="pin1" value="" class="form-control" required />
+            </div><!--/col-->
+        </div><!--/form-group-->
+        <div class="form-group">
+	        <label for="account_pin" class="control-label col-sm-2">PIN (repeat):</label>
+            <div class="col-sm-10">
+	            <input id="account_pin" type="password" autocomplete="off" name="pin2" value="" class="form-control" required />
+            </div><!--/col-->
+        </div><!--/form-group-->
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+	            <input class="btn btn-primary" type="submit" name="submit" value="Add this account to VuFind"/>
+            </div><!--/col-->
+        </div><!--/form-group-->
+	</form>
+<? else: ?>
+    <p><a href="/vufind/Admin/Pin">Return to accounts view.</a></p>
+<? endif; ?>
+
+</div>
+<br class="clear"/>

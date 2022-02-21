@@ -129,6 +129,19 @@ function getMapLink(loc, callnum, prefix, target) {
 }
 
 $(document).ready(function() {
+  // Expand and collapse of No-CNet-ID login, when the page is
+  $('#login-toggle').click(function() {
+    console.log('Do something!');
+    $(this).parents('.login-toggle-wrapper').next('.login-toggle-content').toggle();
+  });
+  $('#modal').on('shown.bs.modal', function() {
+    // Expand and collapse of No-CNet-ID login
+    $(this).find('#login-toggle').click(function() {
+        $(this).parents('.login-toggle-wrapper').next('.login-toggle-content').toggle();
+    });
+  });
+
+
   // Better RSS icon
   $('.fa-bell').addClass('fa-rss').removeClass('fa-bell');
 

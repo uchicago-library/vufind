@@ -1,6 +1,31 @@
 <?php
-
 return [
+    'controllers' => [
+      'factories' => [
+        'VuFindAdmin\Controller\PinController' => 'VuFind\Controller\AbstractBaseFactory',
+      ],
+      'aliases' => [
+        'Pin' => 'VuFindAdmin\Controller\PinController',
+      ],
+    ],
+    'router' => [
+      'routes' => [
+        'admin' => [
+          'child_routes' => [
+            'pin' => [
+              'type' => 'Zend\\Router\\Http\\Segment',
+              'options' => [
+                'route' => '/Pin[/:action]',
+                'defaults' => [
+                  'controller' => 'Pin',
+                  'action' => 'Home',
+                ],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ],
     'vufind' => [
         'plugin_managers' => [
             'ils_driver' => [

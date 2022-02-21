@@ -1,0 +1,50 @@
+<?
+    // Set up page title:
+    $this->headTitle($this->translate('Non-CNetID accounts'));
+
+    // Set up breadcrumbs:
+    /*$this->layout()->breadcrumbs = '<a href="' . $this->url('myresearch-home') . '">'
+        . $this->transEsc('Your Account') . '</a>' . '<span>&gt;</span><em>'
+        . $this->transEsc('Account') . '</em>';*/
+
+    // Set the searchbox based on user preference (past action for now)
+    //$this->render('/search/user-search-preferences.phtml');
+?>
+
+<div class="span11">
+<h2>Non-CNetID Accounts</h2>
+<?=$this->flashmessages()?>
+
+<form action="/vufind/Admin/Pin/create" class="form-inline">
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Create a new account for a patron without a CNetID</button>
+    </div><!--/form-group-->
+</form>
+
+<table>
+<tr>
+    <th class="span1">id</th>
+    <th class="span2">barcode</th>
+    <th class="span1">PIN</th>
+    <th class="span2">First Name</th>
+    <th class="span2">Last Name</th>
+    <th class="span3">Created</th>
+    <th/>
+</tr>
+<? foreach ($this->results as $result): ?>
+    <tr>
+        <td><?=$result['id']; ?></td>
+        <td><?=$result['username']; ?></td>
+        <td><a
+href='/vufind/Admin/Pin/update?barcode=<?=$result['username'];
+?>'>Update PIN</a></td>
+        <td><?=$result['firstname']; ?></td>
+        <td><?=$result['lastname']; ?></td>
+        <td><?=$result['created']; ?></td>
+        <td><a href='/vufind/Admin/Pin/delete?barcode=<?=$result['username']; ?>'>Delete</a></td>
+    </tr>
+<? endforeach; ?>
+</table>
+
+</div>
+<br class="clear"/>

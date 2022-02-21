@@ -3,12 +3,15 @@
 
 /* Change variables to change colors and values through-out the theme */
 @image-path: "../../phoenix/images";
+@maroon: #800;
 @active-orange: #fff93c;
 @dark-green: #137752;
 /* Bootstrap variables as well */
-@brand-primary: #0045a1;
+@brand-primary: @maroon;
 @body-bg: #f8f8f8;
 @grid-gutter-width: 20px;
+@brand-primary-dark: darken(@brand-primary, 6.5%);
+@light-link: #fff;
 
 /*
 / Global
@@ -34,6 +37,26 @@ a {
     border-radius: 0;
     background: #fff;
   }
+}
+
+// Buttons
+.btn-primary:focus,
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary.active,
+.btn-primary.disabled,
+.btn-primary[disabled] {
+    color: @light-link;
+    background-color: @brand-primary-dark;
+    background-color: #4a0000;
+    border-color:@brand-primary-dark;
+    background-image:none;
+}
+
+.btn-primary:active,
+.btn-primary.active {
+    background-color: #300000;
+    background-image:none;
 }
 
 
@@ -89,11 +112,6 @@ header {
   }
 }
 
-.btn-primary {
-  background: #5e5e5e;
-  color: #fff;
-}
-
 .search.container.navbar {
   background: #670000;
   padding: 15px;
@@ -146,6 +164,52 @@ footer {
     padding: 0;
 }
 
+/*Admin/Pin*/
+.template-dir-admin.template-name-pin {
+    table {
+        background-color: transparent;
+        width: 100%;
+        td, th {
+            padding: 4px 10px 4px 5px;
+        }
+        tbody tr:nth-child(2n) td {
+            background-color: #e5ecf9;
+        }
+    }
+}
+#alert {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: center;
+    background:#FFB547;
+    color:@brand-primary-dark;
+    p, h2, h3, h4, h5 {
+        display: inline;
+    }
+    a {
+        color:#0F425C;
+    }
+}
+
+// Auth, Login
+#authcontainer [class^="col"],
+#login-txt[class^="col"],
+#login-toggle[class^="col"]{
+    float:none !important;
+}
+.login-toggle-wrapper {
+    padding-bottom:15px;
+}
+#login-toggle {
+    padding-left:0;
+}
+#login-toggle:after {
+    font-family: FontAwesome;
+    content: " \f101";
+}
+.login-toggle-content {
+    display: none;
+}
 
 /* Imports */
 @import "home-page";
