@@ -27,7 +27,9 @@
       <?php else: ?>
         <?php if ($holding['availability'] ?? false): ?>
           <?php /* Begin Available Items (Holds) */ ?>
-           <span class="text-success"><?=$this->transEsc("Available")?><link property="availability" href="http://schema.org/InStock" /></span>
+          <? ### UChicago customization ### ?>
+           <span class="text-success <?=$holding['hide_status'] ? 'hide' : ''?>"><?=$this->transEsc("Available")?><link property="availability" href="http://schema.org/InStock" /></span>
+          <? ### ./UChicago customization ### ?>
           <?php if ($holding['link'] ?? false): ?>
             <? ### UChicago customization ### ?>
             <!--<a class="<?//=$check ? 'checkRequest ' : ''?>placehold" <?php //if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php //endif; ?>href="<?//=$this->recordLink()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?//=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>-->
@@ -42,7 +44,8 @@
         <?php else: ?>
           <?php /* Begin Unavailable Items (Recalls) */ ?>
           <? ### UChicago customization ### ?>
-          <?php if ($holding['status'] == 'Intellectual item'):?>
+          <?php // Analytic record ?>
+          <?php if ($holding['item_statistical_code'] == '27da80dc-b1de-5719-8326-18c3a41dfc3c'):?>
             To check availability
             <?php $callNumBreak = preg_split("/\s[a-zA-Z0-9]+\./", $holding['callnumber']); ?>
             <?php if ($callNumBreak): ?>
@@ -57,7 +60,7 @@
             <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc&consult=true">consult the series record</a>.
           <?php endif; ?>
           <? ### ./UChicago customization ### ?>
-          <span class="text-danger"><?=$this->transEsc($holding['status'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
+          <span class="text-danger <?=$holding['hide_status'] ? 'hide' : ''?>"><?=$this->transEsc($holding['status'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
           <?php if ($holding['returnDate'] ?? false): ?>&ndash; <span class="small"><?=$this->escapeHtml($holding['returnDate'])?></span><?php endif; ?>
           <?php if ($holding['duedate'] ?? false): ?>
             &ndash; <span class="small"><?=$this->transEsc("Due")?>: <?=$this->escapeHtml($holding['duedate'])?></span>

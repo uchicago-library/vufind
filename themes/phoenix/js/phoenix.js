@@ -160,6 +160,12 @@ $(document).ready(function() {
     updateSearchPlaceholderText($(this));
   });
 
+  $('.offsite-storage').each(function() {
+    var prefixTxt = $(this).data('offsite-prefix');
+    var prefixHtml = '<span class="text-unknown">' + prefixTxt + '</span>';
+    $(this).before(prefixHtml);
+  });
+
   // Add "About the Library Catalog" and "Power searching instructions" links
   var about = '<a href="https://www.lib.uchicago.edu/research/help/catalog-help/about/" class="about-catalog external">About the Library Catalog</a>';
   var powerSearching = '<a href="https://www.lib.uchicago.edu/research/help/catalog-help/power-searching/" class="power-searching external">Power searching instructions (Boolean, etc.)</a>';

@@ -201,6 +201,7 @@ class ServiceLinks extends AbstractHelper {
                 'icon' => $link[2] ?? '',
                 'classes' => $link[3] ?? '',
                 'tagline' => $link[4] ?? '',
+                'data' => $link[5] ?? '',
                 'loc_whitelist' => $locWhitelist ?? [],
                 'loc_blacklist' => $locBlacklist ?? [],
                 'status_whitelist' => $statusWhitelist ?? [],
@@ -284,7 +285,7 @@ class ServiceLinks extends AbstractHelper {
      *
      * @return
      */
-    public function buildLink($holding, $confName, $serviceLink = '', $locWhitelistType = 'shelving', $locBlacklistType = 'shelving') {
+    public function buildLink($holding, $confName, $serviceLink = '', $locWhitelistType = 'shelving', $locBlacklistType = 'shelving', $dataAttrs = []) {
         $config = $this->getLinkConfig($confName);
         if (!$this->enabled($config)) {
             return '';
@@ -302,7 +303,16 @@ class ServiceLinks extends AbstractHelper {
                 // Override servie link if an override value is provided.
                 $serviceLink = $this->replaceTokens($config['url'], $holding);
             }
-            return $this->template($serviceLink, $config['text'], $config['icon'], $config['classes'], [], $config['tagline']);
+            if (empty($dataAttrs) && !empty($config['data'])) {
+                $data = explode(',', $config['data']);
+                foreach ($data as $attr) {
+                    $tmp = explode('>', $attr);
+                    if (count($tmp) == 2) {
+                        $dataAttrs[trim($tmp[0])] = trim($tmp[1]);
+                    }
+                }
+            }
+            return $this->template($serviceLink, $config['text'], $config['icon'], $config['classes'], $dataAttrs, $config['tagline']);
         }
     }
 

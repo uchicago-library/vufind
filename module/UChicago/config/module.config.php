@@ -47,9 +47,11 @@ return [
             'ajaxhandler' => [
                 'factories' => [
                     'UChicago\\AjaxHandler\\GetDedupedEholdings' => 'UChicago\\AjaxHandler\\AbstractAjaxHandlerFactory',
+                    'UChicago\\AjaxHandler\\GetItemStatuses' => 'VuFind\\AjaxHandler\\GetItemStatusesFactory',
                 ],
                 'aliases' => [
                     'dedupedEholdings' => 'UChicago\\AjaxHandler\\GetDedupedEholdings',
+                    'getItemStatuses' => 'UChicago\\AjaxHandler\\GetItemStatuses',
                 ],
             ],
             'related' => [

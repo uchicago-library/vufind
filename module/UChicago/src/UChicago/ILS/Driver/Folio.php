@@ -177,7 +177,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
 
                 // Get duedate
                 $dueDate = '';
-                if ($item->status->name == 'Checked out') {
+                if ($item->status->name == 'Not Available') {
                     $dueDate = $this->getDuedate($item->id);
                 }
 
@@ -186,6 +186,17 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 if (!empty($itemCopyNumber)) {
                     $UCcopyNumber = $itemCopyNumber;
                 }
+
+                $itemStatCodeIds = $item->statisticalCodeIds;
+                $itemAvailableStatCodes = $this->config['Holdings']['item_available_stat_codes'] ?? [];
+                $itemHasAvailableStatCode = count(
+                    array_intersect($itemStatCodeIds, $itemAvailableStatCodes)
+                ) >= 1;
+                $itemHideStatusStatCodes = $this->config['Holdings']['item_hide_status_stat_codes'] ??  [];
+                $itemHasHideStatCode = count(
+                    array_intersect($itemStatCodeIds, $itemHideStatusStatCodes)
+                ) >= 1;
+
                 $items[] = $callNumberData + [
                     'id' => $bibId,
                     'item_id' => $item->id,
@@ -193,7 +204,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     'number' => $enum ? $UCcopyNumber . ' : ' . $enum : $UCcopyNumber,
                     'barcode' => $item->barcode ?? '',
                     'status' => $item->status->name,
-                    'availability' => $item->status->name == 'Available',
+                    'availability' => $item->status->name == 'Available' || $itemHasAvailableStatCode,
                     'is_holdable' => $this->isHoldable($locationName),
                     'holdings_notes'=> $hasHoldingNotes ? $holdingNotes : null,
                     'item_notes' => !empty(implode($itemNotes)) ? $itemNotes : null,
@@ -211,6 +222,8 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     'holding_callnumber_prefix' => $holdingCallNumberPrefix,
                     'holding_callnumber' => $holdingCallNumber,
                     'duedate' => $dueDate,
+                    'hide_status' => $itemHasHideStatCode,
+                    'item_statistical_code' => $itemStatCodeIds[0] ?? '',
                 ];
             }
         }
