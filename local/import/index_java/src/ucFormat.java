@@ -120,7 +120,7 @@ public class ucFormat
 			}
 		}
 
-
+/*
  		Iterator iter928_On = df928Online.iterator();
                 	{
                         	DataField fld928;
@@ -129,7 +129,6 @@ public class ucFormat
                 	                fld928 = (DataField) iter928_On.next();
                                         if(fld928.getSubfield('l') !=null)
                                         {
- 
                                                 String str = fld928.getSubfield('l').getData();
                                                 if (str.equals("Online"))                               
                                                 { 
@@ -139,7 +138,7 @@ public class ucFormat
                                  }
                           }
 
-
+*/
 
                 Iterator iter928 = df928List.iterator();
                 {
@@ -188,7 +187,7 @@ public class ucFormat
                                         }    
 
                                 }
-                              /*  if(fld928.getSubfield('l') !=null)
+                                if(fld928.getSubfield('l') !=null)
                                 {
 
                                         String str = fld928.getSubfield('l').getData();
@@ -197,7 +196,7 @@ public class ucFormat
                                         {
                                                 result.add("Eresource");  System.out.println("~~~~Online ~~~~~");
                                         } 
-                                } */
+                                } 
                         }
                 }
 
