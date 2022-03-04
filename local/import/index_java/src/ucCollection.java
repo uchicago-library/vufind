@@ -19,14 +19,13 @@ public class ucCollection {
 
                 // check the 927 thru 928 # c to find proper location(building) for each book/record
                 List fields = record.getVariableFields(tags);  
-                Iterator i = fields.iterator();  System.out.println("~~~~~I'm HERE -----");
+                Iterator i = fields.iterator(); 
                 if (fields != null)
                 {
                         while( i.hasNext())
                         {
                                 DataField formatField = (DataField) i.next();
                                 Subfield subfield = formatField.getSubfield('c');
-
 
 				if(subfield != null)
 				{      
