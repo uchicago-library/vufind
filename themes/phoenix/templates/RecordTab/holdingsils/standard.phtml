@@ -28,7 +28,11 @@
         <?php if ($holding['availability'] ?? false): ?>
           <?php /* Begin Available Items (Holds) */ ?>
           <? ### UChicago customization ### ?>
-           <span class="text-success <?=$holding['hide_status'] ? 'hide' : ''?>"><?=$this->transEsc("Available")?><link property="availability" href="http://schema.org/InStock" /></span>
+          <span class="text-success <?=$holding['hide_status'] ? 'hide' : ''?>"><?=$this->transEsc("Available")?><link property="availability" href="http://schema.org/InStock" />
+            <?php if (isset($holding['loan_type_id']) && !empty($holding['loan_type_name'])):?>
+              <span class="loan-period">Loan period: <?=$holding['loan_type_name']?>&nbsp;</span>
+            <?endif;?>
+          </span>
           <? ### ./UChicago customization ### ?>
           <?php if ($holding['link'] ?? false): ?>
             <? ### UChicago customization ### ?>

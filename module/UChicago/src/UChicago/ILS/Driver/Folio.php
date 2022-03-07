@@ -78,6 +78,27 @@ class Folio extends \VuFind\ILS\Driver\Folio
 
 
     /**
+     * Get data about a loan type.
+     *
+     * @param string $loanTypeId, UUID
+     *
+     * @return array
+     */
+    protected function getLoanTypeData($loanTypeId)
+    {
+        $name = '';
+        $response = $this->makeRequest(
+            'GET', '/loan-types/' . $loanTypeId
+        );
+        if ($response->isSuccess()) {
+            $data = json_decode($response->getBody());
+            $name = $data->name ?? '';
+        }
+        return compact('name');
+    }
+
+
+    /**
      * This method queries the ILS for holding information.
      *
      * @param string $bibId   Bib-level id
@@ -197,6 +218,15 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     array_intersect($itemStatCodeIds, $itemHideStatusStatCodes)
                 ) >= 1;
 
+                $loanTypeName = '';
+                $tempLoanTypeId = $item->temporaryLoanTypeId ?? '';
+                $permLoanTypeId = $item->permanentLocationId ?? '';
+                $loanTypeId = !empty($tempLoanTypeId) ? $tempLoanTypeId : $permLoanTypeId;
+                if (!empty($loanTypeId)) {
+                    $loanData = $this->getLoanTypeData($loanTypeId);
+                    $loanTypeName = $loanData['name'];
+                }
+
                 $items[] = $callNumberData + [
                     'id' => $bibId,
                     'item_id' => $item->id,
@@ -224,6 +254,8 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     'duedate' => $dueDate,
                     'hide_status' => $itemHasHideStatCode,
                     'item_statistical_code' => $itemStatCodeIds[0] ?? '',
+                    'loan_type_id' => $loanTypeId,
+                    'loan_type_name' => $loanTypeName,
                 ];
             }
         }
