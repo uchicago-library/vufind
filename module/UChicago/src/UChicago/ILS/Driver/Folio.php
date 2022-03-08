@@ -87,7 +87,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
     protected function getLoanTypeData($loanTypeId)
     {
         $name = '';
-        $response = $this->makeRequest(
+        $response = $this->makeForgivingRequest(
             'GET', '/loan-types/' . $loanTypeId
         );
         if ($response->isSuccess()) {
@@ -355,5 +355,48 @@ class Folio extends \VuFind\ILS\Driver\Folio
             ? [] : $this->getPurchaseHistoryData($bibID);
     }
 
+    /**
+     * This is a copy of VuFind/ILS/Driver/AbstractAPI.php with the case statement
+     * taken out. We do not want to throw a RecordMissing for an entire record when
+     * one of the auxiliary data APIs returns a 404.
+     *
+     * @param string $method  GET/POST/PUT/DELETE/etc
+     * @param string $path    API path (with a leading /)
+     * @param array  $params  Parameters object to be sent as data
+     * @param array  $headers Additional headers
+     *
+     * @return \Laminas\Http\Response
+     */
+    public function makeForgivingRequest($method = "GET", $path = "/", $params = [],
+        $headers = []
+    ) {
+        $client = $this->httpService->createClient(
+            $this->config['API']['base_url'] . $path,
+            $method,
+            120
+        );
+
+        // Add default headers and parameters
+        $req_headers = $client->getRequest()->getHeaders();
+        $req_headers->addHeaders($headers);
+        [$req_headers, $params] = $this->preRequest($req_headers, $params);
+
+        if ($this->logger) {
+            $this->debugRequest($method, $path, $params, $req_headers);
+        }
+
+        // Add params
+        if ($method == 'GET') {
+            $client->setParameterGet($params);
+        } else {
+            if (is_string($params)) {
+                $client->getRequest()->setContent($params);
+            } else {
+                $client->setParameterPost($params);
+            }
+        }
+        $response = $client->send();
+        return $response;
+    }
 }
 
