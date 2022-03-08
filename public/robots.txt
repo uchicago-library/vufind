@@ -1,0 +1,12 @@
+User-agent: *
+Crawl-delay: 3
+Disallow: /vufind/AJAX
+Disallow: /vufind/Alphabrowse
+Disallow: /vufind/Browse
+Disallow: /vufind/Combined
+Disallow: /vufind/Search/Results
+Disallow: /vufind/AJAX/
+Disallow: /vufind/Alphabrowse/
+Disallow: /vufind/Browse/
+Disallow: /vufind/Combined/
+Disallow: /vufind/Search/Results/
