@@ -14,20 +14,21 @@ $renewAll = !$this->ilsPaging || !$paginator;
 </a>
 
 <div class="<?=$this->layoutClass('mainbody')?>">
-    <div class="alert alert-warning" role="alert">
-	<p>
-	    We are currently working to restore the ability to sort checked out items and the display of some data fields.
-	</p>
+  <? ### UChicago customization ### ?>
+  <?php if ($this->hasRecalls):?>
+    <div class="alert alert-danger" role="alert">
+      <p>You have item(s) recalled.</P>
     </div>
-    <div class="alert alert-warning" role="alert">
-	<p>
-	    <b>
-		Interlibrary Loan items, reserves items, short term loan items, and recalled items are ineligible for renewal.
-	    </b>
-	    <p>
-		Standard loans are not yet eligible for renewal; we are exploring whether we can provide automated renewals for eligible materials.
-	    </p>
-    </div>
+  <?php endif; ?>
+
+  <div class="alert alert-warning" role="alert">
+    <p>We are currently working to restore the ability to sort checked out items and the display of some data fields.</p>
+  </div>
+  <div class="alert alert-warning" role="alert">
+    <p><strong>Interlibrary Loan items, reserves items, short term loan items, and recalled items are ineligible for renewal.</strong></p>
+    <p>Standard loans are not yet eligible for renewal; we are exploring whether we can provide automated renewals for eligible materials.</p>
+  </div>
+  <? ### ./UChicago customization ### ?>
   <h2><?=$this->transEsc('Your Checked Out Items')?></h2>
   <?=$this->flashmessages()?>
 
@@ -172,6 +173,13 @@ $renewAll = !$this->ilsPaging || !$paginator;
                 <strong><?=$this->transEsc('Borrowing Location')?>:</strong> <?=$this->transEscWithPrefix('location_', $ilsDetails['borrowingLocation'])?>
                 <br />
               <?php endif; ?>
+
+              <? ### UChicago customization ### ?>
+              <?php if (isset($ilsDetails['recalled']) && $ilsDetails['recalled'] === true): ?>
+                <strong class="text-danger"><?=$this->transEsc('This item has been recalled')?></strong>
+                <br />
+              <?php endif; ?>
+              <? ### ./UChicago customization ### ?>
 
               <?php if (isset($ilsDetails['renew'])): ?>
                 <strong><?=$this->transEsc('Renewed')?>:</strong> <?=$this->transEsc($ilsDetails['renew'])?>
