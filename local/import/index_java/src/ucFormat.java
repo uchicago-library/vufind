@@ -56,7 +56,6 @@ public class ucFormat
 		List df903List  = record.getVariableFields("903");
 	        List df928List  = record.getVariableFields("928");
 	        List df927List  = record.getVariableFields("927");
-                List df928Online  = record.getVariableFields("928"); 
 
 		String formatString;
 		char formatCode = ' ';
@@ -120,25 +119,6 @@ public class ucFormat
 			}
 		}
 
-/*
- 		Iterator iter928_On = df928Online.iterator();
-                	{
-                        	DataField fld928;
- 	                       while (iter928_On.hasNext())
-        	                {
-                	                fld928 = (DataField) iter928_On.next();
-                                        if(fld928.getSubfield('l') !=null)
-                                        {
-                                                String str = fld928.getSubfield('l').getData();
-                                                if (str.equals("Online"))                               
-                                                { 
-                                                	result.add("Eresource");  
-                                       	        }
-                                        }
-                                 }
-                          }
-
-*/
 
                 Iterator iter928 = df928List.iterator();
                 {
@@ -194,7 +174,7 @@ public class ucFormat
 
                                         if (str.equals("Online"))
                                         {
-                                                result.add("Eresource");  System.out.println("~~~~Online ~~~~~");
+                                                result.add("Eresource"); 
                                         } 
                                 } 
                         }
