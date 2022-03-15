@@ -466,5 +466,79 @@ class Folio extends \VuFind\ILS\Driver\Folio
         $response = $client->send();
         return $response;
     }
+
+    /**
+     * See if a patron has automated blocks.
+     *
+     * @param string $patronId, UUID
+     *
+     * @return array
+     */
+    public function getAutomatedBlocks($patronId)
+    {
+        $response = $this->makeForgivingRequest(
+            'GET', '/automated-patron-blocks/' . $patronId
+        );
+        $data = json_decode($response->getBody());
+        return $data->automatedPatronBlocks;
+    }
+
+    /**
+     * See if a patron has manual blocks.
+     *
+     * @param string $patronId, UUID
+     *
+     * @return array
+     */
+    public function getManualBlocks($patronId)
+    {
+        $query = ['query' => 'userId==' . $patronId];
+        $response = $this->makeForgivingRequest(
+            'GET', '/manualblocks', $query
+        );
+        $data = json_decode($response->getBody());
+        return $data->manualblocks;
+    }
+
+    /**
+     * See if a patron is active in Folio.
+     *
+     * @param string $patronId, UUID
+     *
+     * @return bool
+     */
+    public function isPatronActive($patronId)
+    {
+        $query = ['query' => 'id==' . $patronId];
+        $response = $this->makeForgivingRequest(
+            'GET', '/users', $query
+        );
+        $data = json_decode($response->getBody());
+        if (count($data->users) > 0) {
+            return $data->users[0]->active;
+        }
+        return false;
+    }
+
+    /**
+     * Check for account blocks.
+     *
+     * @param array $patron The patron data
+     *
+     * @return array|boolean    An array of block messages or false
+     */
+    public function getAccountBlocks($patron)  {
+        $blocks = [];
+        if (!$this->isPatronActive($patron['id'])) {
+            array_push($blocks, 'Patron account is inactive. Contact ipo@uchicago.edu with any questions.');
+        }
+        foreach ($this->getAutomatedBlocks($patron['id']) as $block) {
+            array_push($blocks, $block->message);
+        }
+        foreach ($this->getManualBlocks($patron['id']) as $manBlock) {
+            array_push($blocks, $manBlock->patronMessage);
+        }
+        return $blocks;
+    }
 }
 

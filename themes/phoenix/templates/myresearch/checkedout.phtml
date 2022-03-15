@@ -15,22 +15,23 @@ $renewAll = !$this->ilsPaging || !$paginator;
 
 <div class="<?=$this->layoutClass('mainbody')?>">
   <? ### UChicago customization ### ?>
+  <?=$this->flashmessages()?>
+  <?//=$this->AutomatedPatronBlocks()->getAlertBlocks($this->automatedBlocks)?>
   <?php if ($this->hasRecalls):?>
     <div class="alert alert-danger" role="alert">
-      <p>You have item(s) recalled.</P>
+      <p>You have item(s) recalled.</p>
     </div>
   <?php endif; ?>
 
   <div class="alert alert-warning" role="alert">
     <p>We are currently working to restore the ability to sort checked out items and the display of some data fields.</p>
   </div>
-  <div class="alert alert-warning" role="alert">
-    <p><strong>Interlibrary Loan items, reserves items, short term loan items, and recalled items are ineligible for renewal.</strong></p>
-    <p>Standard loans are not yet eligible for renewal; we are exploring whether we can provide automated renewals for eligible materials.</p>
+  <div class="alert alert-info" role="alert">
+    <p>University of Chicago Library materials on standard loan will be renewed automatically up to their online renewal limit, unless recalled.
+    <a href="https://www.lib.uchicago.edu/borrow/borrowing/renewing-and-returning-items/">More info...</a></p>
   </div>
-  <? ### ./UChicago customization ### ?>
   <h2><?=$this->transEsc('Your Checked Out Items')?></h2>
-  <?=$this->flashmessages()?>
+  <? ### ./UChicago customization ### ?>
 
   <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
 
