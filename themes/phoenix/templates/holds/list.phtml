@@ -14,19 +14,15 @@
 
 <div class="<?=$this->layoutClass('mainbody')?>">
   <div class="row">&nbsp;</div>
+  <? ### ./UChicago customization ### ?>
+  <?=$this->flashmessages()?>
   <div class="alert alert-warning" role="alert">
-      <p>
-	  <b>
-	      You will receive an email notice when items you request are available for pickup.
-	  </b>
-      </p>
-      <p>
-	  Requested items in this list may still be in process. We are currently working to restore the display of requested items' pickup status.
-      </p>
+      <p><strong>You will receive an email notice when items you request are available for pickup.</strong></p>
+      <p>Requested items in this list may still be in process. We are currently working to restore
+      the display of requested items' pickup status.</p>
   </div>
   <h2><?=$this->transEsc('Your Holds and Recalls') ?></h2>
-
-  <?=$this->flashmessages()?>
+  <? ### ./UChicago customization ### ?>
 
   <?=$this->context($this)->renderInContext('librarycards/selectcard.phtml', ['user' => $this->auth()->isLoggedIn()]); ?>
 

@@ -4,11 +4,14 @@ return [
       'factories' => [
         'VuFindAdmin\Controller\PinController' => 'VuFind\Controller\AbstractBaseFactory',
         'UChicago\Controller\MyResearchController' => 'VuFind\Controller\AbstractBaseFactory',
+        'UChicago\Controller\HoldsController' => 'VuFind\Controller\HoldsControllerFactory',
       ],
       'aliases' => [
         'Pin' => 'VuFindAdmin\Controller\PinController',
         'MyResearch' => 'UChicago\Controller\MyResearchController',
         'myresearch' => 'UChicago\Controller\MyResearchController',
+        'Holds' => 'UChicago\Controller\HoldsController',
+        'holds' => 'UChicago\Controller\HoldsController',
       ],
     ],
     'router' => [

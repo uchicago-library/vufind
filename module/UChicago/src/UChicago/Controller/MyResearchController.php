@@ -50,6 +50,31 @@ use VuFind\Search\RecommendListener;
  */
 class MyResearchController extends \VuFind\Controller\MyResearchController
 {
+    /**
+     * Action for sending all of a user's saved favorites to the view
+     *
+     * @return mixed
+     */
+    public function favoritesAction()
+    {
+        ### UChicago customization ###
+        $catalog = $this->getILS();
+        $patron = $this->catalogLogin();
+        $blocks = $catalog->getAccountBlocks($patron);
+        foreach ($blocks as $block) {
+            $this->flashMessenger()->addMessage($block, 'error');
+        }
+        ### ./UChicago customization ##
+
+        // Check permission:
+        $response = $this->permission()->check('feature.Favorites', false);
+        if (is_object($response)) {
+            return $response;
+        }
+
+        // Favorites is the same as MyList, but without the list ID parameter.
+        return $this->forwardTo('MyResearch', 'MyList');
+    }
 
     /**
      * Send list of checked out books to view
@@ -94,6 +119,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
 
         // Get checked out item details:
         $result = $catalog->getMyTransactions($patron, $pageOptions['ilsParams']);
+        $automatedBlocks = $catalog->getAutomatedBlocks($patron['id']);
 
         // Build paginator if needed:
         $paginator = $this->getPaginationHelper()->getPaginator(
@@ -169,9 +195,76 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             compact(
                 'transactions', 'renewForm', 'renewResult', 'paginator', 'ilsPaging',
                 'hiddenTransactions', 'displayItemBarcode', 'sortList', 'params',
-                'accountStatus', 'hasRecalls'
+                'accountStatus', 'hasRecalls', 'automatedBlocks'
             )
         );
+    }
+
+    /**
+     * Send list of fines to view. UChicago: only customized to add blocks to flash messages.
+     *
+     * @return mixed
+     */
+    public function finesAction()
+    {
+        // Stop now if the user does not have valid catalog credentials available:
+        if (!is_array($patron = $this->catalogLogin())) {
+            return $patron;
+        }
+
+        // Connect to the ILS:
+        $catalog = $this->getILS();
+
+        // Get fine details:
+        $result = $catalog->getMyFines($patron);
+        $fines = [];
+        $totalDue = 0;
+        $driversNeeded = [];
+        foreach ($result as $i => $row) {
+            // If we have an id, add it to list of record drivers to load:
+            if ($row['id'] ?? false) {
+                $driversNeeded[$i] = [
+                    'id' => $row['id'],
+                    'source' => $row['source'] ?? DEFAULT_SEARCH_BACKEND
+                ];
+            }
+            $totalDue += $row['balance'] ?? 0;
+            // Store by original index so that we can access it when loading record
+            // drivers:
+            $fines[$i] = $row;
+        }
+
+        if ($driversNeeded) {
+            $recordLoader = $this->serviceLocator->get(\VuFind\Record\Loader::class);
+            $drivers = $recordLoader->loadBatch($driversNeeded, true);
+            foreach ($drivers as $i => $driver) {
+                $fines[$i]['driver'] = $driver;
+                if (empty($fines[$i]['title'])) {
+                    $fines[$i]['title'] = $driver->getShortTitle();
+                }
+            }
+        }
+
+        // Clean up array keys:
+        $fines = array_values($fines);
+
+        // Collect up to date stats for ajax account notifications:
+        if (!empty($this->getConfig()->Authentication->enableAjax)) {
+            $accountStatus = [
+                'total' => $totalDue / 100.00
+            ];
+        } else {
+            $accountStatus = null;
+        }
+
+        ### UChicago customization ###
+        $blocks = $catalog->getAccountBlocks($patron);
+        foreach ($blocks as $block) {
+            $this->flashMessenger()->addMessage($block, 'error');
+        }
+        ### ./UChicago customization ###
+
+        return $this->createViewModel(compact('fines', 'accountStatus'));
     }
 
     /**
