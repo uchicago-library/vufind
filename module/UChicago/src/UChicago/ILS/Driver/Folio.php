@@ -405,6 +405,24 @@ class Folio extends \VuFind\ILS\Driver\Folio
         foreach ($this->getPagedResults(
             'loans', '/circulation/loans', $query
         ) as $trans) {
+            $callnumber = '';
+            $locationData = '';
+            $itemId = $trans->item->id ?? '';
+            $item = '';
+            if (!empty($itemId)) {
+                $item = $this->getItemById($itemId);
+                $callnumber = $item->effectiveCallNumberComponents->callNumber;
+                if (!empty($item->copyNumber)) {
+                    $callnumber .= ' ' . $item->copyNumber;
+                }
+                $effectiveLocationId = $item->effectiveLocationId;
+                $locationData = $this->getLocationData($effectiveLocationId);
+            }
+            $loanPolicyId = $trans->loanPolicyId ?? '';
+            $loanPolicyData = '';
+            if (!empty($loanPolicyId)) {
+                $loanPolicyData = $this->getLoanPolicyData($loanPolicyId);
+            }
             $date = date_create($trans->dueDate);
             $transactions[] = [
                 'duedate' => date_format($date, "j M Y"),
@@ -417,6 +435,10 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 'renew' => $trans->renewalCount ?? 0,
                 'renewable' => true,
                 'title' => $trans->item->title,
+                'location' => $locationData['name'] ?? '',
+                'loan_policy' => $loanPolicyData->description ?? '',
+                'status' => $trans->item->status->name ?? '',
+                'callnumber' => $callnumber,
                 'recalled' => $trans->action == 'recallrequested',
             ];
         }
@@ -539,6 +561,38 @@ class Folio extends \VuFind\ILS\Driver\Folio
             array_push($blocks, $manBlock->patronMessage);
         }
         return $blocks;
+    }
+
+    /**
+     * Get loan policy data by ID.
+     *
+     * @param string $loanPolicyId, UUID
+     *
+     * @return array
+     */
+    public function getLoanPolicyData($loanPolicyId)
+    {
+        $response = $this->makeForgivingRequest(
+            'GET', '/loan-policy-storage/loan-policies/' . $loanPolicyId
+        );
+        $data = json_decode($response->getBody());
+        return $data;
+    }
+
+    /**
+     * Get item by ID.
+     *
+     * @param string $itemId, UUID
+     *
+     * @return array
+     */
+    public function getItemById($itemId)
+    {
+        $response = $this->makeForgivingRequest(
+            'GET', '/item-storage/items/' . $itemId
+        );
+        $data = json_decode($response->getBody());
+        return $data;
     }
 }
 
