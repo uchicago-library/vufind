@@ -19,7 +19,8 @@ $renewAll = !$this->ilsPaging || !$paginator;
   <?//=$this->AutomatedPatronBlocks()->getAlertBlocks($this->automatedBlocks)?>
   <?php if ($this->hasRecalls):?>
     <div class="alert alert-danger" role="alert">
-      <p>You have item(s) recalled.</p>
+      <p><strong>You have recalled items.</strong></p>
+      <p>Recalled items may not be renewed and will accrue a daily overdue fine of $5 per day.</p>
     </div>
   <?php endif; ?>
 
@@ -178,10 +179,6 @@ $renewAll = !$this->ilsPaging || !$paginator;
               <?php endif; ?>
 
               <? ### UChicago customization ### ?>
-              <?php if (isset($ilsDetails['recalled']) && $ilsDetails['recalled'] === true): ?>
-                <strong class="text-danger"><?=$this->transEsc('This item has been recalled')?></strong>
-                <br />
-              <?php endif; ?>
               <?php if (!empty($ilsDetails['location'])): ?>
                 <strong><?=$this->transEsc('Location')?>:</strong> <?=$this->escapeHtml($ilsDetails['location'])?>
                 <br />
@@ -213,6 +210,15 @@ $renewAll = !$this->ilsPaging || !$paginator;
               <?php endif; ?>
 
               <?php $showStatus = true; ?>
+
+              <? ### UChicago customization ### ?>
+              <?php if (isset($ilsDetails['recalled']) && $ilsDetails['recalled'] === true): ?>
+                <div class="alert alert-danger" role="alert">
+                  <p><strong class="text-danger"><?=$this->transEsc('This item has been recalled.')?></strong></p>
+                  <p>Recalled items may not be renewed and will accrue a daily overdue fine of $5 per day.</p>
+                </div>
+              <?php endif; ?>
+              <? ### ./UChicago customization ### ?>
 
               <?php if (isset($this->renewResult[$ilsDetails['item_id']])): ?>
                 <?php $renewDetails = $this->renewResult[$ilsDetails['item_id']]; ?>
