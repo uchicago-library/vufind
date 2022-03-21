@@ -16,10 +16,9 @@
   <div class="row">&nbsp;</div>
   <? ### ./UChicago customization ### ?>
   <?=$this->flashmessages()?>
-  <div class="alert alert-warning" role="alert">
-      <p><strong>You will receive an email notice when items you request are available for pickup.</strong></p>
-      <p>Requested items in this list may still be in process. We are currently working to restore
-      the display of requested items' pickup status.</p>
+  <div class="alert alert-info" role="alert">
+      <p>Items with a request status of "Open - Awaiting Pickup" are available and will be
+      held for pickup until the hold shelf expiration date listed.</p>
   </div>
   <h2><?=$this->transEsc('Your Holds and Recalls') ?></h2>
   <? ### ./UChicago customization ### ?>
@@ -125,10 +124,24 @@
                 <a href="<?=$this->record($resource)->getLink('author', $listAuthors[0])?>"><?=$this->escapeHtml($listAuthors[0])?></a><?php if (count($listAuthors) > 1): ?>, <?=$this->transEsc('more_authors_abbrev')?><?php endif; ?><br/>
               <?php endif; ?>
 
-              <?php if (count($resource->getFormats()) > 0): ?>
-                <?=$this->record($resource)->getFormatList() ?>
-                <br/>
+              <? ### UChicago customization ### ?>
+              <?php //if (count($resource->getFormats()) > 0): ?>
+                <?//=$this->record($resource)->getFormatList() ?>
+                <!--<br/>-->
+              <?php //endif; ?>
+              <?php if (isset($ilsDetails['status']) && !empty($ilsDetails['status'])): ?>
+                <strong><?=$this->transEsc('Request status')?>:</strong> <?=$this->escapeHtml($ilsDetails['status'])?>
+                <br />
               <?php endif; ?>
+              <?php if (isset($ilsDetails['pickup_service_point']) && !empty($ilsDetails['pickup_service_point'])): ?>
+                <strong><?=$this->transEsc('Pickup service point')?>:</strong> <?=$this->escapeHtml($ilsDetails['pickup_service_point'])?>
+                <br />
+              <?php endif; ?>
+              <?php if (isset($ilsDetails['hold_shelf_expiration_date']) && !empty($ilsDetails['hold_shelf_expiration_date'])): ?>
+                <strong><?=$this->transEsc('Hold shelf expiration date')?>:</strong> <?=$this->escapeHtml($ilsDetails['hold_shelf_expiration_date'])?>
+                <br />
+              <?php endif; ?>
+              <? ### ./UChicago customization ### ?>
               <?php if (isset($ilsDetails['volume']) && !empty($ilsDetails['volume'])): ?>
                 <strong><?=$this->transEsc('Volume')?>:</strong> <?=$this->escapeHtml($ilsDetails['volume'])?>
                 <br />
@@ -167,10 +180,12 @@
                 <br />
               <?php endif; ?>
 
-              <?php if (!empty($ilsDetails['create'])): ?>
-                <strong><?=$this->transEsc('Created') ?>:</strong> <?=$this->escapeHtml($ilsDetails['create']) ?>
-                <?php if (!empty($ilsDetails['expire'])): ?>|<?php endif; ?>
-              <?php endif; ?>
+              <? ### UChicago customization ### ?>
+              <?php //if (!empty($ilsDetails['create'])): ?>
+                <!--<strong><?//=$this->transEsc('Created') ?>:</strong> <?//=$this->escapeHtml($ilsDetails['create']) ?>-->
+                <!--<?php //if (!empty($ilsDetails['expire'])): ?>|<?php //endif; ?>-->
+              <?php //endif; ?>
+              <? ### ./UChicago customization ### ?>
               <?php if (!empty($ilsDetails['expire'])): ?>
                 <strong><?=$this->transEsc('hold_expires') ?>:</strong> <?=$this->escapeHtml($ilsDetails['expire']) ?>
               <?php endif; ?>
