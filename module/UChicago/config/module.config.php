@@ -36,16 +36,15 @@ return [
       ],
     ],
     'service_manager' =>
-    array (
+    [
         'allow_override' => true,
-        'factories' =>
-        array (
+        'factories' => [
             'UChicago\Mailer\Mailer' => 'VuFind\Mailer\Factory',
-        ),           
+        ],           
         'aliases' => [
             'UChicago\Mailer' => 'UChicago\Mailer\Mailer',
         ],
-    ),
+    ],
     'vufind' => [
         'plugin_managers' => [
             'ils_driver' => [
