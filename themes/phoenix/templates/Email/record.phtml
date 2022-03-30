@@ -1,0 +1,23 @@
+<?php // This is a text-only email template; do not include HTML!
+$pubDetails = $this->driver->tryMethod('getPublicationDetails');
+$edition = $this->driver->tryMethod('getEdition');
+if (is_array($edition)) {
+    $edition = implode(" ", $edition);
+}
+$imprint = implode("\n", $pubDetails) . $edition;
+$holdings = $this->driver->getRealTimeHoldings();
+?>
+<?=$this->driver->getTitle() . ' ' . $this->driver->getTitleStatement() . ' ' . $imprint . "\n\n"?>
+<?php
+foreach ($holdings['holdings'] as $location => $holding) {
+    if (!empty($holding['items'][0]['location'])) {
+        $item = $holding['items'][0];
+        echo $item['callnumber'] . "\n";
+        echo $item['location'] . "\n\n";
+    } else {
+        ;
+    }
+}
+?>
+<?=$this->serverUrl($this->recordLink()->getUrl($this->driver))?>
+<?php echo "\n\n"; ?>

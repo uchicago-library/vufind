@@ -3,6 +3,7 @@ return [
     'controllers' => [
       'factories' => [
         'VuFindAdmin\Controller\PinController' => 'VuFind\Controller\AbstractBaseFactory',
+        'UChicago\Controller\CartController' => 'VuFind\Controller\CartControllerFactory',
         'UChicago\Controller\MyResearchController' => 'VuFind\Controller\AbstractBaseFactory',
         'UChicago\Controller\HoldsController' => 'VuFind\Controller\HoldsControllerFactory',
       ],
@@ -12,6 +13,8 @@ return [
         'myresearch' => 'UChicago\Controller\MyResearchController',
         'Holds' => 'UChicago\Controller\HoldsController',
         'holds' => 'UChicago\Controller\HoldsController',
+        'Cart' => 'UChicago\Controller\CartController',
+        'cart' => 'UChicago\Controller\CartController',
       ],
     ],
     'router' => [
@@ -32,6 +35,17 @@ return [
         ],
       ],
     ],
+    'service_manager' =>
+    array (
+        'allow_override' => true,
+        'factories' =>
+        array (
+            'UChicago\Mailer\Mailer' => 'VuFind\Mailer\Factory',
+        ),           
+        'aliases' => [
+            'UChicago\Mailer' => 'UChicago\Mailer\Mailer',
+        ],
+    ),
     'vufind' => [
         'plugin_managers' => [
             'ils_driver' => [
