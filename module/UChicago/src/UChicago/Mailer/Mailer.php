@@ -53,7 +53,6 @@ class Mailer extends \VuFind\Mailer\Mailer
         }
 
         $body = '';
-              // 'FOOBAR FOOOOO FOOBAR FOOOOOOO FOOBAR. ' . $msg;
         for ($r = 0; $r < count($records); $r++) {
             if ($r == count($records) - 1) {
                 $m = $msg;
