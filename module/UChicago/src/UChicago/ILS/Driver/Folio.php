@@ -400,28 +400,59 @@ class Folio extends \VuFind\ILS\Driver\Folio
      */
     public function getMyTransactions($patron)
     {
+        $pnum = 1;
+        if (isset($_GET['page'])) {
+            $pnum = (int)$_GET['page'];
+        }
         $query = ['query' => 'userId==' . $patron['id'] . ' and status.name==Open'];
         $transactions = [];
+        $i = 0;
+        $bib = null; // null bib for items we're not currently showing on the page.
         foreach ($this->getPagedResults(
             'loans', '/circulation/loans', $query
         ) as $trans) {
             $callnumber = '';
             $locationData = '';
             $itemId = $trans->item->id ?? '';
-            $item = '';
-            if (!empty($itemId)) {
-                $item = $this->getItemById($itemId);
-                $callnumber = $item->effectiveCallNumberComponents->callNumber;
-                if (!empty($item->copyNumber)) {
-                    $callnumber .= ' ' . $item->copyNumber;
+            $query = ['query' => 'id==' . $itemId];
+            // Only get item information and bib number, etc. for items that we're planning
+            // to show on the screen at any given time.
+            $pageSize = $this->config['MyAccount']['checked_out_page_size'] ?? 50;
+            $maxPage = $pageSize * $pnum;
+            $minPage = $maxPage - $pageSize;
+            if ($i >= $minPage && $i <= $maxPage) {
+                // There is always only 1 item in this loop which is why we can set the return value
+                // outside of it. We only use this because the generator executes faster.
+                foreach ($this->getPagedResults(
+                    'items', '/item-storage/items', $query
+                ) as $item) {
+                    if (!empty($item->effectiveCallNumberComponents->callNumber)) {
+                        $callnumber = $item->effectiveCallNumberComponents->callNumber;
+                    }
+                    if (!empty($item->copyNumber)) {
+                        $callnumber .= ' ' . $item->copyNumber;
+                    }
+                    $effectiveLocationId = $item->effectiveLocationId;
+                    $locationData = $this->getLocationData($effectiveLocationId);
+
+                    $loanPolicyId = $trans->loanPolicyId ?? '';
+                    $loanPolicyData = '';
+                    if (!empty($loanPolicyId)) {
+                        $loanPolicyData = $this->getLoanPolicyData($loanPolicyId);
+                    }
+
+                    // Cache bib numbers by item id to improve login speed for users
+                    // who login a second time. For some reason getBibId is very slow.
+                    $cacheKey = 'loanBibMap';
+                    $loanBibMap = $this->getCachedData($cacheKey);
+                    if (!empty($loanBibMap[$trans->item->id])) {
+                        $bib = $loanBibMap[$trans->item->id]['bib'];
+                    } else {
+                        $bib = $this->getBibId($trans->item->instanceId);
+                        $loanBibMap[$trans->item->id] = compact('bib');
+                    }
+                    $this->putCachedData($cacheKey, $loanBibMap);
                 }
-                $effectiveLocationId = $item->effectiveLocationId;
-                $locationData = $this->getLocationData($effectiveLocationId);
-            }
-            $loanPolicyId = $trans->loanPolicyId ?? '';
-            $loanPolicyData = '';
-            if (!empty($loanPolicyId)) {
-                $loanPolicyData = $this->getLoanPolicyData($loanPolicyId);
             }
             $date = date_create($trans->dueDate);
             $transactions[] = [
@@ -429,18 +460,19 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 'dueTime' => date_format($date, "g:i:s a"),
                 // TODO: Due Status
                 // 'dueStatus' => $trans['itemId'],
-                'id' => $this->getBibId($trans->item->instanceId),
+                'id' => $bib,
                 'item_id' => $trans->item->id,
                 'barcode' => $trans->item->barcode,
                 'renew' => $trans->renewalCount ?? 0,
                 'renewable' => true,
                 'title' => $trans->item->title,
                 'location' => $locationData['name'] ?? '',
-                'loan_policy' => $loanPolicyData->description ?? '',
+                'loan_policy' => $loanPolicyData['desc'] ?? '',
                 'status' => $trans->item->status->name ?? '',
                 'callnumber' => $callnumber,
                 'recalled' => $trans->action == 'recallrequested',
             ];
+            $i++;
         }
         return $transactions;
     }
@@ -644,6 +676,32 @@ class Folio extends \VuFind\ILS\Driver\Folio
     }
 
     /**
+     * Gets loan policies from the /loan-policy-storage/loan-policies/
+     * endpoint and sets an array of loan policy IDs to descriptions.
+     * Descriptions are set from description.
+     *
+     * @return array
+     */
+    protected function getLoanPolicies()
+    {
+        $cacheKey = 'loanPolicyMap';
+        $loanPolicyMap = $this->getCachedData($cacheKey);
+        if (null === $loanPolicyMap) {
+            $loanPolicyMap = [];
+            foreach ($this->getPagedResults(
+                'loanPolicies', '/loan-policy-storage/loan-policies'
+            ) as $loanPolicy) {
+                if (isset($loanPolicy->description)) {
+                $desc = $loanPolicy->description;
+                $loanPolicyMap[$loanPolicy->id] = compact('desc');
+                }
+            }
+        }
+        $this->putCachedData($cacheKey, $loanPolicyMap);
+        return $loanPolicyMap;
+    }
+
+    /**
      * Get loan policy data by ID.
      *
      * @param string $loanPolicyId, UUID
@@ -652,27 +710,22 @@ class Folio extends \VuFind\ILS\Driver\Folio
      */
     public function getLoanPolicyData($loanPolicyId)
     {
-        $response = $this->makeForgivingRequest(
-            'GET', '/loan-policy-storage/loan-policies/' . $loanPolicyId
-        );
-        $data = json_decode($response->getBody());
-        return $data;
-    }
-
-    /**
-     * Get item by ID.
-     *
-     * @param string $itemId, UUID
-     *
-     * @return array
-     */
-    public function getItemById($itemId)
-    {
-        $response = $this->makeForgivingRequest(
-            'GET', '/item-storage/items/' . $itemId
-        );
-        $data = json_decode($response->getBody());
-        return $data;
+        $loanPolicyMap = $this->getLoanPolicies();
+        $desc = '';
+        if (array_key_exists($loanPolicyId, $loanPolicyMap)) {
+            return $loanPolicyMap[$loanPolicyId];
+        } else {
+            // if key is not found in cache, the loan policy could have
+            // been added before the cache expired so check again
+            $loanPolicyResponse = $this->makeRequest(
+                'GET', '/loan-policy-storage/loan-policies/' . $loanPolicyId
+            );
+            if ($loanPolicyResponse->isSuccess()) {
+                $loanPolicy = json_decode($loanPolicyResponse->getBody());
+                $desc = $location->description;
+            }
+        }
+        return compact('desc');
     }
 
     /**
