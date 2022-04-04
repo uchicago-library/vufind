@@ -292,9 +292,8 @@ Title:
 
 Series:
   DismaxFields:
-    - series^100
+    - series^400
     - series2
-  DismaxHandler: edismax
 
 AllFields:
   DismaxFields:
