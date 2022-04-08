@@ -4,7 +4,6 @@ namespace UChicago\ILS\Driver;
 
 class Folio extends \VuFind\ILS\Driver\Folio
 {
-
     /**
      * Helper function to retrieve paged results from FOLIO API
      *
