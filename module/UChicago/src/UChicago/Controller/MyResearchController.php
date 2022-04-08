@@ -116,6 +116,21 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             $config->Catalog->checked_out_page_size ?? 50,
             $catalog->checkFunction('getMyTransactions', $patron)
         );
+        $currSort = $this->params()->fromQuery('sort');
+        $pageOptions['ilsParams']['sort'] = $currSort;
+        $sortOptions = [
+            'dueDate' => 'Due Date',
+            'title' => 'Title',
+            'author' => 'Author',
+        ];
+        $pageOptions['sortList'] = [];
+        foreach ($sortOptions as $sortName => $sortDisplayText) {
+            $pageOptions['sortList'][$sortName] = [
+                'desc' => $sortDisplayText,
+                'url' => '?sort=' . $sortName,
+                'selected' => ($sortName == $currSort)
+            ];
+        }
 
         // Get checked out item details:
         $result = $catalog->getMyTransactions($patron, $pageOptions['ilsParams']);
