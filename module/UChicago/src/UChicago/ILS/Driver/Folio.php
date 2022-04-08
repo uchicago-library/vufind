@@ -406,54 +406,16 @@ class Folio extends \VuFind\ILS\Driver\Folio
         }
         $query = ['query' => 'userId==' . $patron['id'] . ' and status.name==Open'];
         $transactions = [];
-        $i = 0;
         $bib = null; // null bib for items we're not currently showing on the page.
         foreach ($this->getPagedResults(
             'loans', '/circulation/loans', $query
         ) as $trans) {
-            $callnumber = '';
-            $locationData = '';
-            $itemId = $trans->item->id ?? '';
-            $query = ['query' => 'id==' . $itemId];
-            // Only get item information and bib number, etc. for items that we're planning
-            // to show on the screen at any given time.
-            $pageSize = $this->config['MyAccount']['checked_out_page_size'] ?? 50;
-            $maxPage = $pageSize * $pnum;
-            $minPage = $maxPage - $pageSize;
-            if ($i >= $minPage && $i <= $maxPage) {
-                // There is always only 1 item in this loop which is why we can set the return value
-                // outside of it. We only use this because the generator executes faster.
-                foreach ($this->getPagedResults(
-                    'items', '/item-storage/items', $query
-                ) as $item) {
-                    if (!empty($item->effectiveCallNumberComponents->callNumber)) {
-                        $callnumber = $item->effectiveCallNumberComponents->callNumber;
-                    }
-                    if (!empty($item->copyNumber)) {
-                        $callnumber .= ' ' . $item->copyNumber;
-                    }
-                    $effectiveLocationId = $item->effectiveLocationId;
-                    $locationData = $this->getLocationData($effectiveLocationId);
 
-                    $loanPolicyId = $trans->loanPolicyId ?? '';
-                    $loanPolicyData = '';
-                    if (!empty($loanPolicyId)) {
-                        $loanPolicyData = $this->getLoanPolicyData($loanPolicyId);
-                    }
+            $authors = implode(', ', array_map(function($c) {
+                return $c->name;
+            }, $trans->item->contributors ?? []));
 
-                    // Cache bib numbers by item id to improve login speed for users
-                    // who login a second time. For some reason getBibId is very slow.
-                    $cacheKey = 'loanBibMap';
-                    $loanBibMap = $this->getCachedData($cacheKey);
-                    if (!empty($loanBibMap[$trans->item->id])) {
-                        $bib = $loanBibMap[$trans->item->id]['bib'];
-                    } else {
-                        $bib = $this->getBibId($trans->item->instanceId);
-                        $loanBibMap[$trans->item->id] = compact('bib');
-                    }
-                    $this->putCachedData($cacheKey, $loanBibMap);
-                }
-            }
+            $loanDate = date_create($trans->loanDate);
             $date = date_create($trans->dueDate);
             $transactions[] = [
                 'duedate' => date_format($date, "j M Y"),
@@ -466,13 +428,86 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 'renew' => $trans->renewalCount ?? 0,
                 'renewable' => true,
                 'title' => $trans->item->title,
-                'location' => $locationData['name'] ?? '',
-                'loan_policy' => $loanPolicyData['desc'] ?? '',
+                'location' => '',
+                'loan_policy_id' => $trans->loanPolicyId ?? '',
+                'loan_policy' => '',
                 'status' => $trans->item->status->name ?? '',
-                'callnumber' => $callnumber,
+                'callnumber' => '',
                 'recalled' => $trans->action == 'recallrequested',
+                'duedate_raw' => $date,
+                'loandate_raw' => $loanDate,
+                'item_instance_id' => $trans->item->instanceId,
+                'authors' => $authors,
             ];
-            $i++;
+        }
+
+        // Get the sort order
+        $sort = $this->getCoiSort();
+
+        // Sort before getting item informaion.
+        if (!empty($transactions)) {
+            switch($sort) {
+                case 'title':
+                    usort($transactions, $this->alphaStringComp('title'));
+                    break;
+                case 'author':
+                    usort($transactions, $this->alphaStringComp('authors'));
+                    break;
+                default:
+                    usort($transactions, $this->dateComp('duedate_raw'));
+                    break;
+            }
+        }
+
+        // Only get item information and bib number, etc. for items that we're planning
+        // to show on the screen at any given time.
+        $pageSize = $this->config['MyAccount']['checked_out_page_size'] ?? 50;
+        $maxPage = $pageSize * $pnum;
+        $minPage = $maxPage - $pageSize;
+        $slice = array_slice($transactions, $minPage, $pageSize, $preserve_keys=true);
+        foreach ($slice as $i => $trans) {
+            $callnumber = '';
+            $locationData = '';
+            $itemId = $trans['item_id'];
+            $query = ['query' => 'id==' . $itemId];
+            // There is always only 1 item in this loop which is why we can set the return value
+            // outside of it. We only use this because the generator executes faster.
+            foreach ($this->getPagedResults(
+                'items', '/item-storage/items', $query
+            ) as $item) {
+                if (!empty($item->effectiveCallNumberComponents->callNumber)) {
+                    $callnumber = $item->effectiveCallNumberComponents->callNumber;
+                }
+                if (!empty($item->copyNumber)) {
+                    $callnumber .= ' ' . $item->copyNumber;
+                }
+                $effectiveLocationId = $item->effectiveLocationId;
+                $locationData = $this->getLocationData($effectiveLocationId);
+
+                $loanPolicyId = $trans['loan_policy_id'];
+                $loanPolicyData = '';
+                if (!empty($loanPolicyId)) {
+                    $loanPolicyData = $this->getLoanPolicyData($loanPolicyId);
+                }
+
+                // Cache bib numbers by item id to improve login speed for users
+                // who login a second time. For some reason getBibId is very slow.
+                $cacheKey = 'loanBibMap';
+                $loanBibMap = $this->getCachedData($cacheKey);
+                if (!empty($loanBibMap[$itemId])) {
+                    $bib = $loanBibMap[$itemId]['bib'];
+                } else {
+                    $bib = $this->getBibId($trans['item_instance_id']);
+                    $loanBibMap[$itemId] = compact('bib');
+                }
+                $this->putCachedData($cacheKey, $loanBibMap);
+
+                // Set bib number and item information
+                $transactions[$i]['id'] = $bib;
+                $transactions[$i]['location'] = $locationData['name'] ?? '';
+                $transactions[$i]['loan_policy'] = $loanPolicyData['desc'] ?? '';
+                $transactions[$i]['callnumber'] = $callnumber;
+            }
         }
         return $transactions;
     }
@@ -743,6 +778,35 @@ class Folio extends \VuFind\ILS\Driver\Folio
         );
         $data = json_decode($response->getBody());
         return $data;
+    }
+
+    protected function dateComp($key)
+    {
+        return function ($a, $b) use ($key) {
+            if ($a[$key] == $b[$key]) {
+                return $a['id'] < $b['id'] ? -1 : 1;
+            }
+            return $a[$key] < $b[$key] ? -1 : 1;
+        };
+    }
+
+    protected function alphaStringComp($key)
+    {
+        return function($a, $b) use ($key) {
+            return strcasecmp(
+                preg_replace('/[^ \w]+/', '', $a[$key]),
+                preg_replace('/[^ \w]+/', '', $b[$key])
+            );
+        };
+    }
+
+    public function getCoiSort()
+    {
+        if (isset($_GET['sort'])) {
+            return $_GET['sort'];
+        } else {
+            return $this->config['MyAccount']['checkedOutItemsSort'] ?? 'dueDate';
+        }
     }
 }
 

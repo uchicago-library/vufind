@@ -24,9 +24,6 @@ $renewAll = !$this->ilsPaging || !$paginator;
     </div>
   <?php endif; ?>
 
-  <div class="alert alert-warning" role="alert">
-    <p>We are currently working to restore the ability to sort checked out items and the display of some data fields.</p>
-  </div>
   <div class="alert alert-info" role="alert">
     <p>University of Chicago Library materials on standard loan will be renewed automatically up to their online renewal limit, unless recalled.
     <a href="https://www.lib.uchicago.edu/borrow/borrowing/renewing-and-returning-items/">More info...</a></p>
@@ -63,11 +60,11 @@ $renewAll = !$this->ilsPaging || !$paginator;
       <input type="hidden" value="<?=$this->escapeHtmlAttr($this->auth()->getManager()->getCsrfHash())?>" name="csrf"/>
       <div class="toolbar">
         <div class="checkbox">
-          <label>
+          <!--<label>
             <input type="checkbox" name="selectAll" class="checkbox-select-all"/>
-            <?=$this->transEsc('select_page')?>
+            <?//=$this->transEsc('select_page')?>
           </label>
-          <!--<input type="submit" class="btn btn-default" id="renewSelected" name="renewSelected" value="<?=$this->transEscAttr("renew_selected")?>" />-->
+          <input type="submit" class="btn btn-default" id="renewSelected" name="renewSelected" value="<?=$this->transEscAttr("renew_selected")?>" />-->
           <?php if ($renewAll): ?>
             <!--<input type="submit" class="btn btn-default" id="renewAll" name="renewAll" value="<?=$this->transEscAttr('renew_all')?>" />-->
           <?php endif; ?>
