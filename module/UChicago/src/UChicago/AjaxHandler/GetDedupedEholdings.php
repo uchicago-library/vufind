@@ -127,37 +127,60 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
      * @return string, html
      */
     public function getDedupedEholdingsHtml($issns, $sfxNum, $bib, $header) {
-        $config = $this->getConfig();
         $dedupedEholdings = $this->getDedupedEholdings($issns, $sfxNum, $bib);
+        $hasHeader = ($header === 'true');
         if (count(array_filter($dedupedEholdings), COUNT_RECURSIVE) === 0) {
             return '';
         }
-        $coverageLabel = $config['DedupedEholdings']['coverage_label'];
-        $format = '<a href="%s" class="eLink external">%s</a> %s %s %s<br/>';
+        if (empty($dedupedEholdings['deduped']) && empty($dedupedEholdings['complete'])) {
+            return '';
+        }
         $retval = '';
-        if ($header === 'true' && !empty($dedupedEholdings)) {
-          $retval .= '<div class="locpanel-heading online"><h2>Deduped Eholdings</h2></div>';
+        if ($hasHeader == true && !empty($dedupedEholdings)) {
+          $retval .= '<div class="locpanel-heading online"><h2>Online</h2></div>';
         }
-        if ($dedupedEholdings) {
-            $retval .= '<div class="holdings-unit">';
-            $deduped = $dedupedEholdings['deduped'];
-            $complete = $dedupedEholdings['complete'];
-            foreach($deduped as $deh) {
-                $retval .= sprintf($format, $deh['url'], $deh['name'], $coverageLabel, $deh['coverageString'], $deh['note']);
+        $retval .= '<div class="holdings-unit">';
+        $deduped = $dedupedEholdings['deduped'];
+        $complete = $dedupedEholdings['complete'];
+        $retval .= $this->buildLinks($deduped, $hasHeader);
+        if ($complete) {
+            if (count($deduped) < count($complete)) {
+                $retval .= '<div class="toggle">View all available e-resources for this title</div>';
+                $retval .= '<div class="e-list hide">';
+                $retval .= $this->buildLinks($complete, $hasHeader);
+                $retval .= '</div>';
             }
-            if ($complete) {
-                if (count($deduped) < count($complete)) {
-                    $retval .= '<div class="toggle">View all available e-resources for this title</div>';
-                    $retval .= '<div class="e-list hide">';
-                    foreach($complete as $ch) {
-                        $retval .= sprintf($format, $ch['url'], $ch['name'], $coverageLabel, $ch['coverageString'], $ch['note']);
-                    }
-                    $retval .= '</div>';
-                }
-            }
-            $retval .= '</div>';
         }
+        $retval .= '</div>';
         return $retval;
+    }
+
+    /**
+     * Build link strings.
+     *
+     * @param array, $deduped.
+     * @param bool, $isResults
+     *
+     * @return string
+     */
+    protected function buildLinks($deduped, $isResults) {
+        $config = $this->getConfig();
+        $format = '<div class="deduped-group"><a href="%s" class="eLink external">%s <i class="fa fa-external-link" aria-hidden="true"></i></a> %s %s %s %s</div>';
+        $links = '';
+        $callNoUrl = $this->config['Site']['url'] . '/alphabrowse/Home?source=lcc&from=';
+        $coverageLabel = $config['DedupedEholdings']['coverage_label'] . ' ' ?? '';
+        $callNoLinkTxt = $config['DedupedEholdings']['callnumber_link_text'];
+        $callNoLink = ' <a href="%s">%s</a>';
+        foreach($deduped as $deh) {
+            $note = !empty($deh['note']) ? '<br/>' . $deh['note'] : '';
+            $materials = !empty($deh['materials']) ? '<br/>' . $deh['materials'] : '';
+            $callNo = !empty($deh['callno']) && $isResults == true
+                ? '<br/>' . $deh['callno'] . sprintf($callNoLink, $callNoUrl . urlencode($deh['callno']), $callNoLinkTxt)
+                : '';
+            $coverage = !empty($deh['coverageString']) ? '<br/>' . $coverageLabel . $deh['coverageString'] : '';
+            $links .= sprintf($format, $deh['url'], $deh['name'], $coverage, $note, $materials, $callNo);
+        }
+        return $links;
     }
 
     public function handleRequest(Params $params) {
