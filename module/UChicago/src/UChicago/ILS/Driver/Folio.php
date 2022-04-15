@@ -172,7 +172,8 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 }
             }
 
-            $UCcopyNumber = $holding->copyNumber ?? '';
+            $holdingCopyNumber = $holding->copyNumber ?? '';
+            $UCcopyNumber = $holdingCopyNumber;
             $holdingData = clone $holding;
             $holdingData->status = (object) ['name' => ''];
             $holdingLocationId = $holding->effectiveLocationId;
@@ -259,6 +260,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     'item_statistical_code' => $itemStatCodeIds[0] ?? '',
                     'loan_type_id' => $loanTypeId,
                     'loan_type_name' => $loanTypeName,
+                    'holding_copy_number' => $holdingCopyNumber,
                 ];
             }
         }
