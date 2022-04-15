@@ -125,6 +125,9 @@ class Folio extends \VuFind\ILS\Driver\Folio
             $purchaseHistory = $this->getPurchaseHistoryData($bibId);
         }
 
+        $serialIDs = $this->config['Holdings']['is_serial_stat_codes'] ?? [];
+        $isSerial = count(array_intersect($serialIDs, $instance->statisticalCodeIds)) > 0;
+
         foreach ($this->getPagedResults(
             'holdingsRecords', '/holdings-storage/holdings', $query
         ) as $holding) {
@@ -258,6 +261,10 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     'loan_type_name' => $loanTypeName,
                 ];
             }
+        }
+        usort($items, function($a, $b) { return strnatcasecmp($a['number'], $b['number']); });
+        if ($isSerial) {
+            return array_reverse($items);
         }
         return $items;
     }
