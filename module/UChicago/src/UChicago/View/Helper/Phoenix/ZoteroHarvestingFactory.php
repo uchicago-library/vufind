@@ -1,9 +1,9 @@
 <?php
 namespace UChicago\View\Helper\Phoenix;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
-class FooBarFactory implements FactoryInterface
+class ZoteroHarvestingFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName,
         array $options = null
@@ -11,8 +11,9 @@ class FooBarFactory implements FactoryInterface
         if (!empty($options)) {
             throw new \Exception('Unexpected options sent to factory.');
         }
+	$rainbowConfig = null;
         $config = $container->get('VuFind\Config\PluginManager')->get('config');
-        $config = !isset($config->Rainbow) ? false : $config->Rainbow;
-        return new \UChicago\View\Helper\Phoenix\FooBar($config);
+        $config = !isset($config->BibHarvesting) ? false : $config->BibHarvesting;
+        return new \UChicago\View\Helper\Phoenix\ZoteroHarvesting($config);
     }
 }
