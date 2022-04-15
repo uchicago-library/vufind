@@ -116,8 +116,8 @@
         <?php if ($this->callnumberHandler): ?>
           <a href="<?=$this->url('alphabrowse-home') ?>?source=<?=$this->escapeHtmlAttr($this->callnumberHandler) ?>&amp;from=<?=$this->escapeHtmlAttr($callNo['callnumber']) ?>"><?=$this->escapeHtml($callNo['display'])?>
             <? ### UChicago customization ### ?>
-            <?php if (!empty($holding['items'][0]['uc_copy_number'])): ?>
-                <?=' '. $holding['items'][0]['uc_copy_number']?>
+            <?php if (!empty($holding['items'][0]['holding_copy_number'])): ?>
+                <?=' '. $holding['items'][0]['holding_copy_number']?>
             <?php endif; ?>
             <? ### ./UChicago customization ### ?></a>
         <?php else: ?>
