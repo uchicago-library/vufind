@@ -4,6 +4,8 @@
 <? ### ./UChicago customization ### ?>
 <html lang="<?=$this->layout()->userLang?>"<?php if ($this->layout()->rtl): ?> dir="rtl"<?php endif; ?>>
   <head>
+      <!-- <?=$this->ZoteroHarvesting()->happy()?> -->
+    <?=$this->ZoteroHarvesting()->addMetaTags()?>
     <?php $this->headThemeResources(); ?>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
