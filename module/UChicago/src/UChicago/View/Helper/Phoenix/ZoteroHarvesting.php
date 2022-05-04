@@ -23,8 +23,8 @@ class ZoteroHarvesting extends \Laminas\View\Helper\AbstractHelper {
 
 	/* pull down JSON response from VuFind API based on Bib Id */
 	function get_json($bib_id) {
-	    $host = "https://dldc2.lib.uchicago.edu";
-	    // $host = "https://catalog.lib.uchicago.edu";
+	    // $host = "https://dldc2.lib.uchicago.edu";
+	    $host = "https://catalog.lib.uchicago.edu";
 	    $api_route = "/vufind/api/v1/record";
 	    $query_string = "?field[]=rawData&id=";
 	    $url = $host . $api_route . $query_string . $bib_id;
