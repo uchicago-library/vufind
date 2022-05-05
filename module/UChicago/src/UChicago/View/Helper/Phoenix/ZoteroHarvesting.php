@@ -28,9 +28,14 @@ class ZoteroHarvesting extends \Laminas\View\Helper\AbstractHelper {
 	    $api_route = "/vufind/api/v1/record";
 	    $query_string = "?field[]=rawData&id=";
 	    $url = $host . $api_route . $query_string . $bib_id;
-	    $response_contents = file_get_contents($url);
-	    $response_json = json_decode($response_contents);
-	    return $response_json;
+        try {
+            $response_contents = file_get_contents($url);
+            $response_json = json_decode($response_contents);
+            return $response_json;
+        } catch (\Throwable $exn) {
+            return '';
+        }
+
 	}
 
 	/* retrieve item from JSON based on an array index/object
@@ -52,7 +57,7 @@ class ZoteroHarvesting extends \Laminas\View\Helper\AbstractHelper {
 		return $current;
 	    } catch (\Throwable $exn) {
 		return '';
-	    };
+	    }
 	}
 
 	/* put quotes around a string */
@@ -258,20 +263,22 @@ class ZoteroHarvesting extends \Laminas\View\Helper\AbstractHelper {
 
 	function build_meta_tags($bib_id) {
 	    $json = get_json($bib_id);
-	    $record = $json->records[0]->rawData;
-	    $format_array = get_from_json(['format'], $record);
-	    $format = array_to_format($format_array);
-	    $schema = format_switchboard($format);
-	    $vformat = vufind_to_zotero($format);
-	    $format_tag= mk_meta_element("DC.Type", $vformat);
+        if (!empty($json)) {
+            $record = $json->records[0]->rawData;
+            $format_array = get_from_json(['format'], $record);
+            $format = array_to_format($format_array);
+            $schema = format_switchboard($format);
+            $vformat = vufind_to_zotero($format);
+            $format_tag= mk_meta_element("DC.Type", $vformat);
 
 	    /* return $format; */
 	    
-	    if ($schema) {
-		return $format_tag . "\n". table_to_html($schema, $record);
-	    } else {
-		return '';
-	    }
+            if ($schema) {
+                return $format_tag . "\n". table_to_html($schema, $record);
+            }
+        } else {
+            return '';
+        }
 	}
 	
 	$config = $this->bibHarvestingConfig;
