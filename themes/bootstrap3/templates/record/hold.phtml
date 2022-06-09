@@ -31,14 +31,6 @@
     </div>
   <?php endif; ?>
 
-  <?php if (in_array("requiredByDate", $this->extraHoldFields)): ?>
-    <div class="form-group hold-required-by">
-      <label class="control-label"><?=$this->transEsc("hold_required_by")?>:</label>
-      <input id="requiredByDate" type="text" name="gatheredDetails[requiredBy]" value="<?=!empty($this->gatheredDetails['requiredBy']) ? $this->escapeHtmlAttr($this->gatheredDetails['requiredBy']) : $this->escapeHtmlAttr($this->defaultRequiredDate)?>" size="10" class="form-control"/>
-      (<?=$this->dateTime()->getDisplayDateFormat()?>)
-    </div>
-  <?php endif; ?>
-
   <?php if ($this->requestGroupNeeded): ?>
     <div class="form-group hold-request-group">
       <?php

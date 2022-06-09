@@ -347,6 +347,15 @@ class HoldsController extends AbstractBase
         $dateValidationResults = [
             'errors' => []
         ];
+
+        // UChicago Phoenix customization
+        // MT
+
+        // see comment below
+        
+        $default_requiredBy = strtotime("2099-01-01");
+        $gatheredDetails['requiredBy'] = $default_requiredBy;
+        
         // The dates are not required unless one of them is set, so check that first:
         if (!empty($gatheredDetails['startDate'])
             || !empty($gatheredDetails['requiredBy'])
@@ -393,6 +402,19 @@ class HoldsController extends AbstractBase
             $updateFields['requiredByTS']
                 = $dateValidationResults['requiredByTS'];
         }
+
+        // UChicago Phoenix customization
+        // MT
+        
+        // remove the ability for a user-defined required by time;
+        // always hard-override it with a date in the future (i.e. the
+        // year 2099)
+
+        // For more info on why we're doing that please see:
+        // https://trouble.lib.uchicago.edu/bugzilla/show_bug.cgi?id=26728
+
+        $updateFields['requiredBy'] = $default_requiredBy;
+        
         if (($gatheredDetails['frozen'] ?? '') !== '') {
             $updateFields['frozen'] = $gatheredDetails['frozen'] === '1';
             if (($gatheredDetails['frozenThrough']) ?? '' !== '') {

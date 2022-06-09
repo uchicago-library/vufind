@@ -214,9 +214,11 @@ class Holds extends AbstractRequestBase
     public function validateDates(?string $startDate, ?string $requiredBy,
         array $enabledFormFields
     ): array {
+        $default = strtotime("2099-01-01");
+        $requiredBy = $default;
         $result = [
             'startDateTS' => null,
-            'requiredByTS' => null,
+            'requiredByTS' => $default,
             'errors' => [],
         ];
         if (!in_array('startDate', $enabledFormFields)
