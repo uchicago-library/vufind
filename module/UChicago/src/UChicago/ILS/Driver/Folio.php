@@ -436,7 +436,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 'barcode' => $trans->item->barcode,
                 'renew' => $trans->renewalCount ?? 0,
                 'renewable' => true,
-                'title' => $trans->item->title,
+                'title' => $trans->item->title ?? '',
                 'location' => '',
                 'loan_policy_id' => $trans->loanPolicyId ?? '',
                 'loan_policy' => '',
@@ -592,13 +592,75 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 'id' => $this->getBibId(null, null, $hold->itemId),
                 'item_id' => $hold->itemId,
                 'reqnum' => $hold->id,
-                'title' => $hold->item->title,
+                'title' => $trans->item->title ?? '',
                 'status' => $hold->status,
                 'pickup_service_point' => $pickupServicePoint,
                 'hold_shelf_expiration_date' => $holdShelfExpirationDate
             ];
         }
         return $holds;
+    }
+
+    /**
+     * TEMPORARY: This should only be needed until we upgrade to a version
+     * of VuFind with the fixes for the Folio Lotus release.
+     *
+     * Attempts to place a hold or recall on a particular item and returns
+     * an array with result details.
+     *
+     * @param array $holdDetails An array of item and patron data
+     *
+     * @return mixed An array of data on the request including
+     * whether or not it was successful and a system message (if available)
+     */
+    public function placeHold($holdDetails)
+    {
+        $default_request = $this->config['Holds']['default_request'] ?? 'Hold';
+        try {
+            $requiredBy = $this->dateConverter->convertFromDisplayDate(
+                'Y-m-d',
+                $holdDetails['requiredBy']
+            );
+        } catch (Exception $e) {
+            $this->throwAsIlsException($e, 'hold_date_invalid');
+        }
+        $instance = $this->getInstanceByBibId($holdDetails['id']);
+        $requestBody = [
+            'itemId' => $holdDetails['item_id'],
+            'holdingsRecordId' => $holdDetails['holding_id'] ?? '',
+            'instanceId' => $instance->id,
+            'requestLevel' => 'Item',
+            'requestType' => $holdDetails['status'] == 'Available'
+                ? 'Page' : $default_request,
+            'requesterId' => $holdDetails['patron']['id'],
+            'requestDate' => date('c'),
+            'fulfilmentPreference' => 'Hold Shelf',
+            'requestExpirationDate' => $requiredBy,
+            'pickupServicePointId' => $holdDetails['pickUpLocation']
+        ];
+        $response = $this->makeRequest(
+            'POST',
+            '/circulation/requests',
+            json_encode($requestBody)
+        );
+        if ($response->isSuccess()) {
+            $json = json_decode($response->getBody());
+            $result = [
+                'success' => true,
+                'status' => $json->status
+            ];
+        } else {
+            try {
+                $json = json_decode($response->getBody());
+                $result = [
+                    'success' => false,
+                    'status' => $json->errors[0]->message
+                ];
+            } catch (Exception $e) {
+                $this->throwAsIlsException($e, $response->getBody());
+            }
+        }
+        return $result;
     }
 
     /**
