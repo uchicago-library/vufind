@@ -20,6 +20,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
         $offset = 0;
 
         $eHoldingTypeId = $this->config['Holdings']['electronic_holding_type_id'] ?? '';
+        $onOrderLocId = $this->config['Holdings']['on_order_loc_id'] ?? '';
 
         do {
             $combinedQuery = array_merge($query, compact('offset', 'limit'));
@@ -34,7 +35,8 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 throw new ILSException($msg);
             }
             $total = $json->totalRecords ?? 0;
-            if (isset($holdings) && $total === 0 && $holdings->holdingsTypeId != $eHoldingTypeId) {
+            if (isset($holdings) && $total === 0 && ($holdings->holdingsTypeId != $eHoldingTypeId
+                || $holdings->effectiveLocationId == $onOrderLocId)) {
                 yield $holdings;
             }
             $previousCount = $count;
