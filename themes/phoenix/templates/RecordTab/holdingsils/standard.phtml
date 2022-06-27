@@ -60,10 +60,6 @@
             <?php else: ?>
               <?php $c = $callNos['sort'][$numKey]; ?>
             <?php endif; ?>
-            <?php // hAcK, handle bad data ?>
-            <?php if (isset($c)): ?>
-              <?php $c = explode(' ', $c)[0]; ?>
-            <?php endif;?>
             <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc&consult=true">consult the series record</a>.
           <?php endif; ?>
           <? ### ./UChicago customization ### ?>
