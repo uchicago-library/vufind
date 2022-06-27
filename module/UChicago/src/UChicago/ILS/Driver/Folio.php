@@ -594,7 +594,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 'id' => $this->getBibId(null, null, $hold->itemId),
                 'item_id' => $hold->itemId,
                 'reqnum' => $hold->id,
-                'title' => $trans->item->title ?? '',
+                'title' => $hold->instance->title ?? $hold->item->title ?? '',
                 'status' => $hold->status,
                 'pickup_service_point' => $pickupServicePoint,
                 'hold_shelf_expiration_date' => $holdShelfExpirationDate
