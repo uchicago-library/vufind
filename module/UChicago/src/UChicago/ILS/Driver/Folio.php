@@ -638,6 +638,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
             'requestDate' => date('c'),
             'fulfilmentPreference' => 'Hold Shelf',
             'requestExpirationDate' => $requiredBy,
+            'patronComments' => $holdDetails['comment'] ?? '',
             'pickupServicePointId' => $holdDetails['pickUpLocation']
         ];
         $response = $this->makeRequest(
