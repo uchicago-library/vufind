@@ -94,6 +94,14 @@ return [
                     ],
                 ],
             ],
+            'autocomplete' => [
+                'factories' => [
+                    'UChicago\\Autocomplete\\Solr' => 'VuFind\\Autocomplete\\SolrFactory',
+                ],
+                'aliases' => [
+                    'VuFind\\Autocomplete\\Solr' => 'UChicago\\Autocomplete\\Solr',
+                ],
+            ],
         ],
     ],
 ];
