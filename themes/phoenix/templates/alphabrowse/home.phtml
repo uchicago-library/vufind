@@ -144,6 +144,9 @@
                 foreach ($item['extras'][$extraName] as $j => $e):
                   $extraDisplayArray = array_unique(array_merge($extraDisplayArray, $e));
                 endforeach;
+                ### UChicago customization ###
+                $extraDisplayArray = array_map('htmlspecialchars', $extraDisplayArray);
+                ### ./UChicago customization ###
                 echo empty($extraDisplayArray) ? '&nbsp;' : implode('<br />', $extraDisplayArray);
               ?>
             </td>
