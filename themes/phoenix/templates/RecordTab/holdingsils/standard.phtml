@@ -1,5 +1,4 @@
 <?php ### UChicago customization ### ?>
-<?=$this->ServiceLinks()->hold($holding)?>
 <?php $itemStatusWhitelist = ['In process', 'On order']; ?>
 <?php if (strlen($holding['barcode'] ?? '') > 0 || (in_array($holding['status'], $itemStatusWhitelist))): ?>
 <?php ### ./UChicago customization ### ?>
@@ -80,6 +79,7 @@
         <?php endif; ?>
         <? ### UChicago customization ### ?>
         <span class="service-links">
+          <?=$this->ServiceLinks()->hold($holding)?>
           <?=$this->ServiceLinks()->mansueto($holding)?>
           <?=$this->ServiceLinks()->ill($holding)?>
           <?=$this->ServiceLinks()->scrc($holding)?>
