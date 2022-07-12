@@ -5,6 +5,101 @@ namespace UChicago\RecordDriver;
 class SolrMarc extends \VuFind\RecordDriver\SolrMarc
 {
     /**
+     * UChicago customization: modified only to add support for ICU numbers.
+     * Returns the array element for the 'getAllRecordLinks' method
+     *
+     * @param array $field Field to examine
+     *
+     * @return array|bool  Array on success, boolean false if no valid link could be
+     * found in the data.
+     */
+    protected function getFieldData($field)
+    {
+        // Make sure that there is a t field to be displayed:
+        if (!($title = $this->getSubfield($field, 't'))) {
+            return false;
+        }
+
+        $linkTypeSetting = $this->mainConfig->Record->marc_links_link_types
+            ?? 'id,oclc,dlc,isbn,issn,title';
+        $linkTypes = explode(',', $linkTypeSetting);
+        $linkFields = $this->getSubfields($field, 'w');
+
+        // Run through the link types specified in the config.
+        // For each type, check field for reference
+        // If reference found, exit loop and go straight to end
+        // If no reference found, check the next link type instead
+        foreach ($linkTypes as $linkType) {
+            switch (trim($linkType)) {
+            ### UChicago customization ###
+            case 'icu':
+                foreach ($linkFields as $current) {
+                    if ($icu = $this->getIdFromLinkingField($current, 'ICU', true)) {
+                        // Bail if we have bad data, e.g. (ICU)BID=4430978.
+                        if (!is_numeric($icu)) {
+                            $linkType = '';
+                            continue;
+                        }
+                        $link = ['type' => 'icu', 'value' => $icu];
+                    }
+                }
+                break;
+            ### ./UChicago customization ###
+            case 'oclc':
+                foreach ($linkFields as $current) {
+                    if ($oclc = $this->getIdFromLinkingField($current, 'OCoLC')) {
+                        $link = ['type' => 'oclc', 'value' => $oclc];
+                    }
+                }
+                break;
+            case 'dlc':
+                foreach ($linkFields as $current) {
+                    if ($dlc = $this->getIdFromLinkingField($current, 'DLC', true)) {
+                        $link = ['type' => 'dlc', 'value' => $dlc];
+                    }
+                }
+                break;
+            case 'id':
+                foreach ($linkFields as $current) {
+                    if ($bibLink = $this->getIdFromLinkingField($current)) {
+                        $link = ['type' => 'bib', 'value' => $bibLink];
+                    }
+                }
+                break;
+            case 'isbn':
+                if ($isbn = $this->getSubfield($field, 'z')) {
+                    $link = [
+                        'type' => 'isn', 'value' => $isbn,
+                        'exclude' => $this->getUniqueId()
+                    ];
+                }
+                break;
+            case 'issn':
+                if ($issn = $this->getSubfield($field, 'x')) {
+                    $link = [
+                        'type' => 'isn', 'value' => $issn,
+                        'exclude' => $this->getUniqueId()
+                    ];
+                }
+                break;
+            case 'title':
+                $link = ['type' => 'title', 'value' => $title];
+                break;
+            }
+            // Exit loop if we have a link
+            if (isset($link)) {
+                break;
+            }
+        }
+        // Make sure we have something to display:
+        return !isset($link) ? false : [
+            'title' => $this->getRecordLinkNote($field),
+            'value' => $title,
+            'link'  => $link
+        ];
+    }
+
+    /**
      * Get an array of all ISSNs associated with the record (may be empty).
      * Override the default method so that 1. It always returns an array and
      * 2. It separates strings with multiple ISSNs.
