@@ -6,6 +6,9 @@
   $bib = $this->driver->getUniqueID();
   $isSfxStub = strtolower(substr($bib, 0, 3)) == 'sfx';
   $sfxNum = $isSfxStub ? substr($bib, 4) : '';
+  $vNumData = $this->driver->tryMethod('getUCVolumeNumber');
+  $vNum = $vNumData[0]['displayData'][0] ?? [];
+  $vNumAlt = $vNumData[0]['altData'][0] ?? [];
   ### ./UChicago customization ###
   $coverDetails = $this->record($this->driver)->getCoverDetails('result-list', 'medium', $this->recordLink()->getUrl($this->driver));
   $cover = $coverDetails['html'];
@@ -30,11 +33,21 @@
       <div>
         <a href="<?=$this->recordLink()->getUrl($this->driver)?>" class="title getFull" data-view="<?=isset($this->params) ? $this->params->getOptions()->getListViewOption() : 'list' ?>">
           <?=$this->record($this->driver)->getTitleHtml()?>
+          <?php ### UChicago customization ## ?>
+          <? if (!empty($vNum)): ?>
+            <?=$vNum;?>
+          <? endif; ?>
+          <?php ### ./UChicago customization ## ?>
         </a>
         <?php foreach ($this->driver->tryMethod('getTitlesAltScript', [], []) as $altTitle): ?>
           <div class="title-alt">
             <?=$this->escapeHtml($altTitle)?>
-          </div>
+            <?php ### UChicago customization ## ?>
+            <? if (!empty($vNumAlt)): ?>
+              <?=$vNumAlt;?>
+            <? endif; ?>
+            <?php ### ./UChicago customization ## ?>
+         </div>
         <?php endforeach; ?>
       </div>
 
@@ -92,6 +105,23 @@
         <?php foreach ($physicalDesc as $d):?>
           <div><?=$d?></div>
         <? endforeach; ?>
+      <?php endif; ?>
+      <? ### ./UChicago customization ### ?>
+
+      <? ### UChicago customization ### ?>
+      <? ### Add publisher details ### ?>
+      <?php $series = ''; ?>
+      <?php $seriesAlt = ''; ?>
+      <?php $seriesData = $this->driver->tryMethod('getUCSeriesResults')[0] ?? null;?>
+      <?php if (!empty($seriesData)):?>
+        <?php $series = $seriesData['displayData'][0] ?? '';?>
+        <?php $seriesAlt = $seriesData['altData'][0] ?? '';?>
+      <?php endif; ?>
+      <?php if (!empty($series)): ?>
+        <div><?=$series?></div>
+      <?php endif; ?>
+      <?php if (!empty($seriesAlt)): ?>
+        <div><?=$seriesAlt?></div>
       <?php endif; ?>
       <? ### ./UChicago customization ### ?>
 

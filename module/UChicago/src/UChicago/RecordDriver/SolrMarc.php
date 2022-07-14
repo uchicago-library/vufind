@@ -307,6 +307,22 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
         return $this->seriesParse($fields);
     }
 
+    public function getUCSeriesResults()
+    {
+        $fields = [
+            ['490', ['a', 'v', 'x']],
+        ];
+        return $this->seriesParse($fields);
+    }
+
+    public function getUCVolumeNumber()
+    {
+        $fields = [
+            ['490', ['v']],
+        ];
+        return $this->seriesParse($fields);
+    }
+
     public function getUCSubject()
     {
         $fields = [
