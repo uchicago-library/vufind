@@ -5,6 +5,18 @@ namespace UChicago\RecordDriver;
 class SolrMarc extends \VuFind\RecordDriver\SolrMarc
 {
     /**
+     * UChicago customization: this disables the summaries that are displayed
+     * in the description tab and under the title on the full record page.
+     * There is no way to do this in the config.
+     *
+     * @return array
+     */
+    public function getSummary()
+    {
+        return [];
+    }
+
+    /**
      * UChicago customization: modified only to add support for ICU numbers.
      * Returns the array element for the 'getAllRecordLinks' method
      *
