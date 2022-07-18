@@ -19,3 +19,7 @@ foreach ($holdings['holdings'] as $location => $holding) {
 ?>
 <?=$this->serverUrl($this->recordLink()->getUrl($this->driver))?>
 <?="\n\n"?>
+------------------------------------------------------------
+<?php if (!empty($this->message)): ?><?=$this->translate("Message From Sender")?>:
+<?=$this->message?>
+<?php endif; ?>
