@@ -618,14 +618,25 @@ class Folio extends \VuFind\ILS\Driver\Folio
     public function placeHold($holdDetails)
     {
         $default_request = $this->config['Holds']['default_request'] ?? 'Hold';
-        try {
-            $requiredBy = $this->dateConverter->convertFromDisplayDate(
-                'Y-m-d',
-                $holdDetails['requiredBy']
-            );
-        } catch (Exception $e) {
-            $this->throwAsIlsException($e, 'hold_date_invalid');
-        }
+        // UChicago customization: we are removing the required by
+        // form field from the hold request form.  To make this work
+        // we also had to remove requiredByDate from extraHoldFields
+        // in /local/config/vufind/Folio.ini.  For more details please
+        // see:
+
+        // https://trouble.lib.uchicago.edu/bugzilla/show_bug.cgi?id=26728
+
+        // We're leaving the old code commented out below in case we
+        // need to comment-toggle it later.
+
+        // try {
+        //     $requiredBy = $this->dateConverter->convertFromDisplayDate(
+        //         'Y-m-d',
+        //         $holdDetails['requiredBy']
+        //     );
+        // } catch (Exception $e) {
+        //     $this->throwAsIlsException($e, 'hold_date_invalid');
+        // }
         $instance = $this->getInstanceByBibId($holdDetails['id']);
         $requestBody = [
             'itemId' => $holdDetails['item_id'],
@@ -637,7 +648,8 @@ class Folio extends \VuFind\ILS\Driver\Folio
             'requesterId' => $holdDetails['patron']['id'],
             'requestDate' => date('c'),
             'fulfilmentPreference' => 'Hold Shelf',
-            'requestExpirationDate' => $requiredBy,
+            // See above, re: required by form field.
+            // 'requestExpirationDate' => $requiredBy,
             'patronComments' => $holdDetails['comment'] ?? '',
             'pickupServicePointId' => $holdDetails['pickUpLocation']
         ];
@@ -660,6 +672,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     'status' => $json->errors[0]->message
                 ];
             } catch (Exception $e) {
+                $this->throwAsIlsException($e, $response->getBody());
                 $this->throwAsIlsException($e, $response->getBody());
             }
         }
