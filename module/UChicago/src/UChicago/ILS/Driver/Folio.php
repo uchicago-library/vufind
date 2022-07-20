@@ -673,7 +673,6 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 ];
             } catch (Exception $e) {
                 $this->throwAsIlsException($e, $response->getBody());
-                $this->throwAsIlsException($e, $response->getBody());
             }
         }
         return $result;
