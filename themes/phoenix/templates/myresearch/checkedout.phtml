@@ -110,6 +110,11 @@ $renewAll = !$this->ilsPaging || !$paginator;
 
           <?php
             $coverDetails = $this->record($resource)->getCoverDetails('checkedout', 'small', $this->recordLink()->getUrl($resource));
+            ### UChicago customization ###
+            if ($ilsDetails['location'] == 'Interlibrary Loan') {
+              $coverDetails = $this->record($resource)->getCoverDetails('checkedout', 'small', false);
+            }
+            ### ./UChicago customization ###
             $cover = $coverDetails['html'];
             $thumbnail = false;
             $thumbnailAlignment = $this->record($resource)->getThumbnailAlignment('account');
