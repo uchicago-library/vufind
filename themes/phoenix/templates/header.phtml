@@ -99,6 +99,9 @@
   <div class="search container navbar">
     <div class="nav searchbox hidden-print" role="search">
       <?=$this->layout()->searchbox ?>
+      <? ### UChicago customization ### ?>
+      <?=$this->ServiceLinks()->worldCat()?>
+      <? ### ./UChicago customization ### ?>
     </div>
   </div>
 <?php endif; ?>

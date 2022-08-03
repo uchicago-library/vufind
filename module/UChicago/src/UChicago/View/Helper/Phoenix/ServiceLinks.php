@@ -583,4 +583,229 @@ class ServiceLinks extends AbstractHelper {
         return $this->buildLink($holding, 'itemservlet', '');
     }
 
+
+    /**
+     * Decide whether to add a ? or a &.
+     *
+     * @param string $url
+     *
+     * @return string ? or ?.
+     */
+    public function getUrlJoin($url) {
+        if(strpos($url,'?') !== false) {
+            return '&';
+        }
+        return '?';
+    }
+
+
+    /**
+     * Link that forwards search to WorldCat.
+     *
+     * @return sting representing a link.
+     */
+    public function worldCat() {
+        $serviceLink = '';
+
+        // Basic searches and browses
+        $query = $_GET['lookfor'] ?? $_GET['from'] ?? '';
+        $type = $_GET['type'] ?? $_GET['source'] ?? '';
+
+        // Publish dates
+        $publishDatefrom = $_GET['publishDatefrom'] ?? '';
+        $publishDateto = $_GET['publishDateto'] ?? '';
+
+        // Advanced searches
+        parse_str(parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY), $asqs);
+
+        $config = $this->getLinkConfig('worldcat');
+        if (!$this->enabled($config)) {
+            return $serviceLink;
+        }
+
+        $types = [
+            // Default keyword search
+            'AllFields' => 'kw:',
+            // Searches
+            'Title' => 'ti:',
+            'JournalTitle' => 'tk:',
+            'Author' => 'au:',
+            'Subject' => 'su:',
+            'ISN' => 'sn:',
+            'Series' => 'se:',
+            'Publisher' => 'pb:',
+            'publisher' => 'pb:', // Advanced search is different for some reason
+            // Browses
+            'title' => 'ti=',
+            'author' => 'au=',
+            'topic' => 'su=',
+            'journal' => 'tk=',
+            'series' => 'se=',
+            'lcc' => 'sn:'
+        ];
+
+        $formats = [
+            'Book' => [
+                'itemTypes' => ['book'],
+                'itemSubTypes' => ['book-printbook', 'book-digital', 'book-mic', 'book-thsis', 'book-mss', 'book-largeprint', 'book-braille', 'book-continuing']
+            ],
+            'Archives/Manuscripts' => [
+                'itemTypes' => ['archv'],
+                'itemSubTypes' => ['archv-digital']
+            ],
+            'Audio' => [
+                'itemTypes' => ['music'],
+                'itemSubTypes' => ['music-cd'],
+            ],
+            'Audio Cassette' => [
+                'itemTypes' => ['music'],
+                'itemSubTypes' => ['music-cd'],
+            ],
+            'CD' => [
+                'itemTypes' => ['music'],
+                'itemSubTypes' => ['music-cd'],
+            ],
+            'LP' => [
+                'itemTypes' => ['music'],
+                'itemSubTypes' => ['music-cd'],
+            ],
+            'Music recording' => [
+                'itemTypes' => ['music'],
+                'itemSubTypes' => ['music-cd'],
+            ],
+            'Spoken word recording' => [
+                'itemTypes' => ['music'],
+                'itemSubTypes' => ['music-cd'],
+            ],
+            'Dissertations' => [
+                'itemTypes' => [],
+                'itemSubTypes' => ['book-thsis'],
+            ],
+            'E-Resource' => [
+                'itemTypes' => ['web'],
+                'itemSubTypes' => ['jrnl-digital', 'book-digital'],
+            ],
+            'Image' => [
+                'itemTypes' => ['image'],
+                'itemSubTypes' => ['image-2d'],
+            ],
+            'Photograph' => [
+                'itemTypes' => ['image'],
+                'itemSubTypes' => ['image-2d'],
+            ],
+            'Video' => [
+                'itemTypes' => ['video'],
+                'itemSubTypes' => ['video-dvd', 'video-vhs', 'video-digital', 'video-film', 'video-bluray'],
+            ],
+            'Blu-ray disc' => [
+                'itemTypes' => [],
+                'itemSubTypes' => ['video-bluray'],
+            ],
+            'DVD' => [
+                'itemTypes' => [],
+                'itemSubTypes' => ['video-dvd'],
+            ],
+            'Laserdisc' => [
+                'itemTypes' => ['video'],
+                'itemSubTypes' => ['video-dvd', 'video-vhs', 'video-digital', 'video-film', 'video-bluray'],
+            ],
+            'Video cassette' => [
+                'itemTypes' => ['video'],
+                'itemSubTypes' => ['video-dvd', 'video-vhs', 'video-digital', 'video-film', 'video-bluray'],
+            ],
+            'Journal' => [
+                'itemTypes' => ['jrnl'],
+                'itemSubTypes' => ['jrnl-digital', 'jrnl-print'],
+            ],
+            'Kit' => [
+                'itemTypes' => ['kit'],
+                'itemSubTypes' => [],
+            ],
+            'Map' => [
+                'itemTypes' => ['map'],
+                'itemSubTypes' => ['map-mss', 'map-digital'],
+            ],
+            'Music Score' => [
+                'itemTypes' => ['msscr'],
+                'itemSubTypes' => ['msscr-digital'],
+            ],
+            'Print' => [
+                'itemTypes' => [],
+                'itemSubTypes' => ['book-printbook', 'jrnl-print'],
+            ]
+        ];
+
+        $url = $config['url'];
+
+        // Basic search or browse
+        if (!empty($query) && !empty($type) && array_key_exists($type, $types)) {
+            $q = $types[$type] . $query;
+            $url .= '?q=' . urlencode($q);
+        // Advanced search
+        } else if (!empty($asqs['lookfor0']) && !empty($asqs['type0'])) {
+            $url .= '?q=';
+            foreach ($asqs['lookfor0'] as $i => $searchTerm) {
+                if (!empty($searchTerm)) {
+                    $q = $types[$asqs['type0'][$i]] . $searchTerm . ' ';
+                    $url .= urlencode($q);
+                }
+            }
+        }
+
+        // Filters
+        if (!empty($asqs['filter'])) {
+            $itemTypes = [];
+            $itemSubTypes = [];
+            $languages = [];
+            foreach($asqs['filter'] as $filter) {
+                $filterLabel = strtok($filter, ':');
+                preg_match("/^$filterLabel:\"([A-Za-z .\-\/]*?)\"/", $filter, $m);
+                $match = $m[1] ?? '';
+                switch ($filterLabel) {
+                    case 'format':
+                    case '~format':
+                        if (!empty($match) && array_key_exists($match, $formats)) {
+                            $itemTypes = array_merge($itemTypes, $formats[$match]['itemTypes']);
+                            $itemSubTypes = array_merge($itemSubTypes, $formats[$match]['itemSubTypes']);
+                        }
+                        break;
+                    case 'language':
+                    case '~language':
+                        $lang = strtolower(substr($match, 0, 3));
+                        $languages = array_merge($languages, [$lang]);
+                        break;
+                }
+            }
+            if (!empty($itemTypes)) {
+                $url .= $this->getUrlJoin($url) . 'itemType=' . join(',', $itemTypes);
+            }
+            if (!empty($itemSubTypes)) {
+                // Special case for print format
+                // Book or Journal is selected but so is Print. We must eliminate sub-types
+                // so as not to include digital formats.
+                $printItemSubTypes = $formats['Print']['itemSubTypes'];
+                if (array_intersect($itemSubTypes, $printItemSubTypes)) {
+                    // Book is selected
+                    if (array_intersect($itemTypes, $formats['Book']['itemTypes'])) {
+                        $itemSubTypes = array_intersect($printItemSubTypes, $formats['Book']['itemSubTypes']);
+                    // Journal is selected
+                    } else if (array_intersect($itemTypes, $formats['Journal']['itemTypes'])) {
+                        $itemSubTypes = array_intersect($printItemSubTypes, $formats['Journal']['itemSubTypes']);
+                    }
+                }
+                $url .= $this->getUrlJoin($url) . 'itemSubType=' . join(',', $itemSubTypes);
+            }
+            if (!empty($languages)) {
+                $url .= $this->getUrlJoin($url) . 'inLanguage=' . join(',', $languages);
+            }
+        }
+
+        // Publish dates
+        if (!empty($publishDatefrom) && !empty($publishDateto)) {
+            $url .= $this->getUrlJoin($url) . 'datePublished=' . $publishDatefrom . '-' . $publishDateto;
+        }
+
+        $serviceLink = $this->template(trim($url, '+ '), $config['text'], $config['icon'], $config['classes']);
+        return $serviceLink;
+    }
 }
