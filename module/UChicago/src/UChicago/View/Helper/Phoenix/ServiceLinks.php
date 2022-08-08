@@ -750,6 +750,9 @@ class ServiceLinks extends AbstractHelper {
                     $url .= urlencode($q);
                 }
             }
+        // Not a search or browse
+        } else {
+            return $serviceLink;
         }
 
         // Filters
