@@ -2,6 +2,10 @@
 
 namespace UChicago\ILS\Driver;
 
+// THESE SHOULD GO AWAY WHEN WE UPGRADE
+use DateTime;
+use DateTimeZone;
+
 class Folio extends \VuFind\ILS\Driver\Folio
 {
     /**
@@ -51,6 +55,75 @@ class Folio extends \VuFind\ILS\Driver\Folio
             // found, if count does not increase, something has gone
             // wrong. Stop so we don't loop forever.
         } while ($count < $total && $previousCount != $count);
+    }
+
+
+
+    /**
+     * THIS SHOULD GO AWAY WHEN WE UPGRADE
+     * This method queries the ILS for a patron's current fines
+     *
+     *     Input: Patron array returned by patronLogin method
+     *     Output: Returns an array of associative arrays, one for each fine
+     * associated with the specified account. Each associative array contains
+     * these keys:
+     *         amount - The total amount of the fine IN PENNIES. Be sure to adjust
+     * decimal points appropriately (i.e. for a $1.00 fine, amount should be 100).
+     *         checkout - A string representing the date when the item was
+     * checked out.
+     *         fine - A string describing the reason for the fine
+     * (i.e. “Overdue”, “Long Overdue”).
+     *         balance - The unpaid portion of the fine IN PENNIES.
+     *         createdate – A string representing the date when the fine was accrued
+     * (optional)
+     *         duedate - A string representing the date when the item was due.
+     *         id - The bibliographic ID of the record involved in the fine.
+     *         source - The search backend from which the record may be retrieved
+     * (optional - defaults to Solr). Introduced in VuFind 2.4.
+     *
+     */
+    public function getMyFines($patron)
+    {
+        $query = ['query' => 'userId==' . $patron['id'] . ' and status.name==Open'];
+        $fines = [];
+        foreach ($this->getPagedResults(
+            'accounts',
+            '/accounts',
+            $query
+        ) as $fine) {
+            $date = date_create($fine->metadata->createdDate);
+            $title = $fine->title ?? null;
+            $bibId = isset($fine->instanceId)
+                ? $this->getBibId($fine->instanceId)
+                : null;
+            $fines[] = [
+                'id' => $bibId,
+                'amount' => $fine->amount * 100,
+                'balance' => $fine->remaining * 100,
+                'status' => $fine->paymentStatus->name,
+                'type' => $fine->feeFineType,
+                'title' => $title,
+                'createdate' => date_format($date, "j M Y")
+            ];
+        }
+        return $fines;
+    }
+
+
+    /**
+     * THIS SHOULD GO AWAY WHEN WE UPGRADE.
+     * Convert a FOLIO date string to a DateTime object.
+     *
+     * @param string $str FOLIO date string
+     *
+     * @return DateTime
+     */
+    protected function getDateTimeFromString(string $str): DateTime
+    {
+        $dateTime = new DateTime($str, new DateTimeZone('UTC'));
+        $localTimezone = (new DateTime)->getTimezone();
+        $dateTime->setTimezone($localTimezone);
+        return $dateTime;
     }
 
 
@@ -421,18 +494,35 @@ class Folio extends \VuFind\ILS\Driver\Folio
         foreach ($this->getPagedResults(
             'loans', '/circulation/loans', $query
         ) as $trans) {
+            $dueStatus = false;
+            $date = $this->getDateTimeFromString($trans->dueDate);
+            $dueDateTimestamp = $date->getTimestamp();
 
             $authors = implode(', ', array_map(function($c) {
                 return $c->name;
             }, $trans->item->contributors ?? []));
 
             $loanDate = date_create($trans->loanDate);
-            $date = date_create($trans->dueDate);
+
+            $now = time();
+            if ($now > $dueDateTimestamp) {
+                $dueStatus = 'overdue';
+            } elseif ($now > $dueDateTimestamp - (1 * 24 * 60 * 60)) {
+                $dueStatus = 'due';
+            }
             $transactions[] = [
-                'duedate' => date_format($date, "j M Y"),
-                'dueTime' => date_format($date, "g:i:s a"),
+                'duedate' =>
+                    $this->dateConverter->convertToDisplayDate(
+                        'U',
+                        $dueDateTimestamp
+                    ),
+                'dueTime' =>
+                    $this->dateConverter->convertToDisplayTime(
+                        'U',
+                        $dueDateTimestamp
+                    ),
                 // TODO: Due Status
-                // 'dueStatus' => $trans['itemId'],
+                'dueStatus' => $dueStatus,
                 'id' => $bib,
                 'item_id' => $trans->item->id,
                 'barcode' => $trans->item->barcode,
@@ -445,7 +535,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 'status' => $trans->item->status->name ?? '',
                 'callnumber' => '',
                 'recalled' => $trans->action == 'recallrequested',
-                'duedate_raw' => $date,
+                'duedate_raw' => date_create($trans->dueDate),
                 'loandate_raw' => $loanDate,
                 'item_instance_id' => $trans->item->instanceId,
                 'authors' => $authors,
