@@ -4,6 +4,14 @@ namespace UChicago\RecordDriver;
 
 class SolrMarc extends \VuFind\RecordDriver\SolrMarc
 {
+    ### UChicago customization ###
+    // Must exist to override \VuFind\Marc\Serialization\Iso2709
+    // Added to allow MARC records over 99,999 characters to display
+    // This can probably be eliminated after upgrade to VuFind 9.0 along with overrides
+    // in UChicago/Marc/MarcReader.php and UChicago/Marc/Serialization/Iso2709.php
+    protected $marcReaderClass = \UChicago\Marc\MarcReader::class;
+    ### ./UChicago customization ###
+
     /**
      * UChicago customization: this disables the summaries that are displayed
      * in the description tab and under the title on the full record page.
