@@ -262,6 +262,11 @@ class Folio extends \VuFind\ILS\Driver\Folio
             $holdingLocationName = $holdingLocationData['name'];
             $holdingLocationCode = $holdingLocationData['code'];
 
+            // Don't request items for electronic holdings
+            $holdingTypeId = $holding->holdingsTypeId ?? '';
+            if ($holdingTypeId === $this->config['Holdings']['electronic_holding_type_id']) {
+                break;
+            }
 
             foreach ($this->getPagedResults(
                 'items', '/item-storage/items', $query, $holdingData
