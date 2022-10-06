@@ -65,6 +65,8 @@
     .label {
 		font-weight: 400;
 		padding-left: 0;
+        color: #444;
+        background: transparent;
 		&.label-danger {
 			font-size: 1rem;
 			color: #a41915;
@@ -139,10 +141,11 @@
 / Record Holdings
 */
 .tab-content {
-	h3 {
+	h2 {
 		background: #d0d2b4;
 		padding: 0.5em 0.5em 0.25em 0.5em;
 		margin-bottom: 0;
+        font-size: 20px;
 	}
 	table {
 		table-layout: unset;
@@ -203,17 +206,12 @@
   margin-bottom: 1em;
   .locpanel-heading {
     background: #d0d2b4;
-    padding: 0.05em 1em;
     margin-bottom: 0;
     h2 {
-      display:inline-block;
-      font-size: 1.35em;  // COVID Change
-    }
-    h3 {
-      font-size: 1.1em;  // COVID Change
-      font-weight: 600;
-      margin: 0 0 0.5em!important; //compiled override
-      display: inline-block!important; //compiled override
+      font-size: 20px;
+      font-weight: normal;
+      margin: 0!important;
+      display: inline-block!important;
       background: none;
       span {
         font-weight: normal;
@@ -238,11 +236,11 @@
         cursor: pointer;
         font-size: 1.1em;
         font-family: 'ProximaNova-Regular', "Arial", sans-serif;
-        color: #767676;
+        color: darken(#670000, 10%);
     }
     .toggle:before {
         font-family: FontAwesome;
-        color: #acacac;
+        color: darken(#670000, 10%);
         content: "\f107";
         padding-right: 0.2em;
     }
@@ -286,4 +284,14 @@ a.bibToggle:hover {
     font-weight: bold;
     font-size: @font-size-base + 1;
     display: block;
+}
+
+.sr-only {
+    color: #000;
+}
+
+.maplookup {
+    background: #d0d2b4;
+    display: block;
+    padding-left: 0.8em;
 }

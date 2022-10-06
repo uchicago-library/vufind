@@ -11,13 +11,15 @@
     </ul>
     <div style="clear: both;"></div>
   </div>
-  <!-- end // ### UChicago customization ### -->
+  <!-- ### ./UChicago customization ### -->
 
   <div class="navbar-header">
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-collapse" aria-hidden="true">
+    <!-- ### UChicago customization ### -->
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#header-collapse" aria-hidden="true" aria-label="Show main menu">
       <i class="fa fa-bars"></i>
     </button>
-    <a class="navbar-brand lang-<?=$this->layout()->userLang ?>" href="<?=$this->url('home')?>"><img src="/vufind/themes/phoenix/images/ucl_catalog_logo.png"></a>
+    <a class="navbar-brand lang-<?=$this->layout()->userLang ?>" href="<?=$this->url('home')?>"><img src="/vufind/themes/phoenix/images/ucl_catalog_logo.png" alt="The University of Chicago Library Catalog"></a>
+    <!-- ### ./UChicago customization ### -->
   </div>
   <?php if (!isset($this->layout()->renderingError)): ?>
     <div class="collapse navbar-collapse" id="header-collapse">
@@ -89,7 +91,7 @@
               </ul>
             </li>
           <?php endif; ?>
-          <li><a href="https://www.lib.uchicago.edu/research/help/catalog-help/selecting/" title="Help" target="_blank" class="external">Help</a></li>
+          <li><a href="https://www.lib.uchicago.edu/research/help/catalog-help/selecting/" target="_blank" class="external">Help</a></li>
         </ul>
       </nav>
     </div>

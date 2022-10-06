@@ -264,4 +264,7 @@ $(document).ready(function() {
     // Show/hide items
     $(this).parent().find(addtionalBibData).toggle();
   });
+
+  // Accessibility fix
+  $('#publishDatedateSlider').attr('title', 'Year of publication date slider');
 });
