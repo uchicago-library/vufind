@@ -161,15 +161,21 @@ class Folio extends \VuFind\ILS\Driver\Folio
      */
     protected function getLoanTypeData($loanTypeId)
     {
-        $name = '';
-        $response = $this->makeForgivingRequest(
-            'GET', '/loan-types/' . $loanTypeId
-        );
-        if ($response->isSuccess()) {
-            $data = json_decode($response->getBody());
-            $name = $data->name ?? '';
+        $cacheKey = 'loanTypeMap';
+        $loanTypeMap = $this->getCachedData($cacheKey);
+        if (null === $loanTypeMap) {
+            $loanTypeMap = [];
+            foreach ($this->getPagedResults(
+                'loantypes', '/loan-types'
+            ) as $loanType) {
+                if (isset($loanType->name)) {
+                    $name = $loanType->name;
+                    $loanTypeMap[$loanType->id] = compact('name');
+                }
+            }
         }
-        return compact('name');
+        $this->putCachedData($cacheKey, $loanTypeMap);
+        return $loanTypeMap[$loanTypeId];
     }
 
 
