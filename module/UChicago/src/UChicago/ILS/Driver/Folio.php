@@ -217,8 +217,15 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     . '" NOT discoverySuppress==true)'
             ];
             $notesFormatter = function ($note) {
+                $suppressItemNoteTypes = $this->config['Holdings']['suppress_item_note_types'] ?? [];
+                $suppress = false;
+                if (property_exists($note, 'itemNoteTypeId')
+                    && in_array($note->itemNoteTypeId, $suppressItemNoteTypes)
+                ) {
+                    $suppress = true;
+                }
                 return !($note->staffOnly ?? false)
-                    && !empty($note->note) ? $note->note : '';
+                    && !empty($note->note) && !$suppress === true ? $note->note : '';
             };
             $textFormatter = function ($supplement) {
                 $format = '%s %s';
