@@ -313,7 +313,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 $itemHideStatusStatCodes = $this->config['Holdings']['item_hide_status_stat_codes'] ??  [];
                 $itemHasHideStatCode = count(
                     array_intersect($itemStatCodeIds, $itemHideStatusStatCodes)
-                ) >= 1;
+                ) >= 1 || in_array($item->status->name, $itemHideStatusStatCodes);
 
                 $loanTypeName = '';
                 $tempLoanTypeId = $item->temporaryLoanTypeId ?? '';
