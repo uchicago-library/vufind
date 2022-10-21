@@ -13,6 +13,8 @@ return [
         'myresearch' => 'UChicago\Controller\MyResearchController',
         'Holds' => 'UChicago\Controller\HoldsController',
         'holds' => 'UChicago\Controller\HoldsController',
+        'Requests' => 'UChicago\Controller\HoldsController',
+        'requests' => 'UChicago\Controller\HoldsController',
         'Cart' => 'UChicago\Controller\CartController',
         'cart' => 'UChicago\Controller\CartController',
       ],
