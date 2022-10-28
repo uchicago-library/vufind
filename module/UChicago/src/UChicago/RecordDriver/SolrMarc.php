@@ -204,9 +204,26 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
             $field = $multi[0];
             $subfields = $multi[1];
             $data = $this->getFieldArray($field, $subfields, true, ' -- ');
+            $i2s = [];
+            $ffs = $this->getMarcRecord()->getFields($field);
+            if (!empty($ffs)) {
+                foreach ($ffs as $i2) {
+                    $s2 = $i2->getSubfield('2');
+                    if ($s2 != false) {
+                        $heading = $s2->getData();
+                        if (strtolower($heading) === 'fast' && $i2->getIndicator(2) === '7') {
+                            array_push($i2s, true);
+                        } else {
+                            array_push($i2s, false);
+                        }
+                    } else {
+                        array_push($i2s, false);
+                    }
+                }
+            }
             $linkData = $this->getFieldArray($field, $subfields, true, '--');
             $altData = $this->getMarcReader()->getLinkedFieldsSubFields('880', $field, $subfields);
-            array_push($retval, ['displayData' => $data, 'linkData' => $linkData, 'altData' => $altData]);
+            array_push($retval, ['displayData' => $data, 'linkData' => $linkData, 'altData' => $altData, 'areFasts' => $i2s]);
         }
         return $retval;
     }
