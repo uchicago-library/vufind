@@ -260,7 +260,7 @@ class RecordDataFormatterFactory extends \VuFind\View\Helper\Root\RecordDataForm
             ['helperMethod' => 'getFormatList']
         );
         $spec->setTemplateLine(
-            'Local Note', 'getUCLocalNote', 'data-uc-simple.phtml'
+            'Local Note', 'getUCLocalNote', 'data-uc-local-note.phtml'
         );
         $spec->setTemplateLine(
             'URL for this record', 'getUCRecordURL', 'data-uc-simple.phtml'

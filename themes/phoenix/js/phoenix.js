@@ -267,4 +267,10 @@ $(document).ready(function() {
 
   // Accessibility fix
   $('#publishDatedateSlider').attr('title', 'Year of publication date slider');
+
+  // Copy local note (590|a) to the holdings statement on full records.
+  $('.local-note').each(function(){
+    var localNote = $(this).clone().wrapInner('<strong></strong>');
+    localNote.appendTo('.tab-content');
+  });
 });
