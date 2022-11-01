@@ -12,12 +12,16 @@
 @grid-gutter-width: 20px;
 @brand-primary-dark: darken(@brand-primary, 6.5%);
 @light-link: #fff;
+@font-size-base: 14px;
+@clear-input-size: @font-size-base + 2;
+@form-control-padding: 12px;
+
 
 /*
 / Global
 */
 body {
-  font-size: 14px;
+  font-size: @font-size-base;
   color: #333;
 }
 
@@ -245,6 +249,20 @@ footer {
     color: #eee;
     a {
         color: #fff;
+    }
+}
+
+#searchForm {
+    .input-clear {
+        position: absolute;
+        cursor: pointer;
+        font-size: @clear-input-size;
+        color: lighten(@gray-light, 10%);
+        margin-left: -@form-control-padding - 8;
+        margin-top: (@input-height-base / 2) - (@clear-input-size / 2);
+        @media (max-width: @screen-sm-min) {
+            display: none;
+        }
     }
 }
 
