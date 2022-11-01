@@ -275,7 +275,7 @@ $(document).ready(function() {
   });
 
   // Clear inputs on the mini-search box in the gray bar
-  $('#searchForm_lookfor').after('<i class="input-clear fa fa-times-circle-o"></i>');
+  $('.template-name-results #searchForm_lookfor, .template-dir-alphabrowse #searchForm_lookfor, .template-dir-record #searchForm_lookfor').after('<i class="input-clear fa fa-times-circle-o"></i>');
   $('.input-clear').click(function(){
     $(this).parent().find('input').val('');
     $(this).parent().find('input').attr('placeholder',' ');
