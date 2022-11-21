@@ -9,6 +9,7 @@
 
     ### UChicago customization ###
     $isLawPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:lawlibrary:authorized');
+    $isSWLPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:swl:authorized');
     ### ./UChicago customization ###
 ?>
 <h2><?=$this->transEsc('request_place_text')?></h2>
@@ -137,6 +138,13 @@
             <?php ### Only show option for LAW if user is in grouper group ### ?>
             <?php if ($lib['locationID'] === '51787734-d899-41e6-b6b2-e531a315fd61'): ?>
               <?php if ($isLawPatron === true): ?>
+                <option value="<?=$this->escapeHtmlAttr($lib['locationID'])?>"<?=($selected == $lib['locationID']) ? ' selected="selected"' : ''?>>
+                  <?=$this->transEscWithPrefix('location_', $lib['locationDisplay'])?>
+                </option>
+              <?php endif; ?>
+            <?php ### Only show option for SWL if user is in grouper group ### ?>
+            <?php elseif ($lib['locationID'] === '35706615-101a-418b-9f58-bd5343c9013a'): ?>
+              <?php if ($isSWLPatron === true): ?>
                 <option value="<?=$this->escapeHtmlAttr($lib['locationID'])?>"<?=($selected == $lib['locationID']) ? ' selected="selected"' : ''?>>
                   <?=$this->transEscWithPrefix('location_', $lib['locationDisplay'])?>
                 </option>
