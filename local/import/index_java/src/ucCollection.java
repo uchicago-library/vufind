@@ -16,8 +16,8 @@ public class ucCollection {
         {
                 Set result = new LinkedHashSet();
                 String[] tags = {"927", "928"};
-
-                // check the 927 thru 928 # c to find proper location(building) for each book/record
+                
+	        // check the 927 thru 928 # c to find proper location(building) for each book/record
                 List fields = record.getVariableFields(tags);  
                 Iterator i = fields.iterator(); 
                 if (fields != null)
@@ -79,7 +79,7 @@ public class ucCollection {
 					{
 						result.add("Mansueto");
 					}
-if(str.equals("JRL-Acq") || str.equals("JRL-Art420") || str.equals("JRL-ArtResA") || str.equals("JRL-Cat") || str.equals("JRL-CDEV") || str.equals("JRL-CircPer") || str.equals("JRL-CJK") || str.equals("JRL-CJKRar") || str.equals("JRL-CJKRef") || str.equals("JRL-CJKRfHY") || str.equals("JRL-CJKSem") || str.equals("JRL-CJKSPer") || str.equals("JRL-CJKSpHY") || str.equals("JRL-CJKSpl") || str.equals("JRL-CMC") || str.equals("JRL-ERICMic") || str.equals("JRL-Film") || str.equals("JRL-Gen") || str.equals("JRL-GenHY") || str.equals("JRL-Harp") || str.equals("JRL-ILL") || str.equals("JRL-JRLDisp") || str.equals("JRL-JRLRES") || str.equals("JRL-JzAr") || str.equals("JRL-LawMicG") || str.equals("JRL-MapCl") || str.equals("JRL-MapRef") || str.equals("JRL-Mic") || str.equals("JRL-MidEMic") || str.equals("JRL-MSRGen") || str.equals("JRL-Pam") || str.equals("JRL-Rec") || str.equals("JRL-RecHP") || str.equals("JRL-Res") || str.equals("JRL-Resup") || str.equals("JRL-RR") || str.equals("JRL-RR2Per") || str.equals("JRL-RR4") || str.equals("JRL-RR4Cla") || str.equals("JRL-RR4J") || str.equals("JRL-RR5") || str.equals("JRL-RR5EA") || str.equals("JRL-RR5EPer") || str.equals("JRL-RR5Per") || str.equals("JRL-RRExp ") || str.equals("JRL-SAsia") || str.equals("JRL-SciMic") || str.equals("JRL-Ser") || str.equals("JRL-SerArr") || str.equals("JRL-SerCat")  || str.equals("JRL-Slav") || str.equals("JRL-SMicDDC") || str.equals("JRL-SOA") || str.equals("JRL-Stor") || str.equals("JRL-W")  || str.equals("JRL-WCJK") || str.equals("JRL-XClosedCJK") || str.equals("JRL-XClosedGen") || str.equals("ASR-JRLASR")  || str.equals("ASR-RecASR"))
+if(str.equals("JRL-Acq") || str.equals("JRL-READ") || str.equals("JRL-Art420") || str.equals("JRL-ArtResA") || str.equals("JRL-Cat") || str.equals("JRL-CDEV") || str.equals("JRL-CircPer") || str.equals("JRL-CJK") || str.equals("JRL-CJKRar") || str.equals("JRL-CJKRef") || str.equals("JRL-CJKRfHY") || str.equals("JRL-CJKSem") || str.equals("JRL-CJKSPer") || str.equals("JRL-CJKSpHY") || str.equals("JRL-CJKSpl") || str.equals("JRL-CMC") || str.equals("JRL-ERICMic") || str.equals("JRL-Film") || str.equals("JRL-Gen") || str.equals("JRL-GenHY") || str.equals("JRL-Harp") || str.equals("JRL-ILL") || str.equals("JRL-JRLDisp") || str.equals("JRL-JRLRES") || str.equals("JRL-JzAr") || str.equals("JRL-LawMicG") || str.equals("JRL-MapCl") || str.equals("JRL-MapRef") || str.equals("JRL-Mic") || str.equals("JRL-MidEMic") || str.equals("JRL-MSRGen") || str.equals("JRL-Pam") || str.equals("JRL-Rec") || str.equals("JRL-RecHP") || str.equals("JRL-Res") || str.equals("JRL-Resup") || str.equals("JRL-RR") || str.equals("JRL-RR2Per") || str.equals("JRL-RR4") || str.equals("JRL-RR4Cla") || str.equals("JRL-RR4J") || str.equals("JRL-RR5") || str.equals("JRL-RR5EA") || str.equals("JRL-RR5EPer") || str.equals("JRL-RR5Per") || str.equals("JRL-RRExp ") || str.equals("JRL-SAsia") || str.equals("JRL-SciMic") || str.equals("JRL-Ser") || str.equals("JRL-SerArr") || str.equals("JRL-SerCat")  || str.equals("JRL-Slav") || str.equals("JRL-SMicDDC") || str.equals("JRL-SOA") || str.equals("JRL-Stor") || str.equals("JRL-W")  || str.equals("JRL-WCJK") || str.equals("JRL-XClosedCJK") || str.equals("JRL-XClosedGen") || str.equals("ASR-JRLASR")  || str.equals("ASR-RecASR"))
 					{
 						result.add("Regenstein Library");
 					}
@@ -95,7 +95,7 @@ if(str.equals("JRL-Acq") || str.equals("JRL-Art420") || str.equals("JRL-ArtResA"
 					{
 						result.add("Regenstein Reference");
 					}
-					if(str.equals("JRL-JRLRES"))
+					if(str.equals("JRL-JRLRES")) 
 					{
 						result.add("Regenstein Reserves");
 					}
@@ -195,6 +195,10 @@ if(str.equals("JRL-Acq") || str.equals("JRL-Art420") || str.equals("JRL-ArtResA"
 					{
 						result.add("Internet");
 					}
+                                        if(str.equals("JRL-READ"))
+                                        {
+                                                result.add("Reg Reads Collection");
+                                        }
 				}               
 			}
 		}
