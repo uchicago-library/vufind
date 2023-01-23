@@ -4,7 +4,15 @@
 <? ### ./UChicago customization ### ?>
 <html lang="<?=$this->layout()->userLang?>"<?php if ($this->layout()->rtl): ?> dir="rtl"<?php endif; ?>>
   <head>
-      <!-- <?=$this->ZoteroHarvesting()->happy()?> -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-EWT5B3NZ15"></script> <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-EWT5B3NZ15');
+        gtag('set', 'content_group', 'catalog');
+    </script>
+    <!-- <?=$this->ZoteroHarvesting()->happy()?> -->
     <?=$this->ZoteroHarvesting()->addMetaTags()?>
     <?php $this->headThemeResources(); ?>
     <meta charset="utf-8">
