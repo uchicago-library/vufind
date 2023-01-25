@@ -94,14 +94,24 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
         $function = $config['DedupedEholdings']['function'];
         $url = $config['DedupedEholdings']['url'] . '?code=' . $code . '&function=' . $function . '&callback=vufind';
 
-        if (strlen($bib) > 0 && mb_substr($bib, 0, 4) != 'sfx_') {
+        $flag = false;
+        $toss = ['sf', 'oc'];
+        $bibLead = mb_substr($bib, 0, 2);
+        if (strlen($bib) > 0 && in_array($bibLead, $toss) === false) {
             $url .= '&bib=' . $bib;
+            $flag = true;
         }
         if (strlen($issns) > 0) {
             $url .= '&issns=' . $issns;
+            $flag = true;
         }
         if (strlen($sfxNum) > 0) {
             $url .= '&sfx=' . $sfxNum;
+            $flag = true;
+        }
+
+        if ($flag === false) {
+            return [];
         }
 
         $request = new Request();
@@ -127,7 +137,7 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
      * @return string, html
      */
     public function getDedupedEholdingsHtml($issns, $sfxNum, $bib, $header) {
-        $dedupedEholdings = $this->getDedupedEholdings($issns, $sfxNum, $bib);
+        $dedupedEholdings = $this->getDedupedEholdings($issns, $sfxNum, $bib) ?? [];
         $hasHeader = ($header === 'true');
         if (count(array_filter($dedupedEholdings), COUNT_RECURSIVE) === 0) {
             return '';
