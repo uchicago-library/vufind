@@ -55,7 +55,7 @@ public class ucCollection {
 					{
 						result.add("Crerar Video Games");
 					}
-					if(str.equals("DLL-Law") || str.equals("DLL-LawA")  || str.equals("DLL-LawAcq") || str.equals("DLL-LawAid") || str.equals("DLL-LawAnxN") || str.equals("DLL-LawAnxS") || str.equals("DLL-LawC") || str.equals("DLL-LawCat") || str.equals("DLL-LawCity") || str.equals("DLL-LawCS") || str.equals("DLL-LawDisp") || str.equals("DLL-LawDVD") || str.equals("DLL-LawFul") || str.equals("DLL-LawMic") || str.equals("DLL-LawPer") || str.equals("DLL-LawRar") || str.equals("DLL-LawRef") || str.equals("DLL-LawRes") || str.equals("DLL-LawResC") || str.equals("DLL-LawResP") || str.equals("DLL-LawRR") || str.equals("DLL-LawStor") || str.equals("DLL-LawWell") || str.equals("DLL-ResupD") || str.equals("ASR-LawASR") || str.equals("ASR-LawSupr"))
+					if(str.equals("DLL-Law") || str.equals("DLL-LawA")  || str.equals("DLL-LawAcq") || str.equals("DLL-LawAid") || str.equals("DLL-LawAnxN") || str.equals("DLL-LawAnxS") || str.equals("DLL-LawC") || str.equals("DLL-LawCat") || str.equals("DLL-LawCity") || str.equals("DLL-LawCS") || str.equals("DLL-LawDisp") || str.equals("DLL-LawDVD") || str.equals("DLL-LawFul") || str.equals("DLL-LawMic") || str.equals("DLL-LawPer") || str.equals("DLL-LawRar") || str.equals("DLL-LawRef") || str.equals("DLL-LawRes") || str.equals("DLL-LawResC") || str.equals("DLL-LawResP") || str.equals("DLL-LawRR") || str.equals("DLL-LawWell") || str.equals("DLL-ResupD") || str.equals("ASR-LawASR") || str.equals("ASR-LawSupr"))
 					{
 						result.add("D'Angelo Law Library");
 					}
