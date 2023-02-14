@@ -262,7 +262,7 @@
    <field name="topic_unstemmed" type="textProper" indexed="true" stored="false" multiValued="true"/>
    <field name="topic_facet" type="textFacet" indexed="true" stored="true" multiValued="true"/>
    <field name="topic_browse" type="string" indexed="true" stored="false" multiValued="true"/>
-   <field name="author_browse" type="string" indexed="true" stored="false" multiValued="true"/>
+   <field name="author_browse" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="genre" type="text" indexed="true" stored="true" multiValued="true"/>
    <field name="genre_facet" type="textFacet" indexed="true" stored="true" multiValued="true"/>
    <field name="geographic" type="text" indexed="true" stored="true" multiValued="true"/>
@@ -303,6 +303,7 @@
    <field name="barcode" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="doi" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="import_time" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
+   <field name="author_browse_sort" type="string" indexed="true" stored="true" multiValued="true"/>
    <!-- UChicago fields for exactish matching -->
    <field name="title_short_exact" type="text_lr" indexed="true" stored="true"/>
    <field name="title_alt_exact" type="text_lr" indexed="true" stored="true" multiValued="true"/>
