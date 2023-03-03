@@ -1,6 +1,8 @@
 <?php
   $this->headTitle($this->translate('Browse the Collection Alphabetically'));
-  $this->layout()->breadcrumbs = '<a href="' . $this->url('alphabrowse-home') . '">' . $this->transEsc('Browse Alphabetically') . '</a>';
+  ### UChicago customization ###
+  //$this->layout()->breadcrumbs = '<a href="' . $this->url('alphabrowse-home') . '">' . $this->transEsc('Browse Alphabetically') . '</a>';
+  ### ./UChicago customization ###
   $baseQuery = ['source' => $this->source, 'from' => $this->from];
 
   // Set up upper search box if necessary:
