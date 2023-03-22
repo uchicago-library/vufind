@@ -150,7 +150,7 @@ function getAlert(){
             }
             if (level == 'alert-high') {
                 html += '<div id="alert" class="container">' + msg + link + ' </div>';
-                $('.container.navbar').before(html);
+                $('.banner.container.navbar').before(html);
                 return false;
             }
         });
