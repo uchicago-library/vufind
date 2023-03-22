@@ -131,6 +131,32 @@ function getMapLink(loc, callnum, prefix, target) {
   }, 'html');
 }
 
+/*
+ * Display critical alert banners if they exist in Wagtail.
+ */
+function getAlert(){
+    var api = 'https://www.lib.uchicago.edu/api/v2/pages/?type=alerts.AlertPage&fields=title,banner_message,more_info,alert_level,url&format=json';
+    json = $.getJSON(api, function(data) {
+        var pages = data.items;
+        $.each(pages, function(key){
+            var page = pages[key];
+            var level = page.alert_level;
+            var msg = page.banner_message;
+            var url = page.url;
+            var html = '';
+            var link = '';
+            if (page.more_info.replace( /<.*?>/g, '' )) {
+                link = ' <a href="' + url + '">More info...</a>';
+            }
+            if (level == 'alert-high') {
+                html += '<div id="alert" class="container">' + msg + link + ' </div>';
+                $('.container.navbar').before(html);
+                return false;
+            }
+        });
+    });
+}
+
 $(document).ready(function() {
   // Expand and collapse of No-CNet-ID login, when the page is
   $('#login-toggle').click(function() {
@@ -143,6 +169,9 @@ $(document).ready(function() {
         $(this).parents('.login-toggle-wrapper').next('.login-toggle-content').toggle();
     });
   });
+
+  // Display alert banner if one is published in Wagtail
+  getAlert();
 
 
   // Better RSS icon
