@@ -175,7 +175,7 @@ public class ucAuthorBrowseFunctions {
 	{
 		//System.out.println("Input: '" + field.toString() + "'");
 
-		String trimChars = ".,; ";
+		String trimChars = ".,;";
 
 		StringBuilder buf = new StringBuilder();
 		List<Subfield> subFlds = field.getSubfields();
@@ -219,7 +219,7 @@ public class ucAuthorBrowseFunctions {
 				}
 			}
 		}
-		rightTrimBuffer(buf, " ");
+//		rightTrimBuffer(buf, " ");
 		trimBuffer(buf, trimChars);
 
 		//System.out.println("Output: '" + buf.toString() + "'");
@@ -280,7 +280,7 @@ public class ucAuthorBrowseFunctions {
 
 	public static String getSubfields(DataField field, String sfList)
 	{
-		String trimChars = ".,; ";
+		String trimChars = ".,;";
 
 		StringBuilder buf = new StringBuilder();
 		List<Subfield> subFlds = field.getSubfields();
