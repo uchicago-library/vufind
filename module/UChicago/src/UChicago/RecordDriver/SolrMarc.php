@@ -63,6 +63,15 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
                         $link = ['type' => 'icu', 'value' => $icu];
                     }
                 }
+                // We are looping over link types in the config (marc_links_link_types).
+                // The loop goes in the same order as the config. The first item we have
+                // configured is ID which is a bib. ICU is another way we express bib
+                // numbers and it's the second item in the config. If we're on a 776
+                // field, we don't want anything other than a bib link so we break out
+                // of the switch and the outer loop.
+                if ($field['tag'] === '776') {
+                    break 2;
+                }
                 break;
             ### ./UChicago customization ###
             case 'oclc':
