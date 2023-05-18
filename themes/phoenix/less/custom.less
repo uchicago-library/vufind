@@ -133,6 +133,9 @@ header {
   .dropdown-menu {
     background: #670000;
   }
+  :focus {
+    outline: 2px dotted #fff !important;
+  }
 }
 
 .search.container.navbar {
@@ -180,6 +183,9 @@ footer {
     @media (min-width: 768px) {
       padding-bottom: 0;
     }
+  }
+  :focus {
+    outline: 2px dotted #fff !important;
   }
 }
 
@@ -264,6 +270,11 @@ footer {
             display: none;
         }
     }
+}
+
+#advSearchForm h1 {
+    font-size: 23px;
+    font-weight: normal;
 }
 
 .active-filters .filters .filters-term {

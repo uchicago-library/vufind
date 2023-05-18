@@ -157,6 +157,22 @@ function getAlert(){
     });
 }
 
+/*
+ * ADA fix: override setupJumpMenus in themes/bootstrap3/js/common.js
+ */
+function setupJumpMenus(_container) {
+  var container = _container || $('body');
+  var select = container.find('select.jumpMenu');
+  var option = select.find('option');
+  option.click(function jumpMenu(){ $(this).parent().parent('form').submit(); });
+  select.on('keypress', function(event) {
+    // Enter key
+    if (event.keyCode == 13) {
+      $(this).parent('form').submit();
+    }
+  });
+}
+
 $(document).ready(function() {
   // Expand and collapse of No-CNet-ID login, when the page is
   $('#login-toggle').click(function() {
@@ -176,6 +192,25 @@ $(document).ready(function() {
 
   // Better RSS icon
   $('.fa-bell').addClass('fa-rss').removeClass('fa-bell');
+
+  // ADA fix
+  let ash1 = $('#advSearchForm .mainbody .clearfix > h2.pull-left');
+  let asht = ash1.text();
+  ash1.replaceWith( '<h1 class="pull-left flip">' + asht + '</h1>');
+
+  // ADA fix
+  $('.solr-adv-facet .form-control').on('keydown', function(event) {
+    // Enter key
+    if (event.keyCode == 13) {
+      event.preventDefault();
+    }
+  });
+  $('.solr-facets legend').after('<p class="sr-only">Press enter to select an option</p>');
+
+  // ADA fix
+  $('.facet-group span.text').click(function(e) {
+    $(this).parent().parent().parent().find('button').focus();
+  });
 
   /*** Maplookup service link ***/
   $('.maplookup').each(function() {

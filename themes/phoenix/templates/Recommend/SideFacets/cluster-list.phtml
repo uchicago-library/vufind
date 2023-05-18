@@ -1,0 +1,62 @@
+<?php ### UChicago customization ### ?>
+   <?php $dirtyTxt = $this->escapeHtmlAttr($this->title) ?>
+   <?php $cleanTxt = str_replace(['-first'], '', str_replace(['_'], ' ', $dirtyTxt)) ?>
+   <?php $moreTxt = $this->transEsc('more') . " {$cleanTxt}s" ?> 
+   <?php $seeAllTxt = $this->transEsc('see all') . " {$cleanTxt}s" ?>
+   <?php $seeFewerTxt = 'fewer' . " {$cleanTxt}s" ?>
+<?php ### ./UChicago customization ### ?>
+<?php $idAndClass = 'id="more-narrowGroupHidden-' . $this->escapeHtmlAttr($this->title) . '" class="facet narrow-toggle more-facets"'; ?>
+<?php $moreClass = 'narrowGroupHidden-' . $this->escapeHtmlAttr($this->title) . ' hidden'; ?>
+<?php foreach ($this->cluster['list'] as $i => $thisFacet): ?>
+  <?php if ($i == $this->facets_before_more): ?>
+    <?php if ($facetLightbox = $this->options->getFacetListAction()): ?>
+      <?php $moreUrl = $this->url($facetLightbox) . $results->getUrlQuery()->getParams() . '&amp;facet=' . $this->title . '&amp;facetop=' . $thisFacet['operator'] . '&amp;facetexclude=' . ($this->allowExclude ? 1 : 0); ?>
+    <?php else: ?>
+      <?php $moreUrl = '#'; ?>
+    <?php endif; ?>
+    <?php if (($this->showMoreInLightbox && $this->showMoreInLightbox !== 'more') && $facetLightbox): ?>
+      <a <?=$idAndClass ?> data-lightbox href="<?=$moreUrl ?>" rel="nofollow">
+        <span class="text"><?=$this->transEsc('more')?> ...</span>
+      </a>
+      <?php break; ?>
+    <?php endif; ?>
+    <a <?=$idAndClass ?> href="<?=$moreUrl ?>" data-title="<?=$this->escapeHtmlAttr($this->title) ?>" rel="nofollow">
+      <?php ### UChicago customization ### ?>
+      <span class="text"><?=$moreTxt?> ...</span>
+      <?php ### ./UChicago customization ### ?>
+    </a>
+  <?php endif; ?>
+  <?=$this->render('Recommend/SideFacets/single-facet.phtml', [
+    'exclude' => $this->allowExclude,
+    'facet' => $thisFacet,
+    'group' => $this->title,
+    'moreClass' => $i >= $this->facets_before_more ? $moreClass : false,
+    'url' => $this->results->getUrlQuery(),
+    'urlBase' => '',
+  ]) ?>
+<?php endforeach; ?>
+<?php if (empty($this->cluster['list'])): ?>
+  <div class="facet"><?=$this->transEsc('facet_list_empty')?></div>
+<?php endif; ?>
+
+<?php /* LESS and SEE MORE links */ ?>
+<?php if (isset($i) && $i >= $this->facets_before_more): ?>
+  <?php if ($this->showMoreInLightbox === 'more' && $facetLightbox = $options->getFacetListAction()): ?>
+    <?php
+      $moreUrl = $this->url($facetLightbox) . $results->getUrlQuery()->getParams() . '&amp;facet=' . $this->title . '&amp;facetop=' . $thisFacet['operator'] . '&amp;facetexclude=' . ($this->allowExclude ? 1 : 0);
+      if (!empty($this->baseUriExtra)) {
+        $moreUrl .= '&amp;baseUriExtra=' . urlencode($this->baseUriExtra);
+      }
+    ?>
+    <a class="facet narrow-toggle <?=$moreClass ?>" data-lightbox href="<?=$moreUrl ?>" rel="nofollow">
+      <?php ### UChicago customization ### ?>
+      <span class="text"><?=$seeAllTxt?> ...</span>
+      <?php ### ./UChicago customization ### ?>
+    </a>
+  <?php endif; ?>
+  <a class="facet narrow-toggle <?=$moreClass ?> less-facets" href="#" data-title="<?=$this->escapeHtmlAttr($this->title) ?>">
+    <?php ### UChicago customization ### ?>
+    <span class="text"><?=$seeFewerTxt?> ...</span>
+    <?php ### ./UChicago customization ### ?>
+  </a>
+<?php endif; ?>
