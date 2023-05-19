@@ -212,6 +212,15 @@ $(document).ready(function() {
     $(this).parent().parent().parent().find('button').focus();
   });
 
+  // ADA fix
+  $('.searchForm_type').change(function() {
+     $('.searchForm_type option').each(function() {
+        $(this).removeAttr('selected');
+     });
+    let current = $(this).parent().parent().find(':selected');
+    current.attr('selected', 'selected');
+  });
+
   /*** Maplookup service link ***/
   $('.maplookup').each(function() {
     var loc = $(this).data('location');
