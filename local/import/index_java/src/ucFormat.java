@@ -174,7 +174,7 @@ public class ucFormat
 
                                         if (strOnline.equals("Online"))
                                         {
-                                                result.add("Eresource"); System.out.println("~~~~I'm HERE #1"); 
+                                                result.add("Eresource");  
                                         } 
                                 } 
                         }
