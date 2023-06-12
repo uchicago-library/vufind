@@ -170,11 +170,11 @@ public class ucFormat
                                 if(fld928.getSubfield('l') !=null)
                                 {
 
-                                        String str = fld928.getSubfield('l').getData();
+                                        String strOnline = fld928.getSubfield('l').getData();
 
-                                        if (str.equals("Online"))
+                                        if (strOnline.equals("Online"))
                                         {
-                                                result.add("Eresource"); 
+                                                result.add("Eresource"); System.out.println("~~~~I'm HERE #1"); 
                                         } 
                                 } 
                         }
