@@ -270,14 +270,21 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
             $field = $data[0];
             $subfields = $data[1];
             $data = $this->getFieldArray($field, $subfields);
-            $altData = $this->getMarcReader()->getLinkedFieldsSubFields('880', $field, $subfields); 
+            $linkData = $data;
+            $altData = $this->getMarcReader()->getLinkedFieldsSubFields('880', $field, $subfields);
+
+            if ($field == '700' || $field == '730') {
+                $linkSubFields = array_diff($subfields, ['i']);
+                $linkData = $this->getFieldArray($field, $linkSubFields);
+            }
+
             if ($field == '700' || $field == '710' || $field == '711') {
                 $t = $this->getFieldArray($field, ['t']);
                 if (!empty($t)) {
-                    array_push($retval, ['displayData' => $data, 'linkData' => $data, 'altData' => $altData]);
+                    array_push($retval, ['displayData' => $data, 'linkData' => $linkData, 'altData' => $altData]);
                 }
             } else {
-                array_push($retval, ['displayData' => $data, 'linkData' => $data, 'altData' => $altData]);
+                array_push($retval, ['displayData' => $data, 'linkData' => $linkData, 'altData' => $altData]);
             }
         }
         return $retval;
@@ -572,6 +579,7 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
     public function getUCNotes()
     {
         $fields = [
+            ['348', ['c']],
             ['500', ['a']],
             ['501', ['a']],
             ['502', ['a']],
@@ -723,5 +731,12 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
         $field = '086';
         $subfields = ['a', 'z'];
         return $this->simpleParse($field, $subfields);
+    }
+
+    public function getUCTitleFormDates()
+    {
+        $field = '245';
+        $subfields = ['k', 'f'];
+        return strip_tags($this->simpleParse($field, $subfields));
     }
 }
