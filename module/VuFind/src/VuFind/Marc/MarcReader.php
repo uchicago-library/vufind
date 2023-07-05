@@ -4,7 +4,7 @@
  *
  * PHP version 7
  *
- * Copyright (C) The National Library of Finland 2020-2021.
+ * Copyright (C) The National Library of Finland 2020-2022.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2,
@@ -72,6 +72,13 @@ class MarcReader
     protected $fields;
 
     /**
+     * Any warnings encountered when parsing a record
+     *
+     * @var array
+     */
+    protected $warnings;
+
+    /**
      * Constructor
      *
      * @param string $data MARC record in MARCXML or ISO2709 format
@@ -93,9 +100,13 @@ class MarcReader
     {
         $leader = null;
         $valid = false;
+        $this->warnings = [];
         foreach ($this->serializations as $serialization) {
             if ($serialization::canParse($data)) {
-                [$leader, $this->fields] = $serialization::fromString($data);
+                $result = $serialization::fromString($data);
+                $leader = $result[0];
+                $this->fields = $result[1];
+                $this->warnings = $result[2] ?? [];
                 $valid = true;
                 break;
             }
@@ -248,7 +259,9 @@ class MarcReader
      *
      * @return array
      */
-    public function getFieldsSubfields(string $fieldTag, array $subfieldCodes,
+    public function getFieldsSubfields(
+        string $fieldTag,
+        array $subfieldCodes,
         ?string $separator = ' '
     ): array {
         $result = [];
@@ -290,8 +303,11 @@ class MarcReader
      *
      * @return array
      */
-    public function getLinkedField(string $fieldTag, string $linkedFieldTag,
-        string $occurrence = '', ?array $subfieldCodes = null
+    public function getLinkedField(
+        string $fieldTag,
+        string $linkedFieldTag,
+        string $occurrence = '',
+        ?array $subfieldCodes = null
     ): array {
         $results
             = $this->getLinkedFields($fieldTag, $linkedFieldTag, $subfieldCodes);
@@ -313,7 +329,9 @@ class MarcReader
      *
      * @return array
      */
-    public function getLinkedFields(string $fieldTag, string $linkedFieldTag,
+    public function getLinkedFields(
+        string $fieldTag,
+        string $linkedFieldTag,
         ?array $subfieldCodes = null
     ): array {
         $result = [];
@@ -370,8 +388,11 @@ class MarcReader
      *
      * @return array
      */
-    public function getLinkedFieldsSubfields(string $fieldTag,
-        string $linkedFieldTag, array $subfieldCodes, ?string $separator = ' '
+    public function getLinkedFieldsSubfields(
+        string $fieldTag,
+        string $linkedFieldTag,
+        array $subfieldCodes,
+        ?string $separator = ' '
     ): array {
         $result = [];
         foreach ($this->getLinkedFields($fieldTag, $linkedFieldTag, $subfieldCodes)
@@ -419,6 +440,16 @@ class MarcReader
     }
 
     /**
+     * Get any warnings encountered when parsing a record
+     *
+     * @return array
+     */
+    public function getWarnings(): array
+    {
+        return $this->warnings;
+    }
+
+    /**
      * Return first subfield with the given code in the internal MARC field
      *
      * @param array  $field        Internal MARC field
@@ -426,7 +457,9 @@ class MarcReader
      *
      * @return string
      */
-    protected function getInternalSubfield(array $field, string $subfieldCode
+    protected function getInternalSubfield(
+        array $field,
+        string $subfieldCode
     ): string {
         foreach ($field['s'] ?? [] as $subfield) {
             if (key($subfield) == $subfieldCode) {

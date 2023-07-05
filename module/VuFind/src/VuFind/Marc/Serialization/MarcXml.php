@@ -151,7 +151,12 @@ class MarcXml implements SerializationInterface
         $xml->endElement();
         $xml->endDocument();
 
-        return $xml->outputMemory(true);
+        // Strip illegal characters from XML:
+        return preg_replace(
+            '/[^\x{0009}\x{000a}\x{000d}\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}]+/u',
+            '',
+            $xml->outputMemory(true)
+        );
     }
 
     /**
@@ -168,7 +173,9 @@ class MarcXml implements SerializationInterface
         try {
             libxml_clear_errors();
             $doc = \simplexml_load_string(
-                $xml, \SimpleXMLElement::class, LIBXML_COMPACT
+                $xml,
+                \SimpleXMLElement::class,
+                LIBXML_COMPACT
             );
             if (false === $doc) {
                 $errors = libxml_get_errors();
