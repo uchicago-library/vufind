@@ -58,75 +58,6 @@ class Folio extends \VuFind\ILS\Driver\Folio
     }
 
 
-
-    /**
-     * THIS SHOULD GO AWAY WHEN WE UPGRADE
-     * This method queries the ILS for a patron's current fines
-     *
-     *     Input: Patron array returned by patronLogin method
-     *     Output: Returns an array of associative arrays, one for each fine
-     * associated with the specified account. Each associative array contains
-     * these keys:
-     *         amount - The total amount of the fine IN PENNIES. Be sure to adjust
-     * decimal points appropriately (i.e. for a $1.00 fine, amount should be 100).
-     *         checkout - A string representing the date when the item was
-     * checked out.
-     *         fine - A string describing the reason for the fine
-     * (i.e. “Overdue”, “Long Overdue”).
-     *         balance - The unpaid portion of the fine IN PENNIES.
-     *         createdate – A string representing the date when the fine was accrued
-     * (optional)
-     *         duedate - A string representing the date when the item was due.
-     *         id - The bibliographic ID of the record involved in the fine.
-     *         source - The search backend from which the record may be retrieved
-     * (optional - defaults to Solr). Introduced in VuFind 2.4.
-     *
-     */
-    public function getMyFines($patron)
-    {
-        $query = ['query' => 'userId==' . $patron['id'] . ' and status.name==Open'];
-        $fines = [];
-        foreach ($this->getPagedResults(
-            'accounts',
-            '/accounts',
-            $query
-        ) as $fine) {
-            $date = date_create($fine->metadata->createdDate);
-            $title = $fine->title ?? null;
-            $bibId = isset($fine->instanceId)
-                ? $this->getBibId($fine->instanceId)
-                : null;
-            $fines[] = [
-                'id' => $bibId,
-                'amount' => $fine->amount * 100,
-                'balance' => $fine->remaining * 100,
-                'status' => $fine->paymentStatus->name,
-                'type' => $fine->feeFineType,
-                'title' => $title,
-                'createdate' => date_format($date, "j M Y")
-            ];
-        }
-        return $fines;
-    }
-
-
-    /**
-     * THIS SHOULD GO AWAY WHEN WE UPGRADE.
-     * Convert a FOLIO date string to a DateTime object.
-     *
-     * @param string $str FOLIO date string
-     *
-     * @return DateTime
-     */
-    protected function getDateTimeFromString(string $str): DateTime
-    {
-        $dateTime = new DateTime($str, new DateTimeZone('UTC'));
-        $localTimezone = (new DateTime)->getTimezone();
-        $dateTime->setTimezone($localTimezone);
-        return $dateTime;
-    }
-
-
     /**
      * Get loan data by item ID. There should only be 1 result
      * but we loop over a generator.
@@ -210,7 +141,9 @@ class Folio extends \VuFind\ILS\Driver\Folio
         $isSerial = count(array_intersect($serialIDs, $instance->statisticalCodeIds)) > 0;
 
         foreach ($this->getPagedResults(
-            'holdingsRecords', '/holdings-storage/holdings', $query
+            'holdingsRecords',
+            '/holdings-storage/holdings',
+            $query
         ) as $holding) {
             $query = [
                 'query' => '(holdingsRecordId=="' . $holding->id
@@ -276,7 +209,10 @@ class Folio extends \VuFind\ILS\Driver\Folio
             }
 
             foreach ($this->getPagedResults(
-                'items', '/item-storage/items', $query, $holdingData
+                'items',
+                '/item-storage/items',
+                $query,
+                $holdingData
             ) as $item) {
                 $itemNotes = array_filter(
                     array_map($notesFormatter, $item->notes ?? [])
@@ -363,6 +299,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
         }
         return $items;
     }
+
 
     /**
      * Get the unbound location for purchase history
@@ -510,10 +447,12 @@ class Folio extends \VuFind\ILS\Driver\Folio
         $transactions = [];
         $bib = null; // null bib for items we're not currently showing on the page.
         foreach ($this->getPagedResults(
-            'loans', '/circulation/loans', $query
+            'loans',
+            '/circulation/loans',
+            $query
         ) as $trans) {
             $dueStatus = false;
-            $date = $this->getDateTimeFromString($trans->dueDate);
+            $date = date_create($trans->dueDate);
             $dueDateTimestamp = $date->getTimestamp();
 
             $authors = implode(', ', array_map(function($c) {
@@ -679,7 +618,9 @@ class Folio extends \VuFind\ILS\Driver\Folio
         ];
         $holds = [];
         foreach ($this->getPagedResults(
-            'requests', '/request-storage/requests', $query
+            'requests',
+            '/request-storage/requests',
+            $query
         ) as $hold) {
             $pickupServicePoint = '';
             $pickupServicePointId = $hold->pickupServicePointId;
@@ -712,9 +653,6 @@ class Folio extends \VuFind\ILS\Driver\Folio
     }
 
     /**
-     * TEMPORARY: This should only be needed until we upgrade to a version
-     * of VuFind with the fixes for the Folio Lotus release.
-     *
      * Attempts to place a hold or recall on a particular item and returns
      * an array with result details.
      *

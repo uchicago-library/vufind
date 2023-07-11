@@ -27,7 +27,6 @@
  */
 namespace UChicago\Controller;
 
-use Laminas\Stdlib\Parameters;
 use Laminas\View\Model\ViewModel;
 use VuFind\Exception\Auth as AuthException;
 use VuFind\Exception\AuthEmailNotVerified as AuthEmailNotVerifiedException;
@@ -35,8 +34,11 @@ use VuFind\Exception\AuthInProgress as AuthInProgressException;
 use VuFind\Exception\Forbidden as ForbiddenException;
 use VuFind\Exception\ILS as ILSException;
 use VuFind\Exception\ListPermission as ListPermissionException;
+use VuFind\Exception\LoginRequired as LoginRequiredException;
 use VuFind\Exception\Mail as MailException;
+use VuFind\Exception\MissingField as MissingFieldException;
 use VuFind\ILS\PaginationHelper;
+use VuFind\Mailer\Mailer;
 use VuFind\Search\RecommendListener;
 
 /**
@@ -116,6 +118,7 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
             $config->Catalog->checked_out_page_size ?? 50,
             $catalog->checkFunction('getMyTransactions', $patron)
         );
+        ### UChicago customization ###
         $currSort = $this->params()->fromQuery('sort');
         $pageOptions['ilsParams']['sort'] = $currSort;
         $sortOptions = [
@@ -131,14 +134,19 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
                 'selected' => ($sortName == $currSort)
             ];
         }
+        ### ./UChicago customization ###
 
         // Get checked out item details:
         $result = $catalog->getMyTransactions($patron, $pageOptions['ilsParams']);
+        ### UChicago customization ###
         $automatedBlocks = $catalog->getAutomatedBlocks($patron['id']);
+        ### ./UChicago customization ###
 
         // Build paginator if needed:
         $paginator = $this->getPaginationHelper()->getPaginator(
-            $pageOptions, $result['count'], $result['records']
+            $pageOptions,
+            $result['count'],
+            $result['records']
         );
         if ($paginator) {
             $pageStart = $paginator->getAbsoluteItemNumber(1) - 1;
@@ -166,7 +174,9 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         foreach ($result['records'] as $i => $current) {
             // Add renewal details if appropriate:
             $current = $this->renewals()->addRenewDetails(
-                $catalog, $current, $renewStatus
+                $catalog,
+                $current,
+                $renewStatus
             );
             if ($renewStatus && !isset($current['renew_link'])
                 && $current['renewable']
@@ -198,7 +208,9 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         }
 
         $transactions = $this->ilsRecords()->getDrivers($driversNeeded);
+        ### UChicago customization ###
         $hasRecalls = $this->hasRecallsUC($transactions);
+        ### ./UChicago customization ###
 
         $displayItemBarcode
             = !empty($config->Catalog->display_checked_out_item_barcode);
@@ -206,13 +218,24 @@ class MyResearchController extends \VuFind\Controller\MyResearchController
         $ilsPaging = $pageOptions['ilsPaging'];
         $sortList = $pageOptions['sortList'];
         $params = $pageOptions['ilsParams'];
+        ### UChicago customization ###
         return $this->createViewModel(
             compact(
-                'transactions', 'renewForm', 'renewResult', 'paginator', 'ilsPaging',
-                'hiddenTransactions', 'displayItemBarcode', 'sortList', 'params',
-                'accountStatus', 'hasRecalls', 'automatedBlocks'
+                'transactions',
+                'renewForm',
+                'renewResult',
+                'paginator',
+                'ilsPaging',
+                'hiddenTransactions',
+                'displayItemBarcode',
+                'sortList',
+                'params',
+                'accountStatus',
+                'hasRecalls',
+                'automatedBlocks'
             )
         );
+        ### ./UChicago customization ###
     }
 
     /**

@@ -62,7 +62,9 @@ class RecordDataFormatterFactory extends \VuFind\View\Helper\Root\RecordDataForm
      *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function __invoke(ContainerInterface $container, $requestedName,
+    public function __invoke(
+        ContainerInterface $container,
+        $requestedName,
         array $options = null
     ) {
         if (!empty($options)) {
@@ -70,10 +72,12 @@ class RecordDataFormatterFactory extends \VuFind\View\Helper\Root\RecordDataForm
         }
         $helper = new $requestedName();
         $helper->setDefaults(
-            'collection-info', [$this, 'getDefaultCollectionInfoSpecs']
+            'collection-info',
+            [$this, 'getDefaultCollectionInfoSpecs']
         );
         $helper->setDefaults(
-            'collection-record', [$this, 'getDefaultCollectionRecordSpecs']
+            'collection-record',
+            [$this, 'getDefaultCollectionRecordSpecs']
         );
         $helper->setDefaults('core', [$this, 'getDefaultCoreSpecs']);
         $helper->setDefaults('hidden', [$this, 'getDefaultHiddenSpecs']);
@@ -139,43 +143,61 @@ class RecordDataFormatterFactory extends \VuFind\View\Helper\Root\RecordDataForm
     {
         $spec = new \VuFind\View\Helper\Root\RecordDataFormatter\SpecBuilder();
         $spec->setMultiLine(
-            'Authors', 'getDeduplicatedAuthors', $this->getAuthorFunction()
+            'Authors',
+            'getDeduplicatedAuthors',
+            $this->getAuthorFunction()
         );
         $spec->setLine('Summary', 'getSummary');
         $spec->setLine(
-            'Format', 'getFormats', 'RecordHelper',
+            'Format',
+            'getFormats',
+            'RecordHelper',
             ['helperMethod' => 'getFormatList']
         );
         $spec->setLine(
-            'Language', 'getLanguages', null,
+            'Language',
+            'getLanguages',
+            null,
             ['itemPrefix' => '<span property="availableLanguage" typeof="Language">'
                            . '<span property="name">',
              'itemSuffix' => '</span></span>']
         );
         $spec->setTemplateLine(
-            'Published', 'getPublicationDetails', 'data-publicationDetails.phtml'
+            'Published',
+            'getPublicationDetails',
+            'data-publicationDetails.phtml'
         );
         $spec->setLine(
-            'Edition', 'getEdition', null,
+            'Edition',
+            'getEdition',
+            null,
             ['itemPrefix' => '<span property="bookEdition">',
              'itemSuffix' => '</span>']
         );
         $spec->setTemplateLine('Series', 'getSeries', 'data-series.phtml');
         $spec->setTemplateLine(
-            'Subjects', 'getAllSubjectHeadings', 'data-allSubjectHeadings.phtml'
+            'Subjects',
+            'getAllSubjectHeadings',
+            'data-allSubjectHeadings.phtml'
         );
         $spec->setTemplateLine('Online Access', true, 'data-onlineAccess.phtml');
         $spec->setTemplateLine(
-            'Related Items', 'getAllRecordLinks', 'data-allRecordLinks.phtml'
+            'Related Items',
+            'getAllRecordLinks',
+            'data-allRecordLinks.phtml'
         );
         $spec->setLine('Notes', 'getGeneralNotes');
         $spec->setLine('Production Credits', 'getProductionCredits');
         $spec->setLine(
-            'ISBN', 'getISBNs', null,
+            'ISBN',
+            'getISBNs',
+            null,
             ['itemPrefix' => '<span property="isbn">', 'itemSuffix' => '</span>']
         );
         $spec->setLine(
-            'ISSN', 'getISSNs', null,
+            'ISSN',
+            'getISSNs',
+            null,
             ['itemPrefix' => '<span property="issn">', 'itemSuffix' => '</span>']
         );
         return $spec->getArray();
@@ -191,16 +213,22 @@ class RecordDataFormatterFactory extends \VuFind\View\Helper\Root\RecordDataForm
         $spec = new \VuFind\View\Helper\Root\RecordDataFormatter\SpecBuilder();
         $spec->setLine('Summary', 'getSummary');
         $spec->setMultiLine(
-            'Authors', 'getDeduplicatedAuthors', $this->getAuthorFunction()
+            'Authors',
+            'getDeduplicatedAuthors',
+            $this->getAuthorFunction()
         );
         $spec->setLine(
-            'Language', 'getLanguages', null,
+            'Language',
+            'getLanguages',
+            null,
             ['itemPrefix' => '<span property="availableLanguage" typeof="Language">'
                            . '<span property="name">',
              'itemSuffix' => '</span></span>']
         );
         $spec->setLine(
-            'Format', 'getFormats', 'RecordHelper',
+            'Format',
+            'getFormats',
+            'RecordHelper',
             ['helperMethod' => 'getFormatList']
         );
         $spec->setLine('Access', 'getAccessRestrictions');
@@ -417,15 +445,21 @@ class RecordDataFormatterFactory extends \VuFind\View\Helper\Root\RecordDataForm
         $spec->setLine('Production Credits', 'getProductionCredits');
         $spec->setLine('Bibliography', 'getBibliographyNotes');
         $spec->setLine(
-            'ISBN', 'getISBNs', null,
+            'ISBN',
+            'getISBNs',
+            null,
             ['itemPrefix' => '<span property="isbn">', 'itemSuffix' => '</span>']
         );
         $spec->setLine(
-            'ISSN', 'getISSNs', null,
+            'ISSN',
+            'getISSNs',
+            null,
             ['itemPrefix' => '<span property="issn">', 'itemSuffix' => '</span>']
         );
         $spec->setLine(
-            'DOI', 'getCleanDOI', null,
+            'DOI',
+            'getCleanDOI',
+            null,
             ['itemPrefix' => '<span property="identifier">',
              'itemSuffix' => '</span>']
         );

@@ -4,14 +4,6 @@ namespace UChicago\RecordDriver;
 
 class SolrMarc extends \VuFind\RecordDriver\SolrMarc
 {
-    ### UChicago customization ###
-    // Must exist to override \VuFind\Marc\Serialization\Iso2709
-    // Added to allow MARC records over 99,999 characters to display
-    // This can probably be eliminated after upgrade to VuFind 9.0 along with overrides
-    // in UChicago/Marc/MarcReader.php and UChicago/Marc/Serialization/Iso2709.php
-    protected $marcReaderClass = \UChicago\Marc\MarcReader::class;
-    ### ./UChicago customization ###
-
     /**
      * UChicago customization: this disables the summaries that are displayed
      * in the description tab and under the title on the full record page.
@@ -214,21 +206,29 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
             $subfields = $multi[1];
             $data = $this->getFieldArray($field, $subfields, true, ' -- ');
             $i2s = [];
-            $ffs = $this->getMarcRecord()->getFields($field);
-            if (!empty($ffs)) {
-                foreach ($ffs as $i2) {
-                    $s2 = $i2->getSubfield('2');
+            $fieldData = $this->getMarcReader()->getFields($field);
+            if (!empty($fieldData)) {
+                 foreach ($fieldData as $d) {
+                    $i2 = $d['i2'];
+                    foreach ($d['subfields'] as $subfield) {
+                        $code = $subfield['code'];
+                        $s2 = false;
+                        if ($code === '2') {
+                            $s2 = $subfield['data'];
+                            break; // yes?
+                        }
+                    }
                     if ($s2 != false) {
-                        $heading = $s2->getData();
-                        if (strtolower($heading) === 'fast' && $i2->getIndicator(2) === '7') {
+                        $heading = $s2;
+                        if (strtolower($heading) === 'fast' && $i2 === '7') {
                             array_push($i2s, true);
                         } else {
                             array_push($i2s, false);
                         }
                     } else {
                         array_push($i2s, false);
-                    }
-                }
+                    }                   
+                 }               
             }
             $linkData = $this->getFieldArray($field, $subfields, true, '--');
             $altData = $this->getMarcReader()->getLinkedFieldsSubFields('880', $field, $subfields);

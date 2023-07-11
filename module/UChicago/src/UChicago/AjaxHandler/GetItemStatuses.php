@@ -71,7 +71,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
      *
      * @return array                    Summarized availability information
      */
-    protected function getItemStatus($record, $messages, $locationSetting,
+    protected function getItemStatus(
+        $record,
+        $messages,
+        $locationSetting,
         $callnumberSetting
     ) {
         // Summarize call number, location and availability info across all items:
@@ -92,7 +95,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             }
             // Store call number/location info:
             $callNumbers[] = $this->formatCallNo(
-                $info['callnumber_prefix'],
+                $info['callnumber_prefix'] ?? '',
                 $info['callnumber']
             );
 
@@ -109,17 +112,23 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
         }
 
         $callnumberHandler = $this->getCallnumberHandler(
-            $callNumbers, $callnumberSetting
+            $callNumbers,
+            $callnumberSetting
         );
 
         // Determine call number string based on findings:
         $callNumber = $this->pickValue(
-            $callNumbers, $callnumberSetting, 'Multiple Call Numbers'
+            $callNumbers,
+            $callnumberSetting,
+            'Multiple Call Numbers'
         );
 
         // Determine location string based on findings:
         $location = $this->pickValue(
-            $locations, $locationSetting, 'Multiple Locations', 'location_'
+            $locations,
+            $locationSetting,
+            'Multiple Locations',
+            'location_'
         );
 
         if (!empty($services)) {
@@ -214,18 +223,24 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                         ->getItemStatusError($record, $messages['unknown']);
                 } elseif ($locationSetting === 'group') {
                     $current = $this->getItemStatusGroup(
-                        $record, $messages, $callnumberSetting
+                        $record,
+                        $messages,
+                        $callnumberSetting
                     );
                 } else {
                     $current = $this->getItemStatus(
-                        $record, $messages, $locationSetting, $callnumberSetting
+                        $record,
+                        $messages,
+                        $locationSetting,
+                        $callnumberSetting
                     );
                 }
                 // If a full status display has been requested and no errors were
                 // encountered, append the HTML:
                 if ($showFullStatus && empty($record[0]['error'])) {
                     $current['full_status'] = $this->renderer->render(
-                        'ajax/status-full.phtml', [
+                        'ajax/status-full.phtml',
+                        [
                             'statusItems' => $record,
                             'callnumberHandler' => $this->getCallnumberHandler()
                          ]

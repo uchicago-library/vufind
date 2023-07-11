@@ -29,6 +29,7 @@
  */
 namespace UChicago\Controller;
 
+use Laminas\Cache\Storage\StorageInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use VuFind\Exception\ILS as ILSException;
 use VuFind\Validator\Csrf;
@@ -110,7 +111,10 @@ class HoldsController extends \VuFind\Controller\HoldsController
         foreach ($result as $current) {
             // Add cancel details if appropriate:
             $current = $this->holds()->addCancelDetails(
-                $catalog, $current, $cancelStatus, $patron
+                $catalog,
+                $current,
+                $cancelStatus,
+                $patron
             );
             if ($cancelStatus && $cancelStatus['function'] !== 'getCancelHoldLink'
                 && isset($current['cancel_details'])
@@ -120,23 +124,33 @@ class HoldsController extends \VuFind\Controller\HoldsController
             }
 
             // Add update details if appropriate
-            if (empty($holdConfig['updateFields'])) {
                 if (isset($current['updateDetails'])) {
-                    unset($current['updateDetails']);
-                }
-            } elseif (isset($current['updateDetails'])
-                && '' !== $current['updateDetails']
+                if (empty($holdConfig['updateFields'])
+                    || '' === $current['updateDetails']
             ) {
+                    unset($current['updateDetails']);
+                } else {
                 $view->updateForm = true;
                 $this->holds()->rememberValidId($current['updateDetails']);
+            }
             }
 
             $driversNeeded[] = $current;
         }
+        // Cache the current list of requests for editing:
+        $this->putCachedData(
+            $this->getCacheId($patron, 'holds'),
+            $driversNeeded
+        );
 
         // Get List of PickUp Libraries based on patron's home library
         try {
+            $pickupCacheId = $this->getCacheId($patron, 'pickup');
+            $view->pickup = $this->getCachedData($pickupCacheId);
+            if (null === $view->pickup) {
             $view->pickup = $catalog->getPickUpLocations($patron);
+                $this->putCachedData($pickupCacheId, $view->pickup);
+            }
         } catch (\Exception $e) {
             // Do nothing; if we're unable to load information about pickup
             // locations, they are not supported and we should ignore them.

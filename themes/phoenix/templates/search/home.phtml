@@ -1,5 +1,24 @@
+<?php
+  // Set page title.
+  $this->headTitle($this->translate('Search Home'));
+
+  // Disable top search box -- this page has a special layout.
+  $this->layout()->searchbox = false;
+
+  // Set default value if necessary:
+  if (!isset($this->searchClassId)) {
+    $this->searchClassId = 'Solr';
+  }
+
+  $this->layout()->breadcrumbs = false;
+?>
+
 <div class="searchHomeContent">
+  <? ### UChicago customization ### ?>
   <div class="search-hero" role="search">
     <?php require(__DIR__ . '/../../../bootstrap3/templates/search/home.phtml'); ?>
   </div>
+  <? ### ./UChicago customization ### ?>
 </div>
+
+<?=implode('', array_map([$this, 'contentBlock'], $blocks ?? []))?>

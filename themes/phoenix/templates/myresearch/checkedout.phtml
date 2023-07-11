@@ -1,12 +1,12 @@
 <?php
-// Set up page title:
-$this->headTitle($this->translate('Checked Out Items'));
+  // Set up page title:
+  $this->headTitle($this->translate('Checked Out Items'));
 
-// Set up breadcrumbs:
-$this->layout()->breadcrumbs = '<li><a href="' . $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') . '</a></li> <li class="active">' . $this->transEsc('Checked Out Items') . '</li>';
+  // Set up breadcrumbs:
+  $this->layout()->breadcrumbs = '<li><a href="' . $this->url('myresearch-home') . '">' . $this->transEsc('Your Account') . '</a></li> <li class="active">' . $this->transEsc('Checked Out Items') . '</li>';
 
-// Check if "Renew All" button can be displayed:
-$renewAll = !$this->ilsPaging || !$paginator;
+  // Check if "Renew All" button can be displayed:
+  $renewAll = !$this->ilsPaging || !$paginator;
 ?>
 
 <a class="search-filter-toggle visible-xs" href="#myresearch-sidebar" data-toggle="offcanvas" title="Expand Sidebar">
@@ -38,10 +38,8 @@ $renewAll = !$this->ilsPaging || !$paginator;
       <?php if ($paginator): ?>
         <div class="search-stats">
           <?php
-            $end = min(
-              $paginator->getAbsoluteItemNumber($paginator->getItemCountPerPage()),
-              $paginator->getTotalItemCount()
-            );
+            $abs = $paginator->getAbsoluteItemNumber($paginator->getItemCountPerPage());
+            $end = min($abs, $paginator->getTotalItemCount());
             $transParams = [
               '%%start%%' => $this->localizedNumber($paginator->getAbsoluteItemNumber(1)),
               '%%end%%' => $this->localizedNumber($end),
@@ -60,6 +58,7 @@ $renewAll = !$this->ilsPaging || !$paginator;
       <input type="hidden" value="<?=$this->escapeHtmlAttr($this->auth()->getManager()->getCsrfHash())?>" name="csrf"/>
       <div class="toolbar">
         <div class="checkbox">
+          <? ### UChicago customization ### ?>
           <!--<label>
             <input type="checkbox" name="selectAll" class="checkbox-select-all"/>
             <?//=$this->transEsc('select_page')?>
@@ -68,6 +67,7 @@ $renewAll = !$this->ilsPaging || !$paginator;
           <?php if ($renewAll): ?>
             <!--<input type="submit" class="btn btn-default" id="renewAll" name="renewAll" value="<?=$this->transEscAttr('renew_all')?>" />-->
           <?php endif; ?>
+          <? ### ./UChicago customization ### ?>
         </div>
       </div>
     <?php endif; ?>
@@ -109,7 +109,7 @@ $renewAll = !$this->ilsPaging || !$paginator;
           <?php endif; ?>
 
           <?php
-            $coverDetails = $this->record($resource)->getCoverDetails('checkedout', 'small', $this->recordLink()->getUrl($resource));
+            $coverDetails = $this->record($resource)->getCoverDetails('checkedout', 'small', $this->recordLinker()->getUrl($resource));
             ### UChicago customization ###
             if ($ilsDetails['location'] == 'Interlibrary Loan') {
               $coverDetails = $this->record($resource)->getCoverDetails('checkedout', 'small', false);
@@ -136,7 +136,7 @@ $renewAll = !$this->ilsPaging || !$paginator;
                 if (is_a($resource, 'VuFind\\RecordDriver\\SolrDefault') && !is_a($resource, 'VuFind\\RecordDriver\\Missing')) {
                   $title = $resource->getTitle();
                   $title = empty($title) ? $this->transEsc('Title not available') : $this->escapeHtml($title);
-                  echo '<a href="' . $this->recordLink()->getUrl($resource) .
+                  echo '<a href="' . $this->escapeHtmlAttr($this->recordLinker()->getUrl($resource)) .
                     '" class="title">' . $title . '</a>';
                 } elseif (isset($ilsDetails['title']) && !empty($ilsDetails['title'])){
                   // If the record is not available in Solr, perhaps the ILS driver sent us a title we can show...

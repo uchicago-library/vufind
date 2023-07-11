@@ -57,14 +57,6 @@ return [
                     'VuFind\\ILS\\Driver\\Folio' => 'UChicago\\ILS\\Driver\\Folio',
                 ]
             ],
-            'recordtab' => [
-                'factories' => [
-                    'UChicago\\RecordTab\\HoldingsILS' => 'VuFind\\RecordTab\\HoldingsILSFactory',
-                ],
-                'aliases' => [
-                    'VuFind\\RecordTab\\HoldingsILS' => 'UChicago\\RecordTab\\HoldingsILS',
-                ],
-            ],
             'ajaxhandler' => [
                 'factories' => [
                     'UChicago\\AjaxHandler\\GetDedupedEholdings' => 'UChicago\\AjaxHandler\\AbstractAjaxHandlerFactory',

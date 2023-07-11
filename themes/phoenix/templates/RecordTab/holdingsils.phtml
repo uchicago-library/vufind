@@ -52,20 +52,22 @@
   <?php if ($account->loginEnabled() && $offlineMode != 'ils-offline'): ?>
     <?php if (!$user): ?>
       <div class="alert alert-info">
-        <a href="<?=$this->recordLink()->getTabUrl($this->driver, 'Holdings', ['login' => 'true', 'catalogLogin' => 'true'])?>" data-lightbox><?=$this->transEsc("hold_login")?></a>
+        <a href="<?=$this->escapeHtmlAttr($this->recordLinker()->getTabUrl($this->driver, 'Holdings', ['login' => 'true', 'catalogLogin' => 'true']))?>" data-lightbox><?=$this->transEsc("hold_login")?></a>
       </div>
     <?php elseif (!$user->cat_username): ?>
       <div class="alert alert-info">
-        <?=$this->translate("hold_profile_html", ['%%url%%' => $this->recordLink()->getTabUrl($this->driver, 'Holdings', ['catalogLogin' => 'true'])])?>
+        <?=$this->translate("hold_profile_html", ['%%url%%' => $this->escapeHtmlAttr($this->recordLinker()->getTabUrl($this->driver, 'Holdings', ['catalogLogin' => 'true']))])?>
       </div>
     <?php endif; ?>
   <?php endif; ?>
 <?php endif; ?>
 <?php $holdingTitleHold = $this->driver->tryMethod('getRealTimeTitleHold'); if (!empty($holdingTitleHold)): ?>
-  <a class="placehold" data-lightbox title="<?=$this->transEscAttr('request_place_text')?>" href="<?=$this->recordLink()->getRequestUrl($holdingTitleHold)?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc('title_hold_place')?></a>
+  <a class="placehold" data-lightbox title="<?=$this->transEscAttr('request_place_text')?>" href="<?=$this->escapeHtmlAttr($this->recordLinker()->getRequestUrl($holdingTitleHold))?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?=$this->transEsc('title_hold_place')?></a>
 <?php endif; ?>
 <?php if (!empty($urls) || $openUrlActive || $doiActive): ?>
+  <? ### UChicago customization ### ?>
   <h2><?=$this->transEsc("Internet")?></h2>
+  <? ### ./UChicago customization ### ?>
   <?php if (!empty($urls)): ?>
     <?php foreach ($urls as $current): ?>
       <a href="<?=$this->escapeHtmlAttr($this->proxyUrl($current['url']))?>"><?=$this->escapeHtml($current['desc'])?></a><br/>
@@ -75,18 +77,20 @@
   <?php if ($doiActive): ?><?=$doi->renderTemplate()?><?php endif; ?>
 <?php endif; ?>
 
-<?php /* UChicago customization */ ?>
+<?php ### ./UChicago customization ### ?>
   <?php if ($isbns || $oclc): ?>
     <div class="e-links holdings-unit holdings-locpanel online" data-isbns='<?=json_encode($isbns)?>' data-oclc-nums='<?=json_encode($oclc)?>' data-online-header="true"></div>
   <? endif; ?>
   <div class="deduped holdings-unit holdings-locpanel online" data-sfx="<?=$sfxNum?>" data-issns="<?=implode(',', $issns)?>" data-bib="<?=$bib?>" data-online-header="true"></div>
-<?php /* ./UChicago customization */ ?>
+<?php ### ./UChicago customization ### ?>
 
 <?php if (!empty($holdings['electronic_holdings'])): ?>
-  <?=$this->context($this)->renderInContext(
+  <?=
+    $this->context($this)->renderInContext(
       'RecordTab/holdingsils/electronic.phtml',
       ['holdings' => $holdings['electronic_holdings']]
-  );?>
+    );
+  ?>
 <?php endif; ?>
 
 <?php foreach ($holdings['holdings'] ?? [] as $holding): ?>
@@ -114,12 +118,13 @@
     <td width="50%">
       <?php foreach ($callNos as $callNo): ?>
         <?php if ($this->callnumberHandler): ?>
+          <? ### UChicago customization ### ?>
           <a href="<?=$this->url('alphabrowse-home') ?>?source=<?=$this->escapeHtmlAttr($this->callnumberHandler) ?>&amp;from=<?=$this->escapeHtmlAttr($callNo['callnumber']) ?>"><?=$this->escapeHtml($callNo['display'])?>
-            <? ### UChicago customization ### ?>
             <?php if (!empty($holding['items'][0]['holding_copy_number'])): ?>
                 <?=' '. $holding['items'][0]['holding_copy_number']?>
             <?php endif; ?>
-            <? ### ./UChicago customization ### ?></a>
+          </a>
+          <? ### ./UChicago customization ### ?>
         <?php else: ?>
           <?=$this->escapeHtml($callNo['display'])?>
         <?php endif; ?>
@@ -173,6 +178,16 @@
         }
     ?>
   <?php endforeach; ?>
+  <?php if (!empty($holding['purchase_history'])): ?>
+    <tr>
+      <th><?=$this->transEsc("Most Recent Received Issues")?>:</th>
+      <td>
+        <?php foreach ($holding['purchase_history'] as $current): ?>
+          <?=$this->escapeHtml($current['issue'])?><br/>
+        <?php endforeach; ?>
+      </td>
+    </tr>
+  <?php endif; ?>
 </table>
 <?php endforeach; ?>
 <?php if (!empty($holdings['total']) && $paginator = $this->tab->getPaginator($holdings['total'], $holdings['page'], $holdings['itemLimit'])): ?>

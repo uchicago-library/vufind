@@ -42,6 +42,4 @@ class Bookplate extends \VuFind\Related\Bookplate
         }
         return [];
     }
-
 }
-

@@ -1,6 +1,6 @@
 <?php
 /**
- * Record link view helper
+ * Record linker view helper
  *
  * PHP version 7
  *
@@ -28,7 +28,7 @@
 namespace UChicago\View\Helper\Phoenix;
 
 /**
- * Record link view helper
+ * Record linker view helper
  *
  * @category VuFind
  * @package  View_Helpers
@@ -36,7 +36,7 @@ namespace UChicago\View\Helper\Phoenix;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class RecordLink extends \VuFind\View\Helper\Root\RecordLink
+class RecordLinker extends \VuFind\View\Helper\Root\RecordLinker
 {
     /**
      * UChicago customization: modified only to add support for ICU numbers.
@@ -44,57 +44,45 @@ class RecordLink extends \VuFind\View\Helper\Root\RecordLink
      * number), this helper renders a URL linking to that record.
      *
      * @param array  $link   Link information from record model
-     * @param bool   $escape Should we escape the rendered URL?
      * @param string $source Source ID for backend being used to retrieve records
      *
      * @return string       URL derived from link information
      */
-    public function related($link, $escape = true, $source = DEFAULT_SEARCH_BACKEND)
+    public function related($link, $source = DEFAULT_SEARCH_BACKEND)
     {
         $urlHelper = $this->getView()->plugin('url');
         $baseUrl = $urlHelper($this->getSearchActionForSource($source));
         switch ($link['type']) {
         ### UChicago customization ###
         case 'icu':
-            $url = $baseUrl
+            return $baseUrl
                 . '?lookfor=' . urlencode($link['value'])
                 . '&type=id&jumpto=1';
-            break;
         ### ./UChicago customization ###
         case 'bib':
-            $url = $baseUrl
+            return $baseUrl
                 . '?lookfor=' . urlencode($link['value'])
                 . '&type=id&jumpto=1';
-            break;
         case 'dlc':
-            $url = $baseUrl
+            return $baseUrl
                 . '?lookfor=' . urlencode('"' . $link['value'] . '"')
                 . '&type=lccn&jumpto=1';
-            break;
         case 'isn':
-            $url = $baseUrl
+            return $baseUrl
                 . '?join=AND&bool0[]=AND&lookfor0[]=%22'
                 . urlencode($link['value'])
                 . '%22&type0[]=isn&bool1[]=NOT&lookfor1[]=%22'
                 . urlencode($link['exclude'])
                 . '%22&type1[]=id&sort=title&view=list';
-            break;
         case 'oclc':
-            $url = $baseUrl
+            return $baseUrl
                 . '?lookfor=' . urlencode($link['value'])
                 . '&type=oclc_num&jumpto=1';
-            break;
         case 'title':
-            $url = $baseUrl
+            return $baseUrl
                 . '?lookfor=' . urlencode($link['value'])
                 . '&type=title';
-            break;
-        default:
-            throw new \Exception('Unexpected link type: ' . $link['type']);
         }
-
-        $escapeHelper = $this->getView()->plugin('escapeHtml');
-        return $escape ? $escapeHelper($url) : $url;
+        throw new \Exception('Unexpected link type: ' . $link['type']);
     }
-
 }

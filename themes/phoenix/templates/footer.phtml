@@ -2,20 +2,31 @@
   <div class="footer-container">
     <div class="footer-column">
       <?php $this->slot('footer-left')->start(); ?>
+        <? ### UChicago customization ### ?>
         <a href="https://uchicago.edu/"><img class="footer-brand" src="/vufind/themes/phoenix/images/uc_logo.png" alt="The University of Chicago"></a>
+        <? ### ./UChicago customization ### ?>
       <?=$this->slot('footer-left')->end(); ?>
     </div>
     <div class="footer-column">
       <?php $this->slot('footer-center')->start(); ?>
+      <? ### UChicago customization ### ?>
+      <? ### ./UChicago customization ### ?>
       <?=$this->slot('footer-center')->end(); ?>
     </div>
     <div class="footer-column">
       <?php $this->slot('footer-right')->start(); ?>
+      <? ### UChicago customization ### ?>
       <ul>
           <li><a href="https://accessibility.uchicago.edu/">University Accessibility</a></li>
           <li>Powered by <a href="http://vufind.org/">VuFind</a> and <a href="https://www.folio.org/">FOLIO</a></li>
         </ul>
+      <? ### ./UChicago customization ### ?>
       <?=$this->slot('footer-right')->end(); ?>
     </div>
   </div>
+  <? ### UChicago customization ### ?>
+  <!--<div class="poweredby">
+    <?//=$this->layout()->poweredBy ?>
+  </div>-->
+  <? ### ./UChicago customization ### ?>
 </footer>
