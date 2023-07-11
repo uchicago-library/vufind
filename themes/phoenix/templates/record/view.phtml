@@ -16,17 +16,17 @@
     $this->headScript()->appendFile($script);
   }
 
-  <? ### UChicago customization ### ?>
-    // unAPI link:
-    $this->headLink(
-        array(
-            'href' => 'https://www.lib.uchicago.edu/public/unapi/',
-            'rel' => 'unapi-server',
-            'title' => 'unAPI',
-            'type' => 'application/xml'
-        )
-    );
-  <? ### UChicago customization ### ?>
+  ### UChicago customization ###
+  // unAPI link:
+  $this->headLink(
+      array(
+          'href' => 'https://www.lib.uchicago.edu/public/unapi/',
+          'rel' => 'unapi-server',
+          'title' => 'unAPI',
+          'type' => 'application/xml'
+      )
+  );
+  ### UChicago customization ###
 
   // Set up breadcrumbs:
   $this->layout()->breadcrumbs = $this->searchMemory()->getLastSearchLink($this->transEsc('Search'), '<li>', '</li> ') .
