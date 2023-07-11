@@ -36,7 +36,6 @@ use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
 use Laminas\ServiceManager\Exception\ServiceNotFoundException;
 use Laminas\ServiceManager\Factory\DelegatorFactoryInterface;
 use SlmLocale\LocaleEvent;
-use SlmLocale\Strategy\CookieStrategy;
 use SlmLocale\Strategy\QueryStrategy;
 use VuFind\Cookie\CookieManager;
 
@@ -79,7 +78,7 @@ class LocaleDetectorFactory implements DelegatorFactoryInterface
         // TODO: implement mappings in the future?
         //$detector->setMappings($settings->getMappedLocales());
 
-        foreach ($this->getStrategies() as $strategy) {
+        foreach ($this->getStrategies($settings) as $strategy) {
             $detector->addStrategy($strategy);
         }
 
@@ -87,7 +86,10 @@ class LocaleDetectorFactory implements DelegatorFactoryInterface
         $detector->getEventManager()->attach(
             LocaleEvent::EVENT_FOUND,
             function (EventInterface $event) use ($cookies) {
-                $cookies->set('language', $event->getParam('locale'));
+                $language = $event->getParam('locale');
+                if ($language !== $cookies->get('language')) {
+                    $cookies->set('language', $language);
+                }
             }
         );
 
@@ -97,9 +99,11 @@ class LocaleDetectorFactory implements DelegatorFactoryInterface
     /**
      * Generator for retrieving strategies.
      *
+     * @param ?LocaleSettings $settings Locale settings
+     *
      * @return \Generator
      */
-    protected function getStrategies(): \Generator
+    protected function getStrategies(LocaleSettings $settings = null): \Generator
     {
         yield new LocaleDetectorParamStrategy();
 
@@ -107,10 +111,15 @@ class LocaleDetectorFactory implements DelegatorFactoryInterface
         $queryStrategy->setOptions(['query_key' => 'lng']);
         yield $queryStrategy;
 
-        $cookieStrategy = new CookieStrategy();
+        $cookieStrategy = new LocaleDetectorCookieStrategy();
         $cookieStrategy->setCookieName('language');
         yield $cookieStrategy;
 
-        yield new \SlmLocale\Strategy\HttpAcceptLanguageStrategy();
+        // By default, we want to use the HTTP Accept header, so we'll add that
+        // strategy when no settings are provided, or when the settings tell us
+        // that browser language detection should be used.
+        if (!$settings || $settings->browserLanguageDetectionEnabled()) {
+            yield new \SlmLocale\Strategy\HttpAcceptLanguageStrategy();
+        }
     }
 }
