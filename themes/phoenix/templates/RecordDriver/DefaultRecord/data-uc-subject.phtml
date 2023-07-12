@@ -1,16 +1,28 @@
-<?php foreach ($data as $d):?>
-  <?php foreach ($d['displayData'] as $key => $val):?>
-    <?php if (!empty($d['linkData'][$key])): ?>
-       <?php if ($d['areFasts'][$key] === true): ?>
-         <a href="/vufind/Search/Results?lookfor=<?=urlencode($d['linkData'][$key]) . '&type=Subject'?>"><?=$val?></a><br/>
-       <?php else: ?>
-         <a href="/vufind/Alphabrowse/Home?source=topic&from=<?=urlencode($d['linkData'][$key])?>"><?=$val?></a><br/>
-       <?php endif; ?>
-    <?php else: ?>
-        <?=$val?><br/>
-    <?php endif; ?>
+<?php
+  $truncateSettings = [
+    'rows' => $this->config()->getRecordSubjectLimit(),
+    'top-toggle' => 30,
+  ];
+?>
+<div class="truncate-subjects" data-truncate="<?=$this->escapeHtmlAttr(json_encode($truncateSettings))?>">
+  <?php foreach ($data as $d):?>
+      <?php foreach ($d['displayData'] as $key => $val):?>
+        <div class="subject-line" property="keywords">
+          <?php if (!empty($d['linkData'][$key])): ?>
+             <?php if ($d['areFasts'][$key] === true): ?>
+               <a href="/vufind/Search/Results?lookfor=<?=urlencode($d['linkData'][$key]) . '&type=Subject'?>"><?=$val?></a><br/>
+             <?php else: ?>
+               <a href="/vufind/Alphabrowse/Home?source=topic&from=<?=urlencode($d['linkData'][$key])?>"><?=$val?></a><br/>
+             <?php endif; ?>
+          <?php else: ?>
+            <?=$val?><br/>
+          <?php endif; ?>
+        </div>
+      <?php endforeach; ?>
+      <?php foreach ($d['altData'] as $altVal):?>
+        <div class="subject-line" property="keywords">
+          <?=$altVal?><br/>
+        </div>
+      <?php endforeach; ?>
   <?php endforeach; ?>
-  <?php foreach ($d['altData'] as $altVal):?>
-    <?=$altVal?><br/>
-  <?php endforeach; ?>
-<?php endforeach; ?>
+</div>
