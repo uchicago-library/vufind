@@ -238,13 +238,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 // If a full status display has been requested and no errors were
                 // encountered, append the HTML:
                 if ($showFullStatus && empty($record[0]['error'])) {
-                    $current['full_status'] = $this->renderer->render(
-                        'ajax/status-full.phtml',
-                        [
-                            'statusItems' => $record,
-                            'callnumberHandler' => $this->getCallnumberHandler()
-                         ]
-                    );
+                    $current['full_status'] = $this->renderFullStatus($record);
                 }
                 $current['record_number'] = array_search($current['id'], $ids);
                 $statuses[] = $current;

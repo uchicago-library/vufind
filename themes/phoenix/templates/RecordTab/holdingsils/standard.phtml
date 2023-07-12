@@ -61,8 +61,8 @@
             <?php endif; ?>
             <a href="/vufind/alphabrowse/home?from=<?=$c;?>&source=lcc&consult=true">consult the series record</a>.
           <?php endif; ?>
-          <? ### ./UChicago customization ### ?>
           <span class="text-danger <?=$holding['hide_status'] ? 'hide' : ''?>"><?=$this->transEsc($holding['status'])?><link property="availability" href="http://schema.org/OutOfStock" /></span>
+          <? ### ./UChicago customization ### ?>
           <?php if ($holding['returnDate'] ?? false): ?>&ndash; <span class="small"><?=$this->escapeHtml($holding['returnDate'])?></span><?php endif; ?>
           <?php if ($holding['duedate'] ?? false): ?>
             &ndash; <span class="small"><?=$this->transEsc("Due")?>: <?=$this->escapeHtml($holding['duedate'])?></span>

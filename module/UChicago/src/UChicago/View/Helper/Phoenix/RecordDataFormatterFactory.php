@@ -133,7 +133,6 @@ class RecordDataFormatterFactory extends \VuFind\View\Helper\Root\RecordDataForm
         };
     }
 
-
     /**
      * Get default specifications for displaying data in collection-info metadata.
      *
@@ -266,7 +265,9 @@ class RecordDataFormatterFactory extends \VuFind\View\Helper\Root\RecordDataForm
             'Description', 'getUCDescription', 'data-uc-simple.phtml'
         );
         $spec->setLine(
-            'Language', 'getLanguages', null,
+            'Language',
+            'getLanguages',
+            null,
             ['itemPrefix' => '<span property="availableLanguage" typeof="Language">'
                            . '<span property="name">',
              'itemSuffix' => '</span></span>']
