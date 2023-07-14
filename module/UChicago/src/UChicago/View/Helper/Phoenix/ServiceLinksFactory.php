@@ -1,7 +1,7 @@
 <?php
 namespace UChicago\View\Helper\Phoenix;
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class ServiceLinksFactory implements FactoryInterface
 {

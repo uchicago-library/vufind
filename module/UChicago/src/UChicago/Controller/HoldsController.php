@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Holds Controller
  *
@@ -27,12 +28,13 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org Main Site
  */
+
 namespace UChicago\Controller;
 
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 use VuFind\Exception\ILS as ILSException;
-use VuFind\Validator\Csrf;
+use VuFind\Validator\CsrfInterface;
 
 /**
  * Controller for the user holds area.
@@ -116,7 +118,8 @@ class HoldsController extends \VuFind\Controller\HoldsController
                 $cancelStatus,
                 $patron
             );
-            if ($cancelStatus && $cancelStatus['function'] !== 'getCancelHoldLink'
+            if (
+                $cancelStatus && $cancelStatus['function'] !== 'getCancelHoldLink'
                 && isset($current['cancel_details'])
             ) {
                 // Enable cancel form if necessary:
@@ -125,7 +128,8 @@ class HoldsController extends \VuFind\Controller\HoldsController
 
             // Add update details if appropriate
                 if (isset($current['updateDetails'])) {
-                if (empty($holdConfig['updateFields'])
+                if (
+                    empty($holdConfig['updateFields'])
                     || '' === $current['updateDetails']
             ) {
                     unset($current['updateDetails']);

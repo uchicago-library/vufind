@@ -1,6 +1,6 @@
 <?
 namespace UChicago\View\Helper\Phoenix;
-use Zend\View\Helper\AbstractHelper;
+use Laminas\View\Helper\AbstractHelper;
 
 /**
  * Helper class for managing phoenix theme's conditional service links 
@@ -396,7 +396,7 @@ class ServiceLinks extends AbstractHelper {
      * @return sting representing a link.
      */
     public function paging($holding) {
-        $defaultLink = $this->view->recordLink()->getHoldUrl($holding['link']);
+        $defaultLink = $this->view->recordLinker()->getRequestUrl($holding['link']);
         return $this->buildLink($holding, 'paging', $defaultLink);
     }
 
@@ -408,7 +408,7 @@ class ServiceLinks extends AbstractHelper {
      * @return sting representing a link.
      */
     public function hold($holding) {
-        $defaultLink = $this->view->recordLink()->getHoldUrl($holding['link']);
+        $defaultLink = $this->view->recordLinker()->getRequestUrl($holding['link']);
         return $this->buildLink($holding, 'hold', $defaultLink);
     }
 
@@ -441,7 +441,7 @@ class ServiceLinks extends AbstractHelper {
      * @return sting representing a link.
      */
     public function mansueto($holding) {
-        $defaultLink = $this->view->recordLink()->getHoldUrl($holding['link']);
+        $defaultLink = $this->view->recordLinker()->getRequestUrl($holding['link']);
         return $this->buildLink($holding, 'mansueto', $defaultLink, 'shelving', 'library');
     }
 

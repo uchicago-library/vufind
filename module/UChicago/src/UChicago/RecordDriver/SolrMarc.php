@@ -68,14 +68,16 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
             ### ./UChicago customization ###
             case 'oclc':
                 foreach ($linkFields as $current) {
-                    if ($oclc = $this->getIdFromLinkingField($current, 'OCoLC')) {
+                        $oclc = $this->getIdFromLinkingField($current, 'OCoLC');
+                        if ($oclc) {
                         $link = ['type' => 'oclc', 'value' => $oclc];
                     }
                 }
                 break;
             case 'dlc':
                 foreach ($linkFields as $current) {
-                    if ($dlc = $this->getIdFromLinkingField($current, 'DLC', true)) {
+                        $dlc = $this->getIdFromLinkingField($current, 'DLC', true);
+                        if ($dlc) {
                         $link = ['type' => 'dlc', 'value' => $dlc];
                     }
                 }
@@ -91,7 +93,7 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
                 if ($isbn = $this->getSubfield($field, 'z')) {
                     $link = [
                         'type' => 'isn', 'value' => $isbn,
-                        'exclude' => $this->getUniqueId()
+                            'exclude' => $this->getUniqueId(),
                     ];
                 }
                 break;
@@ -99,7 +101,7 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
                 if ($issn = $this->getSubfield($field, 'x')) {
                     $link = [
                         'type' => 'isn', 'value' => $issn,
-                        'exclude' => $this->getUniqueId()
+                            'exclude' => $this->getUniqueId(),
                     ];
                 }
                 break;
@@ -116,9 +118,10 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
         return !isset($link) ? false : [
             'title' => $this->getRecordLinkNote($field),
             'value' => $title,
-            'link'  => $link
+            'link'  => $link,
         ];
     }
+
 
     /**
      * Get an array of all ISSNs associated with the record (may be empty).

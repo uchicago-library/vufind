@@ -24,7 +24,7 @@ return [
         'admin' => [
           'child_routes' => [
             'pin' => [
-              'type' => 'Zend\\Router\\Http\\Segment',
+              'type' => 'Laminas\\Router\\Http\\Segment',
               'options' => [
                 'route' => '/Pin[/:action]',
                 'defaults' => [

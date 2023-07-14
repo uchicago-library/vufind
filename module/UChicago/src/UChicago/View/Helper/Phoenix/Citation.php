@@ -26,6 +26,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace UChicago\View\Helper\Phoenix;
 
 use VuFind\Date\DateException;
@@ -41,8 +42,7 @@ use VuFind\I18n\Translator\TranslatorAwareInterface;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class Citation extends \VuFind\View\Helper\Root\Citation
-    implements TranslatorAwareInterface
+class Citation extends \VuFind\View\Helper\Root\Citation implements TranslatorAwareInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
 

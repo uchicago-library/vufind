@@ -1,4 +1,5 @@
 <?php
+
 /**
  * "Get Item Status" AJAX handler
  *
@@ -27,6 +28,7 @@
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
+
 namespace UChicago\AjaxHandler;
 
 use Laminas\Config\Config;
@@ -52,7 +54,9 @@ use VuFind\Session\Settings as SessionSettings;
  * @license  http://opensource.org/licenses/gpl-2.0.php GNU General Public License
  * @link     https://vufind.org/wiki/development Wiki
  */
-class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements TranslatorAwareInterface
+class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements
+    TranslatorAwareInterface,
+    \VuFind\I18n\HasSorterInterface
 {
     use \VuFind\I18n\Translator\TranslatorAwareTrait;
 
@@ -88,7 +92,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $available = true;
             }
             // Check for a use_unknown_message flag
-            if (isset($info['use_unknown_message'])
+            if (
+                isset($info['use_unknown_message'])
                 && $info['use_unknown_message'] == true
             ) {
                 $use_unknown_status = true;
@@ -152,7 +157,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 ? $this->translate('on_reserve')
                 : $this->translate('Not On Reserve'),
             'callnumber' => htmlentities($callNumber, ENT_COMPAT, 'UTF-8'),
-            'callnumber_handler' => $callnumberHandler
+            'callnumber_handler' => $callnumberHandler,
         ];
     }
 
@@ -167,7 +172,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
     {
         $results = [];
         $this->disableSessionWrites();  // avoid session write timing bug
-        $ids = $params->fromPost('id', $params->fromQuery('id', []));
+        $ids = $params->fromPost('id') ?? $params->fromQuery('id', []);
+        $searchId = $params->fromPost('sid') ?? $params->fromQuery('sid');
         try {
             $results = $this->ils->getStatuses($ids);
         } catch (ILSException $e) {
@@ -178,8 +184,8 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 $results[] = [
                     [
                         'id' => $id,
-                        'error' => 'An error has occurred'
-                    ]
+                        'error' => 'An error has occurred',
+                    ],
                 ];
             }
         }
@@ -201,7 +207,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
             'available' => $this->renderer->render('ajax/status-available.phtml', ['hideStatus' => false]),
             'unavailable' =>
                 $this->renderer->render('ajax/status-unavailable.phtml', ['hideStatus' => false]),
-            'unknown' => $this->renderer->render('ajax/status-unknown.phtml')
+            'unknown' => $this->renderer->render('ajax/status-unknown.phtml'),
         ];
 
         // Load callnumber and location settings:
@@ -238,7 +244,10 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 // If a full status display has been requested and no errors were
                 // encountered, append the HTML:
                 if ($showFullStatus && empty($record[0]['error'])) {
-                    $current['full_status'] = $this->renderFullStatus($record);
+                    $current['full_status'] = $this->renderFullStatus(
+                        $record,
+                        compact('searchId')
+                    );
                 }
                 $current['record_number'] = array_search($current['id'], $ids);
                 $statuses[] = $current;
@@ -260,7 +269,7 @@ class GetItemStatuses extends \VuFind\AjaxHandler\GetItemStatuses implements Tra
                 'reserve_message'      => $this->translate('Not On Reserve'),
                 'callnumber'           => '',
                 'missing_data'         => true,
-                'record_number'        => $recordNumber
+                'record_number'        => $recordNumber,
             ];
         }
 

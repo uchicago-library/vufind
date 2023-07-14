@@ -2,10 +2,6 @@
 
 namespace UChicago\ILS\Driver;
 
-// THESE SHOULD GO AWAY WHEN WE UPGRADE
-use DateTime;
-use DateTimeZone;
-
 class Folio extends \VuFind\ILS\Driver\Folio
 {
     /**
@@ -36,7 +32,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
             $json = json_decode($response->getBody());
             if (!$response->isSuccess() || !$json) {
                 $msg = $json->errors[0]->message ?? json_last_error_msg();
-                throw new ILSException($msg);
+                throw new ILSException("Error: '$msg' fetching '$responseKey'");
             }
             $total = $json->totalRecords ?? 0;
             if (isset($holdings) && $total === 0 && ($holdings->holdingsTypeId != $eHoldingTypeId
@@ -66,7 +62,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
      *
      * @return string
      */
-    protected function getDuedate($itemId)
+    protected function getUCDuedate($itemId)
     {
         $query = [
             'query' => '(itemId=="' . $itemId
@@ -232,7 +228,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 // Get duedate
                 $dueDate = '';
                 if ($item->status->name == 'Not Available') {
-                    $dueDate = $this->getDuedate($item->id);
+                    $dueDate = $this->getUCDuedate($item->id);
                 }
 
                 // Override holdings copy number with item copy number if it exists.
@@ -445,14 +441,16 @@ class Folio extends \VuFind\ILS\Driver\Folio
         }
         $query = ['query' => 'userId==' . $patron['id'] . ' and status.name==Open'];
         $transactions = [];
-        $bib = null; // null bib for items we're not currently showing on the page.
-        foreach ($this->getPagedResults(
-            'loans',
-            '/circulation/loans',
-            $query
-        ) as $trans) {
+        $bib = null; // UChicago change: performance, null bib for items we're not currently showing on the page.
+        foreach (
+            $this->getPagedResults(
+                'loans',
+                '/circulation/loans',
+                $query
+            ) as $trans
+        ) {
             $dueStatus = false;
-            $date = date_create($trans->dueDate);
+            $date = $this->getDateTimeFromString($trans->dueDate);
             $dueDateTimestamp = $date->getTimestamp();
 
             $authors = implode(', ', array_map(function($c) {
@@ -478,9 +476,8 @@ class Folio extends \VuFind\ILS\Driver\Folio
                         'U',
                         $dueDateTimestamp
                     ),
-                // TODO: Due Status
                 'dueStatus' => $dueStatus,
-                'id' => $bib,
+                'id' => $bib, // UChicago change
                 'item_id' => $trans->item->id,
                 'barcode' => $trans->item->barcode,
                 'renew' => $trans->renewalCount ?? 0,
@@ -570,6 +567,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
         return $transactions;
     }
 
+
     /**
      * This method queries the ILS for a patron's current holds
      *
@@ -612,45 +610,92 @@ class Folio extends \VuFind\ILS\Driver\Folio
      */
     public function getMyHolds($patron)
     {
-        $query = [
-            'query' => '(requesterId == "' . $patron['id'] . '"  ' .
-            'and status == Open*)'
-        ];
+        $userQuery = '(requesterId == "' . $patron['id'] . '" '
+            . 'or proxyUserId == "' . $patron['id'] . '")';
+        $query = ['query' => '(' . $userQuery . ' and status == Open*)'];
         $holds = [];
-        foreach ($this->getPagedResults(
-            'requests',
-            '/request-storage/requests',
-            $query
-        ) as $hold) {
+        foreach (
+            $this->getPagedResults(
+                'requests',
+                '/request-storage/requests',
+                $query
+            ) as $hold
+        ) {
             $pickupServicePoint = '';
             $pickupServicePointId = $hold->pickupServicePointId;
             $servicePointData = $this->getServicePointById($pickupServicePointId);
             if (!empty($servicePointData)) {
                 $pickupServicePoint = $servicePointData->servicepoints[0]->name;
             }
-            $requestDate = date_create($hold->requestDate);
+            $requestDate = $this->dateConverter->convertToDisplayDate(
+                "Y-m-d H:i",
+                $hold->requestDate
+            );
             // Set expire date if it was included in the response
             $expireDate = isset($hold->requestExpirationDate)
-                ? date_create($hold->requestExpirationDate) : null;
-            // Set holdShelfExpirationDate if it was included in the response
-            $holdShelfExpirationDate = isset($hold->holdShelfExpirationDate)
-                ? date_format(date_create($hold->holdShelfExpirationDate), "j M Y") : null;
-            $holds[] = [
+                ? $this->dateConverter->convertToDisplayDate(
+                    "Y-m-d H:i",
+                    $hold->requestExpirationDate
+                )
+                : null;
+            // Set lastPickup Date if provided, format to j M Y
+            $lastPickup = isset($hold->holdShelfExpirationDate)
+                ? $this->dateConverter->convertToDisplayDate(
+                    "Y-m-d H:i",
+                    $hold->holdShelfExpirationDate
+                )
+                : null;
+            $currentHold = [
                 'type' => $hold->requestType,
-                'create' => date_format($requestDate, "j M Y"),
-                'expire' => isset($expireDate)
-                    ? date_format($expireDate, "j M Y") : "",
-                'id' => $this->getBibId(null, null, $hold->itemId),
+                'create' => $requestDate,
+                'expire' => $expireDate ?? "",
+                'id' => $this->getBibId(
+                    $hold->instanceId,
+                    $hold->holdingsRecordId,
+                    $hold->itemId
+                ),
                 'item_id' => $hold->itemId,
                 'reqnum' => $hold->id,
+                // Title moved from item to instance in Lotus release:
                 'title' => $hold->instance->title ?? $hold->item->title ?? '',
-                'status' => $hold->status,
+                'available' => in_array(
+                    $hold->status,
+                    $this->config['Holds']['available']
+                    ?? $this->defaultAvailabilityStatuses
+                ),
+                'in_transit' => in_array(
+                    $hold->status,
+                    $this->config['Holds']['in_transit']
+                    ?? $this->defaultInTransitStatuses
+                ),
+                'last_pickup_date' => $lastPickup,
+                'position' => $hold->position ?? null,
                 'pickup_service_point' => $pickupServicePoint,
                 'hold_shelf_expiration_date' => $holdShelfExpirationDate
             ];
+            // If this request was created by a proxy user, and the proxy user
+            // is not the current user, we need to indicate their name.
+            if (
+                ($hold->proxyUserId ?? $patron['id']) !== $patron['id']
+                && isset($hold->proxy)
+            ) {
+                $currentHold['proxiedBy']
+                    = $this->userObjectToNameString($hold->proxy);
+            }
+            // If this request was not created for the current user, it must be
+            // a proxy request created by the current user. We should indicate this.
+            if (
+                ($hold->requesterId ?? $patron['id']) !== $patron['id']
+                && isset($hold->requester)
+            ) {
+                $currentHold['proxiedFor']
+                    = $this->userObjectToNameString($hold->requester);
+            }
+            $holds[] = $currentHold;
         }
         return $holds;
     }
+
 
     /**
      * Attempts to place a hold or recall on a particular item and returns
@@ -675,20 +720,32 @@ class Folio extends \VuFind\ILS\Driver\Folio
         // We're leaving the old code commented out below in case we
         // need to comment-toggle it later.
 
-        // try {
-        //     $requiredBy = $this->dateConverter->convertFromDisplayDate(
-        //         'Y-m-d',
-        //         $holdDetails['requiredBy']
-        //     );
-        // } catch (Exception $e) {
-        //     $this->throwAsIlsException($e, 'hold_date_invalid');
+        // if (
+        //     !empty($holdDetails['requiredByTS'])
+        //     && !is_int($holdDetails['requiredByTS'])
+        // ) {
+        //     throw new ILSException('hold_date_invalid');
         // }
+        // $requiredBy = !empty($holdDetails['requiredByTS'])
+        //     ? gmdate('Y-m-d', $holdDetails['requiredByTS']) : null;
+
         $instance = $this->getInstanceByBibId($holdDetails['id']);
-        $requestBody = [
-            'itemId' => $holdDetails['item_id'],
-            'holdingsRecordId' => $holdDetails['holding_id'] ?? '',
-            'instanceId' => $instance->id,
-            'requestLevel' => 'Item',
+        $isTitleLevel = ($holdDetails['level'] ?? '') === 'title';
+        if ($isTitleLevel) {
+            $instance = $this->getInstanceByBibId($holdDetails['id']);
+            $baseParams = [
+                'instanceId' => $instance->id,
+                'requestLevel' => 'Title',
+            ];
+        } else {
+            // Note: early Lotus releases require instanceId and holdingsRecordId
+            // to be set here as well, but the requirement was lifted in a hotfix
+            // to allow backward compatibility. If you need compatibility with one
+            // of those versions, you can add additional identifiers here, but
+            // applying the latest hotfix is a better solution!
+            $baseParams = ['itemId' => $holdDetails['item_id']];
+        }
+        $requestBody = $baseParams + [
             'requestType' => $holdDetails['status'] == 'Available'
                 ? 'Page' : $default_request,
             'requesterId' => $holdDetails['patron']['id'],
@@ -696,26 +753,34 @@ class Folio extends \VuFind\ILS\Driver\Folio
             'fulfilmentPreference' => 'Hold Shelf',
             // See above, re: required by form field.
             // 'requestExpirationDate' => $requiredBy,
-            'patronComments' => $holdDetails['comment'] ?? '',
-            'pickupServicePointId' => $holdDetails['pickUpLocation']
+            'pickupServicePointId' => $holdDetails['pickUpLocation'],
         ];
+        if (!empty($holdDetails['proxiedUser'])) {
+            $requestBody['requesterId'] = $holdDetails['proxiedUser'];
+            $requestBody['proxyUserId'] = $holdDetails['patron']['id'];
+        }
+        if (!empty($holdDetails['comment'])) {
+            $requestBody['patronComments'] = $holdDetails['comment'];
+        }
         $response = $this->makeRequest(
             'POST',
             '/circulation/requests',
-            json_encode($requestBody)
+            json_encode($requestBody),
+            [],
+            true
         );
         if ($response->isSuccess()) {
             $json = json_decode($response->getBody());
             $result = [
                 'success' => true,
-                'status' => $json->status
+                'status' => $json->status,
             ];
         } else {
             try {
                 $json = json_decode($response->getBody());
                 $result = [
                     'success' => false,
-                    'status' => $json->errors[0]->message
+                    'status' => $json->errors[0]->message,
                 ];
             } catch (Exception $e) {
                 $this->throwAsIlsException($e, $response->getBody());
@@ -724,6 +789,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
         return $result;
     }
 
+ 
     /**
      * This is a copy of VuFind/ILS/Driver/AbstractAPI.php with the case statement
      * taken out. We do not want to throw a RecordMissing for an entire record when

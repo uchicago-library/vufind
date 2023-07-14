@@ -29,10 +29,10 @@ namespace UChicago\AjaxHandler;
 use VuFind\Db\Row\User;
 use VuFind\ILS\Connection;
 use VuFind\Session\Settings as SessionSettings;
-use Zend\Http\Client;
-use Zend\Http\Request;
-use Zend\Mvc\Controller\Plugin\Params;
-use Zend\Mvc\Controller\Plugin\Url;
+use Laminas\Http\Client;
+use Laminas\Http\Request;
+use Laminas\Mvc\Controller\Plugin\Params;
+use Laminas\Mvc\Controller\Plugin\Url;
 /**
  * "Get Deduped Eholdings" AJAX handler
  *
@@ -63,7 +63,7 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
      * @param User|bool         $user Logged in user (or false)
      * @param Url               $url  URL helper
      */
-    public function __construct(\Zend\Config\Config $config) {
+    public function __construct(\Laminas\Config\Config $config) {
         $this->config = $config;
     }
 
