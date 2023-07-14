@@ -41,9 +41,8 @@
     </div>
   <?php endif; ?>
   <div class="media-body">
-
     <? ### UChicago customization ### ?>
-    <h1 property="name"><?=$this->escapeHtml($this->driver->getShortTitle() . ' ' . $this->driver->getSubtitle() . ' ' . $this->driver->getTitleSection() . ' ' . $this->driver->getUCTitleFormDates())?></h1>
+    <h1 property="name"><?=$this->escapeHtml($this->driver->getShortTitle() . ' ' . $this->driver->getSubtitle() . ' ' . $this->driver->getTitleSection() . ' ' . $this->driver->tryMethod('getUCTitleFormDates'))?></h1>
     <? ### ./UChicago customization ### ?>
     <?php foreach ($this->driver->tryMethod('getFullTitlesAltScript', [], []) as $altTitle): ?>
       <div class="title-alt">
