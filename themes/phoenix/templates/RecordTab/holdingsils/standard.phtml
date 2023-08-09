@@ -38,7 +38,7 @@
           <? ### ./UChicago customization ### ?>
           <?php if ($holding['link'] ?? false): ?>
             <? ### UChicago customization ### ?>
-            <!--<a class="<?//=$check ? 'checkRequest ' : ''?>placehold" <?php //if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php //endif; ?>href="<?//=$this->recordLink()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?//=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>-->
+            <!--<a class="<?//=$check ? 'checkRequest ' : ''?>placehold" <?php //if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php //endif; ?>href="<?//=$this->recordLinker()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?//=$this->transEsc($check ? "Check Hold" : "Place a Hold")?></a>-->
             <? ### ./UChicago customization ### ?>
           <?php endif; ?>
           <?php if ($holding['storageRetrievalRequestLink'] ?? false): ?>
@@ -72,7 +72,7 @@
           <?php endif; ?>
           <?php if ($holding['link'] ?? false): ?>
             <? ### UChicago customization ### ?>
-            <!--<a class="<?//=$check ? 'checkRequest' : ''?> placehold" <?php //if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php //endif; ?>href="<?//=$this->recordLink()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?//=$this->transEsc($check ? "Check Recall" : "Recall This")?></a>-->
+            <!--<a class="<?//=$check ? 'checkRequest' : ''?> placehold" <?php //if (!empty($holding['linkLightbox'])): ?>data-lightbox <?php //endif; ?>href="<?//=$this->recordLinker()->getRequestUrl($holding['link'])?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?//=$this->transEsc($check ? "Check Recall" : "Recall This")?></a>-->
             <? ### ./UChicago customization ### ?>
           <?php endif; ?>
           <?=$this->relais()->renderButtonIfActive($this->driver ?? null)?>

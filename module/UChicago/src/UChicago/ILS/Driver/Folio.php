@@ -671,7 +671,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 'last_pickup_date' => $lastPickup,
                 'position' => $hold->position ?? null,
                 'pickup_service_point' => $pickupServicePoint,
-                'hold_shelf_expiration_date' => $holdShelfExpirationDate
+                'hold_shelf_expiration_date' => $lastPickup
             ];
             // If this request was created by a proxy user, and the proxy user
             // is not the current user, we need to indicate their name.
