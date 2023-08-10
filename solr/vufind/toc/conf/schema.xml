@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  
+    For information on how to customize this file, please see
+    http://wiki.apache.org/solr/SchemaXml.  The page also has a link to an 
+    extensively commented version of this file.
+-->
+<schema name="Syndetics Data Cache Index" version="1.4">
+  <types>
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" omitNorms="false"/>
+    <fieldType name="boolean" class="solr.BoolField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="integer" class="solr.IntPointField" omitNorms="true"/>
+    <fieldType name="long" class="solr.LongPointField" omitNorms="true"/>
+    <fieldType name="float" class="solr.FloatPointField" omitNorms="true"/>
+    <fieldType name="double" class="solr.DoublePointField" omitNorms="true"/>
+    <fieldType name="date" class="solr.DatePointField" sortMissingLast="true" omitNorms="false"/>
+    <fieldType name="sint" class="solr.IntPointField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="slong" class="solr.LongPointField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="sfloat" class="solr.FloatPointField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="sdouble" class="solr.DoublePointField" sortMissingLast="true" omitNorms="true"/>
+    <fieldType name="random" class="solr.RandomSortField" indexed="true" />
+	
+    <fieldType name="isbn" class="solr.TextField">
+        <analyzer>
+            <tokenizer class="solr.PatternTokenizerFactory" pattern="[;,]\s*" />
+            <filter class="edu.umich.lib.solr_filters.ISBNNormalizerFilterFactory"/>
+        </analyzer>
+    </fieldType>
+    	
+  </types>
+
+
+  <fields>
+    <field name="_version_" type="long" indexed="true" stored="true"/>
+    <field name="id" type="string" indexed="true" stored="true" required="true" /> 
+    <field name="isbn_text" type="isbn" indexed="true" stored="true" multiValued="true"/> 
+    <field name="timestamp" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
+    
+    <dynamicField name="*_facet" type="string" indexed="true"  stored="true" multiValued="true" omitNorms="true" />
+    <dynamicField name="*_display" type="string" indexed="false" stored="true" multiValued="true"/>
+    
+  </fields>
+	
+  <uniqueKey>id</uniqueKey>
+  <df>isbn_text</df> 
+
+  
+ <!-- <solrQueryParser defaultOperator="OR"/> -->
+  
+</schema>
+
