@@ -163,8 +163,12 @@ function getAlert(){
 function setupJumpMenus(_container) {
   var container = _container || $('body');
   var select = container.find('select.jumpMenu');
-  var option = select.find('option');
-  option.click(function jumpMenu(){ $(this).parent().parent('form').submit(); });
+  var currentVal = select.val();
+  select.on('click blur', function jumpMenu(){
+    if (currentVal != $(this).val()) {
+      $(this).parent('form').submit();
+    }
+  });
   select.on('keypress', function(event) {
     // Enter key
     if (event.keyCode == 13) {
