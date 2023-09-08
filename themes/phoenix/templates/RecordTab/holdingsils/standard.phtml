@@ -86,6 +86,7 @@
           <?=$this->ServiceLinks()->alttext($this->driver->getFormats(), $this->driver->getUniqueID(), $holding)?>
           <?=$this->ServiceLinks()->scanAndDeliver($holding)?>
           <?=$this->ServiceLinks()->offsite($holding)?>
+          <?=$this->ServiceLinks()->storage($holding)?>
           <?=$this->ServiceLinks()->paging($holding)?>
           <?=$this->ServiceLinks()->ask($holding, $cleanTitle)?>
           <?=$this->ServiceLinks()->askSCRC($holding)?>

@@ -479,6 +479,18 @@ class ServiceLinks extends AbstractHelper {
     }
 
     /**
+     * Offsite storage, not Relais.
+     *
+     * @param array $holding.
+     *
+     * @return sting representing a link.
+     */
+    public function storage($holding) {
+        $defaultLink = $this->view->recordLink()->getRequestUrl($holding['link']);
+        return $this->buildLink($holding, 'storage', $defaultLink, 'shelving', 'shelving', []);
+    }
+
+    /**
      * SCRC link, Aeon.
      *
      * @param array $holding.
