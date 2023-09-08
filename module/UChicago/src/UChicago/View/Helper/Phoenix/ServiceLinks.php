@@ -486,7 +486,7 @@ class ServiceLinks extends AbstractHelper {
      * @return sting representing a link.
      */
     public function storage($holding) {
-        $defaultLink = $this->view->recordLinker()->getRequestUrl($holding['link']);
+        $defaultLink = $this->view->recordLink()->getRequestUrl($holding['link']);
         return $this->buildLink($holding, 'storage', $defaultLink, 'shelving', 'shelving', []);
     }
 
