@@ -295,10 +295,6 @@ class ServiceLinks extends AbstractHelper {
         $hasCorrectStatus = $this->hasCorrectStatus($status, $config);
         $hasCorrectLocation = $this->hasCorrectLocation($locationCode, $locWhitelistType, $locBlacklistType, $config);
         if ($hasCorrectStatus && $hasCorrectLocation) {
-            // Add a special url param to differentiate paging requests from others. 
-            if(isset($holding['link']['query'])) {
-                $holding['link']['query'] = 'isPickup=true&' . $holding['link']['query'];
-            }
             if ($this->isURL($config['url'])) {
                 // Override servie link if an override value is provided.
                 $serviceLink = $this->replaceTokens($config['url'], $holding);
@@ -396,6 +392,10 @@ class ServiceLinks extends AbstractHelper {
      * @return sting representing a link.
      */
     public function paging($holding) {
+        // Add a special url param to differentiate paging requests from others.
+        if(isset($holding['link']['query'])) {
+            $holding['link']['query'] = 'isPickup=true&' . $holding['link']['query'];
+        }
         $defaultLink = $this->view->recordLinker()->getRequestUrl($holding['link']);
         return $this->buildLink($holding, 'paging', $defaultLink);
     }

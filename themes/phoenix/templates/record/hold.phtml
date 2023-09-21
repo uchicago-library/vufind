@@ -8,8 +8,11 @@
         . '<li class="active">' . $this->transEsc('request_place_text') . '</li>';
 
     ### UChicago customization ###
-    $isLawPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:lawlibrary:authorized');
-    $isSWLPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:swl:authorized');
+    $isPickup = isset($_GET['isPickup']);
+    $isShibLoggedIn = strtolower($_SESSION['ChoiceAuth']->auth_method) == 'shibboleth';
+    $canPage = $this->ServiceLinks()->isMemberOf('uc:applications:library:paging:authorized') && $isShibLoggedIn;
+    $isLawPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:lawlibrary:authorized') && $isShibLoggedIn;
+    $isSWLPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:swl:authorized') && $isShibLoggedIn;
     ### ./UChicago customization ###
 ?>
 <h2><?=$this->transEsc('request_place_text')?></h2>
@@ -34,6 +37,13 @@
       <li>You will receive an email notice when the item is available for pickup</li>
     </ul>
   </div>
+<?php // The user doesn't have paging privilages and it is a page request ?>
+<?php elseif ($canPage == false && $isPickup): ?>
+  <div class="alert alert-danger">
+    <p>The Paging &amp; Pickup service is limited to current students, faculty, and staff of the University of Chicago.</p>
+  </div>
+  <?php // Prevent the form from rendering. ?>
+  <?php return ?>
 <? else: ?>
   <div class="alert alert-info" role="alert">
     <ul>
