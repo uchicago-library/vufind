@@ -204,15 +204,35 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
     public function subjectParse($fields)
     {
         $retval = [];
+        $flag = false;
         foreach ($fields as $multi) {
             $field = $multi[0];
             $subfields = $multi[1];
             $data = $this->getFieldArray($field, $subfields, true, ' -- ');
-            $i2s = [];
+            $areFast = [];
+            $areLCSH = [];
+            $areMESH = [];
+            $areSCRC = [];
+            $genres = ['rbgenr', 'rbbin', 'rbbin', 'rbpri', 'rbpub', 'rbpap', 'rbtyp', 'aat', 'gmgpc', 'lcgft', 'lobt', 'tept', 'rbmscv', 'rbprov'];
             $fieldData = $this->getMarcReader()->getFields($field);
             if (!empty($fieldData)) {
                  foreach ($fieldData as $d) {
                     $i2 = $d['i2'];
+                    // LCSH
+                    if ($i2 === '0') {
+                        array_push($areLCSH, true);
+                        $flag = true;
+                    } else {
+                        array_push($areLCSH, false);
+                    }
+                    // MESH
+                    if ($i2 === '2') {
+                        array_push($areMESH, true);
+                        $flag = true;
+                    } else {
+                        array_push($areMESH, false);
+                    }
+                    // Subfield 2 to use with FAST headings and SCRC specialized genre terms
                     foreach ($d['subfields'] as $subfield) {
                         $code = $subfield['code'];
                         $s2 = false;
@@ -223,19 +243,41 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
                     }
                     if ($s2 != false) {
                         $heading = $s2;
+                        // FAST
                         if (strtolower($heading) === 'fast' && $i2 === '7') {
-                            array_push($i2s, true);
+                            array_push($areFast, true);
+                            $flag = true;
                         } else {
-                            array_push($i2s, false);
+                            array_push($areFast, false);
+                        }
+                        // SCRC specialized genre vocabularies
+                        if($d['tag'] === '655' && in_array($s2, $genres) && $i2 === '7') {
+                            array_push($areSCRC, true);
+                            $flag = true;
+                        } else {
+                            array_push($areSCRC, false);
                         }
                     } else {
-                        array_push($i2s, false);
-                    }                   
-                 }               
+                        array_push($areFast, false);
+                        array_push($areSCRC, false);
+                    }
+                 }
             }
             $linkData = $this->getFieldArray($field, $subfields, true, '--');
             $altData = $this->getMarcReader()->getLinkedFieldsSubFields('880', $field, $subfields);
-            array_push($retval, ['displayData' => $data, 'linkData' => $linkData, 'altData' => $altData, 'areFasts' => $i2s]);
+            array_push($retval, [
+                'displayData' => $data,
+                'linkData' => $linkData,
+                'altData' => $altData,
+                'areFast' => $areFast,
+                'areLCSH' => $areLCSH,
+                'areMESH' => $areMESH,
+                'areSCRC' => $areSCRC
+            ]);
+        }
+        // Return empty array if none of the subject headings we want are present
+        if ($flag === false) {
+            return [];
         }
         return $retval;
     }
