@@ -88,11 +88,10 @@
        other than the default ./data under the Solr home.
        If replication is in use, this should match the replication configuration. -->
 
-  <lib dir="../../vendor/modules/analysis-extras/lib" regex=".*\.jar" />
-  <lib dir="/data/pyrite/vufind2/solr/vendor/server/solr-webapp/webapp/WEB-INF/lib" regex=".*\.jar" />
-  <lib dir="/usr/local/vufind/solr/vendor/server/solr-webapp/webapp/WEB-INF/lib" regex=".*\.jar" />
-  <lib dir="../jars" regex=".*\.jar" />
   <lib dir="../../../import/lib" regex="marc4j.*\.jar" />
+  <lib dir="../../vendor/modules/analysis-extras/lib" regex=".*\.jar" />
+  <lib dir="../jars" regex=".*\.jar" />
+
 
   <!-- an exact 'path' can be used instead of a 'dir' to specify a 
        specific jar file.  This will cause a serious error to be logged 

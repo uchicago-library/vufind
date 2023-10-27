@@ -22,7 +22,7 @@
     <fieldType name="isbn" class="solr.TextField">
         <analyzer>
             <tokenizer class="solr.PatternTokenizerFactory" pattern="[;,]\s*" />
-            <filter class="edu.umich.lib.solr_filters.ISBNNormalizerFilterFactory"/> 
+            <filter class="edu.umich.lib.solr_filters.ISBNNormalizerFilterFactory"/>
         </analyzer>
     </fieldType>
     	
@@ -41,10 +41,9 @@
   </fields>
 	
   <uniqueKey>id</uniqueKey>
-  <df>isbn_text</df> 
-
+<!--  <df>isbn_text</df> -->
   
- <!-- <solrQueryParser defaultOperator="OR"/> -->
+  
+<!--  <solrQueryParser defaultOperator="OR"/> -->
   
 </schema>
-

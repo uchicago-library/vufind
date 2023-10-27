@@ -33,7 +33,7 @@
 
     <!-- Extra identifiers - where did authority record originate? -->
     <field name="source" type="string" indexed="true" stored="true"/>
-    <field name="record_type" type="string" indexed="true" stored="true"/>
+    <field name="recordtype" type="string" indexed="true" stored="true"/>
     <field name="lccn" type="string" indexed="true" stored="true" multiValued="true"/>
     <field name="institution" type="string" indexed="true" stored="true" multiValued="true"/>
 
