@@ -1,0 +1,265 @@
+/*
+ * Custom format determination script.
+ *
+ * This can be used to override built-in SolrMarc custom functions.  If you change
+ * this script, you will need to activate it in import/marc_local.properties before
+ * it will be applied during indexing.
+ */
+
+import org.marc4j.marc.Record;
+import org.marc4j.marc.ControlField;
+import org.marc4j.marc.DataField;
+import org.marc4j.marc.Subfield;
+import org.marc4j.marc.VariableField;
+import java.lang.String;
+import  java.lang.*;
+import java.util.regex.*;
+
+
+/*
+ * Get call number from Horizon export
+ *
+ * @param  Record          record
+ * @return Set     format of record
+ */
+ 
+public Set getHznCallNumber(Record record)
+{
+     return getHznCallNumber(record, "display");
+}
+
+public Set getHznCallNumber(Record record, String mode)
+{
+	
+	System.out.println(" I'm HORIZON");
+	
+    Set result = new LinkedHashSet();
+    List items  = record.getVariableFields("0929"); 
+    String [] res = new String[2];
+    
+    
+    if (!mode.equals("display") && !mode.equals("sort")) 
+    {
+    	// Throw an error with corrective message
+    	System.err.println("Illegal mode: " + mode + 
+    	    "; allowed values are 'display' or 'sort'");
+    }
+ 
+    // pull 929a sublield from each record
+    Set callNos = indexer.getFieldList(record, "929a");
+    
+    for (String call : callNos) 
+    {
+	// it's a "switch" if statement between sort browse and display browse  
+	if(mode.equals("sort"))
+	{
+	    result.add(CallNumberTrim(call));
+        }
+	else
+        {
+	     result.add(CallNumberDisplay(call));
+	}
+    }
+    return result;
+}
+
+public Set getHznCall_LC_Number(Record record)
+{
+     
+     return getHznCall_LC_Number(record, "display");
+}
+
+public Set getHznCall_LC_Number(Record record, String mode)
+{
+     Set result = new LinkedHashSet();
+     List fld929List  = record.getVariableFields("929");
+     
+      if (fld929List.isEmpty())
+     {
+     	     return result;
+     }
+     
+     Iterator iter = fld929List.iterator();
+     DataField fld929;
+     while (iter.hasNext())
+     {
+    	  fld929 = (DataField) iter.next();
+    	  
+          // Reject only DDC and SuDoc call numbers
+    	  if(fld929.getSubfield('t') != null) 
+    	  {
+               String str_t = fld929.getSubfield('t').getData().trim();
+
+    	       if ( str_t.equals("DDC") || str_t.equals("SuDoc"))
+    	           continue;
+    	  }   
+    	    	    
+    	  if(fld929.getSubfield('a') != null) 
+    	  {
+    	       // pull 929a sublield from each record
+               Set str_a = indexer.getFieldList(record, "929a");
+    	       for (String call : str_a) 
+                    {	                      
+                    	       String [] rest = splitHznPrefixCallnum(call);
+                    	       String  prefx = rest[0];
+                    	       String callNumbr = rest[1];
+                    	    
+                    	    
+                             
+                    	//   String [] rest = splitHznPrefixCallnum(call);
+
+	                 // it's a "switch" if statement between sort browse and display browse  
+	                 if(mode.equals("sort"))
+	                 {
+	                    // result.add(CallNumberTrim(call));
+
+                    	       if (prefx != null) 
+                    	       {
+                                   result.add(callNumbr + " " + prefx);
+                               } 
+                               else
+                           	   result.add(callNumbr);
+                         }
+                         
+	                 else
+                         {
+	                       //result.add(CallNumberDisplay(call));
+	                       //String [] rest = splitHznPrefixCallnum(call);
+                    	       //String  prefx = rest[0];
+                    	       //String callNumbr = rest[1];
+                    	       if (prefx != null) 
+                    	       {
+                                    result.add(prefx + " " + callNumbr);
+                               } 
+                               else
+                           	    result.add(callNumbr);
+	                 } 
+                   }
+           }
+     }  
+     return result; 
+}
+
+public static String[] splitHznPrefixCallnum(callNum)
+{
+//System.out.println("enter splitHznPrefixCallnum");
+//System.out.println("callNum:\t>>" + callNum + "<<");
+//System.out.println("callNum:\t" + stringToHex(callNum));
+        String prefix = null;
+        String callNumber = null;
+        
+        Pattern pat1 = Pattern.compile("\\u0018?(.*)\\u0019 *(.*)");
+        Pattern pat2 = Pattern.compile("<U\\+0018>(.*)<U\\+0019> *(.*)");
+        Pattern pat3 = Pattern.compile("(AudCD|microfm|f) *(.*)");
+        
+	Matcher match1 = pat1.matcher(callNum);
+	Matcher match2 = pat2.matcher(callNum);
+	Matcher match3 = pat3.matcher(callNum);
+	
+	if (match1.matches()) {
+	//	System.out.println(">> " + callNum + " matches pat1");
+		prefix = match1.group(1);
+		call = match1.group(2);
+	} else if (match2.matches()) {
+	//	System.out.println(">> " + callNum + " matches pat2");
+		prefix = match2.group(1);
+		call = match2.group(2);
+	} else if (match3.matches()) {
+	//	System.out.println(">> " + callNum + " matches pat3");
+		prefix = match3.group(1);
+		call = match3.group(2); 
+	} else {
+		call = callNum;
+	}
+	//System.out.println("prefix = " + prefix);
+	//System.out.println("call = " + call);
+	String[] result = {prefix, call};
+	return result;
+}
+
+
+ // dewey-raw: in 929 field look for subfield "t" with "DDC" in that subfield. if there is a subfield  with DDC, use subfield "a" to populate and 
+ //trim any possible #0018 and #0019"deweyRaw" in alphabetical browse.
+public Set getHznDeweyRaw (Record record)
+{
+   List fld929List = record.getVariableFields("929");
+   Iterator iter = fld929List.iterator();
+   Set result = new LinkedHashSet();
+
+    DataField fld929;
+   
+    while (iter.hasNext())
+    {
+            fld929 = (DataField) iter.next();
+            
+            if(fld929.getSubfield('t') != null && 
+            fld929.getSubfield('t').getData().toUpperCase().contains("DDC")) 
+            {  	    
+                  String deweyRaw = fld929.getSubfield('a').getData();
+                  result.add(deweyRaw);
+            } 
+    }
+    return result;   
+}
+
+public Set getHznDeweySort (Record record)
+
+{
+   List fld929List = record.getVariableFields("929");
+   Iterator iter = fld929List.iterator();
+   Set result = new LinkedHashSet();
+
+    DataField fld929;
+    while (iter.hasNext())
+    {
+
+            fld929 = (DataField) iter.next();
+            
+            if(fld929.getSubfield('t') != null && 
+            fld929.getSubfield('t').getData().toUpperCase().contains("DDC")) 
+            { 
+                  String deweySort = CallNumberTrim(fld929.getSubfield('a').getData());
+                  result.add(deweySort); 
+            } 
+    }
+    return result;
+    
+}
+
+
+public static String CallNumberTrim (String callNum)
+{
+
+	// <U+0018> is '\u0018' and <U+0019> is '\u0019'
+	char beginPrefix = '\u0018';
+        char endPrefix = '\u0019'; 
+        //  String ch for matching whether there is still a prefix
+        //  with <U+0018>Aud<U+0019>; looks for 0019> string and
+        //  dispays callNum after 0019>
+        String ch = "0019>";
+        String prefixes;
+        
+        int prefixStartIdx = callNum.indexOf(beginPrefix);
+        int prefixEndIdx = callNum.indexOf(endPrefix); 
+
+	if (callNum.contains("DVD")) {
+	    System.err.println("callNum = " + callNum);
+	    System.err.println("  prefixEndIdx = " + prefixEndIdx);
+	}
+                                     
+	// is sort starts with " < " then it has to be stripped off of <U+0018>Aud<U+0019>
+	if ('<' == callNum.charAt(0))
+	{
+	    int prefix = callNum.indexOf(ch) + 5;
+	    prefixes = callNum.substring(8, prefix-8).trim();
+	    callNum = callNum.substring(prefix).trim() + "  " + prefixes;
+	}
+        else if (prefixEndIdx >= 0)
+	{
+	    System.err.println("callNum = " + callNum);
+	    prefixes = callNum.substring(0,prefixEndIdx);
+	    callNum = callNum.substring(prefixEndIdx).trim() + "  " + prefixes;
+	    System.err.println("callNum = " + callNum);
+	}
+        return callNum;
+}

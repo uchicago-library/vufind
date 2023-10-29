@@ -1,0 +1,29 @@
+#! /bin/bash
+# to_utf8.sh
+# Diagnostic program to output MARC records as utf8 encoded binary MARC records
+# $Id: to_utf8.sh 
+
+E_BADARGS=65
+
+scriptdir=$( (cd -P $(dirname $0) && pwd) )
+solrmarcdir=$( (cd -P $(dirname $0)/.. && pwd) )
+if ! [ -e $solrmarcdir/solrmarc_core.jar ]
+then
+  solrmarcdir=$( (cd -P $(dirname $0)/../../import && pwd) )
+fi
+
+if ! [ -p /dev/stdin ]
+then  
+  if [ $# -eq 0 ]
+  then
+    echo "    Usage: `basename $0` [config.properties] ./path/to/marc.mrc "
+    echo "      Note that if the config.properties file is not specified the Jarfile will be searched for"
+    echo "      a file whose name ends with \"config.properties\""
+    exit $E_BADARGS
+  fi
+fi
+
+java -Dsolrmarc.main.class="org.solrmarc.marc.MarcPrinter" -jar $solrmarcdir/solrmarc_core.jar translate $1 $2 
+
+exit 0
+

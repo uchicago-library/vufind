@@ -1,0 +1,38 @@
+#! /bin/bash
+# syn2marc
+# Program to transform Syndetics data to MARCXML for processing by SolrMarc
+# $Id: syn2marc 
+
+E_BADARGS=65
+
+scriptdir=$( (cd -P $(dirname $0) && pwd) )
+solrmarcdir=$( (cd -P $(dirname $0)/.. && pwd) )
+if ! [ -e $solrmarcdir/solrmarc_core_3.5.jar ]
+then
+  solrmarcdir=$( (cd -P $(dirname $0)/../../import && pwd) )
+fi
+
+if ! [ -p /dev/stdin ]
+then  
+  if [ $# -eq 0 ]
+  then
+    echo "    Usage: `basename $0`  ./path/to/syndeticsdata.xml"
+    exit $E_BADARGS
+  fi
+fi
+
+if [ "$1" == "-f" ]; then
+    shift
+    java -jar -Xms4G -Xmx4G $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl | xmllint --format -
+elif [ "$1" == "-m" ]; then
+    shift
+    java -jar -Xms4G -Xmx4G $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl | $scriptdir/to_utf8 $scriptdir/syn_config.properties
+elif [ "$1" == "-p" ]; then
+    shift
+    java -jar -Xms4G -Xmx4G $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl | printrecord $scriptdir/syn_config.properties
+else
+    java -jar -Xms4G -Xmx4G $scriptdir/saxon9.jar $1 $scriptdir/SyndeticsDataToMARCXML.xsl 
+fi
+
+exit 0
+

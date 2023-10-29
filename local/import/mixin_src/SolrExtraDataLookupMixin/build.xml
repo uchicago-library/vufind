@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<project basedir="." default="package" name="SolrMarcMixin">
+
+    <property file="build.properties" />
+
+    <property environment="env" />
+    <property name="debuglevel" value="source,lines,vars" />
+    <property name="target" value="1.7" />
+    <property name="source" value="1.7" />
+    <property name="build" value="bin" />
+    <property name="src" value="src" />
+    <property name="lib" value="lib" />
+    <property name="dist" value="dist" />
+    <property name="config_file" value="test_config.properties" />
+    <property name="test_data_dir" location="test" />
+    <property name="test_data_filename" value="isbnrecs.mrc" />
+    <property name="test_data_file" value="${test_data_dir}/${test_data_filename}" />
+
+    <property name="solrmarc.directory" value=""/>
+    <fail message="ERROR: No SolrMarc.jar${line.separator}The build.properties file MUST define solrmarc.directory which must point to a directory containing a SolrMarc.jar${line.separator}Note: On Windows machines the pathname must use forward slashes, NOT backslashes">
+        <condition>
+           <or>
+                <equals arg1="${solrmarc.directory}" arg2="" />
+                <not>
+                    <available file="${solrmarc.directory}/SolrMarc.jar"/>
+                </not>
+            </or>
+        </condition>
+    </fail>
+    
+    <patternset id="solrmarc.jars.to.unpack">
+        <patternset>
+            <include name="**/MarcImporter.jar" />
+            <include name="**/marc4j*.jar" />
+            <include name="**/log4j*.jar" />
+            <include name="**/bsh*.jar" />
+            <include name="**/apache-solr-solrj-3.5-*.jar" />
+        </patternset>
+    </patternset>
+
+    <property name="SolrMarcMixin.srcdir" value="src" />
+
+    <path id="SolrMarcMixin.srcpath">
+        <fileset dir="${SolrMarcMixin.srcdir}" includes="**/*.java" />
+    </path>
+
+    <target name="init">
+        <mkdir dir="${build}" />
+        <mkdir dir="test/${build}" />
+        <mkdir dir="${lib}" />
+        <mkdir dir="${dist}" />
+        <mkdir dir="${src}" />
+  <!--      <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch" />
+                <exclude name="**/*.java" />
+            </fileset>
+        </copy> -->
+        <copy todir="${dist}" file="${solrmarc.directory}/SolrMarc.jar" />
+        <unjar src="${dist}/SolrMarc.jar" dest="${lib}" overwrite="true">
+            <patternset refid="solrmarc.jars.to.unpack" />
+            <mapper type="flatten" />
+        </unjar>
+    </target>
+
+    <target name="example-config" depends="init">
+        <mkdir dir="${src}/org/solrmarc/index" />
+        <copy todir="${src}/org/solrmarc/index">
+            <fileset dir="test/example" includes="*.java" />
+        </copy>
+        <copy todir="${dist}">
+            <fileset dir="test/example" includes="*.properties" />
+        </copy>
+        <antcall target="package" inheritAll="true" />
+    </target>
+
+    <target name="example-run" depends="example-config">
+        <antcall target="run" inheritAll="true" />
+    </target>
+
+    <target name="example-clean">
+        <delete >
+            <fileset dir="${src}/org/solrmarc/index" includes="VideoInfoMixin.java" />
+        </delete>
+        <delete >
+            <fileset dir="${dist}" includes="VideoInfoMixin.jar" />
+        </delete>
+    </target>
+
+    <target name="clean">
+        <delete dir="${build}" />
+        <delete dir="${dist}" />
+        <delete>
+            <fileset dir="lib">
+                <patternset refid="solrmarc.jars.to.unpack" />
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="cleanall" depends="clean" />
+
+    <target name="build" depends="build-subprojects,build-project" />
+
+    <target name="build-subprojects" />
+
+    <target name="build-project" depends="init">
+        <echo message="${ant.project.name}: ${ant.file}" />
+        <fail message="No source files found in src directory" >
+            <condition>
+                <resourcecount refid="SolrMarcMixin.srcpath" count="0" when="eq"/>
+            </condition>
+        </fail>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${build}" srcdir="${SolrMarcMixin.srcdir}" encoding="UTF-8" source="${source}" target="${target}" includeAntRuntime="false">
+            <classpath>
+                <fileset dir="lib">
+                    <patternset includes="*.jar" />
+                </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="package" depends="build-project">
+        <echo message="${ant.project.name}: ${ant.file}" />
+        <fail message="More than one source file found in src directory and property custom.mixin.jar not defined" >
+            <condition>
+                <and>
+                    <resourcecount refid="SolrMarcMixin.srcpath" count="1" when="gt"/>
+                    <not>
+                        <isset property="custom.mixin.jar" />
+                    </not>
+                </and>
+            </condition>
+        </fail>
+        <!-- this bit generates a jar file name based on the name of the src file that is found in the src directory -->
+        <!-- since it would fail if more than one src file is found, the fail task ensures that the property is manually set in this case -->
+        <pathconvert property="custom.mixin.jar" refid="SolrMarcMixin.srcpath" setonempty="false">
+            <chainedmapper>
+                <regexpmapper from="^.*[/\\](.*java)$$" to="\1" />
+                <packagemapper from="*.java" to="*.jar" />
+            </chainedmapper>
+        </pathconvert>
+        <echo message="custom.mixin.jar=${custom.mixin.jar}" />
+        <jar destfile="${dist}/${custom.mixin.jar}" basedir="${build}" includes="**/*.class">
+        </jar>
+    </target>
+
+    <target name="install" depends="package">
+        <fail message="Deploy dir not defined" >
+            <condition>
+                <not>
+                    <isset property="deploydir" />
+                </not>
+            </condition>
+        </fail>
+        <copy file="${dist}/${custom.mixin.jar}" todir="${deploydir}" />
+    </target>
+
+    <target name="run" depends="package">
+        <echo message="Running MarcIndexer Test:  " />
+        <echo message="  java -Dsolrmarc.main.class=&quot;org.solrmarc.marc.MarcPrinter&quot; -jar ${dist}/SolrMarc.jar ${config_file} ${test_data_file} index" />
+        <java jar="${dist}/SolrMarc.jar" fork="true" timeout="5000">
+            <sysproperty key="solrmarc.main.class" value="org.solrmarc.marc.MarcPrinter" />
+            <arg value="${config_file}" />
+            <arg value="${test_data_file}" />
+            <arg value="index" />
+        </java>
+    </target>
+
+    <target name="build-refprojects" description="Build all projects which reference this project. Useful to propagate changes." />
+</project>
