@@ -2,7 +2,8 @@
 
 scriptdir=$( (cd -P $(dirname $0) && pwd) )
 solrmarcdir=$( (cd -P $(dirname $0)/.. && pwd) )
-if ! [ -e $solrmarcdir/solrmarc_core.jar ]
+
+if ! [ -e $solrmarcdir/solrmarc_core_3.5.jar ]
 then
   solrmarcdir=$( (cd -P $(dirname $0)/../../import && pwd) )
 fi
@@ -23,7 +24,7 @@ for isbn in `cat $summary_update_file | $scriptdir/syn2marc - |
                sed -e 's/020   $a//' | sort | uniq`
 do
   #  curl -s "http://localhost:8080/solr/biblio/select?q=isbn%3a$isbn&fl=id" |    # This line is for vufind3 ans Solr 5.5 
-     curl -s "http://localhost:8080/solr/biblio/select?fl=id&q=isbn&wt=xml" | 
+     curl -s "http://localhost:8983/solr/biblio/select?fl=id&q=isbn&wt=xml" | 
     xmllint --format - | egrep '"id"' | 
         sed -e 's/.*"id">\([0-9]*\)<.*/\1/' 
 done  |  sort | uniq >  $outputtmpdir/$marc_update_file_ids
@@ -33,10 +34,11 @@ done  |  sort | uniq >  $outputtmpdir/$marc_update_file_ids
 echo "Extracting MARC records from biblio core based matching the list of id just extracted"
 for id in `cat $outputtmpdir/$marc_update_file_ids`
 do
-    $scriptdir/getfromsolr "http://localhost:8080/solr/biblio" "id:$id" fullrecord
+
+    $scriptdir/getfromsolr "http://localhost:8983/solr/biblio" "id:$id" fullrecord
 done > $outputtmpdir/$marc_update_file
 
 echo "Indexing extracted records back into the biblio core"
-$scriptdir/indexfile $configdir/import_ole_syn.properties $outputtmpdir/$marc_update_file 
+$scriptdir/indexfile $configdir/import_folio_syn.properties $outputtmpdir/$marc_update_file 
 
 echo "Done processing summary update file $summ_fname"

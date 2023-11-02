@@ -29,7 +29,8 @@ then
 fi
 
 #java $SOLRMARC_MEM_ARGS -jar $solrmarcdir/solrmarc_core.jar $1 $2 $3
-java $SOLRMARC_MEM_ARGS -jar $solrmarcdir/solrmarc_core.jar $1 -solrj $VUFIND_HOME/solr/vendor/dist/solrj-lib $2 $3
+
+java $SOLRMARC_MEM_ARGS -jar $solrmarcdir/solrmarc_core_3.5.jar $1 -solrj $VUFIND_HOME/solr/vendor/server/solr-webapp/webapp/WEB-INF/lib/ -lib_local "$VUFIND_HOME/import/lib_local;$VUFIND_HOME/solr/vendor/modules/analysis-extras/lib" $2 $3
 
 exit 0
 

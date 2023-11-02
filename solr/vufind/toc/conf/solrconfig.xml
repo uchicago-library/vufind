@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>7.3.1</luceneMatchVersion>
+  <luceneMatchVersion>9.1.1</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load any Jars
        identified and use them to resolve any "plugins" specified in
@@ -88,9 +88,8 @@
   <lib dir="${solr.install.dir:../../../..}/dist/" regex="solr-velocity-\d.*\.jar" />
   -->
   
-  <lib dir="../../vendor/contrib/analysis-extras/lib" regex=".*\.jar" />
-  <lib dir="../../vendor/contrib/analysis-extras/lucene-libs" regex=".*\.jar" />
   <lib dir="../jars" regex=".*\.jar" />
+  <lib dir="../../vendor/modules/analysis-extras/lib" regex=".*\.jar" />
 
   <!-- an exact 'path' can be used instead of a 'dir' to specify a 
        specific jar file.  This will cause a serious error to be logged 
@@ -466,7 +465,7 @@
            autowarmCount - the number of entries to prepopulate from
                and old cache.
       -->
-    <filterCache class="solr.FastLRUCache"
+    <filterCache class="solr.CaffeineCache"
                  size="512"
                  initialSize="512"
                  autowarmCount="0"/>
@@ -479,10 +478,10 @@
             maxRamMB - the maximum amount of RAM (in MB) that this cache is allowed
                        to occupy
       -->
-    <queryResultCache class="solr.LRUCache"
-                      size="512"
-                      initialSize="512"
-                      autowarmCount="0"/>
+    <documentCache class="solr.CaffeineCache"
+                   size="512"
+                   initialSize="512"
+                   autowarmCount="0"/>
 
     <!-- Document Cache
 
@@ -490,14 +489,14 @@
          document).  Since Lucene internal document ids are transient,
          this cache will not be autowarmed.
       -->
-    <documentCache class="solr.LRUCache"
+    <documentCache class="solr.CaffeineCache"
                    size="512"
                    initialSize="512"
                    autowarmCount="0"/>
 
     <!-- custom cache currently used by block join -->
     <cache name="perSegFilter"
-           class="solr.search.LRUCache"
+           class="solr.search.CaffeineCache"
            size="10"
            initialSize="0"
            autowarmCount="10"
@@ -510,7 +509,7 @@
          even if not configured here.
       -->
     <!--
-       <fieldValueCache class="solr.FastLRUCache"
+       <fieldValueCache class="solr.CaffeineCache"
                         size="512"
                         autowarmCount="128"
                         showItems="32" />
@@ -637,24 +636,6 @@
     <maxWarmingSearchers>2</maxWarmingSearchers>
 
   </query>
-
-<!--
-<requestHandler name="/replication" class="solr.ReplicationHandler">
-  <lst name="master">
-    <str name="replicateAfter">optimize</str>
-    <str name="backupAfter">optimize</str>
-    <str name="replicateAfter">commit</str>
-    <str name="confFiles">solrconfig-slave.xml:solrconfig.xml,schema.xml</str>
-    <str name="commitReserveDuration">00:05:10</str>
-  </lst>
-  <int name="maxNumberOfBackups">1</int>
-  <lst name="invariants">
-    <str name="maxWriteMBPerSec">160</str>
-  </lst>
-</requestHandler>
-
--->
-
 
 
   <!-- Request Dispatcher
@@ -1511,9 +1492,12 @@
        in Solr's conf/xslt directory.  Changes to xslt files are checked for
        every xsltCacheLifetimeSeconds.  
     -->
-  <queryResponseWriter name="xslt" class="solr.XSLTResponseWriter">
+
+  <!--
+  <queryResponseWriter name="xslt" class="solr.scripting.xslt.XSLTResponseWriter">
     <int name="xsltCacheLifetimeSeconds">5</int>
   </queryResponseWriter>
+  -->
 
   <!-- Query Parsers
 

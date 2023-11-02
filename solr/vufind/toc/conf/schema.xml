@@ -22,7 +22,7 @@
     <fieldType name="isbn" class="solr.TextField">
         <analyzer>
             <tokenizer class="solr.PatternTokenizerFactory" pattern="[;,]\s*" />
-            <filter class="edu.umich.lib.solr_filters.ISBNNormalizerFilterFactory"/>
+            <filter class="edu.umich.lib.solr_filters.ISBNNormalizerFilterFactory"/> 
         </analyzer>
     </fieldType>
     	
