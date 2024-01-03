@@ -159,7 +159,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
             $textFormatter = function ($supplement) {
                 $format = '%s %s';
                 $supStat = $supplement->statement;
-                $supNote = $supplement->note;
+                $supNote = $supplement->note ?? '';
                 $statement = trim(sprintf($format, $supStat, $supNote));
                 return $statement ?? '';
             };
@@ -247,6 +247,9 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     array_intersect($itemStatCodeIds, $itemHideStatusStatCodes)
                 ) >= 1 || in_array($item->status->name, $itemHideStatusStatCodes);
 
+                $arsenicalStatCodeId = 'c693d804-024e-4437-91e0-882f462abd31';
+                $isArsenical = in_array($arsenicalStatCodeId, $itemStatCodeIds);
+
                 $loanTypeName = '';
                 $tempLoanTypeId = $item->temporaryLoanTypeId ?? '';
                 $permLoanTypeId = $item->permanentLoanTypeId ?? '';
@@ -283,6 +286,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     'duedate' => $dueDate,
                     'hide_status' => $itemHasHideStatCode,
                     'item_statistical_code' => $itemStatCodeIds[0] ?? '',
+                    'is_arsenical' => $isArsenical,
                     'loan_type_id' => $loanTypeId,
                     'loan_type_name' => $loanTypeName,
                     'holding_copy_number' => $holdingCopyNumber,
