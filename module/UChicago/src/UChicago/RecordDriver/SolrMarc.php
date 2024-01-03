@@ -784,4 +784,23 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
         $subfields = ['k', 'f'];
         return strip_tags($this->simpleParse($field, $subfields));
     }
+
+    public function getUCAltTOC()
+    {
+        $altData = $this->getMarcReader()->getLinkedFieldsSubFields('880', '505', ['a', 'g', 'r', 't', 'u']);
+        $tocAlt = [];
+
+        if ($altData) {
+            $strAlt = '';
+            foreach ($altData as $ad) {
+                $strAlt .= trim($ad) . ' ';
+            }
+            $tocAlt = array_merge(
+                $tocAlt,
+                array_filter(array_map('trim', preg_split('/[.\s]--/', $strAlt)))
+            );
+        }
+        return [$tocAlt];
+    }
+
 }

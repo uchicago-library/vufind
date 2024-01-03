@@ -49,6 +49,14 @@ return [
     ],
     'vufind' => [
         'plugin_managers' => [
+            'recordtab' => [
+                'factories' => [
+                    'UChicago\RecordTab\TOCAlt' => 'UChicago\RecordTab\TOCAltFactory',
+                ],
+                'aliases' => [
+                    'tocalt' => 'UChicago\RecordTab\TOCAlt',
+                ],
+            ],
             'ils_driver' => [
                 'factories' => [
                     'UChicago\\ILS\\Driver\\Folio' => 'VuFind\\ILS\\Driver\\FolioFactory',
