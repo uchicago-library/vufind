@@ -892,6 +892,39 @@ class Folio extends \VuFind\ILS\Driver\Folio
     }
 
     /**
+     * This method queries the ILS for a patron's current profile information
+     *
+     * @param array $patron Patron login information from $this->patronLogin
+     *
+     * @return array Profile data in associative array
+     */
+    public function getMyProfile($patron)
+    {
+        $profile = $this->getUserById($patron['id']);
+        $expiration = isset($profile->expirationDate)
+            ? $this->dateConverter->convertToDisplayDate(
+                "Y-m-d H:i",
+                $profile->expirationDate
+            )
+            : null;
+        $regularFirstName = $profile->personal->firstName ?? null;
+        $prefferedFirstName = $profile->personal->preferredFirstName ?? null;
+        return [
+            'id' => $profile->id,
+            'firstname' => $prefferedFirstName ?? $regularFirstName,
+            'lastname' => $profile->personal->lastName ?? null,
+            'email' => $profile->personal->email ?? null,
+            'address1' => $profile->personal->addresses[0]->addressLine1 ?? null,
+            'city' => $profile->personal->addresses[0]->city ?? null,
+            'country' => $profile->personal->addresses[0]->countryId ?? null,
+            'zip' => $profile->personal->addresses[0]->postalCode ?? null,
+            'phone' => $profile->personal->phone ?? null,
+            'mobile_phone' => $profile->personal->mobilePhone ?? null,
+            'expiration_date' => $expiration,
+        ];
+    }
+
+    /**
      * Check for account blocks.
      *
      * @param array $patron The patron data

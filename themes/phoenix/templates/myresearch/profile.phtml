@@ -20,17 +20,19 @@
   <? ### ./UChicago customization ### ?>
 
   <table class="table table-striped">
-    <?=
+    <? ### UChicago customization ### ?>
+    <?/*=
       $this->renderArray(
       $arrTemplate,
-      $this->user,
+      $this->profile,
       [
         $this->transEsc('First Name') => 'firstname',
         $this->transEsc('Last Name') => 'lastname',
         $this->transEsc('Email') => 'email',
       ]
-      );
+      );*/
     ?>
+    <? ### ./UChicago customization ### ?>
     <?php /* this section renders under two distinct circumstances; see if/else below: */ ?>
     <?php if (count($this->pickup ?? []) > 1 || !empty($this->preferredLibraryDisplay)): ?>
       <tr>
@@ -99,6 +101,9 @@
         [
           $this->transEsc('First Name') => 'firstname',
           $this->transEsc('Last Name') => 'lastname',
+          ### UChicago customization ###
+          $this->transEsc('Email') => 'email',
+          ### ./UChicago customization ###
           $this->transEsc('Address') . ' 1' => 'address1',
           $this->transEsc('Address') . ' 2' => 'address2',
           $this->transEsc('Zip') => 'zip',
@@ -112,6 +117,9 @@
         );
       ?>
     </table>
+  <? ### UChicago customization ### ?>
+    <p>See <a href="https://www.lib.uchicago.edu/research/help/catalog-help/my-account/profile/">Catalog Help – Profile</a> for instructions on updating your contact information, including selecting a preferred first name.</p>
+  <? ### ./UChicago customization ### ?>
   <?php elseif ('ils-none' !== $this->ils()->getOfflineMode() && $this->patronLoginView && !empty($this->patronLoginView->getTemplate())): ?>
     <?=$this->partial($this->patronLoginView);?>
   <?php endif; ?>
