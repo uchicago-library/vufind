@@ -57,12 +57,30 @@ class ServiceLinks extends AbstractHelper {
      * @return array of grouper groups
      */
     public function getGrouperGroups() {
-        if (array_key_exists('ucisMemberOf', $_SERVER)) {
-            $groups = explode(';', $_SERVER['ucisMemberOf']);
+        # error_log( "groups = " . $this->groups );
+        if (isset($_SESSION['Grouper'])) {
+            return $_SESSION['Grouper'];
+        }
+        else if (array_key_exists('ucisMemberOf', $_SERVER)) {
+            $delim = strpos( $_SERVER['ucisMemberOf'], ';' ) ? ';' : ',';
+            error_log( "found ucisMemberOf with delim=$delim" );
+            $groups = explode($delim, $_SERVER['ucisMemberOf']);
             $_SESSION['Grouper'] = $groups;
             return  $groups;
-        } else if (isset($_SESSION['Grouper'])) {
-            return $_SESSION['Grouper'];
+        }
+        else if (array_key_exists('OIDC_CLAIM_ucisMemberOf', $_SERVER)) {
+            $delim = strpos( $_SERVER['OIDC_CLAIM_ucisMemberOf'], ';' ) ? ';' : ',';
+            error_log( "found OIDC_CLAIM_ucisMemberOf with delim=$delim" );
+            $groups = explode($delim, $_SERVER['OIDC_CLAIM_ucisMemberOf']);
+            $_SESSION['Grouper'] = $groups;
+            return  $groups;
+        }
+        else if (array_key_exists('REDIRECT_OIDC_CLAIM_ucisMemberOf', $_SERVER)) {
+            $delim = strpos( $_SERVER['REDIRECT_OIDC_CLAIM_ucisMemberOf'], ';' ) ? ';' : ',';
+            error_log( "found REDIRECT_OIDC_CLAIM_ucisMemberOf with delim=$delim" );
+            $groups = explode($delim, $_SERVER['REDIRECT_OIDC_CLAIM_ucisMemberOf']);
+            $_SESSION['Grouper'] = $groups;
+            return  $groups;
         }
         else {
             return [];
@@ -758,8 +776,11 @@ class ServiceLinks extends AbstractHelper {
             $url .= '?q=';
             foreach ($asqs['lookfor0'] as $i => $searchTerm) {
                 if (!empty($searchTerm)) {
-                    $q = $types[$asqs['type0'][$i]] . $searchTerm . ' ';
-                    $url .= urlencode($q);
+                    $type = $asqs['type0'][$i];
+                    if (array_key_exists($type, $types)) {
+                        $q = $types[$type] . $searchTerm . ' ';
+                        $url .= urlencode($q);
+                    }
                 }
             }
         // Not a search or browse

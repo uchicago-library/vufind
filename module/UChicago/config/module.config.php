@@ -49,6 +49,14 @@ return [
     ],
     'vufind' => [
         'plugin_managers' => [
+            'auth' => [
+                'factories' => [
+                    'UChicago\Auth\Shibboleth' => 'VuFind\Auth\ShibbolethFactory',
+                ],
+                'aliases' => [
+                    'shibboleth' => 'UChicago\Auth\Shibboleth',
+                ],
+            ],
             'recordtab' => [
                 'factories' => [
                     'UChicago\RecordTab\TOCAlt' => 'UChicago\RecordTab\TOCAltFactory',
