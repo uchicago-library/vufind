@@ -6,6 +6,9 @@ return [
         'UChicago\Controller\CartController' => 'VuFind\Controller\CartControllerFactory',
         'UChicago\Controller\MyResearchController' => 'VuFind\Controller\AbstractBaseFactory',
         'UChicago\Controller\HoldsController' => 'VuFind\Controller\HoldsControllerFactory',
+        /* BEGIN: Only needed until we upgrade to 9.1.1 */
+        'UChicago\Controller\CoverController' => 'UChicago\Controller\CoverControllerFactory',
+        /* END: Only needed until we upgrade to 9.1.1 */
       ],
       'aliases' => [
         'Pin' => 'VuFindAdmin\Controller\PinController',
@@ -17,6 +20,10 @@ return [
         'requests' => 'UChicago\Controller\HoldsController',
         'Cart' => 'UChicago\Controller\CartController',
         'cart' => 'UChicago\Controller\CartController',
+        /* BEGIN: Only needed until we upgrade to 9.1.1 */
+        'Cover' => 'UChicago\Controller\CoverController',
+        'cover' => 'UChicago\Controller\CoverController',
+        /* END: Only needed until we upgrade to 9.1.1 */
       ],
     ],
     'router' => [
