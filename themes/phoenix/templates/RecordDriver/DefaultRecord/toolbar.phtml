@@ -85,7 +85,9 @@
     <?php endif; ?>
 
     <li role="none">
-      <a class="permalink-record toolbar-btn" data-lightbox href="<?=$this->escapeHtmlAttr($this->recordLinker()->getActionUrl($this->driver, 'Permalink'))?>" rel="nofollow">
+      <? ### UChicago customization ### ?>
+      <a class="permalink-record toolbar-btn" data-lightbox href="<?=$this->escapeHtmlAttr('http://pi.lib.uchicago.edu/1001/cat/bib/' . $this->driver->getUniqueId())?>" rel="nofollow">
+      <? ### ./UChicago customization ### ?>
         <?=$this->icon('external-link') ?>
         <?=$this->transEsc('permanent_link')?>
       </a>
