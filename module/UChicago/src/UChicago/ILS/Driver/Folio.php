@@ -351,21 +351,23 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 $unboundLocation = $this->getPurchaseHistoryLocation($notes);
                 foreach($holding->receivingHistory->entries as $entry) {
                     if (property_exists($entry, 'publicDisplay')) {
-                        $enum = $entry->enumeration;
-                        $chron = $entry->chronology;
-                        $issue = '';
-                        if ($enum) {
-                            $issue .= str_replace('%%enum%%', $enum, $enumTemplate);
+                        if ($entry->publicDisplay != false) {
+                            $enum = $entry->enumeration;
+                            $chron = $entry->chronology;
+                            $issue = '';
+                            if ($enum) {
+                                $issue .= str_replace('%%enum%%', $enum, $enumTemplate);
+                            }
+                            if ($chron) {
+                                $issue .= str_replace('%%chron%%', $chron, $chronTemplate);
+                            }
+                            array_push(
+                                $purchaseHistory,
+                                ['issue' => $issue,
+                                 'holdings_id' => $holdingId,
+                                 'unbound_location' => $unboundLocation]
+                            );
                         }
-                        if ($chron) {
-                            $issue .= str_replace('%%chron%%', $chron, $chronTemplate);
-                        }
-                        array_push(
-                            $purchaseHistory,
-                            ['issue' => $issue,
-                             'holdings_id' => $holdingId,
-                             'unbound_location' => $unboundLocation]
-                        );
                     }
                 }
             }
