@@ -66,9 +66,11 @@ return [
             ],
             'recordtab' => [
                 'factories' => [
+                    'UChicago\\RecordTab\\HoldingsILS' => 'VuFind\\RecordTab\\HoldingsILSFactory',
                     'UChicago\RecordTab\TOCAlt' => 'UChicago\RecordTab\TOCAltFactory',
                 ],
                 'aliases' => [
+                    'VuFind\\RecordTab\\HoldingsILS' => 'UChicago\\RecordTab\\HoldingsILS',
                     'tocalt' => 'UChicago\RecordTab\TOCAlt',
                 ],
             ],
