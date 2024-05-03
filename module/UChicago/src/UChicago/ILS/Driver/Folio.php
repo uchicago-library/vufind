@@ -756,7 +756,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 ? 'Page' : $default_request,
             'requesterId' => $holdDetails['patron']['id'],
             'requestDate' => date('c'),
-            'fulfilmentPreference' => 'Hold Shelf',
+            'fulfillmentPreference' => 'Hold Shelf',
             // See above, re: required by form field.
             // 'requestExpirationDate' => $requiredBy,
             'pickupServicePointId' => $holdDetails['pickUpLocation'],
