@@ -302,6 +302,7 @@
    <field name="series_facet" type="textFacet" indexed="true" stored="true" multiValued="true"/>
    <field name="barcode" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="doi" type="string" indexed="true" stored="true" multiValued="true"/>
+   <field name="video_game_cover" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="import_time" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
    <field name="author_browse_sort" type="string" indexed="true" stored="true" multiValued="true"/>
    <!-- UChicago fields for exactish matching -->
