@@ -64,7 +64,7 @@ function updateSearchPlaceholderText(select) {
  */
 function eholdingsMegaService (isbns, oclc, target, onlineHeader) {
   if (!onlineHeader) { onlineHeader = false; }
-  var url ='https://www.lib.uchicago.edu/cgi-bin/megaholdings?function=megaholdings&callback=x&nums=';
+  var url ='https://restful.lib.uchicago.edu/cgi-bin/megaholdings?function=megaholdings&callback=x&nums=';
   function mapper1(x) { return ("isbn:" + x) }
   url += isbns.map(mapper1).join(',');
   if (isbns.length > 0 && oclc.length > 0) {
