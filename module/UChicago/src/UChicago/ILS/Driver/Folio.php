@@ -456,8 +456,22 @@ class Folio extends \VuFind\ILS\Driver\Folio
             ) as $trans
         ) {
             $dueStatus = false;
-            $date = $this->getDateTimeFromString($trans->dueDate);
-            $dueDateTimestamp = $date->getTimestamp();
+	    $dueDateTimestamp = '';
+	    $dd = '';
+	    $dt = '';
+	    $dueStatus = '';
+            if (isset($trans->dueDate) && !empty($trans->dueDate)) {
+                $date = $this->getDateTimeFromString($trans->dueDate);
+                $dueDateTimestamp = $date->getTimestamp();
+                $dd = $this->dateConverter->convertToDisplayDate('U', $dueDateTimestamp);
+		$dt = $this->dateConverter->convertToDisplayTime('U', $dueDateTimestamp);
+                $now = time();
+                if ($now > $dueDateTimestamp) {
+                    $dueStatus = 'overdue';
+	        } elseif ($now > $dueDateTimestamp - (1 * 24 * 60 * 60)) {
+		    $dueStatus = 'due';
+	        }
+	    }
 
             $authors = implode(', ', array_map(function($c) {
                 return $c->name;
@@ -465,23 +479,10 @@ class Folio extends \VuFind\ILS\Driver\Folio
 
             $loanDate = date_create($trans->loanDate);
 
-            $now = time();
-            if ($now > $dueDateTimestamp) {
-                $dueStatus = 'overdue';
-            } elseif ($now > $dueDateTimestamp - (1 * 24 * 60 * 60)) {
-                $dueStatus = 'due';
-            }
+
             $transactions[] = [
-                'duedate' =>
-                    $this->dateConverter->convertToDisplayDate(
-                        'U',
-                        $dueDateTimestamp
-                    ),
-                'dueTime' =>
-                    $this->dateConverter->convertToDisplayTime(
-                        'U',
-                        $dueDateTimestamp
-                    ),
+                'duedate' => $dd ?? '',
+                'dueTime' => $dt ?? '',
                 'dueStatus' => $dueStatus,
                 'id' => $bib, // UChicago change
                 'item_id' => $trans->item->id,
