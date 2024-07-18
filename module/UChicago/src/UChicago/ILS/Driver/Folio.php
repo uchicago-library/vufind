@@ -350,7 +350,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
             if (property_exists($holding, 'receivingHistory')) {
                 $unboundLocation = $this->getPurchaseHistoryLocation($notes);
                 foreach($holding->receivingHistory->entries as $entry) {
-                    if (property_exists($entry, 'publicDisplay')) {
+                    if (is_object($entry) && property_exists($entry, 'publicDisplay')) {
                         if ($entry->publicDisplay != false) {
                             $enum = $entry->enumeration;
                             $chron = $entry->chronology;
