@@ -803,4 +803,11 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
         return [$tocAlt];
     }
 
+    public function getISBNs()
+    {
+        $isbnArray = (array)($this->fields['isbn'] ?? []);
+        return array_map(function($isbn) {
+            return strtok($isbn, ' ');
+        }, $isbnArray);
+    }
 }
