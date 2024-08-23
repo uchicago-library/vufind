@@ -2,6 +2,9 @@
 
 namespace UChicago\ILS\Driver;
 
+# Delete when we upgrade to VuFind 9.1.1 or above
+use Laminas\Http\Response;
+
 class Folio extends \VuFind\ILS\Driver\Folio
 {
     /**
@@ -1046,5 +1049,77 @@ class Folio extends \VuFind\ILS\Driver\Folio
             return $this->config['MyAccount']['checkedOutItemsSort'] ?? 'dueDate';
         }
     }
-}
 
+    # Delete when we upgrade to VuFind 9.1.1 or above
+    protected function renewTenantToken()
+    {
+        $this->token = null;
+        $response = $this->performOkapiUsernamePasswordAuthentication(
+            $this->config['API']['username'],
+            $this->config['API']['password']
+        );
+        $this->token = $this->extractTokenFromResponse($response);
+        $this->sessionCache->folio_token = $this->token;
+        $this->debug(
+            'Token renewed. Username: ' . $this->config['API']['username'] .
+            ' Token: ' . substr($this->token, 0, 30) . '...'
+        );
+    }
+
+    # Delete when we upgrade to VuFind 9.1.1 or above
+    protected function useLegacyAuthentication(): bool
+    {
+        return $this->config['API']['legacy_authentication'] ?? true;
+    }
+
+
+    # Delete when we upgrade to VuFind 9.1.1 or above
+    protected function performOkapiUsernamePasswordAuthentication(string $username, string $password): Response
+    {
+        $tenant = $this->config['API']['tenant'];
+        $credentials = compact('tenant', 'username', 'password');
+        // Get token
+        return $this->makeRequest(
+            method: 'POST',
+            path: $this->useLegacyAuthentication() ? '/authn/login' : '/authn/login-with-expiry',
+            params: json_encode($credentials),
+            //debugParams: '{"username":"...","password":"..."}' // THIS BREAKS IT
+        );
+    }
+
+    # Delete when we upgrade to VuFind 9.1.1 or above
+    protected function extractTokenFromResponse(Response $response): string
+    {
+        if ($this->useLegacyAuthentication()) {
+            return $response->getHeaders()->get('X-Okapi-Token')->getFieldValue();
+        }
+        $folioUrl = $this->config['API']['base_url'];
+        $cookies = new \Laminas\Http\Cookies();
+        $cookies->addCookiesFromResponse($response, $folioUrl);
+        $results = $cookies->getAllCookies();
+        foreach ($results as $cookie) {
+            if ($cookie->getName() == 'folioAccessToken') {
+                return $cookie->getValue();
+            }
+        }
+        throw new \Exception('Could not find token in response');
+    }
+
+    # Delete when we upgrade to VuFind 9.1.1 or above
+    protected function patronLoginWithOkapi($username, $password)
+    {
+        $response = $this->performOkapiUsernamePasswordAuthentication($username, $password);
+        $debugMsg = 'User logged in. User: ' . $username . '.';
+        // We've authenticated the user with Okapi, but we only have their
+        // username; set up a query to retrieve full info below.
+        $query = 'username == ' . $username;
+        // Replace admin with user as tenant if configured to do so:
+        if ($this->config['User']['use_user_token'] ?? false) {
+            $this->token = $this->extractTokenFromResponse($response);
+            $debugMsg .= ' Token: ' . substr($this->token, 0, 30) . '...';
+        }
+        $this->debug($debugMsg);
+        return $query;
+    }
+
+}
