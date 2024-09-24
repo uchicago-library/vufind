@@ -12,6 +12,20 @@
     $isShibLoggedIn = strtolower($_SESSION['ChoiceAuth']->auth_method) == 'shibboleth';
     $canPage = $this->ServiceLinks()->isMemberOf('uc:applications:library:paging:authorized') && $isShibLoggedIn;
     $isLawPatron = $this->ServiceLinks()->isMemberOf('uc:applications:library:lawlibrary:authorized') && $isShibLoggedIn;
+    $itemID = $_GET['item_id'] ?? '';
+    $holdingID = $_GET['holding_id'] ?? '';
+    $locationCode = '';
+    if ($isPickup == true && $itemID != '' && $holdingID != '') {
+        $holdings = $this->driver->getRealTimeHoldings();
+        $holding = $holdings['holdings'][$holdingID] ?? [];
+        foreach ($holding['items'] as $item) {
+            if (array_key_exists('item_id', $item) && $item['item_id'] == $itemID) {
+                if (array_key_exists('location_code', $item)) {
+                    $locationCode = strtolower($item['location_code']);
+                }
+            }
+        }
+    }
     ### ./UChicago customization ###
 ?>
 <h2><?=$this->transEsc('request_place_text')?></h2>
@@ -140,6 +154,23 @@
           <?php endif; ?>
         </select>
       </div>
+    <?php ### UChicago customization ### ?>
+    <?php elseif ($this->pickup && $locationCode == 'jrl-artresa'): ?>
+      <div class="form-group hold-pickup-location">
+        <label class="control-label"><?=$this->transEsc("pick_up_location")?>:</label>
+        <select id="pickUpLocation" name="gatheredDetails[pickUpLocation]" class="form-control">
+          <?php foreach ($this->pickup as $lib): ?>
+            <?php ### Only show Mansueto  ### ?>
+            <?php if ($lib['locationID'] === '130d8bff-bdbd-4dc5-a4ac-6d970f4918ff'): ?>
+              <option selected="selected" value="<?=$this->escapeHtmlAttr($lib['locationID'])?>"<?=($selected == $lib['locationID']) ? ' selected="selected"' : ''?>>
+                <?=$this->transEscWithPrefix('location_', $lib['locationDisplay'])?>
+              </option>
+            <?php endif; ?>
+            <?php ### ./UChicago customization ### ?>
+          <?php endforeach; ?>
+        </select>
+      </div>
+    <?php ### ./UChicago customization ### ?>
     <?php elseif ($this->pickup): ?>
       <div class="form-group hold-pickup-location">
         <label class="control-label"><?=$this->transEsc("pick_up_location")?>:</label>
