@@ -167,6 +167,9 @@
     <?=$this->googleanalytics()?>
     <?=$this->piwik()?>
     <?=$this->matomo()?>
+    <? ### UChicago customization ### ?>
+    <script src="https://www.lib.uchicago.edu/static/base/js/voc-button.js"></script>
+    <? ### ./UChicago customization ### ?>
     <?php foreach ($this->captcha()->js() as $jsInclude):?>
       <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::FILE, $jsInclude, 'SET')?>
     <?php endforeach; ?>
