@@ -73,7 +73,7 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
      */
     private function jsonp_decode($jsonp, $assoc = false) {
         if($jsonp[0] !== '[' && $jsonp[0] !== '{') { // we have JSONP
-            $jsonp = substr($jsonp, strpos($jsonp, '('));
+            $jsonp = substr(trim($jsonp), strpos($jsonp, '('));
         }
         return json_decode(trim($jsonp,'();'), $assoc);
     }
