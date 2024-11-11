@@ -57,32 +57,31 @@ class ServiceLinks extends AbstractHelper {
      * @return array of grouper groups
      */
     public function getGrouperGroups() {
-        # error_log( "groups = " . $this->groups );
         if (isset($_SESSION['Grouper'])) {
             return $_SESSION['Grouper'];
         }
+        else if (array_key_exists('OIDC_CLAIM_groups', $_SERVER)) {
+            $data = $_SERVER['OIDC_CLAIM_groups'];
+        }
+        else if (array_key_exists('REDIRECT_OIDC_CLAIM_groups', $_SERVER)) {
+            $data = $_SERVER['REDIRECT_OIDC_CLAIM_groups'];
+        }
         else if (array_key_exists('ucisMemberOf', $_SERVER)) {
-            $delim = strpos( $_SERVER['ucisMemberOf'], ';' ) ? ';' : ',';
-            error_log( "found ucisMemberOf with delim=$delim" );
-            $groups = explode($delim, $_SERVER['ucisMemberOf']);
-            $_SESSION['Grouper'] = $groups;
-            return  $groups;
+            $data = $_SERVER['ucisMemberOf'];
         }
         else if (array_key_exists('OIDC_CLAIM_ucisMemberOf', $_SERVER)) {
-            $delim = strpos( $_SERVER['OIDC_CLAIM_ucisMemberOf'], ';' ) ? ';' : ',';
-            error_log( "found OIDC_CLAIM_ucisMemberOf with delim=$delim" );
-            $groups = explode($delim, $_SERVER['OIDC_CLAIM_ucisMemberOf']);
-            $_SESSION['Grouper'] = $groups;
-            return  $groups;
+            $data = $_SERVER['OIDC_CLAIM_ucisMemberOf'];
         }
         else if (array_key_exists('REDIRECT_OIDC_CLAIM_ucisMemberOf', $_SERVER)) {
-            $delim = strpos( $_SERVER['REDIRECT_OIDC_CLAIM_ucisMemberOf'], ';' ) ? ';' : ',';
-            error_log( "found REDIRECT_OIDC_CLAIM_ucisMemberOf with delim=$delim" );
-            $groups = explode($delim, $_SERVER['REDIRECT_OIDC_CLAIM_ucisMemberOf']);
+            $data = $_SERVER['REDIRECT_OIDC_CLAIM_ucisMemberOf'];
+        }
+
+        if (isset($data)) {
+            $delim = strpos($data, ';') ? ';' : ',';
+            $groups = explode($delim, $data);
             $_SESSION['Grouper'] = $groups;
             return  $groups;
-        }
-        else {
+        } else {
             return [];
         }
     }
