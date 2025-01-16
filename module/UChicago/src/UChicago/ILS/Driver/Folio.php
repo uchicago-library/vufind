@@ -8,6 +8,26 @@ use Laminas\Http\Response;
 class Folio extends \VuFind\ILS\Driver\Folio
 {
     /**
+     * Get a total count of records from a FOLIO endpoint.
+     *
+     * @param string $interface FOLIO api interface to call
+     * @param array  $query     Extra GET parameters (e.g. ['query' => 'your cql here'])
+     *
+     * @return int
+     */
+    protected function getResultCount(string $interface, array $query = []): int
+    {
+        $combinedQuery = array_merge($query, ['limit' => 0]);
+        $response = $this->makeRequest(
+            'GET',
+            $interface,
+            $combinedQuery
+        );
+        $json = json_decode($response->getBody());
+        return $json->totalRecords ?? 0;
+    }
+
+    /**
      * Helper function to retrieve paged results from FOLIO API
      *
      * @param string $responseKey Key containing values to collect in response
@@ -38,6 +58,10 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 throw new ILSException("Error: '$msg' fetching '$responseKey'");
             }
             $total = $json->totalRecords ?? 0;
+            if ($responseKey == 'items' && $total >= 1000) {
+                $realTotal = $this->getResultCount($interface, $query);
+                $total = $realTotal;
+            }
             if (isset($holdings) && $total === 0 && ($holdings->holdingsTypeId != $eHoldingTypeId
                 || $holdings->effectiveLocationId == $onOrderLocId)) {
                 yield $holdings;
