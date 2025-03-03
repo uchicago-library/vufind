@@ -40,3 +40,4 @@ themes/sandal/css/compiled.css
 local/import/index_java/bin/org/solrmarc/index/
 public/printenv.php
 public/printenvoidc.php
+public/login_required/ALL
