@@ -1,0 +1,21 @@
+{
+    "__comment__": [
+        "This code is only needed until we upgrade to VuFind 11 or later. Look at", 
+        "closed issue #169 and the pull request for branch 169-backport-rate-limiter",
+        "-and-cloudfare-turnstile to see the full list of files that can be removed",
+        "after we upgrade.",
+        "",
+        "Rename this file from composer.local.json.dist to composer.local.json to",
+        "manage your local dependencies without changing the core composer.json.",
+        "See https://github.com/wikimedia/composer-merge-plugin for more details."
+    ],
+    "require": {
+        "jaybizzle/crawler-detect": "^1.2",
+        "symfony/rate-limiter": "^6.4"
+    },
+    "config": {
+        "platform": {
+            "php": "8.1"
+        }
+    }
+}
