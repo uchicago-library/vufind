@@ -1,5 +1,5 @@
 <?php
-return [
+$config = [
     'controllers' => [
       'factories' => [
         'VuFindAdmin\Controller\PinController' => 'VuFind\Controller\AbstractBaseFactory',
@@ -9,6 +9,10 @@ return [
         /* BEGIN: Only needed until we upgrade to 9.1.1 */
         'UChicago\Controller\CoverController' => 'UChicago\Controller\CoverControllerFactory',
         /* END: Only needed until we upgrade to 9.1.1 */
+        /* BEGIN: Only needed until we upgrade to 11 */
+        'UChicago\Controller\TurnstileController' => 'UChicago\Controller\TurnstileControllerFactory',
+        'UChicago\Controller\CombinedController' => 'VuFind\Controller\AbstractBaseFactory', //Test this one before you remove after upgrade
+        /* END: Only needed until we upgrade to 11 */
       ],
       'aliases' => [
         'Pin' => 'VuFindAdmin\Controller\PinController',
@@ -24,6 +28,12 @@ return [
         'Cover' => 'UChicago\Controller\CoverController',
         'cover' => 'UChicago\Controller\CoverController',
         /* END: Only needed until we upgrade to 9.1.1 */
+        /* BEGIN: Only needed until we upgrade to 11 */
+        'Turnstile' => 'UChicago\Controller\TurnstileController',
+        'turnstile' => 'UChicago\Controller\TurnstileController',
+        'Combined' => 'UChicago\Controller\CombinedController', //Test this one before you remove after upgrade
+        'combined' => 'UChicago\Controller\CombinedController', //Test this one before you remove after upgrade
+        /* END: Only needed until we upgrade to 11 */
       ],
     ],
     'router' => [
@@ -49,9 +59,19 @@ return [
         'allow_override' => true,
         'factories' => [
             'UChicago\Mailer\Mailer' => 'VuFind\Mailer\Factory',
+            /* BEGIN: Only needed until we upgrade to 11 */
+            'UChicago\RateLimiter\RateLimiterManager' => 'UChicago\RateLimiter\RateLimiterManagerFactory',
+            'UChicago\RateLimiter\Turnstile\Turnstile' => 'UChicago\RateLimiter\Turnstile\TurnstileFactory',
+            'UChicago\Cache\Manager' => 'UChicago\Cache\ManagerFactory',
+            'UChicago\Config\PluginManager' => 'VuFind\Config\PluginManagerFactory',
+            /* END: Only needed until we upgrade to 11 */
         ],           
         'aliases' => [
             'UChicago\Mailer' => 'UChicago\Mailer\Mailer',
+            /* BEGIN: Only needed until we upgrade to 11 */
+            'UChicago\CacheManager' => 'UChicago\Cache\Manager',
+            'UChicago\Config' => 'UChicago\Config\PluginManager'
+            /* END: Only needed until we upgrade to 11 */
         ],
     ],
     'vufind' => [
@@ -124,3 +144,15 @@ return [
         ],
     ],
 ];
+
+$staticRoutes = [
+    /* BEGIN: Only needed until we upgrade to 11 */
+    /* BUT: keep this [] for use with static routes in the future */
+    'Turnstile/Challenge', 'Turnstile/Verify',
+    /* END: Only needed until we upgrade to 11 */
+];
+
+$routeGenerator = new \VuFind\Route\RouteGenerator();
+$routeGenerator->addStaticRoutes($config, $staticRoutes);
+
+return $config;

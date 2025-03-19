@@ -1,4 +1,5 @@
 <?php
+/* This code is only needed until we upgrade to VuFind 11 or later. Look at closed issue #169 and the pull request for branch 169-backport-rate-limiter-and-cloudfare-turnstile to see the full list of files that can be removed after we upgrade. */
 /**
  * Template for code module for storing local overrides.
  *
@@ -29,6 +30,7 @@ namespace UChicago;
 
 use Laminas\ModuleManager\ModuleManager;
 use Laminas\Mvc\MvcEvent;
+use UChicago\Bootstrapper;
 
 /**
  * Template for code module for storing local overrides.
@@ -91,5 +93,7 @@ class Module
      */
     public function onBootstrap(MvcEvent $e)
     {
+        $bootstrapper = new Bootstrapper($e);
+        $bootstrapper->bootstrap();
     }
 }
