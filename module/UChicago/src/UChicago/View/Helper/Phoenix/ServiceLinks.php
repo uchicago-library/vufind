@@ -331,6 +331,7 @@ class ServiceLinks extends AbstractHelper {
 
     /**
      * Method gets specified values from the $_SERVER variable.
+     * For 'cn' and 'mail', checks alternative Okta variable names.
      *
      * @param $config, array of key names to pull from the $_SERVER variable.
      *
@@ -339,8 +340,30 @@ class ServiceLinks extends AbstractHelper {
     protected function getServerVars($config) {
         $retval = [];
         foreach ($config as $key => $value) {
-            if (isset($_SERVER[$value])) {
-                $retval[$config[$key]] = $_SERVER[$value];
+            // Special handling for 'cn' (name) and 'mail' (email) to accommodate Okta variable names
+            if ($value === 'cn') {
+                // Check various possible name variables
+                if (isset($_SERVER['cn'])) {
+                    $retval['cn'] = $_SERVER['cn'];
+                } elseif (isset($_SERVER['REDIRECT_OIDC_CLAIM_name'])) {
+                    $retval['cn'] = $_SERVER['REDIRECT_OIDC_CLAIM_name'];
+                } elseif (isset($_SERVER['OIDC_CLAIM_name'])) {
+                    $retval['cn'] = $_SERVER['OIDC_CLAIM_name'];
+                }
+            } elseif ($value === 'mail') {
+                // Check various possible email variables
+                if (isset($_SERVER['mail'])) {
+                    $retval['mail'] = $_SERVER['mail'];
+                } elseif (isset($_SERVER['REDIRECT_OIDC_CLAIM_email'])) {
+                    $retval['mail'] = $_SERVER['REDIRECT_OIDC_CLAIM_email'];
+                } elseif (isset($_SERVER['OIDC_CLAIM_email'])) {
+                    $retval['mail'] = $_SERVER['OIDC_CLAIM_email'];
+                }
+            } else {
+                // Regular handling for all other server variables
+                if (isset($_SERVER[$value])) {
+                    $retval[$config[$key]] = $_SERVER[$value];
+                }
             }
         }
         return $retval;
