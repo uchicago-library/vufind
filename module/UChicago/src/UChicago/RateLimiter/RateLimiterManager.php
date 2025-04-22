@@ -163,9 +163,7 @@ class RateLimiterManager implements LoggerAwareInterface, TranslatorAwareInterfa
                 $this->verboseDebug('No policy matches event');
                 return $result;
             }
-            // We have a policy matching the route, so check rate limiter:
-            $limiter = ($this->rateLimiterFactoryCallback)($this->config, $policyId, $this->clientIp, $this->userId);
-            $limit = $limiter->consume(1);
+
             ### UChicago customization ###
             ### Necessary to make turnstile challenge on the first visit to the site ###
             $turnstileLimiter = ($this->rateLimiterFactoryCallback)(
@@ -177,19 +175,32 @@ class RateLimiterManager implements LoggerAwareInterface, TranslatorAwareInterfa
             );
             $turnstileLimit = $turnstileLimiter->consume(1);
             ### ./UChicago customization ###
+
+            // We have a policy matching the route, so check rate limiter:
+            $limiter = ($this->rateLimiterFactoryCallback)($this->config, $policyId, $this->clientIp, $this->userId);
+            ### UChicago customization ###
+            ### WARNING: This most likely disables rate limiting ###
+            ### That's okay for us. We only care about Turnstile ###
+            $limit = $limiter->consume(0);
+            ### ./UChicago customization ###
+
             if (
                 $limit->isAccepted() &&
                 ($this->config['Policies'][$policyId]['turnstileRateLimiterSettings'] ?? false) &&
                 $this->turnstile?->isChallengeAllowed($event)
             ) {
-                $turnstileLimiter = ($this->rateLimiterFactoryCallback)(
+                ### UChicago customization ###
+                ### Necessary because of the customization above ###
+                /*$turnstileLimiter = ($this->rateLimiterFactoryCallback)(
                     $this->config,
                     $policyId,
                     $this->clientIp,
                     $this->userId,
                     'turnstileRateLimiterSettings'
-                );
+                );*/
+                // I can' believe this is still needed!
                 $turnstileLimit = $turnstileLimiter->consume(1);
+                ### ./UChicago customization ###
             }
             $result = [
                 'allow' => true,
