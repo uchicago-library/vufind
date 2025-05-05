@@ -169,6 +169,7 @@
     <?=$this->matomo()?>
     <? ### UChicago customization ### ?>
     <script src="https://www.lib.uchicago.edu/static/base/js/voc-button.js"></script>
+    <script src="https://liblet.lib.uchicago.edu/static/base/js/jquery.track-everything.js"></script>
     <? ### ./UChicago customization ### ?>
     <?php foreach ($this->captcha()->js() as $jsInclude):?>
       <?=$this->inlineScript(\Laminas\View\Helper\HeadScript::FILE, $jsInclude, 'SET')?>
