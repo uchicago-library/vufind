@@ -1,5 +1,4 @@
 <?php
-  /* This code is only needed until we upgrade to VuFind 11 or later. Look at closed issue #169 and the pull request for branch 169-backport-rate-limiter-and-cloudfare-turnstile to see the full list of files that can be removed after we upgrade. */
   $this->headScript()->appendFile($jsLibraryUrl, 'text/javascript', ['defer' => '', 'async' => '']);
   $js = <<<JS
       function turnstileChallengeEnded(token) {
@@ -20,5 +19,8 @@
     <input id="turnstile_token" name="token" type="hidden">
     <input name="policyId" type="hidden" value="<?=$this->escapeHtml($policyId)?>">
     <input name="destination" type="hidden" value="<?=$this->escapeHtml($destination)?>">
+    <?php ### UChicago customization ### ?>
+    <input name="redirectKey" type="hidden" value="<?=$this->escapeHtml($redirectKey ?? '')?>">
+    <?php ### ./UChicago customization ### ?>
     <input name="hash" type="hidden" value="<?=$this->escapeHtml($hash)?>">
 </form>

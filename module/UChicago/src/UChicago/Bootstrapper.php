@@ -1,5 +1,4 @@
 <?php
-/* This code is only needed until we upgrade to VuFind 11 or later. Look at closed issue #169 and the pull request for branch 169-backport-rate-limiter-and-cloudfare-turnstile to see the full list of files that can be removed after we upgrade. */
 /**
  * VuFind Bootstrapper
  *
@@ -97,11 +96,30 @@ class Bootstrapper extends \VuFind\Bootstrapper
         // hide search or result data from being accessible to Turnstile.
         $response->setStatusCode(307);
         $policyId = $rateLimiterManager->getPolicyIdForEvent($event);
+
+        ### UChicago customization ###
+        ### Pass search queries through Turnstile verification ###
+        // Store full URL with query parameters in session for privacy
+        $redirectKey = 'turnstile_redirect_' . bin2hex(random_bytes(16));
+        $fullUrl = $event->getRequest()->getUri()->toString();
+
+        // Start session if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $_SESSION[$redirectKey] = [
+            'url' => $fullUrl,
+            'expires' => time() + 180 // 3-minute expiration
+        ];
+
         // base64_encoding the destination URL is just further obfuscation
         $context = base64_encode(json_encode([
             'policyId' => $policyId,
             'destination' => $event->getRequest()->getUri()->getPath(),
+            'redirectKey' => $redirectKey,
         ]));
+        ### ./UChicago customization ###
         $response->getHeaders()->addHeaderLine(
             'Location',
             $event->getRequest()->getBaseUrl() . '/Turnstile/Challenge?context=' . $context
