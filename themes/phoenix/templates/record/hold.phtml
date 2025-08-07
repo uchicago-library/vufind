@@ -180,8 +180,21 @@
               <?=$this->transEsc('select_pickup_location')?>
             </option>
           <?php endif; ?>
-          <?php foreach ($this->pickup as $lib): ?>
+          <?php ### UChicago customization ### ?>
+          <?php ### Alpha-sort pickup locations ### ?>
+          <?php
+            $pickupLocations = $this->pickup;
+            usort($pickupLocations, function($a, $b) {
+              return strcasecmp($a['locationDisplay'], $b['locationDisplay']);
+            });
+          ?>
+          <?php foreach ($pickupLocations as $lib): ?>
+          <?php ### ./UChicago customization ### ?>
             <?php ### UChicago customization ### ?>
+            <?php ### Always suppress Document Delivery  ### ?>
+            <?php if ($lib['locationID'] === 'fa3a6ffb-43c2-43e2-bb3e-60ac5fab2951'): ?>
+              <?php continue; ?>
+            <?php endif; ?>
             <?php ### Only show option for LAW if user is in grouper group ### ?>
             <?php if ($lib['locationID'] === '51787734-d899-41e6-b6b2-e531a315fd61'): ?>
               <?php if ($isLawPatron === true): ?>
