@@ -101,10 +101,17 @@ class TurnstileController extends AbstractBase implements
      */
     public function verifyAction()
     {
+        ### UChicago customization ###
+        // Extract all POST parameters first to ensure they're available for HMAC verification
+        // Note: $redirectKey must be extracted before HMAC generation since compact($this->hashKeys)
+        // requires all variables listed in $hashKeys to be defined. To not do so creats an HMAC
+        // verification bypass security vulnerability
         $token = $this->params()->fromPost('token');
         $policyId = $this->params()->fromPost('policyId');
         $destination = $this->params()->fromPost('destination');
+        $redirectKey = $this->params()->fromPost('redirectKey');
         $priorHash = $this->params()->fromPost('hash');
+        ### ./UChicago customization ###
 
         $siteKey = $this->config['Turnstile']['siteKey'];
         $newHash = $this->hmac->generate($this->hashKeys, compact($this->hashKeys));
@@ -120,8 +127,6 @@ class TurnstileController extends AbstractBase implements
 
         // Try to retrieve the full URL from session (with query parameters)
         $redirectUrl = $destination; // fallback to path-only destination
-
-        $redirectKey = $this->params()->fromPost('redirectKey');
         if ($redirectKey && isset($_SESSION[$redirectKey])) {
             $sessionData = $_SESSION[$redirectKey];
 
