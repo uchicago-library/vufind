@@ -359,4 +359,33 @@ $(document).ready(function() {
     $(this).parent().find('input').focus();
       window.searchTerms = '';
   });
+
+  // Fix for HTML-encoded autocomplete suggestions
+  // Decode HTML entities when autocomplete suggestions are selected
+  $(document).on('mousedown', '.autocomplete-results .ac-item', function(e) {
+    var encodedText = $(this).text();
+    var decodedText = $('<div>').html(encodedText).text();
+
+    // Find the search input and set the decoded value after a brief delay
+    // to let the autocomplete library finish its work first
+    setTimeout(function() {
+      $('#searchForm_lookfor').val(decodedText);
+    }, 0);
+  });
+
+  // Also handle keyboard selection (ENTER key) on search input when autocomplete is active
+  $(document).on('keydown', '#searchForm_lookfor.autocomplete', function(e) {
+    // ENTER key
+    if (e.keyCode === 13) {
+      var currentValue = $(this).val();
+      // Check if the current value is HTML encoded
+      if (currentValue.indexOf('&') > -1) {
+        var decodedText = $('<div>').html(currentValue).text();
+        // Set the decoded value after a brief delay to let any other handlers finish
+        setTimeout(function() {
+          $('#searchForm_lookfor').val(decodedText);
+        }, 0);
+      }
+    }
+  });
 });
