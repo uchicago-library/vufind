@@ -1,5 +1,4 @@
 <?php
-/* This code is only needed until we upgrade to VuFind 11 or later. Look at closed issue #169 and the pull request for branch 169-backport-rate-limiter-and-cloudfare-turnstile to see the full list of files that can be removed after we upgrade. */
 /**
  * Turnstile Controller
  *
@@ -55,7 +54,9 @@ class TurnstileController extends AbstractBase implements
      *
      * @var array
      */
-    protected $hashKeys = ['siteKey', 'policyId', 'destination'];
+    ### UChicago customization ###
+    protected $hashKeys = ['siteKey', 'policyId', 'destination', 'redirectKey'];
+    ### ./UChicago customization ###
 
     /**
      * Constructor
@@ -100,10 +101,17 @@ class TurnstileController extends AbstractBase implements
      */
     public function verifyAction()
     {
+        ### UChicago customization ###
+        // Extract all POST parameters first to ensure they're available for HMAC verification
+        // Note: $redirectKey must be extracted before HMAC generation since compact($this->hashKeys)
+        // requires all variables listed in $hashKeys to be defined. To not do so creats an HMAC
+        // verification bypass security vulnerability
         $token = $this->params()->fromPost('token');
         $policyId = $this->params()->fromPost('policyId');
         $destination = $this->params()->fromPost('destination');
+        $redirectKey = $this->params()->fromPost('redirectKey');
         $priorHash = $this->params()->fromPost('hash');
+        ### ./UChicago customization ###
 
         $siteKey = $this->config['Turnstile']['siteKey'];
         $newHash = $this->hmac->generate($this->hashKeys, compact($this->hashKeys));
@@ -114,7 +122,25 @@ class TurnstileController extends AbstractBase implements
         $ipAddress = $this->event->getRequest()->getServer('REMOTE_ADDR');
         $this->turnstile->validateAndCacheResult($token, $policyId, $ipAddress);
 
+        ### UChicago customization ###
+        ### Forward GET parameters for search ###
+
+        // Try to retrieve the full URL from session (with query parameters)
+        $redirectUrl = $destination; // fallback to path-only destination
+        if ($redirectKey && isset($_SESSION[$redirectKey])) {
+            $sessionData = $_SESSION[$redirectKey];
+
+            // Check if session data is valid and not expired
+            if (isset($sessionData['url'], $sessionData['expires']) && $sessionData['expires'] > time()) {
+                $redirectUrl = $sessionData['url'];
+            }
+
+            // Clean up the session data
+            unset($_SESSION[$redirectKey]);
+        }
+
         // Either way, return an http redirect to the referrer page.
-        return $this->redirect()->toUrl($destination);
+        return $this->redirect()->toUrl($redirectUrl);
+        ### ./UChicago customization ###
     }
 }
