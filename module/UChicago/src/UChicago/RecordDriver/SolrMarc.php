@@ -617,6 +617,7 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
             ['561', ['3', 'a']],
             ['562', ['3', 'a', 'b', 'c', 'd', 'e']],
             ['563', ['3', 'a']],
+            ['585', ['3', 'a']],
         ];
         return $this->multiSimpleParse($fields);
     }
