@@ -53,7 +53,14 @@
           <?php // Analytic record ?>
           <?php if ($holding['item_statistical_code'] == '27da80dc-b1de-5719-8326-18c3a41dfc3c'):?>
             To check availability
-            <?php $callNumBreak = preg_split("/\s[a-zA-Z0-9]+\./", $holding['callnumber']); ?>
+            <?php
+              // Improved regex to handle dates and number/volume info after call number
+              // This pattern will split on:
+              // 1. Space followed by 4-digit year (like " 1955")
+              // 2. Space followed by "no." or "v." (like " no.3")
+              // 3. Space followed by alphanumeric+period (original pattern)
+              $callNumBreak = preg_split("/\s+(?:\d{4}|[a-zA-Z0-9]+\.)/", $holding['callnumber']);
+            ?>
             <?php if ($callNumBreak): ?>
               <?php $c = $callNumBreak[0]; ?>
             <?php else: ?>

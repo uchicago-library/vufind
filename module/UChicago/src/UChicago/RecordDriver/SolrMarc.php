@@ -617,6 +617,7 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
             ['561', ['3', 'a']],
             ['562', ['3', 'a', 'b', 'c', 'd', 'e']],
             ['563', ['3', 'a']],
+            ['585', ['3', 'a']],
         ];
         return $this->multiSimpleParse($fields);
     }
@@ -803,4 +804,11 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
         return [$tocAlt];
     }
 
+    public function getISBNs()
+    {
+        $isbnArray = (array)($this->fields['isbn'] ?? []);
+        return array_map(function($isbn) {
+            return strtok($isbn, ' ');
+        }, $isbnArray);
+    }
 }

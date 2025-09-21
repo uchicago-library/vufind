@@ -73,7 +73,7 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
      */
     private function jsonp_decode($jsonp, $assoc = false) {
         if($jsonp[0] !== '[' && $jsonp[0] !== '{') { // we have JSONP
-            $jsonp = substr($jsonp, strpos($jsonp, '('));
+            $jsonp = substr(trim($jsonp), strpos($jsonp, '('));
         }
         return json_decode(trim($jsonp,'();'), $assoc);
     }
@@ -182,12 +182,15 @@ class GetDedupedEholdings extends \VuFind\AjaxHandler\AbstractBase
         $callNoLinkTxt = $config['DedupedEholdings']['callnumber_link_text'];
         $callNoLink = ' <a href="%s">%s</a>';
         foreach($deduped as $deh) {
+            $coverage = '';
             $note = !empty($deh['note']) ? '<br/>' . $deh['note'] : '';
             $materials = !empty($deh['materials']) ? '<br/>' . $deh['materials'] : '';
             $callNo = !empty($deh['callno']) && $isResults == true
                 ? '<br/>' . $deh['callno'] . sprintf($callNoLink, $callNoUrl . urlencode($deh['callno']), $callNoLinkTxt)
                 : '';
-            $coverage = !empty($deh['coverageString']) ? '<br/>' . $coverageLabel . $deh['coverageString'] : '';
+            if ($deh['coverageString'] != 'coverage unknown') {
+                $coverage = !empty($deh['coverageString']) ? '<br/>' . $coverageLabel . $deh['coverageString'] : '';
+            }
             $links .= sprintf($format, $deh['url'], $deh['name'], $coverage, $note, $materials, $callNo);
         }
         return $links;

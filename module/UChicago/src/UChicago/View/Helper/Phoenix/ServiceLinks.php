@@ -1,6 +1,7 @@
 <?
 namespace UChicago\View\Helper\Phoenix;
 use Laminas\View\Helper\AbstractHelper;
+use VuFind\View\Helper\Root\Auth;
 
 /**
  * Helper class for managing phoenix theme's conditional service links 
@@ -11,8 +12,36 @@ use Laminas\View\Helper\AbstractHelper;
  */
 class ServiceLinks extends AbstractHelper {
 
-    public function __construct($config=false) {
+    /**
+     * Auth view helper
+     *
+     * @var Auth
+     */
+    protected $auth;
+
+    /**
+     * Cached user object to avoid repeated database queries
+     *
+     * @var \VuFind\Db\Row\User|bool|null
+     */
+    protected $cachedUser = null;
+
+    /**
+     * Cached server variables to avoid repeated lookups
+     *
+     * @var array
+     */
+    protected $cachedServerVars = [];
+
+    /**
+     * Constructor
+     *
+     * @param mixed $config Configuration
+     * @param Auth  $auth   Auth view helper
+     */
+    public function __construct($config=false, Auth $auth = null) {
          $this->linkConfig = $config;
+         $this->auth = $auth;
     }
 
     /**
@@ -57,32 +86,31 @@ class ServiceLinks extends AbstractHelper {
      * @return array of grouper groups
      */
     public function getGrouperGroups() {
-        # error_log( "groups = " . $this->groups );
         if (isset($_SESSION['Grouper'])) {
             return $_SESSION['Grouper'];
         }
+        else if (array_key_exists('OIDC_CLAIM_groups', $_SERVER)) {
+            $data = $_SERVER['OIDC_CLAIM_groups'];
+        }
+        else if (array_key_exists('REDIRECT_OIDC_CLAIM_groups', $_SERVER)) {
+            $data = $_SERVER['REDIRECT_OIDC_CLAIM_groups'];
+        }
         else if (array_key_exists('ucisMemberOf', $_SERVER)) {
-            $delim = strpos( $_SERVER['ucisMemberOf'], ';' ) ? ';' : ',';
-            error_log( "found ucisMemberOf with delim=$delim" );
-            $groups = explode($delim, $_SERVER['ucisMemberOf']);
-            $_SESSION['Grouper'] = $groups;
-            return  $groups;
+            $data = $_SERVER['ucisMemberOf'];
         }
         else if (array_key_exists('OIDC_CLAIM_ucisMemberOf', $_SERVER)) {
-            $delim = strpos( $_SERVER['OIDC_CLAIM_ucisMemberOf'], ';' ) ? ';' : ',';
-            error_log( "found OIDC_CLAIM_ucisMemberOf with delim=$delim" );
-            $groups = explode($delim, $_SERVER['OIDC_CLAIM_ucisMemberOf']);
-            $_SESSION['Grouper'] = $groups;
-            return  $groups;
+            $data = $_SERVER['OIDC_CLAIM_ucisMemberOf'];
         }
         else if (array_key_exists('REDIRECT_OIDC_CLAIM_ucisMemberOf', $_SERVER)) {
-            $delim = strpos( $_SERVER['REDIRECT_OIDC_CLAIM_ucisMemberOf'], ';' ) ? ';' : ',';
-            error_log( "found REDIRECT_OIDC_CLAIM_ucisMemberOf with delim=$delim" );
-            $groups = explode($delim, $_SERVER['REDIRECT_OIDC_CLAIM_ucisMemberOf']);
+            $data = $_SERVER['REDIRECT_OIDC_CLAIM_ucisMemberOf'];
+        }
+
+        if (isset($data)) {
+            $delim = strpos($data, ';') ? ';' : ',';
+            $groups = explode($delim, $data);
             $_SESSION['Grouper'] = $groups;
             return  $groups;
-        }
-        else {
+        } else {
             return [];
         }
     }
@@ -331,6 +359,83 @@ class ServiceLinks extends AbstractHelper {
     }
 
     /**
+     * Get the cached user object from auth helper (or fetch it once if not cached yet)
+     *
+     * @return \VuFind\Db\Row\User|bool The user object if logged in, false otherwise
+     */
+    protected function getCurrentUser() {
+        // Return cached result if available
+        if ($this->cachedUser !== null) {
+            return $this->cachedUser;
+        }
+
+        // Fetch and cache the user object
+        $this->cachedUser = ($this->auth !== null) ? $this->auth->isLoggedIn() : false;
+        return $this->cachedUser;
+    }
+
+    /**
+     * Get user information from the database
+     *
+     * @param array $fields Array of field names to retrieve ('cn' for name, 'mail' for email)
+     *
+     * @return array Associative array with keys from $fields if available
+     */
+    protected function getUserInfo($fields) {
+        // Get all available user data (cached or from database)
+        $allUserData = $this->getAllUserData();
+
+        // Only return the requested fields
+        $retval = [];
+        foreach ($fields as $field) {
+            if (isset($allUserData[$field])) {
+                $retval[$field] = $allUserData[$field];
+            }
+        }
+
+        return $retval;
+    }
+
+    /**
+     * Get and cache all available user data from the database
+     *
+     * @return array Associative array with all available user data
+     */
+    protected function getAllUserData() {
+        // Use a fixed cache key for all user data
+        $cacheKey = 'all_user_data';
+
+        // Return cached result if available
+        if (isset($this->cachedServerVars[$cacheKey])) {
+            return $this->cachedServerVars[$cacheKey];
+        }
+
+        // Get user data from database
+        $userData = [];
+        $user = $this->getCurrentUser();
+
+        // Get name if available
+        if ($user && !empty($user->firstname)) {
+            $fullName = trim($user->firstname . ' ' . ($user->lastname ?? ''));
+            if (!empty($fullName)) {
+                $userData['cn'] = $fullName;
+            }
+        }
+
+        // Get email if available
+        if ($user && !empty($user->email)) {
+            $userData['mail'] = $user->email;
+        }
+
+        // Add additional user data here as needed in the future
+
+        // Cache the result
+        $this->cachedServerVars[$cacheKey] = $userData;
+
+        return $userData;
+    }
+
+    /**
      * Method gets specified values from the $_SERVER variable.
      *
      * @param $config, array of key names to pull from the $_SERVER variable.
@@ -389,7 +494,7 @@ class ServiceLinks extends AbstractHelper {
             return '';
         }
         $formats = $this->urlEncodeArray($formats);
-        $patron = $this->urlEncodeArrayAsString($this->getServerVars(['cn', 'mail']));
+        $patron = $this->urlEncodeArrayAsString($this->getUserInfo(['cn', 'mail']));
         $status = $holding ? urlencode($holding['status']) : '';
         $barcode = $holding ? urlencode($holding['barcode']) : '';
         $defaultUrl = 'http://forms2.lib.uchicago.edu/lib/searchform/alt-text-request.php?barcode=' . $barcode . '&amp;bib=' . $bib . '&amp;status=' . $status  . '&amp;' . $patron . $formats;
@@ -550,7 +655,7 @@ class ServiceLinks extends AbstractHelper {
             $currentUrl = "http://";
         }
         $currentUrl .= $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-        $patron = $this->urlEncodeArrayAsString($this->getServerVars(['cn', 'mail']));
+        $patron = $this->urlEncodeArrayAsString($this->getUserInfo(['cn', 'mail']));
         $title = urlencode('Ask a Librarian Library Catalog: ' . $title);
         $defaultUrl = 'https://www.lib.uchicago.edu/search/forms/need-help-ask-librarian/?bib={ID}&barcode={BARCODE}' . '&amp;subject=' . $title . '&amp;referrer=' . urlencode($currentUrl);
         $defaultUrl = $this->replaceTokens($defaultUrl, $holding);
@@ -570,7 +675,7 @@ class ServiceLinks extends AbstractHelper {
     public function askSCRC($holding) {
         $defaultUrl = 'https://www.lib.uchicago.edu/search/forms/ask-scrc-or-request-scan/?bib={ID}&amp;barcode={BARCODE}';
         $defaultUrl = $this->replaceTokens($defaultUrl, $holding);
-        $patron = $this->urlEncodeArrayAsString($this->getServerVars(['cn', 'mail']));
+        $patron = $this->urlEncodeArrayAsString($this->getUserInfo(['cn', 'mail']));
         if (!empty($patron)) {
             $defaultUrl = $defaultUrl . '&amp;' . $patron;
         }
@@ -592,7 +697,7 @@ class ServiceLinks extends AbstractHelper {
             return '';
         }
 
-        $patron = $this->urlEncodeArrayAsString($this->getServerVars(['cn', 'mail']));
+        $patron = $this->urlEncodeArrayAsString($this->getUserInfo(['cn', 'mail']));
         $subject = urlencode('Catalog Record Problem: ' . $title);
         $defaultUrl = $config['url'] . '?bib=' . $id . '&amp;subject=' . $subject;
         if (!empty($patron)) {

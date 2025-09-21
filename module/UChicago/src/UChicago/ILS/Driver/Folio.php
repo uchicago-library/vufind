@@ -2,8 +2,31 @@
 
 namespace UChicago\ILS\Driver;
 
+# Delete when we upgrade to VuFind 9.1.1 or above
+use Laminas\Http\Response;
+
 class Folio extends \VuFind\ILS\Driver\Folio
 {
+    /**
+     * Get a total count of records from a FOLIO endpoint.
+     *
+     * @param string $interface FOLIO api interface to call
+     * @param array  $query     Extra GET parameters (e.g. ['query' => 'your cql here'])
+     *
+     * @return int
+     */
+    protected function getResultCount(string $interface, array $query = []): int
+    {
+        $combinedQuery = array_merge($query, ['limit' => 0]);
+        $response = $this->makeRequest(
+            'GET',
+            $interface,
+            $combinedQuery
+        );
+        $json = json_decode($response->getBody());
+        return $json->totalRecords ?? 0;
+    }
+
     /**
      * Helper function to retrieve paged results from FOLIO API
      *
@@ -35,6 +58,10 @@ class Folio extends \VuFind\ILS\Driver\Folio
                 throw new ILSException("Error: '$msg' fetching '$responseKey'");
             }
             $total = $json->totalRecords ?? 0;
+            if ($responseKey == 'items' && $total >= 1000) {
+                $realTotal = $this->getResultCount($interface, $query);
+                $total = $realTotal;
+            }
             if (isset($holdings) && $total === 0 && ($holdings->holdingsTypeId != $eHoldingTypeId
                 || $holdings->effectiveLocationId == $onOrderLocId)) {
                 yield $holdings;
@@ -350,7 +377,7 @@ class Folio extends \VuFind\ILS\Driver\Folio
             if (property_exists($holding, 'receivingHistory')) {
                 $unboundLocation = $this->getPurchaseHistoryLocation($notes);
                 foreach($holding->receivingHistory->entries as $entry) {
-                    if (property_exists($entry, 'publicDisplay')) {
+                    if (is_object($entry) && property_exists($entry, 'publicDisplay')) {
                         if ($entry->publicDisplay != false) {
                             $enum = $entry->enumeration;
                             $chron = $entry->chronology;
@@ -456,8 +483,22 @@ class Folio extends \VuFind\ILS\Driver\Folio
             ) as $trans
         ) {
             $dueStatus = false;
-            $date = $this->getDateTimeFromString($trans->dueDate);
-            $dueDateTimestamp = $date->getTimestamp();
+	    $dueDateTimestamp = '';
+	    $dd = '';
+	    $dt = '';
+	    $dueStatus = '';
+            if (isset($trans->dueDate) && !empty($trans->dueDate)) {
+                $date = $this->getDateTimeFromString($trans->dueDate);
+                $dueDateTimestamp = $date->getTimestamp();
+                $dd = $this->dateConverter->convertToDisplayDate('U', $dueDateTimestamp);
+		$dt = $this->dateConverter->convertToDisplayTime('U', $dueDateTimestamp);
+                $now = time();
+                if ($now > $dueDateTimestamp) {
+                    $dueStatus = 'overdue';
+	        } elseif ($now > $dueDateTimestamp - (1 * 24 * 60 * 60)) {
+		    $dueStatus = 'due';
+	        }
+	    }
 
             $authors = implode(', ', array_map(function($c) {
                 return $c->name;
@@ -465,23 +506,10 @@ class Folio extends \VuFind\ILS\Driver\Folio
 
             $loanDate = date_create($trans->loanDate);
 
-            $now = time();
-            if ($now > $dueDateTimestamp) {
-                $dueStatus = 'overdue';
-            } elseif ($now > $dueDateTimestamp - (1 * 24 * 60 * 60)) {
-                $dueStatus = 'due';
-            }
+
             $transactions[] = [
-                'duedate' =>
-                    $this->dateConverter->convertToDisplayDate(
-                        'U',
-                        $dueDateTimestamp
-                    ),
-                'dueTime' =>
-                    $this->dateConverter->convertToDisplayTime(
-                        'U',
-                        $dueDateTimestamp
-                    ),
+                'duedate' => $dd ?? '',
+                'dueTime' => $dt ?? '',
                 'dueStatus' => $dueStatus,
                 'id' => $bib, // UChicago change
                 'item_id' => $trans->item->id,
@@ -1045,5 +1073,77 @@ class Folio extends \VuFind\ILS\Driver\Folio
             return $this->config['MyAccount']['checkedOutItemsSort'] ?? 'dueDate';
         }
     }
-}
 
+    # Delete when we upgrade to VuFind 9.1.1 or above
+    protected function renewTenantToken()
+    {
+        $this->token = null;
+        $response = $this->performOkapiUsernamePasswordAuthentication(
+            $this->config['API']['username'],
+            $this->config['API']['password']
+        );
+        $this->token = $this->extractTokenFromResponse($response);
+        $this->sessionCache->folio_token = $this->token;
+        $this->debug(
+            'Token renewed. Username: ' . $this->config['API']['username'] .
+            ' Token: ' . substr($this->token, 0, 30) . '...'
+        );
+    }
+
+    # Delete when we upgrade to VuFind 9.1.1 or above
+    protected function useLegacyAuthentication(): bool
+    {
+        return $this->config['API']['legacy_authentication'] ?? true;
+    }
+
+
+    # Delete when we upgrade to VuFind 9.1.1 or above
+    protected function performOkapiUsernamePasswordAuthentication(string $username, string $password): Response
+    {
+        $tenant = $this->config['API']['tenant'];
+        $credentials = compact('tenant', 'username', 'password');
+        // Get token
+        return $this->makeRequest(
+            method: 'POST',
+            path: $this->useLegacyAuthentication() ? '/authn/login' : '/authn/login-with-expiry',
+            params: json_encode($credentials),
+            //debugParams: '{"username":"...","password":"..."}' // THIS BREAKS IT
+        );
+    }
+
+    # Delete when we upgrade to VuFind 9.1.1 or above
+    protected function extractTokenFromResponse(Response $response): string
+    {
+        if ($this->useLegacyAuthentication()) {
+            return $response->getHeaders()->get('X-Okapi-Token')->getFieldValue();
+        }
+        $folioUrl = $this->config['API']['base_url'];
+        $cookies = new \Laminas\Http\Cookies();
+        $cookies->addCookiesFromResponse($response, $folioUrl);
+        $results = $cookies->getAllCookies();
+        foreach ($results as $cookie) {
+            if ($cookie->getName() == 'folioAccessToken') {
+                return $cookie->getValue();
+            }
+        }
+        throw new \Exception('Could not find token in response');
+    }
+
+    # Delete when we upgrade to VuFind 9.1.1 or above
+    protected function patronLoginWithOkapi($username, $password)
+    {
+        $response = $this->performOkapiUsernamePasswordAuthentication($username, $password);
+        $debugMsg = 'User logged in. User: ' . $username . '.';
+        // We've authenticated the user with Okapi, but we only have their
+        // username; set up a query to retrieve full info below.
+        $query = 'username == ' . $username;
+        // Replace admin with user as tenant if configured to do so:
+        if ($this->config['User']['use_user_token'] ?? false) {
+            $this->token = $this->extractTokenFromResponse($response);
+            $debugMsg .= ' Token: ' . substr($this->token, 0, 30) . '...';
+        }
+        $this->debug($debugMsg);
+        return $query;
+    }
+
+}
