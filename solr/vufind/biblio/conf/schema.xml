@@ -281,6 +281,8 @@
    <field name="container_start_page" type="text" indexed="true" stored="true"/>
    <field name="container_reference" type="text" indexed="true" stored="true"/>
    <!-- Local fields for UChicago -->
+   <field name="video_game" type="text" indexed="true" stored="true" multiValued="true"/>
+   <field name="video_game_online" type="text" indexed="true" stored="true" multiValued="true"/>
    <field name="donor" type="textProper" indexed="true" stored="true" multiValued="true"/>
    <field name="donor_code" type="textProper" indexed="true" stored="true" multiValued="true"/>
    <field name="title_uniform" type="text" indexed="true" stored="true" multiValued="true"/>

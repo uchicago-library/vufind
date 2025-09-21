@@ -7,6 +7,7 @@ import org.marc4j.marc.ControlField;
 import org.marc4j.marc.DataField;
 import org.marc4j.marc.Subfield;
 import org.marc4j.marc.VariableField;
+import java.lang.String;
 
 //import java.lang.Object
 
@@ -52,6 +53,7 @@ public class ucFormat
 		List df347List  = record.getVariableFields("347"); 
 		List df502List  = record.getVariableFields("502"); 
 		List df538List  = record.getVariableFields("538"); 
+                List df753List  = record.getVariableFields("753");
 		List df856List  = record.getVariableFields("856");
 		List df903List  = record.getVariableFields("903");
 	        List df928List  = record.getVariableFields("928");
@@ -127,6 +129,15 @@ public class ucFormat
                         {
                                 fld928 = (DataField) iter928.next();
 
+                                if(fld928.getSubfield('g') != null)
+				{
+					String str = fld928.getSubfield('g').getData().toLowerCase();
+                                        if (str.contains("vgameonline"))
+                                        {
+                                                result.add("VideoGame");
+						result.add("OnlineVideoGame");
+                                        }
+				}
                                 if(fld928.getSubfield('p') != null)
                                 {
                                         String str = fld928.getSubfield('p').getData();
@@ -406,6 +417,34 @@ public class ucFormat
 				result.add("Dissertations");
 			}
 		}
+
+
+
+
+               Iterator iter753 = df753List.iterator();
+                {
+                        DataField fld753;
+                        while (iter753.hasNext())
+                        {
+                                fld753 = (DataField) iter753.next();
+                                {
+                                        if(fld753.getSubfield('a') != null)
+                                        {
+                                                String strVideo = fld753.getSubfield('a').getData();
+                                                String str = strVideo.toLowerCase();
+ 
+                                                if ( str.contains("apple mac os 9") || str.contains("atari 2600") || str.contains("atari jaguar") || str.contains("atari lynx") || str.contains("colecovision") || str.contains("intellivision") || str.contains("magnavox odyssey 2") || str.contains("microsoft xbox") || str.contains("microsoft xbox 360") || str.contains("microsoft xbox one") || str.contains("new nintendo 3ds") || str.contains("nintendo 3ds") || str.contains("nintendo 64") || str.contains("nintendo ds") || str.contains("nintendo dsi") ||  str.contains("nintendo nintertainment system") || str.contains("nintendo game boy") || str.contains("nintendo game boy advance") || str.contains("nintendo game boy color") ||  str.contains("nintendo gamecube") || str.contains("nintendo switch") || str.contains("nintendo switch 2") || str.contains("nintendo virtual boy") || str.contains("nintendo wii") || str.contains("nintendo wii u") || str.contains("sega cd") || str.contains("sega dreamcast") || str.contains("sega game gear") || str.contains("sega genesis") || str.contains("sega mega drive") ||  str.contains("sega mega drive 32x") || str.contains("sony playstation") || str.contains("sony playstation 2") || str.contains("sony playstation 3") || str.contains("sony playstation 4") || str.contains("sony playstation portable") || str.contains("sony playstation vita") || str.contains("super nintendo entertainment system") || str.contains("turbografx-16") )
+						{
+							result.add("VideoGame");
+ 						}
+                                                if ( str.contains("xbox") || str.contains("wii") )
+                                                {
+                                                        result.add("VideoGame");        //$
+                                                }
+                                        }
+                                }
+                        }
+                }
 
 
                Iterator iter856 = df856List.iterator();
