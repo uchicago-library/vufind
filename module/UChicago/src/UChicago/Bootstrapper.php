@@ -125,4 +125,31 @@ class Bootstrapper extends \VuFind\Bootstrapper
             $event->getRequest()->getBaseUrl() . '/Turnstile/Challenge?context=' . $context
         );
     }
+
+    ### UChicago customization ###
+    /**
+     * Set up referrer policy for Record pages
+     *
+     * @return void
+     */
+    protected function initRecordReferrerPolicy(): void
+    {
+        if (PHP_SAPI === 'cli') {
+            return;
+        }
+
+        $callback = function ($event) {
+            $routeMatch = $event->getRouteMatch();
+            if ($routeMatch) {
+                $controller = $routeMatch->getParam('controller');
+                // Set unsafe-url referrer policy only for Record pages
+                if ($controller === 'Record') {
+                    $headers = $event->getResponse()->getHeaders();
+                    $headers->addHeaderLine('Referrer-Policy', 'unsafe-url');
+                }
+            }
+        };
+        $this->events->attach('dispatch', $callback, 1000);
+    }
+    ### ./UChicago customization ###
 }
