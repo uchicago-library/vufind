@@ -811,4 +811,37 @@ class SolrMarc extends \VuFind\RecordDriver\SolrMarc
             return strtok($isbn, ' ');
         }, $isbnArray);
     }
+
+    /**
+     * Check if this record is a Banned Book (901|a = "Banned")
+     *
+     * @return bool
+     */
+    public function isBannedBook()
+    {
+        $field901 = $this->getMarcReader()->getFields('901');
+        if (!empty($field901)) {
+            foreach ($field901 as $field) {
+                foreach ($field['subfields'] as $subfield) {
+                    if ($subfield['code'] === 'a' && strcasecmp(trim($subfield['data']), 'Banned') === 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get Banned Books note if applicable
+     *
+     * @return string|null
+     */
+    public function getBannedBooksNote()
+    {
+        if ($this->isBannedBook()) {
+            return 'This title is part of the Library\'s collection of books that have been banned across the U.S. <a href="https://guides.lib.uchicago.edu/bannedbooks" target="_blank">Learn more about banned books</a>.';
+        }
+        return null;
+    }
 }

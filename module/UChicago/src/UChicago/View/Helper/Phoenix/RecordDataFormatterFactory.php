@@ -296,6 +296,9 @@ class RecordDataFormatterFactory extends \VuFind\View\Helper\Root\RecordDataForm
             'URL for this record', 'getUCRecordURL', 'data-uc-simple.phtml'
         );
         $spec->setTemplateLine(
+            'Banned Books Collection', 'getBannedBooksNote', 'data-uc-banned-books.phtml'
+        );
+        $spec->setTemplateLine(
             'Related Items', 'getAllRecordLinks', 'data-allRecordLinks.phtml'
         );
         return $spec->getArray();
