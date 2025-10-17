@@ -134,6 +134,30 @@ class Folio extends \VuFind\ILS\Driver\Folio
 
 
     /**
+     * Check if an item is an in-process SCRC item that should be treated as available
+     *
+     * @param string $status       Item status name
+     * @param string $locationCode Full location code (e.g., 'spclasr-ucpress')
+     *
+     * @return bool
+     */
+    protected function isSCRCInProcessItem($status, $locationCode)
+    {
+        // Only apply to "In process" items
+        if (strtolower($status) !== 'in process') {
+            return false;
+        }
+
+        // Extract library code (first part before hyphen)
+        $libraryCode = strtolower(explode('-', $locationCode)[0]);
+
+        // Check if it's a SCRC location
+        $scrcLocations = ['spcl', 'spclasr'];
+        return in_array($libraryCode, $scrcLocations);
+    }
+
+
+    /**
      * This method queries the ILS for holding information.
      *
      * @param string $bibId   Bib-level id
@@ -293,7 +317,9 @@ class Folio extends \VuFind\ILS\Driver\Folio
                     'number' => $enum ? $UCcopyNumber . ' : ' . $enum : $UCcopyNumber,
                     'barcode' => $item->barcode ?? '',
                     'status' => $item->status->name,
-                    'availability' => $item->status->name == 'Available' || $itemHasAvailableStatCode,
+                    'availability' => $item->status->name == 'Available'
+                        || $itemHasAvailableStatCode
+                        || $this->isSCRCInProcessItem($item->status->name, $locationCode),
                     'is_holdable' => $this->isHoldable($locationName),
                     'holdings_notes'=> $hasHoldingNotes ? $holdingNotes : null,
                     'item_notes' => !empty(implode($itemNotes)) ? $itemNotes : null,
