@@ -57,6 +57,11 @@
 }
 
 .status {
+    @media (min-width: 768px) {
+        position: absolute;
+        left: 0;
+        margin: 0.35em 0;
+    }
     .label {
 		font-weight: 400;
 		padding-left: 0;
@@ -73,6 +78,15 @@
 		    background-color: transparent;
 		}
 	}
+}
+
+// Override absolute positioning for list views
+.template-dir-myresearch.template-name-mylist .record-list .status {
+    @media (min-width: 768px) {
+        position: static;
+        left: auto;
+        margin: 0;
+    }
 }
 
 .result-links.hidden-print {
