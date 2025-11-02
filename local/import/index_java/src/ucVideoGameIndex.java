@@ -359,7 +359,8 @@ public class ucVideoGameIndex
                 return result;
         }
 
-        public Set getOnlineVideoGameIndex(Record record)       
+
+        public Set getOnlineVideoGameIndex(Record record)
         {
                 Set result = new LinkedHashSet();
                 List df928List  = record.getVariableFields("928");
@@ -370,17 +371,22 @@ public class ucVideoGameIndex
                 while (iter.hasNext())
                  {
                         fld928 = (DataField) iter.next();
-                        String onlineGame = fld928.getSubfield('g').getData().toLowerCase();
-
-
-                        if(onlineGame != null)
+                        if(fld928.getSubfield('g') != null )
                         {
-                                if( onlineGame.contains("vgameonline") )
+                                String Game = fld928.getSubfield('g').getData();
+                                String onlineGame =  Game.toLowerCase();
+
+
+                                if( onlineGame != null )
                                 {
-                                        result.add(onlineGame);
-                                } 
+                                        if( onlineGame.contains("vgameonline") )
+                                        {
+                                                result.add(onlineGame);
+                                        }
+                                }
                         }
-                }
-                return result;  
+                 }
+                return result;
         }
 }
+
