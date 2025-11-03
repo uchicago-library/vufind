@@ -145,7 +145,10 @@ class Turnstile implements HttpServiceAwareInterface, LoggerAwareInterface
             return null;
         }
         $cacheKey = $this->getCacheKey($policyId, $clientIp);
-        return $this->turnstileCache->getItem($cacheKey);
+        $result = $this->turnstileCache->getItem($cacheKey);
+        // Convert false (cache miss) to null so Turnstile challenge is presented
+        // instead of "Too Many Requests" when servers don't share memcached
+        return ($result === false) ? null : $result;
     }
 
     /**
