@@ -27,7 +27,7 @@ public class ucDOI
 				String str = fld856.getSubfield('u').getData(); 
                                 if(str.contains("/10."))
 				{
-		                result.add((str.substring(str.indexOf("/10."))).substring(1));
+		                	result.add((str.substring(str.indexOf("/10."))).substring(1));
     				} 
                         }
                 }
