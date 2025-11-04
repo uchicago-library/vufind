@@ -22,7 +22,7 @@ public class ucDOI
                         fld856 = (DataField) iter.next();
                         String str = fld856.getSubfield('u').getData();
 
-                        if(str != null) {
+                        if(fld856.getSubfield('u') != null) {
                                 if(str.contains("/10."))
 				{
 		                result.add((str.substring(str.indexOf("/10."))).substring(1));
