@@ -202,9 +202,11 @@ public class ucFormat
                                 {
                                         if ( fld024.getSubfield('2').getData().contains("doi"))
                                         {
-                                        	String str = (fld024.getSubfield('a').getData());
                           			if( fld024.getSubfield('a') != null)
-                                                 result.add(str);
+						{
+							String str = (fld024.getSubfield('a').getData());
+                                                 	result.add(str);
+						}
                                         }
                                 }
                         }
@@ -228,8 +230,8 @@ public class ucFormat
 					}
 				}
 			}
-
-	}
+		}
+	
 
 
 		Iterator iter336 = df336List.iterator();
