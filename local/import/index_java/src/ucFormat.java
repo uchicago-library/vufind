@@ -203,7 +203,7 @@ public class ucFormat
                                         if ( fld024.getSubfield('2').getData().contains("doi"))
                                         {
                                         	String str = (fld024.getSubfield('a').getData());
-                          			if(str != null)
+                          			if( fld024.getSubfield('a') != null)
                                                  result.add(str);
                                         }
                                 }
