@@ -90,6 +90,11 @@ public class ucVideoGameIndex
 					result.add("xbox one");
 					result.add("xbox 1");
 				}
+				if(str.contains("microsoft xbox one"))
+				{
+					result.add(str);
+					result.add("microsoft xbox series x/s"); 
+				}
 				if(str.contains("new nintendo 3ds"))
 				{
 					result.add(str);
