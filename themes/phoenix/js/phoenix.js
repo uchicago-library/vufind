@@ -72,7 +72,9 @@ function eholdingsMegaService (isbns, oclc, target, onlineHeader) {
   }
   function mapper2(x) { return ("oclc:" + x) }
   url += oclc.map(mapper2).join(',');
+  target.addClass('eholdings-loading').html(VuFind.loading());
   $.get(url, function(data, status, xhr) {
+    target.removeClass('eholdings-loading').empty();
     var response = JSON.parse(data);
     var links = response.oks;
     if (links !== undefined && links.length != 0) {
@@ -89,7 +91,9 @@ function eholdingsMegaService (isbns, oclc, target, onlineHeader) {
       html += links.map(addLink).join('');
       target.append(html);
     }
-  }, 'text'); // Not JSON?
+  }, 'text').fail(function() {
+    target.removeClass('eholdings-loading').empty();
+  });
 }
 
 /*
@@ -97,7 +101,9 @@ function eholdingsMegaService (isbns, oclc, target, onlineHeader) {
  */
 function getDedupedEholdings(issns, sfx, bib, target, onlineHeader) {
   if (!onlineHeader) { onlineHeader = false };
+  target.addClass('eholdings-loading').html(VuFind.loading());
   $.get(VuFind.path + '/AJAX/JSON?method=dedupedEholdings', 'issns=' + issns + '&sfx=' + sfx + '&header=' + onlineHeader + '&bib=' + bib, function(data, status, xhr) {
+    target.removeClass('eholdings-loading').empty();
     var response = JSON.parse(data);
 
     target.append(response.data);
@@ -111,7 +117,9 @@ function getDedupedEholdings(issns, sfx, bib, target, onlineHeader) {
         $(this).parent().children('.e-list').toggleClass('hide');
     });
 
-  }, 'html');
+  }, 'html').fail(function() {
+    target.removeClass('eholdings-loading').empty();
+  });
 }
 
 /*

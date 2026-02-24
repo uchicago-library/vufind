@@ -156,11 +156,11 @@
         <?php if ($this->driver->supportsAjaxStatus()): ?>
           <strong class="hideIfDetailed"><?=$this->transEsc('Call Number')?>:</strong>
           <span class="callnumber ajax-availability hidden">
-            <?=$this->transEsc('loading_ellipsis')?><br>
+            <span class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> <?=$this->transEsc('loading_ellipsis')?></span><br>
           </span>
           <strong><?=$this->transEsc('Located')?>:</strong>
           <span class="location ajax-availability hidden">
-            <?=$this->transEsc('loading_ellipsis')?>
+            <span class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> <?=$this->transEsc('loading_ellipsis')?></span>
           </span>
           <div class="locationDetails"></div>
         <?php else: ?>
@@ -207,7 +207,7 @@
 
         <?php if (!$openUrlActive && empty($urls) && $this->driver->supportsAjaxStatus()): ?>
           <span class="status ajax-availability hidden">
-            <span class="label label-default"><?=$this->transEsc('loading_ellipsis')?></span>
+            <span class="loading-spinner"><i class="fa fa-spinner fa-spin"></i> <?=$this->transEsc('loading_ellipsis')?></span>
           </span>
         <?php endif; ?>
       </div>
