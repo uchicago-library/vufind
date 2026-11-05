@@ -1,12 +1,100 @@
 <?php
 
 namespace UChicago\ILS\Driver;
+use VuFind\Exception\ILS as ILSException;
 
 # Delete when we upgrade to VuFind 9.1.1 or above
 use Laminas\Http\Response;
 
 class Folio extends \VuFind\ILS\Driver\Folio
 {
+
+    /**
+     * Make requests
+     *
+     * @param string            $method              GET/POST/PUT/DELETE/etc
+     * @param string            $path                API path (with a leading /)
+     * @param string|array      $params              Query parameters
+     * @param array             $headers             Additional headers
+     * @param true|int[]|string $allowedFailureCodes HTTP failure codes that should
+     * NOT cause an ILSException to be thrown. May be an array of integers, a regular
+     * expression, or boolean true to allow all codes.
+     *
+     * @return \Laminas\Http\Response
+     * @throws ILSException
+     */
+    public function makeRequest(
+        $method = "GET",
+        $path = "/",
+        $params = [],
+        $headers = [],
+        $allowedFailureCodes = []
+    ) {
+        $client = $this->httpService->createClient(
+            $this->config['API']['base_url'] . $path,
+            $method,
+            29
+        );
+
+        // Add default headers and parameters
+        $req_headers = $client->getRequest()->getHeaders();
+        $req_headers->addHeaders($headers);
+        [$req_headers, $params] = $this->preRequest($req_headers, $params);
+
+        if ($this->logger) {
+            $this->debugRequest($method, $path, $params, $req_headers);
+        }
+
+        // Add params
+        if ($method == 'GET') {
+            $client->setParameterGet($params);
+        } else {
+            if (is_string($params)) {
+                $client->getRequest()->setContent($params);
+            } else {
+                $client->setParameterPost($params);
+            }
+        }
+        try {
+            $response = $client->send();
+        } catch (\Exception $e) {
+            $this->logError("Unexpected " . get_class($e) . ": " . (string)$e);
+            throw new ILSException("Error during send operation.");
+        }
+        $code = $response->getStatusCode();
+        if (
+            !$response->isSuccess()
+            && !$this->failureCodeIsAllowed($code, $allowedFailureCodes)
+        ) {
+            $this->logError(
+                "Unexpected error response; code: $code, body: "
+                . $response->getBody()
+            );
+            throw new ILSException("Unexpected error code.");
+        }
+        if ($jsonLog = ($this->config['API']['json_log_file'] ?? false)) {
+            if (APPLICATION_ENV !== 'development') {
+                throw new \Exception(
+                    'SECURITY: json_log_file enabled outside of development mode'
+                );
+            }
+            $body = $response->getBody();
+            $jsonBody = @json_decode($body);
+            $json = file_exists($jsonLog)
+                ? json_decode(file_get_contents($jsonLog)) : [];
+            $json[] = [
+                'expectedMethod' => $method,
+                'expectedPath' => $path,
+                'expectedParams' => $params,
+                'body' => $jsonBody ? $jsonBody : $body,
+                'bodyType' => $jsonBody ? 'json' : 'string',
+                'code' => $code,
+            ];
+            file_put_contents($jsonLog, json_encode($json));
+        }
+        return $response;
+    }
+
     /**
      * Get a total count of records from a FOLIO endpoint.
      *
