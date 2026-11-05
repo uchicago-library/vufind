@@ -111,7 +111,6 @@ if(str.equals("JRL-Acq") || str.equals("MapCl") || str.equals("MapRef") || str.e
                                         {
                                                 result.add("Regenstein, 1st Floor Maroon Oasis Collection");
                                         }
-
 					if(str.equals("SWL-SWL") || str.equals("SWL-SWLBdP") || str.equals("SWL-SWLDep") || str.equals("SWL-SWLDiss") || str.equals("SWL-SWLDpY") || str.equals("SWL-SWLMEd") || str.equals("SWL-SWLMic") || str.equals("SWL-SWLPam") || str.equals("SWL-SWLPer") || str.equals("SWL-SWLRef") || str.equals("SWL-SWLRes"))
 					{
 						result.add("Social Work Library");
