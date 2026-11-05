@@ -1,6 +1,7 @@
 <?php ### UChicago customization ### ?>
    <?php $dirtyTxt = $this->escapeHtmlAttr($this->title) ?>
    <?php $cleanTxt = str_replace(['-first'], '', str_replace(['_'], ' ', $dirtyTxt)) ?>
+   <?php if ($this->title === 'building') { $cleanTxt = 'location'; } ?>
    <?php $moreTxt = $this->transEsc('more') . " {$cleanTxt}s" ?> 
    <?php $seeAllTxt = $this->transEsc('see all') . " {$cleanTxt}s" ?>
    <?php $seeFewerTxt = 'fewer' . " {$cleanTxt}s" ?>
