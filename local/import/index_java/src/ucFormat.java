@@ -30,7 +30,6 @@ public class ucFormat
 
 
 
-
 	/*
 	 * Determine Record Format(s)
 	 *
@@ -78,6 +77,14 @@ public class ucFormat
 			{
 				fld927 = (DataField) iter927.next();
 
+				if(fld927.getSubfield('m') != null)
+				{
+					String str = fld927.getSubfield('m').getData().toLowerCase();
+					if (str.equals("map"))
+					{
+					//	result.add("Map");
+					}
+				}
 				if(fld927.getSubfield('p') != null) 
 				{
 					String str = fld927.getSubfield('p').getData();
@@ -490,128 +497,32 @@ public class ucFormat
                                 }
                         }
 		}
-/*
-		Iterator iter903 = df903List.iterator();
+
+                Iterator iter928emaps = df928List.iterator();
 		{
-			DataField fld903;
-			while (iter903.hasNext())
+			DataField fld928;
+                        while(iter928emaps.hasNext())
 			{
-				fld903 = (DataField) iter903.next();
-
-				if(fld903.getSubfield('a') != null)
-				{
-					if ( fld903.getSubfield('a').getData().contains("Hathi"))
+                                fld928 = (DataField) iter928emaps.next();
+                                if(fld928.getSubfield('g') != null)
+                                {
+                                        if ( fld928.getSubfield('g').getData().contains("emaps"))
 					{
-                                                if(fld903.getSubfield('r') != null)
-                                                {
-                                                       if ( fld903.getSubfield('r').getData().toUpperCase().contains("ETAS"))
-                                                       {
-                                                               break;
-                                                       }
-                                                }
-						result.add("Eresource");
-					}
-				}
-			}
-		}
-*/
-/*
-		List<DataField> l = new ArrayList<DataField>();
-		for (VariableField item : items) l.add((DataField)item); 
-		for (DataField item : l) 
-		{
-			DataField df = (DataField)item;
-			if (item != null) 
-			{
-				// 1. item.getSubfield returns a Subfield object,
-				Subfield a = ((DataField) item).getSubfield('a');
-
-				if( a != null)
-				{
-
-
-					// 2. Subfield.getData() returns a String
-					String callNo = a.getData();		 
-
-					// 3. Check the String for 0x18. 
-					//    Use String methods to search for 0x18. Try "indexOf" method.
-					int prefixStartIdx = callNo.indexOf(beginPrefix);
-					int prefixEndIdx = callNo.indexOf(endPrefix);
-
-					String startStr = "<U+0018>";
-					String endStr = "<U+0019>";
-
-					if (prefixStartIdx == -1)
-					{
-						if (callNo.startsWith(startStr))
+				                // check the Leader at position 6
+                				leaderBit6 = leader.charAt(6);
+                				switch (Character.toUpperCase(leaderBit6)) 
 						{
-							prefixStartIdx = startStr.length() -1;
-							prefixEndIdx = callNo.indexOf(endStr);
+							case 'E':
+                					case 'F':
+								result.add("Emap"); System.out.println("~~~I'm IN EMAPs~~~");  
+								break;
 						}
 					}
-
-					// 4. If there's a 0x18, then get the substring between 0x18 and 0x19
-					//    Check String methods, subsequence? substring?
-					if (prefixStartIdx >= 0  || callNo.startsWith(startStr))
-
-					{
-						String prefixes = callNo.substring(prefixStartIdx+1, prefixEndIdx);
-
-						if (prefixes.equals("DVD"))
-						{
-							result.add("DVD");
-							result.add("Video");
-						}
-						if (prefixes.equals("VidCass"))
-						{
-							result.add("tapeVideo");
-							result.add("Video");
-						}
-						if (prefixes.equals("LasDisc"))
-						{
-							result.add("LaserDisc");
-							result.add("Video");
-						}
-						if (prefixes.equals("AudCD"))
-						{
-							result.add("CD");  
-							result.add("Audio");
-						}
-						if (prefixes.equals("AudDisc"))
-						{
-							result.add("Phonograph");
-							result.add("Audio");
-						}
-						if (prefixes.equals("AudCass"))
-						{
-							result.add("AudioCass");
-							result.add("Audio");
-						}
-						if (prefixes.contains("micro"))
-						{
-							result.add("Microform");
-						}              	    		
-
-					}	
-				}
-				// Collection codes for mircoforms
-				Subfield c = ((DataField) item).getSubfield('c');
-				if(c != null)
-				{
-					String subC = c.getData();
-
-					if(subC.equals("LawMic") || subC.equals("Mic") || subC.equals("MidEMic") || subC.equals("SciMic")
-							|| subC.equals("SMicDDC") || subC.equals("SMicDoc") || subC.equals("WSciMic"))
-					{
-						result.add("Microform");   	         	 
-					}   
-				}     
-
+				}	
 			}
 		}
 
 
-*/
 		// check the 006 - this is a repeating field
 
 		List fields006 = record.getVariableFields("006");
@@ -929,8 +840,6 @@ public class ucFormat
 		case 'P':
 			result.add("ArchivalCollections");   //Manuscripts   // $ 
 			break;
-
-
 		}
 
 		// Nothing worked!
