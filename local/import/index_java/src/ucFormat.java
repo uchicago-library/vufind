@@ -514,7 +514,7 @@ public class ucFormat
 						{
 							case 'E':
                 					case 'F':
-								result.add("Emap"); System.out.println("~~~I'm IN EMAPs~~~");  
+								result.add("Emap"); //System.out.println("~~~I'm IN EMAPs~~~");  
 								break;
 						}
 					}
