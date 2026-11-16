@@ -82,7 +82,8 @@ public class ucFormat
 					String str = fld927.getSubfield('m').getData().toLowerCase();
 					if (str.equals("map"))
 					{
-					//	result.add("Map");
+						result.add("Map");
+						result.add("Atlas");
 					}
 				}
 				if(fld927.getSubfield('p') != null) 
